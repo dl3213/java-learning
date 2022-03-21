@@ -1,0 +1,12 @@
+# Project exclude paths test
+/*/target/
+/.idea/
+.project
+.classpath
+/*/.project
+/*/.classpath
+/*/.settings/
+/*/.mvn/
+/*/mvnw
+/*/mvnw.cmd
+/*/*.iml
