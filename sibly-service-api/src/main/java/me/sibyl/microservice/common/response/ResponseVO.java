@@ -1,6 +1,7 @@
-package me.sibyl.microservice.eureka.response;
+package me.sibyl.microservice.common.response;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @Classname Response
@@ -9,6 +10,7 @@ import lombok.Data;
  * @Create 2022/03/23 21:33
  */
 @Data
+@ToString
 public class ResponseVO {
     private Integer Code = 200;
     private String msg;

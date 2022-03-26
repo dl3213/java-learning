@@ -10,7 +10,7 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-openfeign-core</artifactId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>

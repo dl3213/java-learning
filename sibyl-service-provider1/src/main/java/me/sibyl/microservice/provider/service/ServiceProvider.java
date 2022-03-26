@@ -1,6 +1,9 @@
 package me.sibyl.microservice.provider.service;
 
 
+import me.sibyl.microservice.common.request.RequestVO;
+import me.sibyl.microservice.common.response.ResponseVO;
+
 public interface ServiceProvider {
-    String test();
+    ResponseVO test(RequestVO requestVO);
 }

@@ -1,7 +1,7 @@
 package me.sibyl.microservice.provider.service.impl;
 
-import me.sibyl.microservice.eureka.request.RequestVO;
-import me.sibyl.microservice.eureka.response.ResponseVO;
+import me.sibyl.microservice.common.request.RequestVO;
+import me.sibyl.microservice.common.response.ResponseVO;
 import me.sibyl.microservice.provider.service.ServiceProvider;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 public class ServiceProviderImpl implements ServiceProvider {
 
     @Override
-    public String test() {
+    public ResponseVO test(RequestVO requestVO) {
         System.err.println("test1");
-        return "test1";
+        return new ResponseVO();
     }
 }

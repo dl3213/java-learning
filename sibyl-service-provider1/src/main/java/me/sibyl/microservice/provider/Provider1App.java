@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -15,9 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
  * @Create 2022/03/22 21:55
  */
 @SpringBootApplication(exclude = {GsonAutoConfiguration.class})
-//@EnableEurekaClient
-//@EnableFeignClients
+@EnableEurekaClient
+@EnableFeignClients
 @EnableDiscoveryClient
+@ComponentScan("me.sibyl.microservice")
 public class Provider1App {
 
     public static void main(String[] args) {

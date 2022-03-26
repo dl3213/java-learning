@@ -19,19 +19,19 @@ import javax.annotation.Resource;
 @Component
 public class ServiceProviderImpl implements ServiceProvider {
 
-    @Resource
-    private RestTemplate restTemplate;
+//    @Resource
+//    private RestTemplate restTemplate;
 
     @Override
     public String test() {
-        ResponseEntity<String> exchange =
-                restTemplate.exchange(
-                        "http://service-provider1/test",
-                        HttpMethod.GET,
-                        null,
-                        new ParameterizedTypeReference<String>() {}
-                );
-        System.err.println(exchange.getBody());
+//        ResponseEntity<String> exchange =
+//                restTemplate.exchange(
+//                        "http://service-provider1/test",
+//                        HttpMethod.GET,
+//                        null,
+//                        new ParameterizedTypeReference<String>() {}
+//                );
+//        //System.err.println(exchange.getBody());
 
         System.err.println("test2");
         return "test2";
