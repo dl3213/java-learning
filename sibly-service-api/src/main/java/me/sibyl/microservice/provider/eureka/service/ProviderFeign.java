@@ -17,6 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Component
 @FeignClient(value = "service-provider1")
 public interface ProviderFeign {
-    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    @RequestMapping(value = "/app/test", method = RequestMethod.POST)
     ResponseVO test(@RequestBody(required = false) RequestVO requestVO);
 }
