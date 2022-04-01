@@ -1,7 +1,11 @@
 package me.sibly.microservice.application.controller;
 
+import me.sibly.microservice.application.test.Main;
+import me.sibly.microservice.application.test.Member;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @Classname AppController
@@ -16,4 +20,10 @@ public class AppController {
     public String hello(){
         return "hello";
     }
+
+    @GetMapping("/test")
+    public Member test(){
+        return Main.getRet();
+    }
 }
+
