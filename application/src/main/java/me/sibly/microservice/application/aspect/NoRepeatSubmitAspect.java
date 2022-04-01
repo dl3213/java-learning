@@ -15,20 +15,22 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @Classname NoRepeatSubmitAspect
- * @Description 重复提交处理切片
+ * @Description 重复提交处理切片，参数校验需@Validated，同时校验请求限制次数
  * @Date 2022/3/29 14:14
  * @Author by Qin Yazhi
  */
 @Aspect
 @Component
 @Slf4j
+//@Order(12)
 public class NoRepeatSubmitAspect {
 
-    private static final String keyPrefix = "noRepeatSubmit-";
+    public static final String keyPrefix = "noRepeatSubmit-";
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -43,20 +45,31 @@ public class NoRepeatSubmitAspect {
         try {
             HttpServletRequest request = RequestUtils.getRequest();
             String sessionId = RequestUtils.getServletRequestAttributes().getSessionId();
-            String key = keyPrefix +  sessionId + "-" + request.getServletPath();
-            log.info("[请求重复切片处理]redis-key: {} ", key);
-            if (opsForValue.get(key) == null) {// 如果缓存中有这个url视为重复提交
-                Object o = pjp.proceed();
-                opsForValue.set(key, 0, noRepeatSubmit.expire(), TimeUnit.SECONDS);
-                return o;
-            } else {
+
+            String noRepeatSubmitKey = keyPrefix +  sessionId + "-" + request.getServletPath();
+            String requestCountLimitKey = RequestCountLimitAspect.keyPrefix + sessionId + "-" + request.getServletPath();
+
+            Integer integer = opsForValue.get(noRepeatSubmitKey);
+            log.info("[请求重复切片处理]redis-key: {} , value:{}", noRepeatSubmitKey, integer);
+
+            // 如果缓存中有这个url视为重复提交
+            if (Objects.nonNull(integer)) {
                 log.error("[请求重复切片处理]重复提交");
                 return new ResponseVO(800200,"重复请求");
             }
+
+            //若存在请求次数限制，限制=0时，直接返回，无需处理设置重复缓存
+            if(Objects.nonNull(opsForValue.get(requestCountLimitKey)) && opsForValue.get(requestCountLimitKey) == 0){
+                return new ResponseVO(800200,"接口请求超过次数");
+            }
+
+            Object o = pjp.proceed();
+            opsForValue.set(noRepeatSubmitKey, 0, noRepeatSubmit.expire(), TimeUnit.SECONDS);
+            return o;
         } catch (Throwable e) {
             e.printStackTrace();
-            log.error("[请求重复切片处理]验证重复提交时出现未知异常!");
-            return new ResponseVO(800500,"验证重复提交时出现未知异常!");
+            log.error("[请求重复切片处理]验证重复提交时出现未知异常");
+            return new ResponseVO(800500,"验证重复提交时出现未知异常");
         }
     }
 

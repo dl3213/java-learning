@@ -18,18 +18,25 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+
+/**
+ * @Classname RequestCountLimitAspect
+ * @Description 时间段内限制请求次数
+ * @Date 2022/3/29 14:14
+ * @Author by Qin Yazhi
+ */
+
 @Aspect
 @Component
 @Slf4j
+//@Order(11)
 public class RequestCountLimitAspect {
 
-    private static final String keyPrefix = "requestCountLimit-";
+    public static final String keyPrefix = "requestCountLimit-";
 
     @Resource
     private RedisTemplate redisTemplate;
 
-    // 定义切点
-    // 让所有有@LimitRequest注解的方法都执行切面方法
     @Pointcut("@annotation(requestCountLimit)")
     public void pointCut(RequestCountLimit requestCountLimit) {
     }
@@ -42,29 +49,33 @@ public class RequestCountLimitAspect {
             // 获得request对象
             HttpServletRequest request = RequestUtils.getRequest();
             String sessionId = RequestUtils.getServletRequestAttributes().getSessionId();
-            String key = keyPrefix + sessionId + "-" + request.getServletPath();
-            log.info("[限制请求次数切片处理]redis-key: {} ", key);
+
+            String requestCountLimitKey = keyPrefix + sessionId + "-" + request.getServletPath();
+            //String noRepeatSubmitKey = NoRepeatSubmitAspect.keyPrefix +  sessionId + "-" + request.getServletPath();
 
             // 从缓存中获取请求次数
-            Integer count = opsForValue.get(key);
-            log.info("[限制请求次数切片处理]剩余请求次数: {} ", count);
+            Integer count = opsForValue.get(requestCountLimitKey);
+            log.info("[限制请求次数切片处理]redis-key: {} , value: {}", requestCountLimitKey, count);
 
-            if(Objects.isNull(count)) {//null -> 第一次请求
-                opsForValue.set(key, requestCountLimit.count() - 1, requestCountLimit.time(), TimeUnit.SECONDS);
+            //null -> 第一次请求
+            if(Objects.isNull(count)) {
+                opsForValue.set(requestCountLimitKey, requestCountLimit.count() - 1, requestCountLimit.time(), TimeUnit.SECONDS);
             }else {
-                if(count == 0){// 0 -> 次数限制
+                // 0 -> 次数限制
+                if(Objects.nonNull(count) && count == 0){
                     return new ResponseVO(800200,"接口请求超过次数");
                 }else {// -1 保存
                     // SETRANGE?
-                    opsForValue.increment (key, - 1 );
+                    opsForValue.increment (requestCountLimitKey, - 1 );
                 }
             }
+
             Object result = pjp.proceed();
             return result;
         }catch (Exception e){
             e.printStackTrace();
-            log.error("[限制请求次数切片处理]验证限制请求次数时出现未知异常!");
-            return new ResponseVO(800500,"验证限制请求次数时出现未知异常!");
+            log.error("[限制请求次数切片处理]验证限制请求次数时出现未知异常");
+            return new ResponseVO(800500,"验证限制请求次数时出现未知异常");
         }
     }
 

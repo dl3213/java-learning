@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Classname ProviderFeign
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @Author dyingleaf3213
  * @Create 2022/03/22 22:13
  */
-@Component
-@FeignClient(value = "service-provider1")
+@FeignClient(value = "service-provider1",path = "/app")
 public interface ProviderFeign {
-    @RequestMapping(value = "/app/test", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
     ResponseVO test(@RequestBody(required = false) RequestVO requestVO);
 }
