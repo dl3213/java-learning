@@ -2,11 +2,10 @@ package me.sibyl.microservice.provider.controller;
 
 import me.sibyl.microservice.common.request.RequestVO;
 import me.sibyl.microservice.common.response.ResponseVO;
-import me.sibyl.microservice.provider.eureka.service.ProviderFeign;
-import me.sibyl.microservice.provider.service.ServiceProvider;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import me.sibyl.microservice.provider.eureka.Provider1Feign;
+import me.sibyl.microservice.provider.eureka.Provider2Feign;
+import me.sibyl.microservice.provider.service.ProviderService2;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -18,18 +17,19 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/app")
-public class AppController {
+public class AppController implements Provider2Feign {
 
 
     @Resource
-    private ServiceProvider serviceProvider;
+    private ProviderService2 providerService2;
     @Resource
-    private ProviderFeign providerFeign;
+    private Provider1Feign provider1Feign;
 
-    @GetMapping("/test")
-    public String test(){
-        ResponseVO test = providerFeign.test(new RequestVO());
+    @PostMapping("/test2")
+    @Override
+    public ResponseVO test2(@RequestBody(required = false) RequestVO requestVO) {
+        ResponseVO test = provider1Feign.test1(requestVO);
         System.err.println(test);
-        return "test2";
+        return test;
     }
 }
