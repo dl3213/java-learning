@@ -1,5 +1,6 @@
 package me.sibyl.controller;
 
+import me.sibyl.base.config.SibylException;
 import me.sibyl.common.response.ResponseVO;
 import me.sibyl.dao.UserMapper;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class AppController {
 
     @GetMapping("/test")
     public ResponseVO test(){
+//        throw new RuntimeException();
         return new ResponseVO(200, "test",userMapper.selectList(null));
     }
 }

@@ -1,10 +1,9 @@
 package me.sibyl.cas;
 
+import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.mapper.MenuMapper;
 import me.sibyl.cas.mapper.UserMapper;
-import me.sibyl.cas.util.RedisUtil;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -23,8 +22,8 @@ public class AppTest {
     private UserMapper userMapper;
     @Resource
     private MenuMapper menuMapper;
-    @Autowired
-    private RedisUtil redisUtil;
+    @Resource
+    private RedisService redisService;
 
     @Test
     public void test(){

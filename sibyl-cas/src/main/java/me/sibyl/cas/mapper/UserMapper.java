@@ -1,7 +1,7 @@
 package me.sibyl.cas.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.sibyl.cas.base.entity.User;
+import me.sibyl.base.entity.User;
 import org.springframework.stereotype.Repository;
 
 /**

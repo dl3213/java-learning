@@ -1,4 +1,4 @@
-package me.sibyl.entity;
+package me.sibyl.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

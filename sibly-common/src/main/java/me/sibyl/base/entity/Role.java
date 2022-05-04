@@ -1,4 +1,4 @@
-package me.sibyl.entity;
+package me.sibyl.base.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -16,18 +16,13 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-@TableName("sys_user")
+@TableName("sys_role")
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class User extends BaseEntity {
+public class Role extends BaseEntity {
     @TableId
     private Long id;
-    private String username;
     private String name;
-    private String password;
-    private Integer age;
-    private String email;
-    private String phone;
-    private Integer status;
+    private String key;
 }

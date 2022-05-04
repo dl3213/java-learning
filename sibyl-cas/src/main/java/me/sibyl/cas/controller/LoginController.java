@@ -1,7 +1,7 @@
 package me.sibyl.cas.controller;
 
-import me.sibyl.cas.base.domain.R;
-import me.sibyl.cas.base.entity.User;
+import me.sibyl.base.domain.ResponseVO;
+import me.sibyl.base.entity.User;
 import me.sibyl.cas.service.UserLoginService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,12 +23,12 @@ public class LoginController {
     private UserLoginService userLoginService;
 
     @PostMapping("/user/login")
-    public R login(@RequestBody User user){
+    public ResponseVO login(@RequestBody User user){
         return userLoginService.login(user);
     }
 
     @GetMapping("/user/logout")
-    public R logout(){
+    public ResponseVO logout(){
         return userLoginService.logout();
     }
 }

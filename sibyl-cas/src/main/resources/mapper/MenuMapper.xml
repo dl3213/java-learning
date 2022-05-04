@@ -4,10 +4,10 @@
 
     <select id="selectKeysByUserId" resultType="java.lang.String">
         SELECT DISTINCT m.key
-        FROM user_role ur
-                 LEFT JOIN role r on ur.role_id = r.id
-                 LEFT JOIN role_menu rm on ur.role_id = rm.role_id
-                 LEFT JOIN menu m on m.id = rm.menu_id
+        FROM sys_user_role ur
+                 LEFT JOIN sys_role responseVO on ur.role_id = responseVO.id
+                 LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
+                 LEFT JOIN sys_menu m on m.id = rm.menu_id
         where user_id = #{uid};
     </select>
 

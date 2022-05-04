@@ -1,12 +1,12 @@
 package me.sibyl.cas.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import me.sibyl.cas.base.domain.R;
-import me.sibyl.cas.base.entity.User;
-import me.sibyl.cas.util.JwtUtil;
-import me.sibyl.cas.util.RedisUtil;
+import me.sibyl.base.domain.ResponseVO;
+import me.sibyl.base.entity.User;
+import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.domain.LoginUser;
 import me.sibyl.cas.service.UserLoginService;
+import me.sibyl.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,10 +29,10 @@ public class UserLoginServiceImpl implements UserLoginService {
     private AuthenticationManager authenticationManager;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
-    public R login(User user) {
+    public ResponseVO login(User user) {
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword());
@@ -47,21 +47,21 @@ public class UserLoginServiceImpl implements UserLoginService {
 
         String jwt = JwtUtil.createJwt(uid, loginUser.getUser().getUsername(), JSONObject.parseObject(JSONObject.toJSONString(loginUser.getUser())));
 
-        redisUtil.set("login:"+uid, loginUser);
+        redisService.set("login:"+uid, loginUser);
 
-        return R.success(200,"登录成功",jwt);
+        return ResponseVO.success(200,"登录成功",jwt);
     }
 
     @Override
-    public R logout() {
+    public ResponseVO logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Object principal = authentication.getPrincipal();
 
         LoginUser loginUser = (LoginUser) principal;
         String username = loginUser.getUser().getUsername();
-        redisUtil.delete("login:"+username);
+        redisService.delete("login:"+username);
 
-        return R.success("注销成功");
+        return ResponseVO.success("注销成功");
     }
 }

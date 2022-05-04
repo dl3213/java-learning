@@ -1,7 +1,7 @@
 package me.sibyl.cas.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.sibyl.cas.base.entity.Menu;
+import me.sibyl.base.entity.Menu;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package me.sibyl.cas.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import me.sibyl.cas.base.entity.User;
+import me.sibyl.base.entity.User;
 import me.sibyl.cas.domain.LoginUser;
 import me.sibyl.cas.mapper.MenuMapper;
 import me.sibyl.cas.mapper.UserMapper;
@@ -41,7 +41,7 @@ public class UserDetailService implements UserDetailsService {
 
             Assert.notNull(user,"查询用户不存在");
 
-            System.err.println(user);
+            //System.err.println(user);
 
             //权限
             //List<String> arr = new ArrayList<>(Arrays.asList("system:dept:list","system:test:list"));
