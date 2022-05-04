@@ -1,7 +1,7 @@
 package me.sibyl.microservice.provider.eureka;
 
-import me.sibyl.microservice.common.request.RequestVO;
-import me.sibyl.microservice.common.response.ResponseVO;
+import me.sibyl.common.request.RequestVO;
+import me.sibyl.common.response.ResponseVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

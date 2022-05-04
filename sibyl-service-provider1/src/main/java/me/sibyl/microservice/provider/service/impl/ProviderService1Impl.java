@@ -1,7 +1,7 @@
 package me.sibyl.microservice.provider.service.impl;
 
-import me.sibyl.microservice.common.request.RequestVO;
-import me.sibyl.microservice.common.response.ResponseVO;
+import me.sibyl.common.request.RequestVO;
+import me.sibyl.common.response.ResponseVO;
 import me.sibyl.microservice.provider.service.ProviderService1;
 import org.springframework.stereotype.Component;
 

@@ -27,7 +27,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>me.sibly.microservice</groupId>
+            <groupId>me.sibly</groupId>
             <artifactId>sibly-common</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
