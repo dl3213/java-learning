@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class Menu extends BaseEntity {
     @TableId
-    private Long id;
+    private String id;
     private String name;
     private String key;
     private Integer status;

@@ -2,9 +2,12 @@ package me.sibyl.controller;
 
 import me.sibyl.common.response.ResponseVO;
 import me.sibyl.snaker.SnakerEngineFacets;
+import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.core.Execution;
 import org.snaker.engine.entity.Order;
+import org.snaker.engine.entity.Process;
 import org.snaker.engine.entity.Task;
+import org.snaker.engine.model.ProcessModel;
 import org.snaker.engine.model.TaskModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +27,22 @@ public class SnakerController {
 
    @Resource
     private SnakerEngineFacets snakerEngineFacets;
+    @Resource
+    private SnakerEngine engine;
+
+    @GetMapping("test")
+    public ResponseVO test(){
+        List<Process> processs = engine.process().getProcesss(null);
+        System.err.println(processs);
+
+        processs.forEach(item->{
+            ProcessModel model = item.getModel();
+            System.err.println(model);
+        });
+//        Task complete = engine.task().complete("41977ea4774d4df7b315340e7fd8c19f","snaker.admin");
+//        System.err.println(complete);
+        return ResponseVO.success();
+    }
 
     @GetMapping("get")
     public ResponseVO get(){

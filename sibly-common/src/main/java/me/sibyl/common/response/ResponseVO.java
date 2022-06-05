@@ -37,4 +37,8 @@ public class ResponseVO {
         this.msg = "操作成功";
         this.data = data;
     }
+
+    public static ResponseVO success() {
+        return new ResponseVO(200, "success", null);
+    }
 }

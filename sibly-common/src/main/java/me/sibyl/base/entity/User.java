@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class User extends BaseEntity {
     @TableId
-    private Long id;
+    private String id;
     private String username;
     private String name;
     private String password;

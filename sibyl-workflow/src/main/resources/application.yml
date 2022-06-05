@@ -5,4 +5,4 @@ spring:
   application:
     name: sibyl-workflow
   profiles:
-    include: data
+    include: data, workflow

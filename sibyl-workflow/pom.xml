@@ -15,6 +15,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>me.sibly</groupId>
+            <artifactId>sibyl-cache</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.github.zc-libre/snakerflow-spring-boot-stater -->
         <dependency>
             <groupId>com.github.zc-libre</groupId>

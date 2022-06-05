@@ -20,7 +20,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class User extends BaseEntity {
+public class User
+//        extends BaseEntity
+{
     @TableId
     private Long id;
     private String username;
