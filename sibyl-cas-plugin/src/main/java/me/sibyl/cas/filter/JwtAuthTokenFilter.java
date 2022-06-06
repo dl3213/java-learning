@@ -1,7 +1,7 @@
 package me.sibyl.cas.filter;
 
 import io.jsonwebtoken.Claims;
-import me.sibyl.base.config.SibylException;
+import me.sibyl.common.config.SibylException;
 import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.domain.LoginUser;
 import me.sibyl.util.JwtUtil;

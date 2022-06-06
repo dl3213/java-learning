@@ -1,9 +1,6 @@
 package me.sibyl.controller;
 
 import lombok.SneakyThrows;
-import me.sibyl.base.config.SibylException;
-import me.sibyl.common.response.ResponseVO;
-import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
 import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;

@@ -1,4 +1,4 @@
-package me.sibyl.base.domain;
+package me.sibyl.common.domain;
 
 public interface BaseInfoInterface {
 

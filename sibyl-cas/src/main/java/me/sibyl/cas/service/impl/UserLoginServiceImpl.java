@@ -1,8 +1,8 @@
 package me.sibyl.cas.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import me.sibyl.base.domain.ResponseVO;
 import me.sibyl.base.entity.User;
+import me.sibyl.common.response.ResponseVO;
 import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.domain.LoginUser;
 import me.sibyl.cas.service.UserLoginService;

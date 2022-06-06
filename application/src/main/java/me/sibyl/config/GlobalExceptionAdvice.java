@@ -1,9 +1,9 @@
 package me.sibyl.config;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.base.config.SibylException;
-import me.sibyl.base.domain.CommonEnum;
-import me.sibyl.base.domain.ResponseVO;
+import me.sibyl.common.config.SibylException;
+import me.sibyl.common.domain.CommonEnum;
+import me.sibyl.common.response.ResponseVO;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

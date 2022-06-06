@@ -17,6 +17,6 @@ public class ProviderService1Impl implements ProviderService1 {
     @Override
     public ResponseVO test1(RequestVO requestVO) {
         System.err.println("test1");
-        return new ResponseVO(200,"from provider1",requestVO);
+        return ResponseVO.success(200,"from provider1",requestVO);
     }
 }

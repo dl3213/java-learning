@@ -1,44 +1,102 @@
 package me.sibyl.common.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import me.sibyl.common.domain.CommonEnum;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @Classname Response
+ * @Classname ResponseUtil
  * @Description TODO
- * @Author dyingleaf3213
- * @Create 2022/03/23 21:33
+ * @Date 2021/7/27 20:47
+ * @Created by dyingleaf3213
  */
 @Data
-@ToString
-@Accessors(chain = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class ResponseVO {
-    private Integer code = 200;
-    private String msg;
-    private Object data;
+public class ResponseVO extends HashMap<String, Object> {
 
-    public ResponseVO(Integer code, String msg) {
-        this.code = code;
-        this.msg = msg;
-    }
+    private static String DATA_NAME = "data";
+    private static String CODE_NAME = "code";
+    private static String MSG_NAME = "msg";
 
-    public ResponseVO(Integer code, Object data) {
-        this.code = code;
-        this.data = data;
-    }
-
-    public ResponseVO(Object data) {
-        this.code = 200;
-        this.msg = "操作成功";
-        this.data = data;
+    public ResponseVO() {
+        put(CODE_NAME, 200);
+        put(MSG_NAME, "操作成功");
+        put(DATA_NAME, null);
     }
 
     public static ResponseVO success() {
-        return new ResponseVO(200, "success", null);
+        return new ResponseVO();
     }
+
+    public static ResponseVO success(String msg) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(MSG_NAME, msg);
+        return responseVO;
+    }
+    public static ResponseVO success(Object data) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(DATA_NAME, data);
+        return responseVO;
+    }
+
+    public static ResponseVO success(int code, String msg) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(MSG_NAME, msg);
+        responseVO.put(CODE_NAME, code);
+        return responseVO;
+    }
+
+    public static ResponseVO success(String msg, Object data) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(MSG_NAME, msg);
+        responseVO.put(DATA_NAME, data);
+        return responseVO;
+    }
+
+    public static ResponseVO success(Integer code, Object data) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(CODE_NAME, 200);
+        responseVO.put(MSG_NAME, "操作成功");
+        responseVO.put(DATA_NAME, data);
+        return responseVO;
+    }
+
+    public static ResponseVO success(Map<String, Object> map) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.putAll(map);
+        return responseVO;
+    }
+
+    public static ResponseVO success(int i, String msg, Object data) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(CODE_NAME,i);
+        responseVO.put(MSG_NAME,msg);
+        responseVO.put(DATA_NAME, data);
+        return responseVO;
+    }
+
+
+    public static ResponseVO error(CommonEnum internalServerError) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(CODE_NAME, internalServerError.code());
+        responseVO.put(MSG_NAME, internalServerError.msg());
+        return responseVO;
+    }
+
+    public static ResponseVO error(String msg) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(CODE_NAME, 404);
+        responseVO.put(MSG_NAME, msg);
+        return responseVO;
+    }
+
+    public static ResponseVO error(int code,  String msg) {
+        ResponseVO responseVO = new ResponseVO();
+        responseVO.put(CODE_NAME, code);
+        responseVO.put(MSG_NAME, msg);
+        return responseVO;
+    }
+
 }

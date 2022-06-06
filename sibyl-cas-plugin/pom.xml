@@ -58,6 +58,12 @@
             <version>1.2.79</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-base</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

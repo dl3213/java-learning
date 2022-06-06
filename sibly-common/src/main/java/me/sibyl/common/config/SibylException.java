@@ -1,7 +1,7 @@
-package me.sibyl.base.config;
+package me.sibyl.common.config;
 
 import lombok.Data;
-import me.sibyl.base.domain.BaseInfoInterface;
+import me.sibyl.common.domain.BaseInfoInterface;
 
 /**
  * @Classname SibylException
