@@ -14,9 +14,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @MapperScan("me.sibyl.dao")
 @EnableAsync
-public class Application {
+public class SpringBootApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(SpringBootApp.class, args);
     }
 }

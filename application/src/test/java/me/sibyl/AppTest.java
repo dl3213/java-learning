@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @Author dyingleaf3213
  * @Create 2022/04/01 21:15
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,classes = Application.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,classes = SpringBootApp.class)
 @Slf4j
 public class AppTest {
 
