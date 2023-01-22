@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.sibly.microservice</groupId>
+    <groupId>me.sibyl.microservice</groupId>
     <artifactId>sibyl-eureka-server</artifactId>
     <version>0.0.1</version>
     <name>sibyl-eureka</name>

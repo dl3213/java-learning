@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.sibly.microservice</groupId>
+    <groupId>me.sibyl.microservice</groupId>
     <artifactId>sibyl-service-provider2</artifactId>
     <version>0.0.1</version>
 
@@ -27,8 +27,8 @@
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>me.sibly.microservice</groupId>
-            <artifactId>sibly-service-interface</artifactId>
+            <groupId>me.sibyl.microservice</groupId>
+            <artifactId>sibyl-service-interface</artifactId>
             <version>0.0.1</version>
         </dependency>
 

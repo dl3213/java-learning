@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Id;
 
 /**
  * @Classname User
@@ -20,11 +21,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class User
-//        extends BaseEntity
+public class User extends BaseEntity
 {
-    @TableId
-    private Long id;
+    @Id
+    private String id;
     private String username;
     private String name;
     private String password;

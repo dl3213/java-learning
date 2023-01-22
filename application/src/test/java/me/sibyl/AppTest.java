@@ -18,6 +18,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AppTest {
 
+    public static void main(String[] args) {
+        System.err.println("test");
+        System.out.println("test");
+    }
+
     @Test
     public void test01(){
         //flatMap(对流扁平化处理)

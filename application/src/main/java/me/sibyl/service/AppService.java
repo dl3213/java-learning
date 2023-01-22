@@ -26,10 +26,9 @@ public class AppService {
 //        if(user.getName().equals("String")){
 //            throw new RuntimeException("test");
 //        }
-        userMapper.insert(user);
+        int insert = userMapper.insert(user);
         System.err.println(Thread.currentThread().getName());
-
-        asyncService.test(user.getId());
+//        asyncService.test(user.getId());
     }
 
 }

@@ -2,11 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<!--    <parent>-->
-<!--        <artifactId>sibly-microservice</artifactId>-->
-<!--        <groupId>me.sibyl-microservice</groupId>-->
-<!--        <version>0.0.1</version>-->
-<!--    </parent>-->
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.sibyl.microservice</groupId>
     <artifactId>application</artifactId>
@@ -42,17 +38,18 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
-            <version>RELEASE</version>
+            <version>${spring.boot.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>RELEASE</version>
+            <version>${spring.boot.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -61,15 +58,10 @@
             <version>1.8.6</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
+
 <!--        <dependency>-->
-<!--            <groupId>me.sibly.microservice</groupId>-->
-<!--            <artifactId>sibly-service-interface</artifactId>-->
+<!--            <groupId>me.sibyl.microservice</groupId>-->
+<!--            <artifactId>sibyl-service-interface</artifactId>-->
 <!--            <version>0.0.1</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
@@ -88,12 +80,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>RELEASE</version>
+            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>me.sibly</groupId>
-            <artifactId>sibly-common</artifactId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-common</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>

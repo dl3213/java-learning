@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.sibly.microservice</groupId>
+    <groupId>me.sibyl.microservice</groupId>
     <artifactId>sibyl-workflow</artifactId>
     <version>0.0.1</version>
 
@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>me.sibly</groupId>
+            <groupId>me.sibyl</groupId>
             <artifactId>sibyl-cache</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
@@ -77,8 +77,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>me.sibly</groupId>
-            <artifactId>sibly-common</artifactId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-common</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>

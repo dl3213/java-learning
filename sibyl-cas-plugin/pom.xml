@@ -15,16 +15,22 @@
     </properties>
 
     <dependencies>
-
         <dependency>
-            <groupId>me.sibly</groupId>
-            <artifactId>sibly-common</artifactId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-base</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>me.sibly</groupId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-common</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.sibyl</groupId>
             <artifactId>sibyl-cache</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
@@ -56,12 +62,6 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.79</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.sibyl</groupId>
-            <artifactId>sibyl-base</artifactId>
-            <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
 
