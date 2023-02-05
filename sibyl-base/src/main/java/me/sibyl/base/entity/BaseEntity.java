@@ -34,6 +34,6 @@ public class BaseEntity implements Serializable {
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
-    private String createBy;
-    private String updateBy;
+    private String createId;
+    private String updateId;
 }

@@ -29,7 +29,6 @@ public class AppController {
 
     @GetMapping("test")
     public void test(){
-        List<User> users = userMapper.selectList(null);
-        System.err.println(users);
+        System.err.println("test");
     }
 }

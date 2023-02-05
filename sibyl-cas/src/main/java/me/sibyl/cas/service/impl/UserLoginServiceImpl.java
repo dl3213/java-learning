@@ -2,6 +2,8 @@ package me.sibyl.cas.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import me.sibyl.base.entity.User;
+import me.sibyl.cas.vo.request.LoginRequest;
+import me.sibyl.common.response.Response;
 import me.sibyl.common.response.ResponseVO;
 import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.domain.LoginUser;
@@ -32,7 +34,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     private RedisService redisService;
 
     @Override
-    public ResponseVO login(User user) {
+    public Response login(LoginRequest user) {
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword());
@@ -49,11 +51,11 @@ public class UserLoginServiceImpl implements UserLoginService {
 
         redisService.set("login:"+uid, loginUser);
 
-        return ResponseVO.success(200,"登录成功",jwt);
+        return Response.success(200,"登录成功",jwt);
     }
 
     @Override
-    public ResponseVO logout() {
+    public Response logout() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Object principal = authentication.getPrincipal();
@@ -62,6 +64,6 @@ public class UserLoginServiceImpl implements UserLoginService {
         String username = loginUser.getUser().getUsername();
         redisService.delete("login:"+username);
 
-        return ResponseVO.success("注销成功");
+        return Response.success("注销成功");
     }
 }

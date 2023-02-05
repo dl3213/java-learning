@@ -70,7 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/login").anonymous()
+                .antMatchers("/user/login", "/druid/login.html")
+                .anonymous()
                 //.antMatchers("/hello").hasAuthority("system:dept:list")
                 .anyRequest().authenticated();
 //
