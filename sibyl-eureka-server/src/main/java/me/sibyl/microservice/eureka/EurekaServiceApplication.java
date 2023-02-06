@@ -7,10 +7,10 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication(exclude = {GsonAutoConfiguration.class})
 @EnableEurekaServer
-public class SibylEurekaApplication {
+public class EurekaServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SibylEurekaApplication.class, args);
+        SpringApplication.run(EurekaServiceApplication.class, args);
     }
 
 }

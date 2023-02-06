@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableEurekaClient
 @EnableFeignClients
 @EnableDiscoveryClient
-@ComponentScan("me.sibyl.microservice.*")
+@ComponentScan("me.sibyl.microservice")
 public class Provider3App {
 
     public static void main(String[] args) {
