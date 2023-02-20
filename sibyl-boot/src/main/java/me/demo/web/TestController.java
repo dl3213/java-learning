@@ -45,7 +45,7 @@ public class TestController {
         HashMap<String, Object> dataMap = new HashMap<>();
         dataMap.put("PO_ntjc_page_code", "PO_ntjc_page_code");
         dataMap.put("PO_ntjc_code", "PO_ntjc_code");
-        dataMap.put("PO_ntjc_06_安全关键件清单_table", "安全关键件清单测试文本内容");
+        dataMap.put("PO_ntjc_06_安全关键件清单_table", "<p style='font-size: 1132px;'>安全关键 \n 件清单测试文本内容</p>");
         dataMap.put("book_mark_e_mail", "1176748545@qq.com");
         String picUrl = "D:\\dl3213\\workspace\\4me\\sibyl-microservice\\sibyl-boot\\src\\main\\resources\\QQ图片20221201163828.png";
         dataMap.put("PO_ntjc_05_描述说明_样品_PicTable", DocxUtil.createPicture(picUrl, 200,150));

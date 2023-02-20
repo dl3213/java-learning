@@ -1,19 +1,15 @@
 package me.demo.util;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRow;
 import org.w3c.dom.Node;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.Files;
@@ -60,9 +56,6 @@ public class DocxUtil {
 
         XWPFDocument wordDocx = xwpfDocxBuilder(templateFilePath, hashMap);
 
-        //嵌套表格处理
-        tableHandler(hashMap, wordDocx);
-
         OutputStream os = new FileOutputStream(outPutFilePath);
         wordDocx.write(os);
         os.close();
@@ -92,7 +85,7 @@ public class DocxUtil {
         }
 
         //嵌套表格处理
-        tableHandler(hashMap, docx);
+        tableCollectionHandler(hashMap, docx);
 
         try {
             is.close();
@@ -103,21 +96,25 @@ public class DocxUtil {
         return docx;
     }
 
-    private static void tableHandler(HashMap<String, Object> dataMap, XWPFDocument wordDoc) {
+    /**
+     * 整个文档的所有表格处理
+     */
+    private static void tableCollectionHandler(HashMap<String, Object> dataMap, XWPFDocument wordDoc) {
 
         if (Objects.isNull(wordDoc)) return;
 
+        //获取文档的第一层全部表格(嵌套表格不在此处)
         List<XWPFTable> tables = wordDoc.getTables();
 
         // todo 递归???
         while (CollectionUtils.isNotEmpty(tables)) {
 
-            List<XWPFTable> tablesForEach = tables;
-            List<XWPFTable> tablesCopy = new ArrayList<>();
+            List<XWPFTable> tablesForEach = tables;//当前表格
+            List<XWPFTable> tablesCopy = new ArrayList<>();//当前表格的子表格
             //表格处理
             for (XWPFTable table : tablesForEach) {
                 boolean tableDel = tableHandler(dataMap, tablesCopy, table, wordDoc);
-                if(tableDel) return;
+                if (tableDel) return;
             }
 
             tables = tablesCopy;//后处理子表格
@@ -130,6 +127,7 @@ public class DocxUtil {
      * 表格处理
      */
     private static boolean tableHandler(HashMap<String, Object> dataMap, List<XWPFTable> tablesCopy, XWPFTable table, XWPFDocument wordDoc) {
+        //遍历表格的列，并处理
         for (int rowIndex = 0; rowIndex < table.getRows().size(); rowIndex++) {
             boolean tableDel = rowHandler(dataMap, tablesCopy, table, rowIndex, wordDoc);
             if (tableDel) return true;//存在删除操作，提前返回
@@ -141,8 +139,10 @@ public class DocxUtil {
      * 表格行处理
      */
     private static boolean rowHandler(HashMap<String, Object> dataMap, List<XWPFTable> tablesCopy, XWPFTable table, int rowIndex, XWPFDocument wordDocx) {
-        XWPFTableRow row = table.getRows().get(rowIndex);
+        //遍历列的单元格，并处理
+        XWPFTableRow row = table.getRows().get(rowIndex);//从单元格里获取子表格，准备下次处理
         for (int celIndex = 0; celIndex < row.getTableICells().size(); celIndex++) {
+            //单元格处理
             boolean rowDel = cellHandler(dataMap, tablesCopy, table, rowIndex, row, celIndex, wordDocx);
             if (rowDel) return true;//存在删除操作，提前返回
         }
@@ -155,9 +155,9 @@ public class DocxUtil {
     private static boolean cellHandler(HashMap<String, Object> dataMap, List<XWPFTable> tablesCopy, XWPFTable table, int rowIndex, XWPFTableRow row, int celIndex, XWPFDocument wordDocx) {
         XWPFTableCell c = (XWPFTableCell) row.getTableICells().get(celIndex);
         //子表格:先集中
-        List<XWPFTable> sonTables = c.getTables();
-        tablesCopy.addAll(sonTables);//
-        //表格自己的行段落处理
+        List<XWPFTable> sonTables = c.getTables();//获取子表格
+        tablesCopy.addAll(sonTables);//获取子表格
+        //单元格自己的行段落处理
         for (XWPFParagraph paragraph : c.getParagraphs()) {
             boolean rowDel = replaceContentByBookmark(dataMap, paragraph, celIndex, c, rowIndex, row, table, wordDocx);
             if (rowDel) return true;//存在删除操作，提前返回
@@ -165,10 +165,16 @@ public class DocxUtil {
         return false;
     }
 
+    /**
+     * 非表格节点替换文本
+     */
     private static boolean replaceContentByBookmark(HashMap<String, Object> dataMap, XWPFParagraph xwpfParagraph) {
         return replaceContentByBookmark(dataMap, xwpfParagraph, null, null, null, null, null, null);
     }
 
+    /**
+     * 表格节点替换文件，因为涉及表格操作，需传入更多参数
+     */
     private static boolean replaceContentByBookmark(HashMap<String, Object> dataMap, XWPFParagraph xwpfParagraph, Integer cellIndex, XWPFTableCell cell, Integer rowIndex, XWPFTableRow row, XWPFTable table, XWPFDocument wordDocx) {
         if (Objects.isNull(xwpfParagraph)) return false;
         CTP ctp = xwpfParagraph.getCTP();
@@ -222,30 +228,36 @@ public class DocxUtil {
         switch (mapData.getClass().getName()) {
             //字符串类型
             case "java.lang.String":
-                textHandler(run, mapData);
+                textHandler(run, mapData, wordDocx);
                 return false;
-            case "me.demo.util.DocxUtil$Picture":
+            case "me.demo.util.DocxUtil$Picture": // todo 不同包
                 pictureHandler(run, (Picture) mapData);
                 return false;
-            case "me.demo.util.DocxUtil$TableOperator":
+            case "me.demo.util.DocxUtil$TableOperator":// todo 不同包
                 tableOperationHandler(cellIndex, cell, rowIndex, mapData, table, wordDocx);
                 return true;
             default:
-                textHandler(run, mapData);
+                textHandler(run, mapData, wordDocx);
                 return false;
         }
     }
 
+    /**
+     *  todo 表格增删操作
+     */
     private static void tableOperationHandler(Integer cellIndex, XWPFTableCell cell, Integer rowIndex, Object mapData, XWPFTable table, XWPFDocument wordDocx) {
         TableOperator operator = (TableOperator) mapData;
         switch (operator) {
             case CELL_DEL:
+                //单元格所在列删除该单元格
                 cell.getTableRow().getCtRow().removeTc(cellIndex);
                 break;
             case ROW_DEL:
+                //单元格所在列所在表格删除改列
                 cell.getTableRow().getTable().removeRow(rowIndex);
                 break;
             case TABLE_DEL:
+                //获取单元格所在表格的节点的父节点，删除该表格节点
                 cell.getTableRow().getTable().getCTTbl().getDomNode().getParentNode().removeChild(cell.getTableRow().getTable().getCTTbl().getDomNode());
                 break;
             default:
@@ -253,6 +265,9 @@ public class DocxUtil {
         }
     }
 
+    /**
+     *  图片插入操作
+     */
     private static void pictureHandler(XWPFRun run, Picture mapData) {
         Picture pic = mapData;
         File picFile = getPicFile(pic.getPath());
@@ -272,11 +287,17 @@ public class DocxUtil {
         }
     }
 
-    private static void textHandler(XWPFRun run, Object mapData) {
+    /**
+     *  文本操作
+     */
+    private static void textHandler(XWPFRun run, Object mapData, XWPFDocument wordDocx) {
         String text = String.valueOf(mapData);
         run.setText(text);
     }
 
+    /**
+     *  根据文件名获取图片类型
+     */
     private static int getPictureType(String picType) {
         int res = XWPFDocument.PICTURE_TYPE_PICT;
         if (picType != null) {
@@ -295,13 +316,15 @@ public class DocxUtil {
         return res;
     }
 
+    /**
+     *  准备图片内容
+     */
     private static File getPicFile(String url) {
         try {
             if (!url.matches("([A-Z|a-z]:\\\\[^*|\"<>?\\n]*)|(\\\\\\\\.*?\\\\.*)")) return null;
             File file = new File(url);
             if (!file.exists()) return null;
             if (file.isDirectory()) return null;
-
             return new File(url);
 
         } catch (Exception e) {
@@ -310,6 +333,9 @@ public class DocxUtil {
         }
     }
 
+    /**
+     *  文件操作枚举
+     */
     public enum TableOperator {//暂不支持列操作
         CELL_DEL,//删除单元格
         ROW_DEL,//删除行
@@ -317,10 +343,16 @@ public class DocxUtil {
         ;
     }
 
+    /**
+     *  创建图片操作
+     */
     public static Picture createPicture(String path, int width, int height) {
         return new Picture(path, width, height);
     }
 
+    /**
+     *  图片内部类
+     */
     @Data
     @AllArgsConstructor
     static class Picture {
