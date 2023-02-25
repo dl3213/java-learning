@@ -7,9 +7,6 @@
     <groupId>me.sibyl-microservice</groupId>
     <artifactId>sibyl-microservice</artifactId>
     <version>0.0.1</version>
-    <modules>
-        <module>application</module>
-    </modules>
     <packaging>pom</packaging>
 
     <properties>
