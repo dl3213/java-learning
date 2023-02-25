@@ -1,10 +1,9 @@
 package me.sibyl.mq.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.mq.config.ConfirmConfig;
-import me.sibyl.mq.config.DelayedQueueConfig;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import me.sibyl.mq.rabbit.provider.ConfirmMqProvider;
+import me.sibyl.mq.rabbit.provider.DelayedMqProvider;
+import me.sibyl.mq.rabbit.provider.TopicMqProvider;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,31 +24,25 @@ import java.time.LocalDateTime;
 public class ProviderController {
 
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private ConfirmMqProvider confirmMqProvider;
+    @Resource
+    private DelayedMqProvider delayedMqProvider;
+    @Resource
+    private TopicMqProvider topicMqProvider;
 
-    @GetMapping("/send")
+    @GetMapping("/topic/send")
+    public void topicSend(String msg) {
+        topicMqProvider.send(msg);
+    }
+
+    @GetMapping("/delayed/send")
     public void send(String msg, Integer ttl) {
         log.info("provider --------- time = {}, send = {}, ttl = {} ", LocalDateTime.now(), msg, ttl);
-        rabbitTemplate.convertAndSend(
-                DelayedQueueConfig.delayed_exchange_name,
-                DelayedQueueConfig.delayed_routing_key,
-                msg,
-                (message) -> {
-                    message.getMessageProperties().setDelay(ttl);
-                    return message;
-                });
+        delayedMqProvider.send(msg, ttl);
     }
 
     @GetMapping("/confirm/send")
     public void confirmSend(String msg) {
-        CorrelationData correlationData = new CorrelationData();
-        correlationData.setId(String.valueOf(System.currentTimeMillis()));
-        log.info("provider --------- time = {}, send = {} ", LocalDateTime.now(), msg);
-        rabbitTemplate.convertAndSend(
-                ConfirmConfig.confirm_exchange,
-                ConfirmConfig.confirm_routing_key+"2",
-                msg,
-                correlationData
-        );
+        confirmMqProvider.send(msg);
     }
 }

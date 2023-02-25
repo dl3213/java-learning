@@ -17,14 +17,14 @@ import javax.servlet.http.HttpServletRequest;
  * @Date 2022/5/24 13:27
  * @Author by Qin Yazhi
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(value = {"me.sibyl.cas.controller"})
-public class BaseGlobalExceptionHandler {
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public Response bindException(HttpServletRequest request, Exception e, BindingResult bindingResult) {
-        e.printStackTrace();
-        return Response.error(bindingResult.getFieldError().getDefaultMessage());
-    }
-}
+//@Order(Ordered.HIGHEST_PRECEDENCE)
+//@RestControllerAdvice(value = {"me.sibyl.cas.controller"})
+//public class BaseGlobalExceptionHandler {
+//
+//    @ExceptionHandler(Exception.class)
+//    @ResponseBody
+//    public Response bindException(HttpServletRequest request, Exception e, BindingResult bindingResult) {
+//        e.printStackTrace();
+//        return Response.error(bindingResult.getFieldError().getDefaultMessage());
+//    }
+//}

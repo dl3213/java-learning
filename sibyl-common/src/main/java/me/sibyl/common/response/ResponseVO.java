@@ -98,5 +98,4 @@ public class ResponseVO extends HashMap<String, Object> {
         responseVO.put(MSG_NAME, msg);
         return responseVO;
     }
-
 }

@@ -1,8 +1,8 @@
-package me.sibyl.mq.controller;
+package me.sibyl.mq.consumer;
 
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.mq.config.ConfirmConfig;
+import me.sibyl.mq.rabbit.confirm.ConfirmConfig;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -17,11 +17,11 @@ import java.time.LocalDateTime;
  */
 @Component
 @Slf4j
-public class Consumer {
+public class BackupConsumer {
 
-    @RabbitListener(queues = ConfirmConfig.confirm_queue)
+    @RabbitListener(queues = ConfirmConfig.backup_queue)
     public void consumer(Message message, Channel channel) throws Exception {
         String msg = new String(message.getBody());
-        log.info("consumer --------- time = {}, msg = {}", LocalDateTime.now(), msg);
+        log.info("[BackupConsumer] --------- time = {}, msg = {}", LocalDateTime.now(), msg);
     }
 }

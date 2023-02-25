@@ -1,6 +1,7 @@
-package me.sibyl.mq.config;
+package me.sibyl.mq.rabbit.callback;
 
 import lombok.extern.slf4j.Slf4j;
+import me.sibyl.mq.rabbit.delayed.DelayedQueueConfig;
 import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -31,6 +32,7 @@ public class MqCallback implements RabbitTemplate.ConfirmCallback, RabbitTemplat
 
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+        //延时队列会暂存到交换机上，也会触发这里
         if (ack){
             log.info("ack : id = " + (Objects.nonNull(correlationData) ? correlationData.getId() : null));
         }else {
@@ -40,6 +42,8 @@ public class MqCallback implements RabbitTemplate.ConfirmCallback, RabbitTemplat
 
     @Override
     public void returnedMessage(ReturnedMessage returnedMessage) {
+        //延时队列会暂存到交换机上，也会触发这里
+        if(returnedMessage.getExchange().equals(DelayedQueueConfig.delayed_exchange_name)) return;
         log.error(
                 "msg : {}, return by :{}, cause: {}, routingKey:{}",
                 new String(returnedMessage.getMessage().getBody()),

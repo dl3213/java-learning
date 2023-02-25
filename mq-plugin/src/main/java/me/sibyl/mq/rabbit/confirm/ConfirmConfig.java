@@ -1,4 +1,4 @@
-package me.sibyl.mq.config;
+package me.sibyl.mq.rabbit.confirm;
 
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Qualifier;
