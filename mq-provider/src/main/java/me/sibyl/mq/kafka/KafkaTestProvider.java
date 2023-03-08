@@ -25,7 +25,7 @@ public class KafkaTestProvider {
 
         KafkaProducer<String, String> kafkaProducer = new KafkaProducer<String, String>(properties);
 
-        kafkaProducer.send(new ProducerRecord<>("sibyl", "hello, I`m kafka"), (recordMetadata, exception)->{
+        kafkaProducer.send(new ProducerRecord("sibyl", 0,"","hello, I`m kafka"), (recordMetadata, exception)->{
 
         });
 
