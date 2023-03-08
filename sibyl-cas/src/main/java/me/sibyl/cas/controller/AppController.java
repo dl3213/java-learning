@@ -2,6 +2,7 @@ package me.sibyl.cas.controller;
 
 import me.sibyl.base.entity.User;
 import me.sibyl.cas.mapper.UserMapper;
+import me.sibyl.common.response.Response;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,12 +24,14 @@ public class AppController {
 
     @GetMapping("/hello")
     @PreAuthorize("@exp.hasAuth('system:dept:list')")
-    public String hello(){
-        return "hello";
+    public Response hello(){
+        return Response.success();
     }
 
     @GetMapping("test")
-    public void test(){
+    public Response test(){
         System.err.println("test");
+        System.err.println();
+        return Response.success();
     }
 }

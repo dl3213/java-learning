@@ -1,7 +1,7 @@
 package me.sibyl.cas;
 
 import me.sibyl.cache.service.RedisService;
-import me.sibyl.cas.mapper.MenuMapper;
+import me.sibyl.cas.mapper.PermissionMapper;
 import me.sibyl.cas.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,7 @@ public class AppTest {
     @Resource
     private UserMapper userMapper;
     @Resource
-    private MenuMapper menuMapper;
+    private PermissionMapper permissionMapper;
     @Resource
     private RedisService redisService;
 

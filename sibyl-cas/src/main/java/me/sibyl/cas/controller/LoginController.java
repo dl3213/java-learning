@@ -1,6 +1,7 @@
 package me.sibyl.cas.controller;
 
 
+import com.alibaba.fastjson.JSONObject;
 import me.sibyl.base.entity.User;
 import me.sibyl.cas.service.UserLoginService;
 import me.sibyl.cas.vo.request.LoginRequest;
@@ -27,6 +28,7 @@ public class LoginController {
 
     @PostMapping("/user/login")
     public Response login(LoginRequest user){
+        System.err.println(user);
         return userLoginService.login(user);
     }
 

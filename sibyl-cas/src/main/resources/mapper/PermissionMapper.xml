@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="me.sibyl.cas.mapper.MenuMapper">
+<mapper namespace="me.sibyl.cas.mapper.PermissionMapper">
 
     <select id="selectKeysByUserId" resultType="java.lang.String">
         SELECT DISTINCT m.key
         FROM sys_user_role ur
                  LEFT JOIN sys_role responseVO on ur.role_id = responseVO.id
-                 LEFT JOIN sys_role_menu rm on ur.role_id = rm.role_id
-                 LEFT JOIN sys_menu m on m.id = rm.menu_id
+                 LEFT JOIN sys_role_permission rm on ur.role_id = rm.role_id
+                 LEFT JOIN sys_permission m on m.id = rm.menu_id
         where user_id = #{uid};
     </select>
 

@@ -1,12 +1,11 @@
 package me.sibyl.cas.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import me.sibyl.base.entity.User;
+import lombok.extern.slf4j.Slf4j;
+import me.sibyl.cas.domain.SecurityUser;
 import me.sibyl.cas.vo.request.LoginRequest;
 import me.sibyl.common.response.Response;
-import me.sibyl.common.response.ResponseVO;
 import me.sibyl.cache.service.RedisService;
-import me.sibyl.cas.domain.LoginUser;
 import me.sibyl.cas.service.UserLoginService;
 import me.sibyl.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +24,7 @@ import javax.annotation.Resource;
  * @Create 2022/02/26 11:27
  */
 @Service
+@Slf4j
 public class UserLoginServiceImpl implements UserLoginService {
 
     @Resource
@@ -36,22 +36,21 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     public Response login(LoginRequest user) {
 
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
         Authentication authenticate = authenticationManager.authenticate(token);
 
-        Assert.notNull(authenticate,"登录失败");
+        Assert.notNull(authenticate, "登录失败");
 
-        LoginUser loginUser = (LoginUser) authenticate.getPrincipal();
+        SecurityUser securityUser = (SecurityUser) authenticate.getPrincipal();
 
-        String uid = loginUser.getUser().getUsername();
+        String uid = securityUser.getUsername();
 
-        String jwt = JwtUtil.createJwt(uid, loginUser.getUser().getUsername(), JSONObject.parseObject(JSONObject.toJSONString(loginUser.getUser())));
+        String jwt = JwtUtil.createJwt(uid, securityUser.getUsername(), JSONObject.parseObject(JSONObject.toJSONString(securityUser.getCurrentUserInfo())));
+        log.info("[login]token=" + jwt);
+        redisService.set(jwt, securityUser);
 
-        redisService.set("login:"+uid, loginUser);
-
-        return Response.success(200,"登录成功",jwt);
+        return Response.success(200, "登录成功", jwt);
     }
 
     @Override
@@ -60,9 +59,9 @@ public class UserLoginServiceImpl implements UserLoginService {
 
         Object principal = authentication.getPrincipal();
 
-        LoginUser loginUser = (LoginUser) principal;
-        String username = loginUser.getUser().getUsername();
-        redisService.delete("login:"+username);
+        SecurityUser securityUser = (SecurityUser) principal;
+        String username = securityUser.getUsername();
+        redisService.delete("login:" + username);
 
         return Response.success("注销成功");
     }

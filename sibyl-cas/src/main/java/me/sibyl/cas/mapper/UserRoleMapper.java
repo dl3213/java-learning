@@ -1,7 +1,8 @@
 package me.sibyl.cas.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.sibyl.base.entity.Menu;
+import me.sibyl.base.entity.Permission;
+import me.sibyl.base.entity.UserRole;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,7 +14,6 @@ import java.util.List;
  * @Created by dyingleaf3213
  */
 @Repository
-public interface MenuMapper extends BaseMapper<Menu> {
+public interface UserRoleMapper extends BaseMapper<UserRole> {
 
-    List<String> selectKeysByUserId(String uid);
 }

@@ -1,0 +1,12 @@
+
+server:
+  port: 9002
+
+spring:
+  application:
+    name: sibyl-boot
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
