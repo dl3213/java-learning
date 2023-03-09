@@ -1,6 +1,7 @@
 package me.sibyl.microservice.provider.service.impl;
 
 import me.sibyl.common.request.RequestVO;
+import me.sibyl.common.response.Response;
 import me.sibyl.common.response.ResponseVO;
 import me.sibyl.microservice.provider.service.ProviderService1;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,8 @@ import org.springframework.stereotype.Component;
 public class ProviderService1Impl implements ProviderService1 {
 
     @Override
-    public ResponseVO test1(RequestVO requestVO) {
+    public Response test1(RequestVO requestVO) {
         System.err.println("test1");
-        return ResponseVO.success(200,"from provider1",requestVO);
+        return Response.success(200,"from provider1",requestVO);
     }
 }

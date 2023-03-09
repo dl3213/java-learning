@@ -1,6 +1,7 @@
 package me.sibyl.microservice.provider.controller;
 
 import me.sibyl.common.request.RequestVO;
+import me.sibyl.common.response.Response;
 import me.sibyl.common.response.ResponseVO;
 import me.sibyl.microservice.provider.eureka.Provider1Feign;
 import me.sibyl.microservice.provider.service.ProviderService1;
@@ -26,8 +27,8 @@ public class AppController implements Provider1Feign {
 
     @Override
     @PostMapping("/test1")
-    public ResponseVO test1(@RequestBody(required = false) RequestVO requestVO){
-        ResponseVO test = providerService1.test1(requestVO);
+    public Response test1(@RequestBody(required = false) RequestVO requestVO){
+        Response test = providerService1.test1(requestVO);
         return test;
     }
 }

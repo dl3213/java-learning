@@ -29,11 +29,12 @@ public class Response extends HashMap<String, Object> {
         return new Response();
     }
 
-    public static Response success(String msg) {
-        Response responseVO = new Response();
-        responseVO.put(MSG_NAME, msg);
-        return responseVO;
-    }
+//    public static Response success(String msg) {
+//        Response responseVO = new Response();
+//        responseVO.put(MSG_NAME, msg);
+//        return responseVO;
+//    }
+
     public static Response success(Object data) {
         Response responseVO = new Response();
         responseVO.put(DATA_NAME, data);

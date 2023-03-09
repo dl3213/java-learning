@@ -1,7 +1,7 @@
 package me.sibyl.microservice.provider.eureka;
 
 import me.sibyl.common.request.RequestVO;
-import me.sibyl.common.response.ResponseVO;
+import me.sibyl.common.response.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,5 +17,5 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public interface Provider1Feign {
 
     @RequestMapping(value = "/test1", method = RequestMethod.POST)
-    ResponseVO test1(@RequestBody(required = false) RequestVO requestVO);
+    Response test1(@RequestBody(required = false) RequestVO requestVO);
 }

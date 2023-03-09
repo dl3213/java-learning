@@ -6,7 +6,6 @@ import me.sibyl.base.entity.User;
 import me.sibyl.cas.service.UserLoginService;
 import me.sibyl.cas.vo.request.LoginRequest;
 import me.sibyl.common.response.Response;
-import me.sibyl.common.response.ResponseVO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
