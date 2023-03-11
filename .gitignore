@@ -10,3 +10,7 @@
 /*/mvnw
 /*/mvnw.cmd
 /*/*.iml
+/log/
+/*/log/
+/*/*.log
+/*/*.gz

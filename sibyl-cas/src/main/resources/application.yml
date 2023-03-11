@@ -6,3 +6,18 @@ spring:
     name: sibyl-cas
   profiles:
     include: data
+
+debug: false
+
+logging:
+  level:
+    me.sibyl: debug
+    root: info
+  file:
+    name: ${spring.application.name}/log/${spring.application.name}.log
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: ${spring.application.name}/log/${spring.application.name}-%d{yyyy-MM-dd}.%i.log
+#      clean-history-on-start: false
+#      max-file-size: 10MB
+#      max-history: 7
