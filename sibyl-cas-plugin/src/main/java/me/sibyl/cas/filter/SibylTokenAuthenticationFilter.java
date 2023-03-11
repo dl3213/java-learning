@@ -28,13 +28,13 @@ import java.io.UnsupportedEncodingException;
 
 @Slf4j
 @Component
-public class MyTokenAuthenticationFilter extends OncePerRequestFilter {
+public class SibylTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final RedisService redisService;
 
     public static final String login_cache_key = "sibyl-login-";
 
-    public MyTokenAuthenticationFilter(RedisService redisService) {
+    public SibylTokenAuthenticationFilter(RedisService redisService) {
         this.redisService = redisService;
     }
 

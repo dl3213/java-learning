@@ -35,7 +35,7 @@ public class AdminAuthenticationEntryPoint implements AuthenticationEntryPoint {
             // 其中HttpStatus类是自己定义的一个枚举类。用于定义状态码和消息
             result = Response.error(HttpStatus.UNAUTHORIZED.value(),message);
         }else{
-            result = Response.error(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+            result = Response.error(HttpStatus.UNAUTHORIZED.value(), "token失效");
         }
         WebUtil.renderString(httpServletResponse, JSON.toJSONString(result));
     }
