@@ -1,9 +1,9 @@
 
 server:
-  port: 9101  #服务端口号
+  port: 9103  #服务端口号
 spring:
   application:
-    name: sibyl-eureka-service-consumer #服务名称--调用的时候根据名称来调用该服务的方法
+    name: sibyl-eureka-service-order-provider #服务名称--调用的时候根据名称来调用该服务的方法
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,7 +21,7 @@ spring:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath*:/mapper/**/*.xml
+#  mapper-locations: classpath*:/mapper/**/*.xml
 
 eureka:
   instance:
@@ -30,8 +30,6 @@ eureka:
   client:
     serviceUrl: #注册中心的注册地址
       defaultZone: http://127.0.0.1:8761/eureka/
-#    register-with-eureka: false
-#    registry-fetch-interval-seconds: 10
 
 #seata:
 #  enabled: true
@@ -49,10 +47,3 @@ eureka:
 feign:
   circuitbreaker:
     enabled: true
-  hystrix:
-    enabled: false
-    client:
-      config:
-        default:
-          connect-timeout: 300000
-          read-timeout: 300000

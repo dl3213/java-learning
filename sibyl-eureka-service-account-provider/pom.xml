@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>me.sibyl</groupId>
-    <artifactId>sibyl-eureka-service-consumer</artifactId>
+    <artifactId>sibyl-eureka-service-account-provider</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>sibyl-eureka-service-consumer</name>
+    <name>sibyl-eureka-service-account-provider</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>1.8</java.version>
@@ -77,13 +77,6 @@
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.68</version>
-            <scope>compile</scope>
-        </dependency>
-
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.cloud</groupId>-->
 <!--            <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
@@ -98,7 +91,6 @@
 <!--            <artifactId>archaius-core</artifactId>-->
 <!--            <version>0.7.7</version>-->
 <!--        </dependency>-->
-
     </dependencies>
     <dependencyManagement>
         <dependencies>

@@ -3,10 +3,16 @@ package me.sibyl.controller;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
-import me.sibyl.microservice.provider.eureka.ServiceConsumer1;
-import me.sibyl.microservice.provider.eureka.ServiceProvider2;
-import me.sibyl.microservice.request.ServiceRequest;
+import me.sibyl.dao.UserMapper;
+import me.sibyl.entity.User;
+import me.sibyl.microservice.provider.eureka.AccountServiceProvider;
+import me.sibyl.microservice.provider.eureka.OrderServiceProvider;
+import me.sibyl.microservice.request.AccountConsumeRequest;
+import me.sibyl.microservice.request.OrderCreateRequest;
+import me.sibyl.vo.ConsumeRequest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,20 +27,46 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/app")
 @Slf4j
-public class AppController implements ServiceConsumer1 {
+public class AppController{
 
     @Resource
-    private ServiceProvider2 serviceProvider2;
+    private OrderServiceProvider orderServiceProvider;
 
-    @Override
-    @PostMapping(value = "/consume1")
-    public Response consume1(ServiceRequest requestVO) {
-        log.info("[consumer] now is consumer1");
+    @Resource
+    private AccountServiceProvider accountServiceProvider;
 
-        Response query = serviceProvider2.query2(requestVO.getId());
-        System.err.println(JSONObject.toJSONString(query));
-//        Response update = serviceProvider2.update2(requestVO);
-//        System.err.println(update);
-        return query;
+    @Resource
+    private UserMapper userMapper;
+
+    @PostMapping(value = "/test")
+//    @GlobalTransactional
+    @Transactional
+    public Response test(@RequestBody ConsumeRequest request) {
+        log.info("[test] now is AppController");
+
+        User user = userMapper.selectById(request.getUserId());
+        log.info("[test] user => " + JSONObject.toJSONString(user));
+
+        OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
+        orderCreateRequest.setAmount(request.getAmount());
+        orderCreateRequest.setLinkId(request.getUserId());
+        Response orderCreate = orderServiceProvider.create(orderCreateRequest);
+        log.info("[test]order create :"+JSONObject.toJSONString(orderCreate));
+
+        //int i = 1/0;
+
+        AccountConsumeRequest accountConsumeRequest = new AccountConsumeRequest();
+        accountConsumeRequest.setUserId(request.getUserId());
+        accountConsumeRequest.setAmount(request.getAmount());
+        Response consume = accountServiceProvider.consume(accountConsumeRequest);
+        log.info("[test]account consume :"+JSONObject.toJSONString(consume));
+
+        //int i = 1/0;
+
+        user.setCreateId(String.valueOf(System.currentTimeMillis()));
+        userMapper.updateById(user);
+        log.info("[test] updateById => " + JSONObject.toJSONString(user));
+
+        return Response.success();
     }
 }
