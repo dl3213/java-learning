@@ -1,23 +1,20 @@
 package me.sibyl.cas.config;
 
-import me.sibyl.cas.filter.MyTokenAuthenticationFilter;
+import me.sibyl.cas.filter.SibylTokenAuthenticationFilter;
 import me.sibyl.cas.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-
-import javax.annotation.Resource;
 
 /**
  * @Classname SecurityConfig
@@ -28,7 +25,7 @@ import javax.annotation.Resource;
 @EnableWebSecurity
 // 开启注解权限资源控制
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     /**
      * 自定义认证处理器 (重点：额外添加的类，用于获取用户信息，保存用户信息。并且处理登录等操作)
@@ -53,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * Token 处理器 (额外添加的类 这个类在下方有说明)
      */
-    private final MyTokenAuthenticationFilter myTokenAuthenticationFilter;
+    private final SibylTokenAuthenticationFilter sibylTokenAuthenticationFilter;
 
     /**
      * 退出登录处理类 (我在这里处理了一下缓存的token退出的时候清除掉了，这个类下方也有说明)
@@ -77,10 +74,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             AdminAuthenticationSuccessHandler adminAuthenticationSuccessHandler,
             AdminAuthenticationFailureHandler adminAuthenticationFailureHandler,
             AdminAuthenticationEntryPoint adminAuthenticationEntryPoint,
-            MyTokenAuthenticationFilter myTokenAuthenticationFilter,
+            SibylTokenAuthenticationFilter sibylTokenAuthenticationFilter,
             AdminLogoutSuccessHandler adminLogoutSuccessHandler,
             MyAccessDeniedHandler myAccessDeniedHandler) {
-        this.myTokenAuthenticationFilter = myTokenAuthenticationFilter;
+        this.sibylTokenAuthenticationFilter = sibylTokenAuthenticationFilter;
         //this.adminAuthenticationProvider = adminAuthenticationProvider;
         this.adminAuthenticationSuccessHandler = adminAuthenticationSuccessHandler;
         this.adminAuthenticationFailureHandler = adminAuthenticationFailureHandler;
@@ -95,8 +92,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new MyPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.antMatcher("/**").authorizeRequests();
 
         // 标记只能在 服务器本地ip[127.0.0.1或者localhost] 访问`/home`接口，其他ip地址无法访问
@@ -155,7 +152,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
 
         // 添加前置的过滤器 用于验证token
-        http.addFilterBefore(myTokenAuthenticationFilter, BasicAuthenticationFilter.class);
+        http.addFilterBefore(sibylTokenAuthenticationFilter, BasicAuthenticationFilter.class);
+
+        return http.build();
     }
 
 //    @Override
@@ -165,25 +164,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        // super.configure(auth);
 //    }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         // ignoring 允许添加 RequestMatcher Spring Security 应该忽略的实例。
-        web.ignoring().antMatchers(HttpMethod.GET,
-                "/favicon.ico",
-                "/*.html",
-                "/**/*.css",
-                "/**/*.js");
-        web.ignoring().antMatchers(HttpMethod.GET,"/swagger-resources/**");
-        web.ignoring().antMatchers(HttpMethod.GET,"/webjars/**");
-        web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs");
-        web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs-ext");
-        web.ignoring().antMatchers(HttpMethod.GET,"/configuration/ui");
-        web.ignoring().antMatchers(HttpMethod.GET,"/configuration/security");
+
+        return (web) ->{
+            web.ignoring().antMatchers(HttpMethod.GET,
+                    "/favicon.ico",
+                    "/*.html",
+                    "/**/*.css",
+                    "/**/*.js");
+            web.ignoring().antMatchers(HttpMethod.GET,"/swagger-resources/**");
+            web.ignoring().antMatchers(HttpMethod.GET,"/webjars/**");
+            web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs");
+            web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs-ext");
+            web.ignoring().antMatchers(HttpMethod.GET,"/configuration/ui");
+            web.ignoring().antMatchers(HttpMethod.GET,"/configuration/security");
+        };
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

@@ -76,7 +76,6 @@ public class UserDetailService implements UserDetailsService {
         //通过用户ID查询角色中间表
         //通过角色中间表查询角色列表
         // 返回角色列表
-        System.err.println(userId);
 
         List<UserRole> userRoles = userRoleMapper.selectList(
                 Wrappers.lambdaQuery(new UserRole())
@@ -86,13 +85,6 @@ public class UserDetailService implements UserDetailsService {
                 .stream()
                 .filter(Objects::nonNull)
                 .map(UserRole::getRoleId).collect(Collectors.toList());
-
-        List<Role> roles = roleMapper.selectList(null);
-
-        for (String s : roleIdList) {
-            Role role = roleMapper.selectById(s);
-            System.err.println(role);
-        }
 
         List<Role> collect = roleIdList.stream()
                 .map(roleMapper::selectById)

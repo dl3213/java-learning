@@ -3,7 +3,8 @@ package me.sibyl.config;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.config.SibylException;
 import me.sibyl.common.domain.CommonEnum;
-import me.sibyl.common.response.ResponseVO;
+import me.sibyl.common.response.Response;
+import me.sibyl.common.response.Response;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,9 +29,9 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(value = SibylException.class)
     @ResponseBody
-    public  ResponseVO bizExceptionHandler(HttpServletRequest req, SibylException e){
+    public  Response bizExceptionHandler(HttpServletRequest req, SibylException e){
         log.error("发生业务异常！原因是：{}",e.getMsg());
-        return ResponseVO.error(e.getCode(),e.getMsg());
+        return Response.error(e.getCode(),e.getMsg());
     }
 
     /**
@@ -41,9 +42,9 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(value =NullPointerException.class)
     @ResponseBody
-    public ResponseVO exceptionHandler(HttpServletRequest req, NullPointerException e){
+    public Response exceptionHandler(HttpServletRequest req, NullPointerException e){
         log.error("发生空指针异常！原因是:",e);
-        return ResponseVO.error(CommonEnum.NOT_FOUND);
+        return Response.error(CommonEnum.NOT_FOUND);
     }
 
 
@@ -52,8 +53,8 @@ public class GlobalExceptionAdvice {
      */
     @ExceptionHandler(value =Exception.class)
     @ResponseBody
-    public ResponseVO exceptionHandler(Exception e){
+    public Response exceptionHandler(Exception e){
         log.error("未知异常！原因是:{}", e);
-        return ResponseVO.error(CommonEnum.INTERNAL_SERVER_ERROR);
+        return Response.error(500, e.getMessage());
     }
 }

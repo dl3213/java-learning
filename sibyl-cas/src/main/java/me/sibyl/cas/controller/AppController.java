@@ -1,5 +1,6 @@
 package me.sibyl.cas.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import me.sibyl.base.entity.User;
 import me.sibyl.cas.mapper.UserMapper;
 import me.sibyl.common.response.Response;
@@ -17,6 +18,7 @@ import java.util.List;
  * @Create 2022/02/26 09:54
  */
 @RestController
+@Slf4j
 public class AppController {
 
     @Resource
@@ -30,8 +32,11 @@ public class AppController {
 
     @GetMapping("test")
     public Response test(){
-        System.err.println("test");
-        System.err.println();
+        log.trace("i am trace.");
+        log.debug("i am debug.");
+        log.info("i am info.");
+        log.warn("i am warn.");
+        log.error("i am error.");
         return Response.success();
     }
 }
