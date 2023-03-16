@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
  * @Classname AppController
@@ -40,7 +41,6 @@ public class AppController{
 
     @PostMapping(value = "/test")
 //    @GlobalTransactional
-    @Transactional
     public Response test(@RequestBody ConsumeRequest request) {
         log.info("[test] now is AppController");
 
@@ -63,7 +63,7 @@ public class AppController{
 
         //int i = 1/0;
 
-        user.setCreateId(String.valueOf(System.currentTimeMillis()));
+        user.setUpdateTime(LocalDateTime.now());
         userMapper.updateById(user);
         log.info("[test] updateById => " + JSONObject.toJSONString(user));
 
