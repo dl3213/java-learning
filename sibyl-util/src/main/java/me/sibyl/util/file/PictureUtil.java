@@ -1,4 +1,4 @@
-package me.sibyl.util;
+package me.sibyl.util.file;
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
@@ -135,7 +135,6 @@ public class PictureUtil {
             ImageWriteParam iwp = writer.getDefaultWriteParam();
             iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             float i = ((float) (256 * 1024)) / ((float) bytes.length);
-            System.err.println(i);
             iwp.setCompressionQuality(i);
 
             ByteArrayOutputStream output = new ByteArrayOutputStream();

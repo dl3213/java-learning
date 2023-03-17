@@ -5,6 +5,7 @@ import me.sibyl.entity.BusinessOrder;
 import me.sibyl.microservice.request.OrderCreateRequest;
 import me.sibyl.service.OrderService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private BusinessOrderMapper businessOrderMapper;
 
     @Override
+    @Transactional
     public String create(OrderCreateRequest orderCreateRequest) {
         BusinessOrder order = BusinessOrder
                 .builder()

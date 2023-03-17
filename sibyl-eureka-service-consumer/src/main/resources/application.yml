@@ -33,18 +33,18 @@ eureka:
 #    register-with-eureka: false
 #    registry-fetch-interval-seconds: 10
 
-#seata:
-#  enabled: true
-#  application-id: ${spring.application.name}
-#  tx-service-group: sibyl_eureka_tx_group
-#  service:
-#    vgroup-mapping:
-#      sibyl_eureka_tx_group: seata-server # 找到seata集群中名为"seata-server"的application
-#  registry:
-#    type: eureka # 注册中心为eureka
-#    eureka:
-#      application: ${spring.application.name}
-#      service-url: http://127.0.0.1:8761/eureka/
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: my_test_tx_group
+  service:
+    vgroup-mapping:
+      my_test_tx_group: seata-server # 找到seata集群中名为"seata-server"的application
+  registry:
+    type: eureka # 注册中心为eureka
+    eureka:
+      application: ${spring.application.name}
+      service-url: http://127.0.0.1:8761/eureka/
 
 feign:
   circuitbreaker:

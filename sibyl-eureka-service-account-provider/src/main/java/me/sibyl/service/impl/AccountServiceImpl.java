@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
                         .set(UserAccount::getVersion, account.getVersion() + 1)
         );
 
-        //int i = 1 / 0;
+//        int i = 1 / 0;
 
         return account.getUserId();
     }
