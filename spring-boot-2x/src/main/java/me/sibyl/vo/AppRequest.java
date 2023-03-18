@@ -1,6 +1,7 @@
 package me.sibyl.vo;
 
 import lombok.Data;
+import me.sibyl.annotation.Watching;
 
 /**
  * @Classname AppRequest
@@ -11,5 +12,8 @@ import lombok.Data;
 @Data
 public class AppRequest {
     private String id;
+    @Watching
     private String value;
+    @Watching
+    private int get;
 }

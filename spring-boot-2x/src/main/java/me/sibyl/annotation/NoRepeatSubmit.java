@@ -15,17 +15,22 @@ import java.lang.annotation.*;
 @Inherited
 public @interface NoRepeatSubmit {
     /**
-     *  过期时间
+     *  过期时间 秒
      **/
     long expire() default 10;
 
     /**
-     *
+     *  指定方法的参数类
      */
     Class<?>[] watchClass() default {};
 
     /**
-     *
+     * 指定方法的参数字段
      */
     String[] classParamName() default {};
+
+    /**
+     *  指定类型
+     */
+    TargetMode mode() default TargetMode.session;
 }

@@ -1,16 +1,29 @@
 package me.sibyl.aspect;
 
+import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.annotation.NoRepeatSubmit;
+import me.sibyl.annotation.TargetMode;
+import me.sibyl.annotation.Watching;
+import me.sibyl.common.config.SibylException;
 import me.sibyl.util.RequestUtils;
 import me.sibyl.util.object.ObjectUtil;
+import me.sibyl.vo.AppRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.CodeSignature;
+import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.Objects;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,24 +35,128 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AopJoinPointUtil {
 
-    public static String getCacheKeyByTarget(String keyPrefix, ProceedingJoinPoint pjp, Class[] classes, String[] paramNames) {
+    public static String getCacheKeyByTarget(String keyPrefix, ProceedingJoinPoint pjp, TargetMode mode, Class[] classes, String[] paramNames) {
         String noRepeatSubmitKey = keyPrefix;
 
-        if (validatedWatcher(classes, paramNames)) {
-            // class[param=value]-
-            String classParamValueBuilder = Arrays.stream(classes)
-                    .filter(Objects::nonNull)
-                    .map(watchClass -> classValueBuilder(pjp, paramNames, watchClass))
-                    .collect(Collectors.joining("-"));
-            noRepeatSubmitKey += classParamValueBuilder;
-        } else {
-            HttpServletRequest request = RequestUtils.getRequest();
-            String sessionId = RequestUtils.getServletRequestAttributes().getSessionId();
-            noRepeatSubmitKey += sessionId + "-" + request.getServletPath();
+        mode = Objects.nonNull(mode) ? mode : TargetMode.session;
+
+        switch (mode) {
+            case session:
+                noRepeatSubmitKey = builderBySession(noRepeatSubmitKey);
+                break;
+            case classParam:
+                noRepeatSubmitKey = builderByClassParamValue(pjp, classes, paramNames, noRepeatSubmitKey);
+                break;
+            case watching:// todo 只能获取方法的第一层参数和第二层参数(参数的参数)
+                noRepeatSubmitKey = builderByWatching(pjp, noRepeatSubmitKey);
+                break;
+            default:
+                noRepeatSubmitKey = builderBySession(noRepeatSubmitKey);
+                break;
         }
         return noRepeatSubmitKey;
     }
 
+    private static String builderByClassParamValue(ProceedingJoinPoint pjp, Class[] classes, String[] paramNames, String noRepeatSubmitKey) {
+        if (!validatedWatcher(classes, paramNames)) throw new SibylException("TargetMode = classParam validated fail ");
+        // class[param=value;]-
+        String classParamValueBuilder = Arrays.stream(classes)
+                .filter(Objects::nonNull)
+                .map(watchClass -> classValueBuilder(pjp, paramNames, watchClass))
+                .collect(Collectors.joining("-"));
+        noRepeatSubmitKey += classParamValueBuilder;
+        return noRepeatSubmitKey;
+    }
+
+    private static String builderByWatching(ProceedingJoinPoint pjp, String noRepeatSubmitKey) {
+        //Gson gson = new GsonBuilder().create();//gson处理比较好?
+        //参数位置固定 todo 需要做校验？
+        //参数名称
+        String[] paramArr = ((CodeSignature) pjp.getSignature()).getParameterNames();
+        //参数类型 此时不知道参数是否有注解
+        Class[] typeArr = ((CodeSignature) pjp.getSignature()).getParameterTypes();
+        //参数值
+        Object[] args = pjp.getArgs();
+
+        //先构造方式所有参数列表
+        LinkedList<EasyField> fileList = new LinkedList<>();
+        for (int i = 0; i < args.length; i++) {
+            EasyField easyField = EasyField.builder()
+                    .name(paramArr[i])
+                    .clazz(typeArr[i])
+                    .value(args[i])
+                    .build();
+            fileList.add(easyField);
+        }
+
+        Method targetMethod = Arrays.stream(pjp.getTarget().getClass().getDeclaredMethods())
+                .filter(Objects::nonNull)
+                .filter(method -> pjp.getSignature().getName().equals(method.getName()))
+                .findFirst()
+                .orElse(null);
+
+        JSONObject json = new JSONObject();
+        for (int i = 0; i < targetMethod.getParameters().length; i++) {
+            Parameter parameter = targetMethod.getParameters()[i];
+//                    Class<?> parameterType = parameter.getType();
+//                    System.err.println(parameterType.getName());
+            Watching watching = parameter.getAnnotation(Watching.class);
+            EasyField easyField = fileList.get(i);
+            if (Objects.isNull(easyField.getValue())) continue;
+            if (Objects.nonNull(watching)) {
+                json.put(easyField.getName(), String.valueOf(easyField.getValue()));
+            } else {
+                //检查参数的参数
+                Type parameterizedType = parameter.getParameterizedType();
+                Object value = easyField.getValue();
+                Field[] declaredFields = value.getClass().getDeclaredFields();
+                for (Field declaredField : declaredFields) {
+                    if (Objects.isNull(declaredField)) continue;
+                    Annotation annotation = declaredField.getAnnotation(Watching.class);
+                    if (Objects.isNull(annotation)) continue;
+                    try {
+                        declaredField.setAccessible(true);
+                        Object o = declaredField.get(value);
+                        if (Objects.isNull(o)) continue;
+                        json.put(declaredField.getName(), String.valueOf(o));
+                    } catch (Exception e) {
+
+                    }
+                }
+            }
+
+        }
+
+        String collect = json.entrySet()
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(e -> Objects.nonNull(e.getKey()) && Objects.nonNull(e.getValue()))
+                .map(entry -> entry.getKey() + "=" + String.valueOf(entry.getValue()))
+                .collect(Collectors.joining("-"));
+        noRepeatSubmitKey += collect;
+        return noRepeatSubmitKey;
+    }
+
+    private static String builderBySession(String noRepeatSubmitKey) {
+        HttpServletRequest request = RequestUtils.getRequest();
+        String sessionId = RequestUtils.getServletRequestAttributes().getSessionId();
+        noRepeatSubmitKey += sessionId + "-" + request.getServletPath();
+        return noRepeatSubmitKey;
+    }
+
+    public static void main(String[] args) throws Exception {
+        String str = "test";
+        int value = 1;
+        AppRequest request = new AppRequest();
+        request.setId("dl3213");
+
+        //y
+        Gson gson = new GsonBuilder().create();
+//        System.err.println(gson.fromJson());
+        System.err.println(gson.toJson(str));
+        System.err.println(gson.toJson(value));
+        System.err.println(gson.toJson(request));
+    }
 
     public static String classValueBuilder(ProceedingJoinPoint pjp, String[] paramNames, Class<?> watchClass) {
         StringBuffer stringBuffer = new StringBuffer();

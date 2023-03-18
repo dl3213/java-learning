@@ -53,7 +53,7 @@ public class NoRepeatSubmitAspect {
             if (redisState != 1) throw new RedisConnectionFailureException("redis不可用");
 
             //构建缓存key
-            String noRepeatSubmitKey = AopJoinPointUtil.getCacheKeyByTarget(keyPrefix, pjp, noRepeatSubmit.watchClass(), noRepeatSubmit.classParamName());
+            String noRepeatSubmitKey = AopJoinPointUtil.getCacheKeyByTarget(keyPrefix, pjp, noRepeatSubmit.mode() ,noRepeatSubmit.watchClass(), noRepeatSubmit.classParamName());
 
             String ret = opsForValue.get(noRepeatSubmitKey);
             log.info("[请求重复切片处理]redis-key: {} , value:{}", noRepeatSubmitKey, ret);
