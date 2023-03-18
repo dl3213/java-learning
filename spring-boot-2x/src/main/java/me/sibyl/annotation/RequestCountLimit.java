@@ -17,10 +17,20 @@ public @interface RequestCountLimit {
     /**
      * 限制时间 单位：秒
      */
-    int time() default 3600;
+    int time() default 15;
 
     /**
      * 允许请求的次数
      */
     int count() default 3;
+
+    /**
+     *
+     */
+    Class<?>[] watchClass() default {};
+
+    /**
+     *
+     */
+    String[] classParamName() default {};
 }

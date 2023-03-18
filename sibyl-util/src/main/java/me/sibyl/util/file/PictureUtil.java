@@ -1,7 +1,5 @@
 package me.sibyl.util.file;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.IIOImage;

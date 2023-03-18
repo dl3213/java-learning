@@ -17,5 +17,15 @@ public @interface NoRepeatSubmit {
     /**
      *  过期时间
      **/
-    int expire() default 10;
+    long expire() default 10;
+
+    /**
+     *
+     */
+    Class<?>[] watchClass() default {};
+
+    /**
+     *
+     */
+    String[] classParamName() default {};
 }

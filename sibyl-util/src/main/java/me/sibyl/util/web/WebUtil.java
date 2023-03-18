@@ -1,4 +1,4 @@
-package me.sibyl.util;
+package me.sibyl.util.web;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.PrintWriter;
  * @Create 2022/02/26 16:07
  */
 
-public class WebUtil {
+public final class WebUtil {
 
     public static void renderString(HttpServletResponse response, String str) {
         PrintWriter out = null;
