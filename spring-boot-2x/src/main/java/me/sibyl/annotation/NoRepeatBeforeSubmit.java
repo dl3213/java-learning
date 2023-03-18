@@ -1,5 +1,7 @@
 package me.sibyl.annotation;
 
+import me.sibyl.aspect.TargetMode;
+
 import java.lang.annotation.*;
 
 /**
@@ -13,7 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface NoRepeatSubmit {
+public @interface NoRepeatBeforeSubmit {
     /**
      *  过期时间 秒
      **/

@@ -39,12 +39,12 @@ public class RequestCountLimitAspect {
     @Resource
     private RedisTemplate redisTemplate;
 
-    @Pointcut("@annotation(requestCountLimit)")
-    public void pointCut(RequestCountLimit requestCountLimit) {
+    @Pointcut("@annotation(limit)")
+    public void pointCut(RequestCountLimit limit) {
     }
 
-    @Around("pointCut(requestCountLimit)")
-    public Object doAround(ProceedingJoinPoint pjp, RequestCountLimit requestCountLimit) throws Throwable {
+    @Around("pointCut(limit)")
+    public Object doAround(ProceedingJoinPoint pjp, RequestCountLimit limit) throws Throwable {
         ValueOperations<String, Integer> opsForValue = redisTemplate.opsForValue();
 
         try {
@@ -59,7 +59,7 @@ public class RequestCountLimitAspect {
 
             //null -> 第一次请求
             if(Objects.isNull(count)) {
-                opsForValue.set(requestCountLimitKey, requestCountLimit.count() - 1, requestCountLimit.time(), TimeUnit.SECONDS);
+                opsForValue.set(requestCountLimitKey, limit.count() - 1, limit.time(), TimeUnit.SECONDS);
             }else {
                 // 0 -> 次数限制
                 if(Objects.nonNull(count) && count == 0){

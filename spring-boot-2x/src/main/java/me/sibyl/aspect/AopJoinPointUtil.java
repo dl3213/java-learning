@@ -1,21 +1,17 @@
 package me.sibyl.aspect;
 
-import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.annotation.TargetMode;
 import me.sibyl.annotation.Watching;
 import me.sibyl.common.config.SibylException;
 import me.sibyl.util.RequestUtils;
 import me.sibyl.util.object.ObjectUtil;
 import me.sibyl.vo.AppRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.CodeSignature;
-import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -35,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AopJoinPointUtil {
 
-    public static String getCacheKeyByTarget(String keyPrefix, ProceedingJoinPoint pjp, TargetMode mode, Class[] classes, String[] paramNames) {
+    public static String getCacheKeyByTarget(String keyPrefix, JoinPoint joinPoint, TargetMode mode, Class[] classes, String[] paramNames) {
         String noRepeatSubmitKey = keyPrefix;
 
         mode = Objects.nonNull(mode) ? mode : TargetMode.session;
@@ -45,10 +41,10 @@ public class AopJoinPointUtil {
                 noRepeatSubmitKey = builderBySession(noRepeatSubmitKey);
                 break;
             case classParam:
-                noRepeatSubmitKey = builderByClassParamValue(pjp, classes, paramNames, noRepeatSubmitKey);
+                noRepeatSubmitKey = builderByClassParamValue(joinPoint, classes, paramNames, noRepeatSubmitKey);
                 break;
             case watching:// todo 只能获取方法的第一层参数和第二层参数(参数的参数)
-                noRepeatSubmitKey = builderByWatching(pjp, noRepeatSubmitKey);
+                noRepeatSubmitKey = builderByWatching(joinPoint, noRepeatSubmitKey);
                 break;
             default:
                 noRepeatSubmitKey = builderBySession(noRepeatSubmitKey);
@@ -57,26 +53,26 @@ public class AopJoinPointUtil {
         return noRepeatSubmitKey;
     }
 
-    private static String builderByClassParamValue(ProceedingJoinPoint pjp, Class[] classes, String[] paramNames, String noRepeatSubmitKey) {
+    private static String builderByClassParamValue(JoinPoint joinPoint, Class[] classes, String[] paramNames, String noRepeatSubmitKey) {
         if (!validatedWatcher(classes, paramNames)) throw new SibylException("TargetMode = classParam validated fail ");
         // class[param=value;]-
         String classParamValueBuilder = Arrays.stream(classes)
                 .filter(Objects::nonNull)
-                .map(watchClass -> classValueBuilder(pjp, paramNames, watchClass))
+                .map(watchClass -> classValueBuilder(joinPoint, paramNames, watchClass))
                 .collect(Collectors.joining("-"));
         noRepeatSubmitKey += classParamValueBuilder;
         return noRepeatSubmitKey;
     }
 
-    private static String builderByWatching(ProceedingJoinPoint pjp, String noRepeatSubmitKey) {
+    private static String builderByWatching(JoinPoint joinPoint, String noRepeatSubmitKey) {
         //Gson gson = new GsonBuilder().create();//gson处理比较好?
         //参数位置固定 todo 需要做校验？
         //参数名称
-        String[] paramArr = ((CodeSignature) pjp.getSignature()).getParameterNames();
+        String[] paramArr = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
         //参数类型 此时不知道参数是否有注解
-        Class[] typeArr = ((CodeSignature) pjp.getSignature()).getParameterTypes();
+        Class[] typeArr = ((CodeSignature) joinPoint.getSignature()).getParameterTypes();
         //参数值
-        Object[] args = pjp.getArgs();
+        Object[] args = joinPoint.getArgs();
 
         //先构造方式所有参数列表
         LinkedList<EasyField> fileList = new LinkedList<>();
@@ -89,9 +85,9 @@ public class AopJoinPointUtil {
             fileList.add(easyField);
         }
 
-        Method targetMethod = Arrays.stream(pjp.getTarget().getClass().getDeclaredMethods())
+        Method targetMethod = Arrays.stream(joinPoint.getTarget().getClass().getDeclaredMethods())
                 .filter(Objects::nonNull)
-                .filter(method -> pjp.getSignature().getName().equals(method.getName()))
+                .filter(method -> joinPoint.getSignature().getName().equals(method.getName()))
                 .findFirst()
                 .orElse(null);
 
@@ -158,15 +154,15 @@ public class AopJoinPointUtil {
         System.err.println(gson.toJson(request));
     }
 
-    public static String classValueBuilder(ProceedingJoinPoint pjp, String[] paramNames, Class<?> watchClass) {
+    public static String classValueBuilder(JoinPoint joinPoint, String[] paramNames, Class<?> watchClass) {
         StringBuffer stringBuffer = new StringBuffer();
-        String keyBuilder = classParamValueBuilder(pjp, paramNames, watchClass);
+        String keyBuilder = classParamValueBuilder(joinPoint, paramNames, watchClass);
         if (StringUtils.isBlank(keyBuilder)) return null;
         stringBuffer.append(keyBuilder);
         return stringBuffer.toString();
     }
 
-    public static String classParamValueBuilder(ProceedingJoinPoint pjp, String[] paramNames, Class<?> watchClass) {
+    public static String classParamValueBuilder(JoinPoint joinPoint, String[] paramNames, Class<?> watchClass) {
         if (Objects.isNull(watchClass)) return null;
         StringBuffer classValueBuilder = new StringBuffer();
         classValueBuilder.append(watchClass.getName());
@@ -174,7 +170,7 @@ public class AopJoinPointUtil {
 
         String collect = Arrays.stream(paramNames)
                 .filter(StringUtils::isNotBlank)
-                .map(paramName -> paramValueBuilder(pjp, watchClass, paramName))
+                .map(paramName -> paramValueBuilder(joinPoint, watchClass, paramName))
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.joining(";"));
         classValueBuilder.append(collect);
@@ -182,9 +178,9 @@ public class AopJoinPointUtil {
         return classValueBuilder.toString();
     }
 
-    public static String paramValueBuilder(ProceedingJoinPoint pjp, Class<?> watchClass, String paramName) {
+    public static String paramValueBuilder(JoinPoint joinPoint, Class<?> watchClass, String paramName) {
         if (!ObjectUtil.classHasParam(watchClass, paramName)) return null;
-        Object arg = Arrays.stream(pjp.getArgs()).filter(Objects::nonNull).filter(e -> watchClass.getName().equals(e.getClass().getName())).findFirst().orElse(null);
+        Object arg = Arrays.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(e -> watchClass.getName().equals(e.getClass().getName())).findFirst().orElse(null);
         if (Objects.isNull(arg)) return null;
         JSONObject obj = JSONObject.from(arg);
         String stringValue = obj.getString(paramName);

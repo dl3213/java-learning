@@ -1,4 +1,4 @@
-package me.sibyl.annotation;
+package me.sibyl.aspect;
 
 import lombok.AllArgsConstructor;
 

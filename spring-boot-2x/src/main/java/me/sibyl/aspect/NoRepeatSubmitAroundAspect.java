@@ -4,11 +4,13 @@ package me.sibyl.aspect;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.annotation.NoRepeatSubmit;
+import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.common.response.Response;
+import me.sibyl.util.RequestUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
@@ -18,6 +20,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 @Order(12)
-public class NoRepeatSubmitAspect {
+public class NoRepeatSubmitAroundAspect {
 
     public static final String keyPrefix = "noRepeatSubmit-";
 
@@ -42,18 +45,24 @@ public class NoRepeatSubmitAspect {
     @Resource
     private RedisTemplate redisTemplate;
 
-    @Pointcut("@annotation(noRepeatSubmit)")
-    public void pointCut(NoRepeatSubmit noRepeatSubmit) {
+    @Pointcut("@annotation(submit)")
+    public void pointCut(NoRepeatAroundSubmit submit) {
     }
 
-    @Around("pointCut(noRepeatSubmit)")
-    public Object around(ProceedingJoinPoint pjp, NoRepeatSubmit noRepeatSubmit) throws Throwable {
+    @Around("pointCut(submit)")
+    public Object around(ProceedingJoinPoint pjp, NoRepeatAroundSubmit submit) throws Throwable {
         ValueOperations<String, String> opsForValue = redisTemplate.opsForValue();
         try {
             if (redisState != 1) throw new RedisConnectionFailureException("redis不可用");
 
             //构建缓存key
-            String noRepeatSubmitKey = AopJoinPointUtil.getCacheKeyByTarget(keyPrefix, pjp, noRepeatSubmit.mode() ,noRepeatSubmit.watchClass(), noRepeatSubmit.classParamName());
+            String noRepeatSubmitKey = AopJoinPointUtil.getCacheKeyByTarget(
+                    keyPrefix,
+                    pjp,
+                    submit.mode(),
+                    submit.watchClass(),
+                    submit.classParamName()
+            );
 
             String ret = opsForValue.get(noRepeatSubmitKey);
             log.info("[请求重复切片处理]redis-key: {} , value:{}", noRepeatSubmitKey, ret);
@@ -70,7 +79,7 @@ public class NoRepeatSubmitAspect {
             }
 
             Object o = pjp.proceed();
-            opsForValue.set(noRepeatSubmitKey, JSONObject.toJSONString(o), noRepeatSubmit.expire(), TimeUnit.SECONDS);
+            opsForValue.set(noRepeatSubmitKey, JSONObject.toJSONString(o), submit.expire(), TimeUnit.SECONDS);
             return o;
         } catch (RedisConnectionFailureException redisException) {
             redisState = 0;
@@ -83,6 +92,5 @@ public class NoRepeatSubmitAspect {
             return Response.error(800500, "验证重复提交时出现未知异常");
         }
     }
-
 
 }

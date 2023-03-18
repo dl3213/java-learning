@@ -1,9 +1,9 @@
 package me.sibyl.controller;
 
 import lombok.SneakyThrows;
-import me.sibyl.annotation.NoRepeatSubmit;
-import me.sibyl.annotation.RequestCountLimit;
-import me.sibyl.annotation.TargetMode;
+import me.sibyl.annotation.NoRepeatAroundSubmit;
+import me.sibyl.annotation.NoRepeatBeforeSubmit;
+import me.sibyl.aspect.TargetMode;
 import me.sibyl.annotation.Watching;
 import me.sibyl.common.response.Response;
 import me.sibyl.entity.User;
@@ -55,7 +55,7 @@ public class AppController {
     }
 
     @GetMapping("/hello")
-    @NoRepeatSubmit(mode = TargetMode.classParam, watchClass = {AppRequest.class, AppRequest2.class}, classParamName = {"id", "name"})
+    @NoRepeatAroundSubmit(mode = TargetMode.classParam, watchClass = {AppRequest.class, AppRequest2.class}, classParamName = {"id", "name"})
     public Response hello(@Validated AppRequest request, AppRequest2 request2) {
         // 目的 == 需求 == 出发点
 //        System.err.println("hello");
@@ -64,7 +64,7 @@ public class AppController {
     }
 
     @GetMapping("/hello2")
-    @NoRepeatSubmit(mode = TargetMode.watching)
+    @NoRepeatBeforeSubmit(mode = TargetMode.watching)
     public String hello2() {
         // 目的 == 需求 == 出发点
 //        System.err.println("hello2");
@@ -72,7 +72,7 @@ public class AppController {
     }
 
     @GetMapping("/hello3")
-    @NoRepeatSubmit(mode = TargetMode.watching)
+    @NoRepeatAroundSubmit(mode = TargetMode.watching)
     public String hello3(@Watching String param, AppRequest request, @Watching AppRequest2 request2 , @Watching int paramInt) {
         // 目的 == 需求 == 出发点
 //        System.err.println("hello3");
