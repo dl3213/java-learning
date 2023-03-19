@@ -29,3 +29,11 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath*:/mapper/**/*.xml
 
+dubbo:
+  protocol:
+    name: dubbo
+    port: 20882
+  scan:
+    base-packages: me.sibyl.dubbo
+  consumer:
+    check: false

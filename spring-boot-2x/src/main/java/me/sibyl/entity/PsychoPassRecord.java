@@ -31,4 +31,7 @@ public class PsychoPassRecord extends BaseEntity {
     private String uid;
     private String psychoPass;
     private String type;
+    private String code;
+    private String flag;
+    private String state;
 }
