@@ -12,5 +12,5 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 
 public interface DubboOrderService {
-    Response create(OrderCreateRequest request);
+    String create(OrderCreateRequest request);
 }

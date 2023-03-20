@@ -1,9 +1,9 @@
 
 server:
-  port: 8082
+  port: 8083
 spring:
   application:
-    name: sibyl-nacos-account-provider
+    name: sibyl-nacos-order-provider
   profiles:
     active: dev
   datasource:

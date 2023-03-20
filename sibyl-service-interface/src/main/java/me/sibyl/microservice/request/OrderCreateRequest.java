@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -16,7 +17,10 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCreateRequest {
+public class OrderCreateRequest implements Serializable {
+
+    private static final long serialVersionUID = -1L;
+
     @NonNull
     private BigDecimal amount;
     private String linkId;

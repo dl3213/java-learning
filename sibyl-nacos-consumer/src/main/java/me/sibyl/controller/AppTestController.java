@@ -1,8 +1,13 @@
 package me.sibyl.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
+import me.sibyl.common.response.Response;
 import me.sibyl.entity.User;
 import me.sibyl.microservice.provider.nacos.DubboAccountService;
+import me.sibyl.microservice.provider.nacos.DubboOrderService;
 import me.sibyl.microservice.request.AccountConsumeRequest;
+import me.sibyl.microservice.request.OrderCreateRequest;
 import me.sibyl.sevice.UserService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,16 +25,19 @@ import java.math.BigDecimal;
  */
 @RestController
 @RequestMapping("/api/v1")
-public class AppController {
+@Slf4j
+public class AppTestController {
 
     @Resource
     private UserService userService;
 
     @DubboReference
     private DubboAccountService dubboAccountService;
+    @DubboReference
+    private DubboOrderService dubboOrderService;
 
     @GetMapping("/test")
-    public String test(){
+    public String test() {
         User u = userService.queryById("dl3213");
         System.err.println(u);
 
@@ -38,6 +46,13 @@ public class AppController {
         requestVO.setAmount(BigDecimal.ONE);
         String consume = dubboAccountService.consume(requestVO);
         System.err.println(consume);
+
+        OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
+        orderCreateRequest.setAmount(requestVO.getAmount());
+        orderCreateRequest.setLinkId(requestVO.getUserId());
+        String orderId = dubboOrderService.create(orderCreateRequest);
+        System.err.println("[test]order create = " + orderId);
+
         return String.valueOf(System.currentTimeMillis());
     }
 }
