@@ -1,6 +1,7 @@
 package me.sibyl.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
 import me.sibyl.entity.User;
@@ -37,6 +38,7 @@ public class AppTestController {
     private DubboOrderService dubboOrderService;
 
     @GetMapping("/test")
+    @GlobalTransactional(name = "consume-test", rollbackFor = Exception.class)
     public String test() {
         User u = userService.queryById("dl3213");
         System.err.println(u);
@@ -46,6 +48,8 @@ public class AppTestController {
         requestVO.setAmount(BigDecimal.ONE);
         String consume = dubboAccountService.consume(requestVO);
         System.err.println(consume);
+
+        //int i = 1 / 0;
 
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
         orderCreateRequest.setAmount(requestVO.getAmount());

@@ -36,3 +36,16 @@ dubbo:
     base-packages: me.sibyl.dubbo
   consumer:
     check: false
+
+# seata 配置
+seata:
+  # 使用哪个事务组
+  tx-service-group: my-tx-group
+  service:
+    # 事务组对应的集群民称
+    vgroup-mapping.my-tx-group: seata-server
+    # seata-server的地址
+    grouplist.seata-server: 127.0.0.1:8091
+  enabled: true
+
+
