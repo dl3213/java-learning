@@ -1,7 +1,7 @@
 package me.sibyl.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.util.DocxUtil;
+import me.sibyl.util.docx.DocxUtil;
 import org.springframework.util.ClassUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

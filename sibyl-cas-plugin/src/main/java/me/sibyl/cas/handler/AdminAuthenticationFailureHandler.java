@@ -3,7 +3,7 @@ package me.sibyl.cas.handler;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
-import me.sibyl.util.WebUtil;
+import me.sibyl.util.web.WebUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;

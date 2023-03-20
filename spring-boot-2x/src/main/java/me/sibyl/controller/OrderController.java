@@ -1,14 +1,13 @@
 package me.sibyl.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.annotation.NoRepeatSubmit;
+import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.common.response.Response;
 import me.sibyl.service.BusinessOrderService;
 import me.sibyl.vo.OrderCreateRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -28,7 +27,7 @@ public class OrderController {
     private BusinessOrderService businessOrderService;
 
     @PostMapping(path = "/create")
-    @NoRepeatSubmit
+    @NoRepeatAroundSubmit
     public Response create(@Validated OrderCreateRequest orderCreateRequest){
         return Response.success(businessOrderService.createOrder(orderCreateRequest));
     }

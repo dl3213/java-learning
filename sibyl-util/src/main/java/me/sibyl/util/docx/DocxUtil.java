@@ -1,8 +1,8 @@
-package me.sibyl.util;
+package me.sibyl.util.docx;
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBookmark;
@@ -26,7 +26,7 @@ import java.util.Objects;
  * @Date 2023/2/9 15:51
  * @Author by Qin Yazhi
  */
-public class DocxUtil {
+public final class DocxUtil {
 
     private static final String BOOKMARK_START_TAG = "w:bookmarkStart";
     private static final String BOOKMARK_END_TAG = "w:bookmarkEnd";

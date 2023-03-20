@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -16,7 +17,10 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountConsumeRequest {
+public class AccountConsumeRequest implements Serializable {
+
+    private static final long serialVersionUID = -1L;
+
     @NonNull
     private String userId;
     @NonNull

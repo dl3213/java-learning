@@ -14,7 +14,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Classname AppTest
@@ -46,16 +48,22 @@ public class AppTest {
 //            System.err.println(psychoPassRecord);
 //        }
 
-        for (int i = 0; i < 1000000; i++) {
+        List<String> strings = Arrays.asList("sibyl", "test", "dev", "prod","dl3213","steam");
+
+        Stream.iterate(1, a -> a + 1).limit(1000000).parallel().forEach(i ->{
             User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
             record.setUid(user.getId());
             record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 500.00d)));
             record.setType("0");
             record.setCreateId(user.getId());
+            record.setFlag(String.valueOf(System.currentTimeMillis()%5));
+            record.setState(String.valueOf(System.currentTimeMillis()%5));
+            record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));
             record.setCreateTime(LocalDateTime.now());
             psychoPassRecordMapper.insert(record);
-        }
+        });
+
     }
 
     @Test

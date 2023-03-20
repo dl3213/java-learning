@@ -9,13 +9,10 @@ import java.lang.annotation.*;
  * @Author by Qin Yazhi
  */
 
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface NoRepeatSubmit {
-    /**
-     *  过期时间
-     **/
-    int expire() default 10;
+public @interface Watching {
+
 }
