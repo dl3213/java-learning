@@ -1,5 +1,8 @@
 package me.sibyl.util.file;
 
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import lombok.SneakyThrows;
 import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.IIOImage;
@@ -96,7 +99,7 @@ public class PictureUtil {
         imageOutput.close();
     }
 
-    private static byte[] getByte(FileInputStream inputStream) throws Exception {
+    public static byte[] getByte(FileInputStream inputStream) throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         //创建一个Buffer字符串
@@ -117,7 +120,7 @@ public class PictureUtil {
 
     public static void main(String[] args) throws Exception {
 
-        String path = "D:\\85704476-2.png";
+        String path = "D:\\图片1.png";
 
         File file = new File(path);
         System.err.println("file = " + file.length());// 1024 b = 1kb
@@ -125,14 +128,15 @@ public class PictureUtil {
 
         byte[] bytes = getByte(inputStream);
 
-        if (bytes.length >= (256 * 1024)) {
+        int maxSize = 1024 * 1024;
+        if (bytes.length >= maxSize) {
             FileInputStream input = new FileInputStream(path);
             BufferedImage bufferedImage = ImageIO.read(input);
 
             ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
             ImageWriteParam iwp = writer.getDefaultWriteParam();
             iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            float i = ((float) (256 * 1024)) / ((float) bytes.length);
+            float i = ((float) maxSize) / ((float) bytes.length);
             iwp.setCompressionQuality(i);
 
             ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -148,10 +152,43 @@ public class PictureUtil {
             imgOutStrm.close();
         }
 
-        String outPath = "D:\\" + System.currentTimeMillis() + ".png";
+        String outPath = "D:\\图片1" + System.currentTimeMillis() + ".png";
         FileImageOutputStream imageOutput = new FileImageOutputStream(new File(outPath));
         imageOutput.write(bytes, 0, bytes.length);//将byte写入硬盘
         imageOutput.close();
+    }
+
+    @SneakyThrows
+    public static void main20230317(String[] args) {
+
+        String path = "D:\\图片1.png";
+
+        File file = new File(path);
+        System.err.println("file = " + file.length());// 1024 b = 1kb
+        FileInputStream inputStream = new FileInputStream(path);
+
+        byte[] bytes = FileUtil.getByte(inputStream);
+        System.err.println(bytes.length);
+        int maxSize = 256 << 10;//等效256*1024
+        if (bytes.length > (maxSize)) {
+            ByteArrayInputStream inputStream2 = new ByteArrayInputStream(bytes);
+            double i = ((double) (maxSize)) / ((double) bytes.length);
+            System.err.println(i);
+            Thumbnails.Builder<? extends InputStream> builder = Thumbnails.of(inputStream2).scale(i);
+            BufferedImage bufferedImage = builder.asBufferedImage();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "jpg", outputStream);
+            bytes = outputStream.toByteArray();
+
+            inputStream.close();
+            outputStream.close();
+        }
+
+        String outPath = "D:\\图片1" + System.currentTimeMillis() + ".png";
+        FileImageOutputStream imageOutput = new FileImageOutputStream(new File(outPath));
+        imageOutput.write(bytes, 0, bytes.length);//将byte写入硬盘
+        imageOutput.close();
+
     }
 
 }

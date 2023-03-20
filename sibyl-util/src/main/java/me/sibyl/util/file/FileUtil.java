@@ -1,14 +1,13 @@
 package me.sibyl.util.file;
 
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import me.sibyl.util.stream.StreamUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -21,33 +20,30 @@ import java.util.HashMap;
  * @Author dyingleaf3213
  * @Create 2023/03/16 20:20
  */
-@Slf4j
 public class FileUtil {
 
     //    public static String testFilePath = "D:\\4test\\gif\\73500614.gif";
 //    public static String testFilePath = "D:\\4test\\85704476-2.png";
-    public static String testFilePath = "D:\\4test\\85704476-21678973228770.png";
+    public static String testFilePath = "D:\\图片1.png";
 
     @SneakyThrows
     public static void main(String[] args) {
         File file = new File(testFilePath);
         System.err.println("file.length() = " + file.length());
-        FileInputStream fileInputStream = new FileInputStream(file);
-        ByteArrayInputStream byteInputStream = FileUtil.trans2ByteStream(fileInputStream);
+        ByteArrayInputStream byteInputStream = FileUtil.getByteInputStream(file);
         System.err.println("file type = " + FileUtil.getFileTypeFromByteStream(byteInputStream));
 
-        byte[] sourceBytes = FileUtil.getByteFromByteStream(byteInputStream);
+        byte[] sourceBytes = FileUtil.getByteWithResetStream(byteInputStream);
 //        System.err.println("sourceBytes.length = " + sourceBytes.length);
-        System.err.println("sourceBytes.type = " + FileUtil.getFileTypeFromByte(sourceBytes));
+//        System.err.println("sourceBytes.type = " + FileUtil.getFileTypeFromByte(sourceBytes));
 
-
-        BufferedImage inputImage = ImageIO.read(new File(testFilePath));
+//        BufferedImage inputImage = ImageIO.read(new File(testFilePath));
         // 图片类型转换 : 所有图片先转jpg再压缩,效果更好
-        String outputFile = testFilePath.replace(".", System.currentTimeMillis() + ".");
-        System.err.println("outputFile = " + outputFile);
-        File output = new File(outputFile);
-        ImageIO.write(inputImage, "jpg", output);
-        System.err.println("outputFile type =" + FileUtil.getFileTypeFromByteStream(FileUtil.trans2ByteStream(new FileInputStream(outputFile))));
+//        String outputFile = testFilePath.replace(".", System.currentTimeMillis() + ".");
+//        System.err.println("outputFile = " + outputFile);
+//        File output = new File(outputFile);
+//        ImageIO.write(inputImage, "jpg", output);
+//        System.err.println("outputFile type =" + FileUtil.getFileTypeFromByteStream(FileUtil.trans2ByteStream(new FileInputStream(outputFile))));
 
         //图片压缩
         byte[] zipPic = FileUtil.zipPic(sourceBytes, FileUtil.getFileTypeFromByteStream(byteInputStream), 0.1f);
@@ -63,72 +59,108 @@ public class FileUtil {
 //        imageOutput.close();
     }
 
-    @SneakyThrows
     public static byte[] zipPic(byte[] sourceBytes, String picType, float quality) {
 
         byte[] bytes = null;
+        try (
+                ByteArrayInputStream input = new ByteArrayInputStream(sourceBytes);
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ) {
+            BufferedImage bufferedImage = ImageIO.read(input);
+            ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
+            ImageWriteParam iwp = writer.getDefaultWriteParam();
+            iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            iwp.setCompressionQuality(quality);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(sourceBytes);
-        BufferedImage bufferedImage = ImageIO.read(input);
+            ImageOutputStream imgOutStrm = ImageIO.createImageOutputStream(output);
+            writer.setOutput(imgOutStrm);
+            IIOImage image = new IIOImage(bufferedImage, null, null);
+            writer.write(null, image, iwp);
 
-        ImageWriter writer = (ImageWriter) ImageIO.getImageWritersByFormatName("jpeg").next();
-        ImageWriteParam iwp = writer.getDefaultWriteParam();
-        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        iwp.setCompressionQuality(quality);
+            writer.dispose();
+            bytes = output.toByteArray();
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        ImageOutputStream imgOutStrm = ImageIO.createImageOutputStream(output);
-        writer.setOutput(imgOutStrm);
-        IIOImage image = new IIOImage(bufferedImage, null, null);
-        writer.write(null, image, iwp);
+            input.close();
+            output.close();
+            imgOutStrm.close();
+            return bytes;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
-        writer.dispose();
-        bytes = output.toByteArray();
 
-        input.close();
-        output.close();
-        imgOutStrm.close();
-        return bytes;
     }
 
-    private static byte[] getByteFromByteStream(ByteArrayInputStream inputStream) throws Exception {
+    public static byte[] getByteWithResetStream(ByteArrayInputStream inputStream) {
 
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        //创建一个Buffer字符串
-        byte[] buffer = new byte[1024];
-        //每次读取的字符串长度，如果为-1，代表全部读取完毕
-        int len = 0;
-        //使用一个输入流从buffer里把数据读取出来
-        while ((len = inputStream.read(buffer)) != -1) {
-            //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
-            outStream.write(buffer, 0, len);
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();) {
+            //创建一个Buffer字符串
+            byte[] buffer = new byte[1024];
+            //每次读取的字符串长度，如果为-1，代表全部读取完毕
+            int len = 0;
+            //使用一个输入流从buffer里把数据读取出来
+            while ((len = inputStream.read(buffer)) != -1) {
+                //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
+                outStream.write(buffer, 0, len);
+            }
+            //关闭输入流
+            if (inputStream.markSupported()) {
+                inputStream.reset();
+            } else {
+                throw new Exception("markSupported = false");
+            }
+            outStream.close();
+            return outStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        //关闭输入流
-        if (inputStream.markSupported()) {
-            inputStream.reset();
-        } else {
-            throw new Exception("markSupported = false");
-        }
-        outStream.close();
-        return outStream.toByteArray();
+
     }
 
-    private static ByteArrayInputStream trans2ByteStream(InputStream inputStream) throws Exception {
+    public static byte[] getByte(InputStream inputStream) {
 
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        //创建一个Buffer字符串
-        byte[] buffer = new byte[1024];
-        //每次读取的字符串长度，如果为-1，代表全部读取完毕
-        int len = 0;
-        //使用一个输入流从buffer里把数据读取出来
-        while ((len = inputStream.read(buffer)) != -1) {
-            //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
-            outStream.write(buffer, 0, len);
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();) {
+            //创建一个Buffer字符串
+            byte[] buffer = new byte[1024];
+            //每次读取的字符串长度，如果为-1，代表全部读取完毕
+            int len = 0;
+            //使用一个输入流从buffer里把数据读取出来
+            while ((len = inputStream.read(buffer)) != -1) {
+                //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
+                outStream.write(buffer, 0, len);
+            }
+            //关闭输入流
+            inputStream.close();
+            outStream.close();
+            return outStream.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        //关闭输入流
-        inputStream.close();
-        outStream.close();
-        return new ByteArrayInputStream(outStream.toByteArray());
+    }
+
+    public static ByteArrayInputStream trans2ByteStream(InputStream inputStream) {
+
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();) {
+            //创建一个Buffer字符串
+            byte[] buffer = new byte[1024];
+            //每次读取的字符串长度，如果为-1，代表全部读取完毕
+            int len = 0;
+            //使用一个输入流从buffer里把数据读取出来
+            while ((len = inputStream.read(buffer)) != -1) {
+                //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
+                outStream.write(buffer, 0, len);
+            }
+            //关闭输入流
+            inputStream.close();
+            outStream.close();
+            return new ByteArrayInputStream(outStream.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -202,13 +234,14 @@ public class FileUtil {
     }
 
     public static String getFileTypeFromByteStream(ByteArrayInputStream byteArrayInputStream) {
-        InputStream copy = copy(byteArrayInputStream);
-        return mFileTypes.get(getFileHeader(copy));
+        //InputStream copy = copyByteStream(byteArrayInputStream);
+        String fileHeader = getFileHeader(byteArrayInputStream);
+        return mFileTypes.get(fileHeader);
     }
 
-    public static ByteArrayInputStream copy(ByteArrayInputStream inputStream) {
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    public static ByteArrayInputStream copyByteStream(ByteArrayInputStream inputStream) {
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {
             byte[] buffer = new byte[1024];
             int len;
             while ((len = inputStream.read(buffer)) > -1) {
@@ -220,14 +253,13 @@ public class FileUtil {
             if (inputStream.markSupported()) {
                 inputStream.reset();
             } else {
-                throw new Exception("markSupported = false");
+                System.err.println("inputStream.markSupported = false");
+                System.err.println("inputStream closed");
+                inputStream.close();
             }
             return new ByteArrayInputStream(bytes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
-        } catch (Exception exception) {
-            exception.printStackTrace();
             return null;
         }
     }
@@ -245,14 +277,17 @@ public class FileUtil {
              */
             is.read(b, 0, b.length);
             value = bytesToHexString(b);
-        } catch (Exception e) {
-        } finally {
-            if (null != is) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
+
+            if (inputStream.markSupported()) {
+                inputStream.reset();
+            } else {
+                System.err.println("inputStream.markSupported = false");
+                System.err.println("inputStream closed");
+                inputStream.close();
             }
+        } catch (IOException e) {
+        } finally {
+            StreamUtil.close(is);
         }
         if (StringUtils.startsWith(value, "FFD8FF")) {
             value = value.substring(0, 6);
@@ -278,4 +313,26 @@ public class FileUtil {
     }
 
 
+    public static ByteArrayInputStream getByteInputStream(File file) {
+
+        try (
+                FileInputStream inputStream = new FileInputStream(file);
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        ) {
+            //创建一个Buffer字符串
+            byte[] buffer = new byte[1024];
+            //每次读取的字符串长度，如果为-1，代表全部读取完毕
+            int len = 0;
+            //使用一个输入流从buffer里把数据读取出来
+            while ((len = inputStream.read(buffer)) != -1) {
+                //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
+                outStream.write(buffer, 0, len);
+            }
+            //关闭输入流
+            return new ByteArrayInputStream(outStream.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
