@@ -12,7 +12,7 @@ import java.io.*;
  * @Author by Qin Yazhi
  */
 
-public class StreamUtil {
+public final class StreamUtil {
 
     @SneakyThrows
     public static void main(String[] args) {

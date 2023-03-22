@@ -21,7 +21,7 @@ import java.io.*;
  * @Create 2023/03/13 20:28
  */
 
-public class PictureUtil {
+public final class PictureUtil {
 
     public static void main2(String[] args) throws Exception {
         String path = "D:\\85704476-2.png";

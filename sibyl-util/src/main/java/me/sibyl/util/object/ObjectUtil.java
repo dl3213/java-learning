@@ -15,7 +15,9 @@ import java.util.Objects;
 public final class ObjectUtil {
 
     public static boolean classHasParam(Class clazz, String paramName) {
-        if (Objects.isNull(clazz) || StringUtils.isBlank(paramName)) return false;
+        if (Objects.isNull(clazz) || StringUtils.isBlank(paramName)) {
+            return false;
+        }
         try {
             Field field = clazz.getDeclaredField(paramName);
             return Objects.nonNull(field);

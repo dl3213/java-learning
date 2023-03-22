@@ -20,7 +20,7 @@ import java.util.HashMap;
  * @Author dyingleaf3213
  * @Create 2023/03/16 20:20
  */
-public class FileUtil {
+public final class FileUtil {
 
     //    public static String testFilePath = "D:\\4test\\gif\\73500614.gif";
 //    public static String testFilePath = "D:\\4test\\85704476-2.png";
@@ -108,7 +108,7 @@ public class FileUtil {
             if (inputStream.markSupported()) {
                 inputStream.reset();
             } else {
-                throw new Exception("markSupported = false");
+                //throw new Exception("markSupported = false");
             }
             outStream.close();
             return outStream.toByteArray();

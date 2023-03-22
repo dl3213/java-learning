@@ -7,7 +7,7 @@ package me.sibyl.util.thread;
  * @Create 2023/02/20 21:05
  */
 
-public class ThreadUtil {
+public final class ThreadUtil {
 
     public static void sleep(long millis) {
         try {

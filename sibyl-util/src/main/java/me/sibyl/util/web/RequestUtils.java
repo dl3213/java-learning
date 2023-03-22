@@ -8,7 +8,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class RequestUtils {
+public final class RequestUtils {
 
     public static HttpServletRequest getRequest(){
         ServletRequestAttributes attributes = (ServletRequestAttributes) getServletRequestAttributes();
