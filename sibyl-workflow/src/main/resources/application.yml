@@ -1,8 +1,0 @@
-server:
-  port: 9301
-
-spring:
-  application:
-    name: sibyl-workflow
-  profiles:
-    include: data, workflow

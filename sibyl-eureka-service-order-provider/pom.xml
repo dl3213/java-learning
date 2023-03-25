@@ -72,8 +72,8 @@
             <version>3.5.1</version>
         </dependency>
         <dependency>
-            <groupId>me.sibyl.microservice</groupId>
-            <artifactId>sibyl-service-interface</artifactId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-service-api</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>

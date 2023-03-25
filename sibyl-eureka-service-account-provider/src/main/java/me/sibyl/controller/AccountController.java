@@ -26,6 +26,7 @@ public class AccountController {
     @PostMapping(value = "/consume")
     public Response consume(@RequestBody AccountConsumeRequest request) {
         log.info("[account-service] now is account-service");
+        int i=1/0;
         String consume = accountService.consume(request);
         return Response.success(consume);
     }

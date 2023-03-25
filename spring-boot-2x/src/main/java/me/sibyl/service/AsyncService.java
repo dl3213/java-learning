@@ -3,10 +3,13 @@ package me.sibyl.service;
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * @Classname AsyncService
@@ -19,6 +22,19 @@ public class AsyncService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Async
+    public void voidAsync(){
+        System.err.println(Thread.currentThread().getName()+" => " + System.currentTimeMillis());
+        throw new RuntimeException("xixixi");
+    }
+
+    @Async
+    public Future<String> stringAsync(){
+        long currentTimeMillis = System.currentTimeMillis();
+        System.err.println(Thread.currentThread().getName()+" => " + currentTimeMillis);
+        return new AsyncResult<String>(String.valueOf(currentTimeMillis));
+    }
 
     @Async
     public void test(Long id) {

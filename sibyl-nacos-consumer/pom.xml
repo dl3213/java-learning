@@ -53,6 +53,16 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.alibaba.csp/sentinel-core &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.csp</groupId>-->
+<!--            <artifactId>sentinel-core</artifactId>-->
+<!--            <version>1.8.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
@@ -83,8 +93,8 @@
             <version>3.5.1</version>
         </dependency>
         <dependency>
-            <groupId>me.sibyl.microservice</groupId>
-            <artifactId>sibyl-service-interface</artifactId>
+            <groupId>me.sibyl</groupId>
+            <artifactId>sibyl-service-api</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>

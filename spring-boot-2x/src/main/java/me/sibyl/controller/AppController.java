@@ -6,12 +6,14 @@ import me.sibyl.annotation.NoRepeatBeforeSubmit;
 import me.sibyl.aspect.TargetMode;
 import me.sibyl.annotation.Watching;
 import me.sibyl.common.response.Response;
+import me.sibyl.common.response.ResponseVO;
 import me.sibyl.entity.User;
 import me.sibyl.listener.SibylEvent;
 import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.concurrent.Future;
 
 /**
  * @Classname AppController
@@ -46,7 +49,7 @@ public class AppController {
         //System.err.println(Thread.currentThread().getName());
         //System.err.println(user.getId());
         System.err.println(user.getId());
-        appService.save(user);//保存数据库
+//        appService.save(user);//保存数据库
         System.err.println(user.getId());
 
         Thread.sleep(10000);
@@ -73,17 +76,33 @@ public class AppController {
 
     @GetMapping("/hello3")
     @NoRepeatAroundSubmit(mode = TargetMode.watching)
-    public String hello3(@Watching String param, AppRequest request, @Watching AppRequest2 request2 , @Watching int paramInt) {
+    public String hello3(@Watching String param, AppRequest request, @Watching AppRequest2 request2, @Watching int paramInt) {
         // 目的 == 需求 == 出发点
 //        System.err.println("hello3");
         return String.valueOf(System.currentTimeMillis());
     }
 
 
-//    @GetMapping("/test")
-//    public ResponseVO test(){
-////        throw new RuntimeException();
-//        return new ResponseVO(200, "test",userMapper.selectList(null));
-//    }
+    @SneakyThrows
+    @GetMapping("/async")
+    public Response async() {
+        System.err.println(Thread.currentThread().getName() + " => " + System.currentTimeMillis());
+        asyncService.voidAsync();
+        Future<String> future = asyncService.stringAsync();
+//        System.err.println("future.get() => " + future.get());
+        System.err.println(Thread.currentThread().getName() + " => " + System.currentTimeMillis());
+        return Response.success();
+    }
+
+    @GetMapping("/cache")
+    @Cacheable(
+            value = "",
+            cacheNames = {"sibyl-cache#5"},
+            key = "#root.targetClass+'-'+#root.methodName"
+    )
+    public Response cache() {
+        System.err.println("executed...");
+        return Response.success(System.currentTimeMillis());
+    }
 }
 
