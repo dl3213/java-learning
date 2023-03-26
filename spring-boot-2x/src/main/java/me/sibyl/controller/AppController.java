@@ -13,7 +13,10 @@ import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.ApplicationContext;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,12 +99,28 @@ public class AppController {
 
     @GetMapping("/cache")
     @Cacheable(
-            value = "",
-            cacheNames = {"sibyl-cache#5"},
+            cacheNames = {"sibyl-cache"},
             key = "#root.targetClass+'-'+#root.methodName"
     )
     public Response cache() {
         System.err.println("executed...");
+        return Response.success(System.currentTimeMillis());
+    }
+
+
+    @Resource
+    private CacheManager cacheManager;
+
+    @GetMapping("/cache/query")
+    public Response cacheQuery() {
+        Cache cache = cacheManager.getCache("sibyl-cache");
+        System.err.println(cache);
+        System.err.println(cache.getClass());
+        CaffeineCache caffeineCache = (CaffeineCache) cache;
+        caffeineCache.getNativeCache().asMap().entrySet().forEach(c ->{
+            System.err.println(c.getKey());
+            System.err.println(c.getValue());
+        });
         return Response.success(System.currentTimeMillis());
     }
 }

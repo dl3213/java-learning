@@ -1,6 +1,7 @@
 package me.sibyl.common.response;
 
 import lombok.Data;
+import lombok.ToString;
 import me.sibyl.common.domain.CommonEnum;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @Created by dyingleaf3213
  */
 @Data
+@ToString
 public class Response extends HashMap<String, Object> {
 
     private static String DATA_NAME = "data";
