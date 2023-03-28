@@ -63,7 +63,7 @@ public class ImageOperator {
                 //2.设置内容
                 //  颜色
 //                .color(new Color(0, 0, 0, 255))
-                .color(context -> new Color(0,0,0,255))
+//                .color(context -> new Color(0,0,0,255))
 //                .fontSize(50)
                 .fontSize(context ->
                         context.getImage().getHeight() > context.getImage().getWidth() ?
@@ -260,53 +260,6 @@ public class ImageOperator {
         // 这三个参数分别为你的文字内容，起始位置横坐标(px)，纵坐标位置(px)。
         pen.drawString(waterText, x, y);
         pen.dispose();
-    }
-
-    public ByteArrayInputStream copyByteStream(ByteArrayInputStream inputStream) {
-
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = inputStream.read(buffer)) > -1) {
-                byteArrayOutputStream.write(buffer, 0, len);
-            }
-            byteArrayOutputStream.flush();
-            byte[] bytes = byteArrayOutputStream.toByteArray();
-            byteArrayOutputStream.close();
-            if (inputStream.markSupported()) {
-                inputStream.reset();
-            } else {
-                System.err.println("inputStream.markSupported = false");
-                System.err.println("inputStream closed");
-                inputStream.close();
-            }
-            return new ByteArrayInputStream(bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public ByteArrayInputStream getByteInputStream(File file) {
-
-        try (
-                FileInputStream inputStream = new FileInputStream(file);
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        ) {
-            //创建一个Buffer字符串
-            byte[] buffer = new byte[1024];
-            //每次读取的字符串长度，如果为-1，代表全部读取完毕
-            int len = 0;
-            //使用一个输入流从buffer里把数据读取出来
-            while ((len = inputStream.read(buffer)) != -1) {
-                //用输出流往buffer里写入数据，中间参数代表从哪个位置开始读，len代表读取的长度
-                outStream.write(buffer, 0, len);
-            }
-            return new ByteArrayInputStream(outStream.toByteArray());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public static byte[] getByteWithCloseStream(InputStream inputStream) {
