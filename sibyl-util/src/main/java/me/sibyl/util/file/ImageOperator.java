@@ -1,11 +1,11 @@
 package me.sibyl.util.file;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 /**
  * @Classname ImageOperator
- * @Description ImageUtil
+ * @Description ImageOperator
  * @Date 2023/3/28 14:37
  * @Author by Qin Yazhi
  */
@@ -45,16 +45,20 @@ public class ImageOperator {
     @Getter
     @Setter
     private Integer y;
+    @Getter
+    @Setter
+    private Integer degree;
 
     public static void main(String[] args) throws Exception {
-        String filePath = "D:\\4test\\TPbQ2K2l.jpeg";
+        String filePath = "D:\\test\\图片1.png";
         File file = new File(filePath);
         System.err.println(file.getAbsolutePath());
         System.err.println(file.length());
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        byte[] test = ImageOperator.builder()
+        byte[] test = null;
+        ImageOperator.builder()
                 //1.先设置输入源：三选一
 //                .file(file) //三选一
 //                .inputStreamWithClose(new FileInputStream(file)) //三选一
@@ -65,28 +69,29 @@ public class ImageOperator {
 //                .color(new Color(0, 0, 0, 255))
 //                .color(context -> new Color(0,0,0,255))
 //                .fontSize(50)
-                .fontSize(context ->
-                        context.getImage().getHeight() > context.getImage().getWidth() ?
-                                (context.getImage().getHeight() / 3 / context.getWaterText().length()) : (context.getImage().getWidth() / 2) / context.getWaterText().length())
-
+//                .fontSize(context ->
+//                        context.getImage().getHeight() > context.getImage().getWidth() ?
+//                                (context.getImage().getHeight() / 3 / context.getWaterText().length()) : (context.getImage().getWidth() / 2) / context.getWaterText().length())
 //                .font(new Font("微软雅黑", Font.ITALIC, 75))
 //                .font(context -> new Font("微软雅黑", Font.ITALIC, context.getFontSize()))
 //                .x(120)
 //                .x(context -> context.getImage().getWidth() / 2)
 //                .y(20)
 //                .y(context -> context.getImage().getHeight() / 2)
+//                .degree(45)// 水平顺时针
+//                .degree(context -> context.getImage().getHeight() / 2)
                 //3.输出，四选一
-//                .out(file.getAbsolutePath())//四选一，无返回值
-//                .out(file)//四选一，无返回值
-//                .out(outputStream)//四选一，无返回值
-                .out()//四选一,有返回值
-                ;
-        //相同的属性，后覆盖上，大步骤顺序固定，其他步骤：字体大小->子样式
+                .out(file.getAbsolutePath())//四选一，无返回值，输出到指定文件路径
+//                .out(file)//四选一，无返回值，输出到指定文件
+//                .out(outputStream)//四选一，无返回值，输出到指定输出流
+//                .out()//四选一,有返回值，输出 图片byte[]
+        ;
+        //相同的属性，后覆盖前，大步骤顺序固定，其他步骤：字大小->字样式(因为字样式里才是最终的字大小)
 
-        String outPath = filePath.replace(".", System.currentTimeMillis() + ".");
-        FileImageOutputStream imageOutput = new FileImageOutputStream(new File(outPath));
-        imageOutput.write(test, 0, test.length);//将byte写入硬盘
-        imageOutput.close();
+//        String outPath = filePath.replace(".", System.currentTimeMillis() + ".");
+//        FileImageOutputStream imageOutput = new FileImageOutputStream(new File(outPath));
+//        imageOutput.write(test, 0, test.length);//将byte写入硬盘
+//        imageOutput.close();
         System.err.println("end");
     }
 
@@ -126,15 +131,14 @@ public class ImageOperator {
 
     /**
      * 图片添加水印
-     * filePath 输出文件路径
-     * waterText 文字水印
+     * filePath 输出到指定文件路径
      */
     public void out(String filePath) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText(this.bytes, this.waterText, this.color, this.font, this.x, this.y);
+        this.bytes = this.addWaterText();
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(filePath);) {
             fileOutputStream.write(this.bytes, 0, this.bytes.length);//将byte写入硬盘
@@ -143,12 +147,16 @@ public class ImageOperator {
         }
     }
 
+    /**
+     * 图片添加水印
+     * file 输出到指定文件
+     */
     public void out(File file) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText(this.bytes, this.waterText, this.color, this.font, this.x, this.y);
+        this.bytes = this.addWaterText();
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(file);) {
             fileOutputStream.write(this.bytes, 0, this.bytes.length);//将byte写入硬盘
@@ -157,12 +165,16 @@ public class ImageOperator {
         }
     }
 
+    /**
+     * 图片添加水印
+     * outputStream 输出到指定输出流
+     */
     public void out(OutputStream outputStream) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText(this.bytes, this.waterText, this.color, this.font, this.x, this.y);
+        this.bytes = this.addWaterText();
 
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
             byte[] buffer = new byte[1024];
@@ -178,15 +190,22 @@ public class ImageOperator {
 
     }
 
+    /**
+     * 图片添加水印
+     * 返回处理之后的图片byte[]
+     */
     public byte[] out() {
         if (StringUtils.isBlank(this.waterText)) {
             return null;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText(this.bytes, this.waterText, this.color, this.font, this.x, this.y);
+        this.bytes = this.addWaterText();
         return this.bytes;
     }
 
+    /**
+     * 必要校验，byte[] 不能为空
+     */
     private void defaultValidatedBytes() {
         if (Objects.isNull(this.bytes)) {
             throw new RuntimeException("文件byte为空");
@@ -194,6 +213,9 @@ public class ImageOperator {
         this.defaultValidated();
     }
 
+    /**
+     * 默认校验：未设置的参数提供默认值
+     */
     private void defaultValidated() {
         if (Objects.isNull(this.image)) {
             try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
@@ -206,7 +228,8 @@ public class ImageOperator {
             this.color = new Color(255, 0, 0, 255);
         }
         if (Objects.isNull(this.fontSize)) {
-            this.fontSize = (this.image.getWidth() / 4) / this.waterText.length();
+            this.fontSize = this.image.getHeight() > this.image.getWidth() ?
+                    (this.image.getHeight() / 3 / this.waterText.length()) : (this.image.getWidth() / 2) / this.waterText.length();
         }
         if (Objects.isNull(this.font)) {
             this.font = new Font("微软雅黑", Font.ITALIC, this.fontSize);
@@ -219,49 +242,65 @@ public class ImageOperator {
         }
     }
 
-    private void imageOperate(String waterText, Color color, Font font, int x, int y, OutputStream fos, String formatter) throws IOException {
-        //图片绘制
-        penDrawString(this.image, waterText, color, font, x, y);
-        ImageIO.write(this.image, formatter, fos);
-    }
-
-    public byte[] addWaterText(byte[] srcBytes, String waterText, Color color, Font font, int x, int y) {
+    /**
+     * 图片水印操作
+     */
+    public byte[] addWaterText() {
 
         try (
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(srcBytes);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(this.bytes);
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
         ) {
 
             String formatter = getFormatter(inputStream);
             if (StringUtils.isBlank(formatter)) {
                 System.err.println("非图片文件");
-                return srcBytes;
+                return this.bytes;
             }
-            if (StringUtils.isBlank(waterText)) {
+            if (StringUtils.isBlank(this.waterText)) {
                 System.err.println("无文字输入");
-                return srcBytes;
+                return this.bytes;
             }
 
-            imageOperate(waterText, color, font, x, y, output, formatter);
+            imageOperate(formatter, output);
 
             return output.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
-            return srcBytes;
+            return this.bytes;
         }
     }
 
+    /**
+     * 图片绘制操作，并输出到输出流
+     */
+    private void imageOperate(String formatter, OutputStream outputStream) throws IOException {
+        //图片绘制
+        penDrawString();
+        ImageIO.write(this.image, formatter, outputStream);
+    }
 
-    public static void penDrawString(BufferedImage image, String waterText, Color color, Font font, int x, int y) {
+    /**
+     * 图片绘制操作
+     */
+    public void penDrawString() {
         // 创建画笔
-        Graphics2D pen = image.createGraphics();
-        pen.setColor(color);
-        pen.setFont(font);
+        Graphics2D pen = this.image.createGraphics();
+        pen.setColor(this.color);
+        pen.setFont(this.font);
+
+        if (null != this.degree) {
+            pen.rotate(Math.toRadians(this.degree), this.x, this.y);
+        }
+
         // 这三个参数分别为你的文字内容，起始位置横坐标(px)，纵坐标位置(px)。
-        pen.drawString(waterText, x, y);
+        pen.drawString(this.waterText, this.x, this.y);
         pen.dispose();
     }
 
+    /**
+     * 输入流转byte[],并关闭流
+     */
     public static byte[] getByteWithCloseStream(InputStream inputStream) {
 
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();) {
@@ -284,6 +323,9 @@ public class ImageOperator {
         }
     }
 
+    /**
+     * ByteArrayInputStream转byte，并重置流
+     */
     public static byte[] getByteWithResetStream(ByteArrayInputStream inputStream) {
 
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();) {
@@ -331,66 +373,110 @@ public class ImageOperator {
         }
     }
 
-    public ImageOperator y(Integer y) {
+    private ImageOperator degree(int degree) {
+        imageBuilder();
+        this.degree = degree;
+        return this;
+    }
+
+    public ImageOperator degree(Function<ImageOperator, Integer> function) {
+        imageBuilder();
+        this.degree = function.apply(this);
+        return this;
+    }
+    /**
+     * 设置水印位置 y , 输入数字
+     */
+    public ImageOperator y(int y) {
         imageBuilder();
         this.y = y;
         return this;
     }
 
+    /**
+     * 设置水印位置 y, 提供内部属性
+     */
     public ImageOperator y(Function<ImageOperator, Integer> yFunction) {
         imageBuilder();
         this.y = yFunction.apply(this);
         return this;
     }
 
-    public ImageOperator x(Integer x) {
+    /**
+     * 设置水印位置 x , 输入数字
+     */
+    public ImageOperator x(int x) {
         imageBuilder();
         this.x = x;
         return this;
     }
 
+    /**
+     * 设置水印位置 x, 提供内部属性
+     */
     public ImageOperator x(Function<ImageOperator, Integer> xFunction) {
         imageBuilder();
         this.x = xFunction.apply(this);
         return this;
     }
 
+    /**
+     * 设置水印 文字大小 , 输入数字
+     */
     public ImageOperator fontSize(Integer fontSize) {
         imageBuilder();
         this.fontSize = fontSize;
         return this;
     }
 
+    /**
+     * 设置水印 文字大小 , 提供内部属性
+     */
     public ImageOperator fontSize(Function<ImageOperator, Integer> function) {
         imageBuilder();
         this.fontSize = function.apply(this);
         return this;
     }
 
+    /**
+     * 设置水印 文字样式 , 输入Font类
+     */
     public ImageOperator font(Font font) {
         imageBuilder();
         this.font = font;
         return this;
     }
 
+    /**
+     * 设置水印 文字样式 , 提供内部属性
+     */
     public ImageOperator font(Function<ImageOperator, Font> function) {
         imageBuilder();
         this.font = function.apply(this);
         return this;
     }
 
+    /**
+     * 设置水印 文字颜色 , 输入Color类
+     */
     public ImageOperator color(Color color) {
         imageBuilder();
         this.color = color;
         return this;
     }
 
+    /**
+     * 设置水印 文字颜色 , 提供内部属性
+     */
     public ImageOperator color(Function<ImageOperator, Color> function) {
         imageBuilder();
         this.color = function.apply(this);
         return this;
     }
 
+    /**
+     * 内部构建 BufferedImage ，提供内部属性时必须不为空
+     */
     private void imageBuilder() {
         if (Objects.isNull(this.image)) {
             try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
