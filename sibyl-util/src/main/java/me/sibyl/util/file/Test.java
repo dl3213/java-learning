@@ -34,8 +34,8 @@ public class Test {
 //                .color(context -> new Color(255,0,0,255))
 //                .fontSize(50)
                 .fontSize(context ->
-                        context.getImage().getHeight() > context.getImage().getWidth() ?
-                                (context.getImage().getHeight() / 3 / context.getWaterText().length()) : (context.getImage().getWidth() / 2) / context.getWaterText().length())
+                        context.getSrcImage().getHeight() > context.getSrcImage().getWidth() ?
+                                (context.getSrcImage().getHeight() / 3 / context.getWaterText().length()) : (context.getSrcImage().getWidth() / 2) / context.getWaterText().length())
 
 //                .font(new Font("微软雅黑", Font.ITALIC, 75))
 //                .font(context -> new Font("微软雅黑", Font.ITALIC, context.getFontSize()))
