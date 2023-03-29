@@ -24,9 +24,9 @@ import java.util.function.Function;
 public class ImageOperator {
 
     @Getter
-    private byte[] bytes;
+    private byte[] srcBytes;
     @Getter
-    private BufferedImage image;
+    private BufferedImage srcImage;
     @Getter
     @Setter
     private String waterText;
@@ -84,7 +84,7 @@ public class ImageOperator {
 //                .degree(45)// 水平顺时针
 //                .degree(context -> context.getImage().getHeight() / 2)
                 //3.输出，四选一
-                .output(file.getAbsolutePath())//四选一，无返回值，输出到指定文件路径
+                .output(file.getAbsolutePath().replace(".", System.currentTimeMillis() + "."))//四选一，无返回值，输出到指定文件路径
 //                .output(file)//四选一，无返回值，输出到指定文件
 //                .output(outputStream)//四选一，无返回值，输出到指定输出流
 //                .output()//四选一,有返回值，输出 图片byte[]
@@ -104,30 +104,32 @@ public class ImageOperator {
     }
 
     public ImageOperator bytes(byte[] bytes) {
-        this.bytes = bytes;
+        this.srcBytes = bytes;
         imageBuilder();
         return this;
     }
+
     public ImageOperator input(byte[] bytes) {
-        this.bytes = bytes;
+        this.srcBytes = bytes;
         imageBuilder();
         return this;
     }
 
     public ImageOperator inputStreamWithClose(InputStream inputStream) {
-        this.bytes = getByteWithCloseStream(inputStream);
+        this.srcBytes = getByteWithCloseStream(inputStream);
         imageBuilder();
         return this;
     }
+
     public ImageOperator input(InputStream inputStream) {
-        this.bytes = getByteWithCloseStream(inputStream);
+        this.srcBytes = getByteWithCloseStream(inputStream);
         imageBuilder();
         return this;
     }
 
     public ImageOperator file(File file) {
         try (FileInputStream fileInputStream = new FileInputStream(file);) {
-            this.bytes = getByteWithCloseStream(fileInputStream);
+            this.srcBytes = getByteWithCloseStream(fileInputStream);
             imageBuilder();
         } catch (Exception e) {
         }
@@ -137,7 +139,7 @@ public class ImageOperator {
 
     public ImageOperator input(File file) {
         try (FileInputStream fileInputStream = new FileInputStream(file);) {
-            this.bytes = getByteWithCloseStream(fileInputStream);
+            this.srcBytes = getByteWithCloseStream(fileInputStream);
             imageBuilder();
         } catch (Exception e) {
         }
@@ -161,10 +163,10 @@ public class ImageOperator {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText();
+        this.srcBytes = this.addWaterText();
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(filePath);) {
-            fileOutputStream.write(this.bytes, 0, this.bytes.length);//将byte写入硬盘
+            fileOutputStream.write(this.srcBytes, 0, this.srcBytes.length);//将byte写入硬盘
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -179,10 +181,10 @@ public class ImageOperator {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText();
+        this.srcBytes = this.addWaterText();
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(file);) {
-            fileOutputStream.write(this.bytes, 0, this.bytes.length);//将byte写入硬盘
+            fileOutputStream.write(this.srcBytes, 0, this.srcBytes.length);//将byte写入硬盘
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -197,9 +199,9 @@ public class ImageOperator {
             return;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText();
+        this.srcBytes = this.addWaterText();
 
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.srcBytes);) {
             byte[] buffer = new byte[1024];
             int len;
             while ((len = byteArrayInputStream.read(buffer)) > -1) {
@@ -222,15 +224,15 @@ public class ImageOperator {
             return null;
         }
         this.defaultValidatedBytes();
-        this.bytes = this.addWaterText();
-        return this.bytes;
+        this.srcBytes = this.addWaterText();
+        return this.srcBytes;
     }
 
     /**
      * 必要校验，byte[] 不能为空
      */
     private void defaultValidatedBytes() {
-        if (Objects.isNull(this.bytes)) {
+        if (Objects.isNull(this.srcBytes)) {
             throw new RuntimeException("文件byte为空");
         }
         this.defaultValidated();
@@ -240,9 +242,9 @@ public class ImageOperator {
      * 默认校验：未设置的参数提供默认值
      */
     private void defaultValidated() {
-        if (Objects.isNull(this.image)) {
-            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
-                this.image = ImageIO.read(byteArrayInputStream);
+        if (Objects.isNull(this.srcImage)) {
+            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.srcBytes);) {
+                this.srcImage = ImageIO.read(byteArrayInputStream);
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
@@ -251,8 +253,8 @@ public class ImageOperator {
             this.color = new Color(255, 0, 0, 255);
         }
         if (Objects.isNull(this.fontSize)) {
-            this.fontSize = this.image.getHeight() > this.image.getWidth() ?
-                    (this.image.getHeight() / 3 / this.waterText.length()) : (this.image.getWidth() / 2) / this.waterText.length();
+            this.fontSize = this.srcImage.getHeight() > this.srcImage.getWidth() ?
+                    (this.srcImage.getHeight() / 3 / this.waterText.length()) : (this.srcImage.getWidth() / 2) / this.waterText.length();
         }
         if (Objects.isNull(this.font)) {
             this.font = new Font("微软雅黑", Font.ITALIC, this.fontSize);
@@ -271,18 +273,18 @@ public class ImageOperator {
     public byte[] addWaterText() {
 
         try (
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(this.bytes);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(this.srcBytes);
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
         ) {
 
             String formatter = getFormatter(inputStream);
             if (StringUtils.isBlank(formatter)) {
                 System.err.println("非图片文件");
-                return this.bytes;
+                return this.srcBytes;
             }
             if (StringUtils.isBlank(this.waterText)) {
                 System.err.println("无文字输入");
-                return this.bytes;
+                return this.srcBytes;
             }
 
             imageOperate(formatter, output);
@@ -290,7 +292,7 @@ public class ImageOperator {
             return output.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
-            return this.bytes;
+            return this.srcBytes;
         }
     }
 
@@ -298,17 +300,18 @@ public class ImageOperator {
      * 图片绘制操作，并输出到输出流
      */
     private void imageOperate(String formatter, OutputStream outputStream) throws IOException {
-        //图片绘制
+        penDrawImage();
+        //图片绘制文字
         penDrawString();
-        ImageIO.write(this.image, formatter, outputStream);
+        ImageIO.write(this.srcImage, formatter, outputStream);
     }
 
     /**
-     * 图片绘制操作
+     * 图片绘制文字操作
      */
     public void penDrawString() {
         // 创建画笔
-        Graphics2D pen = this.image.createGraphics();
+        Graphics2D pen = this.srcImage.createGraphics();
         pen.setColor(this.color);
         pen.setFont(this.font);
 
@@ -319,6 +322,30 @@ public class ImageOperator {
         // 这三个参数分别为你的文字内容，起始位置横坐标(px)，纵坐标位置(px)。
         pen.drawString(this.waterText, this.x, this.y);
         pen.dispose();
+    }
+
+    /**
+     * 图片绘制图片操作 todo
+     */
+    public void penDrawImage() {
+//        // 创建画笔
+//        Graphics2D pen = this.srcImage.createGraphics();
+//
+//        try {
+//            pen.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,0.9f));
+//            System.err.println("penDrawImage");
+//            File input = new File("D:\\test\\icon.jpg");
+//            System.err.println(input.length());
+//            System.err.println(input.exists());
+//            BufferedImage img = ImageIO.read(input);
+//            System.err.println(img);
+//            System.err.println(img.getWidth());
+//            System.err.println(img.getWidth());
+//            pen.drawImage(img, 0,0, null);
+//        } catch (IOException ioException) {
+//            ioException.printStackTrace();
+//        }
+//        pen.dispose();
     }
 
     /**
@@ -407,6 +434,7 @@ public class ImageOperator {
         this.degree = function.apply(this);
         return this;
     }
+
     /**
      * 设置水印位置 y , 输入数字
      */
@@ -501,9 +529,9 @@ public class ImageOperator {
      * 内部构建 BufferedImage ，提供内部属性时必须不为空
      */
     private void imageBuilder() {
-        if (Objects.isNull(this.image)) {
-            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.bytes);) {
-                this.image = ImageIO.read(byteArrayInputStream);
+        if (Objects.isNull(this.srcImage)) {
+            try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.srcBytes);) {
+                this.srcImage = ImageIO.read(byteArrayInputStream);
             } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
