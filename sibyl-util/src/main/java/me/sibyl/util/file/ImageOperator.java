@@ -62,7 +62,10 @@ public class ImageOperator {
                 //1.先设置输入源：三选一
 //                .file(file) //三选一
 //                .inputStreamWithClose(new FileInputStream(file)) //三选一
-                .bytes(ImageOperator.getByteWithCloseStream(new FileInputStream(file))) //三选一
+//                .bytes(ImageOperator.getByteWithCloseStream(new FileInputStream(file))) //三选一
+                .input(file)
+//                .input(new FileInputStream(file))
+//                .input(ImageOperator.getByteWithCloseStream(new FileInputStream(file)))
                 .waterText("test")
                 //2.设置内容
                 //  颜色
@@ -81,10 +84,10 @@ public class ImageOperator {
 //                .degree(45)// 水平顺时针
 //                .degree(context -> context.getImage().getHeight() / 2)
                 //3.输出，四选一
-                .out(file.getAbsolutePath())//四选一，无返回值，输出到指定文件路径
-//                .out(file)//四选一，无返回值，输出到指定文件
-//                .out(outputStream)//四选一，无返回值，输出到指定输出流
-//                .out()//四选一,有返回值，输出 图片byte[]
+                .output(file.getAbsolutePath())//四选一，无返回值，输出到指定文件路径
+//                .output(file)//四选一，无返回值，输出到指定文件
+//                .output(outputStream)//四选一，无返回值，输出到指定输出流
+//                .output()//四选一,有返回值，输出 图片byte[]
         ;
         //相同的属性，后覆盖前，大步骤顺序固定，其他步骤：字大小->字样式(因为字样式里才是最终的字大小)
 
@@ -105,14 +108,34 @@ public class ImageOperator {
         imageBuilder();
         return this;
     }
+    public ImageOperator input(byte[] bytes) {
+        this.bytes = bytes;
+        imageBuilder();
+        return this;
+    }
 
     public ImageOperator inputStreamWithClose(InputStream inputStream) {
         this.bytes = getByteWithCloseStream(inputStream);
         imageBuilder();
         return this;
     }
+    public ImageOperator input(InputStream inputStream) {
+        this.bytes = getByteWithCloseStream(inputStream);
+        imageBuilder();
+        return this;
+    }
 
     public ImageOperator file(File file) {
+        try (FileInputStream fileInputStream = new FileInputStream(file);) {
+            this.bytes = getByteWithCloseStream(fileInputStream);
+            imageBuilder();
+        } catch (Exception e) {
+        }
+
+        return this;
+    }
+
+    public ImageOperator input(File file) {
         try (FileInputStream fileInputStream = new FileInputStream(file);) {
             this.bytes = getByteWithCloseStream(fileInputStream);
             imageBuilder();
@@ -133,7 +156,7 @@ public class ImageOperator {
      * 图片添加水印
      * filePath 输出到指定文件路径
      */
-    public void out(String filePath) {
+    public void output(String filePath) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
@@ -151,7 +174,7 @@ public class ImageOperator {
      * 图片添加水印
      * file 输出到指定文件
      */
-    public void out(File file) {
+    public void output(File file) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
@@ -169,7 +192,7 @@ public class ImageOperator {
      * 图片添加水印
      * outputStream 输出到指定输出流
      */
-    public void out(OutputStream outputStream) {
+    public void output(OutputStream outputStream) {
         if (StringUtils.isBlank(this.waterText)) {
             return;
         }
@@ -194,7 +217,7 @@ public class ImageOperator {
      * 图片添加水印
      * 返回处理之后的图片byte[]
      */
-    public byte[] out() {
+    public byte[] output() {
         if (StringUtils.isBlank(this.waterText)) {
             return null;
         }

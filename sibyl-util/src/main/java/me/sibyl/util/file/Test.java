@@ -1,11 +1,9 @@
 package me.sibyl.util.file;
 
 import javax.imageio.stream.FileImageOutputStream;
-import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  * @author dyingleaf3213
@@ -49,7 +47,7 @@ public class Test {
 //                .out(file.getAbsolutePath())//四选一，无返回值
 //                .out(file)//四选一，无返回值
 //                .out(outputStream)//四选一，无返回值
-                .out()//四选一,有返回值
+                .output()//四选一,有返回值
                 ;
         //相同的属性，后覆盖上，大步骤顺序固定，其他步骤：字体大小->子样式
 
