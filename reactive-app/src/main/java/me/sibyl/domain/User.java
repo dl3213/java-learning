@@ -1,8 +1,5 @@
-package me.sibyl.entity;
+package me.sibyl.domain;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -18,13 +15,14 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-@TableName("sys_user")
+//@TableName("sys_user")
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)
-public class User extends BaseEntity
+public class User
+//        extends BaseEntity
 {
-    @TableId(type = IdType.ASSIGN_ID)
+    @Id
     private String id;
     private String username;
     private String name;

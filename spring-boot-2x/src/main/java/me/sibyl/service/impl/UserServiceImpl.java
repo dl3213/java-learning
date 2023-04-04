@@ -24,6 +24,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public User detail(String id) {
-        return this.getBaseMapper().queryById(id);
+        User user = this.getBaseMapper().queryById(id);
+        return user;
     }
 }

@@ -4,6 +4,6 @@
 <mapper namespace="me.sibyl.dao.UserMapper">
 
     <select id="queryById"  resultType="me.sibyl.entity.User">
-        select * from sys_user where id=#{id};
+        select * from sys_user where id=#{id}
     </select>
 </mapper>

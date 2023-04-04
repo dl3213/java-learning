@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../node_modules/font-awesome/css/font-awesome.css">
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        background: url(D:/4code/Z-Project/public/pic/113.PNG);
+        background-size: cover;
+        font-family: sans-serif;
+   }
+   .container{
+       position: absolute;
+       top:50%;
+       left:50%;
+       transform: translate(-50%,-50%);
+       width: 700px;
+       height: 420px;
+       border-radius: 5px;
+       border:10px solid rgba(255, 255, 255, .2);
+       box-shadow: 10px 10px 15px rgba(0, 0, 0, .5);
+
+   }
+   .imgBx{
+       width: 350px;
+       height: 420px;
+       overflow: hidden;
+       float: left;
+   }
+   .imgBx img{
+       width: 100%;
+       height: 100%;
+   }
+   .loginBox{
+       float: right;
+       width: 350px;
+       height: 420px;
+       box-sizing: border-box;
+       padding:80px 40px;
+       background: rgba(255,255,255,.8);
+
+   }
+   h3{
+       margin: 0;
+       padding: 0 0 20px ;
+       color: #262626;
+
+   }
+   .loginBox input{
+       width: 100%;
+       margin-bottom: 20px;
+   }
+   .loginBox input[type="text"],
+   .loginBox input[type="password"]{
+       border:none;
+       border-bottom: 2px solid #262626;
+       outline: none;
+       height: 40px;
+       color: #262626;
+       background: transparent;
+       font-size: 16px;
+       padding-left: 20px;
+       box-sizing: border-box;
+   }
+   ::placeholder{
+       color: rgba(0, 0, 0, .5);
+    
+   }
+   .inputBox{
+       position: relative;
+
+   }
+   .inputBox span{
+       position: absolute;
+       top:10px;
+       color: #262626;
+   }
+   .loginBox input[type="submit"]{
+       border:none;
+       outline: none;
+       height: 40px;
+       font-size: 16px;
+       background: #ed292a;
+       color: #fff;
+       border-radius: 20px;
+       cursor: pointer;
+
+   }
+   .loginBox a{
+       color: #262626;
+       font-size: 14px;
+       font-weight: bold;
+       text-decoration: none;
+   }
+</style>
+<body>
+    <div class="container">
+        <div class="imgBx">
+            <img src="D:/4code/Z-Project/public/soviet.PNG" alt="">
+        </div>
+        <div class="loginBox">
+            <h3>Sign in Here</h3>
+            <form action="">
+                <div class="inputBox">
+                    <span><i class="fa fa-user" aria-hidden="true"></i></span>
+                    <input type="text" name="" placeholder="Username">
+                    
+                </div>
+                <div class="inputBox">
+                    <span><i class="fa fa-lock" aria-hidden="true"></i></span>
+                    <input type="password" name="" placeholder="Password">
+                    
+                </div>
+                    <input type="submit" value="Sign In">
+                    <a href="#">Forget Password</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

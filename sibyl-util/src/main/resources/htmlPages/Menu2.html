@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #f1f1f1;
+    }
+
+    #menu2 {
+        margin: 0;
+        padding: 0;
+        margin-top: 350px;
+    }
+
+    #menu2 li {
+        list-style: none;
+        display: inline-block;
+    }
+
+    #menu2 li a {
+        text-decoration: none;
+        position: relative;
+        color: #313131;
+        font-size: 50px;
+        font-weight: 700;
+        font-family: sans-serif;
+        display: block;
+        overflow: hidden;
+        transition: 0.7s all;
+        padding: 14px 20px;
+        text-transform: uppercase;
+    }
+
+    #menu2 li a:before {
+        content: '';
+        width: 60px;
+        position: absolute;
+        border-bottom: 8px solid #313131;
+        bottom: 0;
+        right: 350px;
+        transition: 0.7s all;
+    }
+
+    #menu2 li a:hover:before {
+        right: 0;
+    }
+</style>
+
+<body>
+    <ul id="menu2">
+        <ul>
+            <center>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Home2</a></li>
+                <li><a href="#">Home3</a></li>
+                <li><a href="#">Home4</a></li>
+                <li><a href="#">Home5</a></li>
+            </center>
+        </ul>
+    </ul>
+</body>
+
+</html>

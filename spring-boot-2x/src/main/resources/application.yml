@@ -5,4 +5,5 @@ spring:
   application:
     name: sibyl-application
   profiles:
-    include: data
+    active: dev
+    include: sharding-data

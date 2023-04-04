@@ -29,7 +29,7 @@ public class CachingConfig {
                 .initialCapacity(10)  // 初始大小
                 .maximumSize(100)     // 最大容量
                 .recordStats()        // 打开统计
-                .expireAfterAccess(10, TimeUnit.MINUTES);  // 5分钟不访问自动丢弃
+                .expireAfterAccess(10, TimeUnit.MINUTES);  // 10分钟不访问自动丢弃
 //              .executor(ThreadPoolUtil.getThreadPool()); // 走线程池，需自定义线程池,可不用
         caffeineCacheManager.setCaffeine(caffeine);
         caffeineCacheManager.setCacheNames(Arrays.asList("sibyl-cache"));  // 设定缓存器名称

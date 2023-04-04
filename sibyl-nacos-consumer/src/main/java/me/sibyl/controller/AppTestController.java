@@ -5,6 +5,7 @@ import me.sibyl.entity.User;
 import me.sibyl.sevice.AppService;
 import me.sibyl.sevice.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,9 +37,9 @@ public class AppTestController {
     }
 
 
-    @GetMapping("/test/query")
-    public String testQuery() {
-        User u = userService.queryById("dl3213");
+    @GetMapping("/user/query/detail/{id}")
+    public String testQuery(@PathVariable String id) {
+        User u = userService.queryById(id);
         System.err.println(u);
         return String.valueOf(System.currentTimeMillis());
     }

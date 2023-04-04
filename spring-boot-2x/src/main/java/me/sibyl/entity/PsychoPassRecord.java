@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 
 /**
- * @Classname PychoPassRecord
+ * @Classname PsychoPassRecord
  * @Description TODO
  * @Author dyingleaf3213
  * @Create 2023/03/08 21:00
@@ -26,7 +26,7 @@ import org.springframework.data.annotation.Id;
 @ToString(callSuper = true)
 public class PsychoPassRecord extends BaseEntity {
 
-    @TableId(type = IdType.ASSIGN_UUID)
+    @TableId(type = IdType.ASSIGN_ID)
     private String id;
     private String uid;
     private String psychoPass;

@@ -1,0 +1,51 @@
+spring:
+  shardingsphere:
+    props:
+      sql:
+        show: true
+    datasource:
+      names: sibyl-original #,sibyl-2023
+      sibyl-original:  #主：写
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: root
+        password: 123456
+#      sibyl-2023: #从：读
+#        type: com.alibaba.druid.pool.DruidDataSource
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        url: jdbc:mysql://localhost:3306/sibyl-2023?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+#        username: root
+#        password: 123456
+    sharding:
+      tables:
+        psycho_pass_record:
+          actual-data-nodes: sibyl-original.psycho_pass_record_$->{202303..202305}
+#          key-generator:
+#            column: id
+#            type: SNOWFLAKE
+#            props:
+#              waker:
+#                id: 1
+          table-strategy:
+            complex:
+              sharding-columns: create_time
+              algorithm-class-name: me.sibyl.algorithm.SibylComplexKeysShardingAlgorithm
+#          database-strategy:
+#            inline:
+#              sharding-column: id
+#              algorithm-expression: ds$->{id%2+1}
+#            standard:
+#              sharding-column: id
+#              range-algorithm-class-name: com.sibyl.application.config.StandardDatabaseStrategyRangeAlgorithm
+#              precise-algorithm-class-name: com.sibyl.application.config.StandardDatabaseStrategyPreciseAlgorithm
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+#    password:
+mybatis-plus:
+  configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+  mapper-locations: classpath*:/mapper/**/*.xml

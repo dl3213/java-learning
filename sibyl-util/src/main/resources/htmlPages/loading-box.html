@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background: #f1f1f1;
+        }
+        .box{
+            width: 200px;
+            height: 200px;
+            position: absolute;
+            top:50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background: #313131;
+            padding: 10px;
+        }
+        .box span{
+            width: 80px;
+            height: 80px;
+            display: block;
+            background: #34495e;
+            animation: lol 4s infinite
+        }
+        @keyframes lol{
+            0%{
+                margin: 0;
+            }
+            25%{
+                margin: 0 0 0 120px;
+            }
+            50%{
+                margin: 120px 0 0 120px;
+            }
+            75%{
+                margin: 120px 120px 0 0;
+            }
+            100%{
+                
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <span></span>
+    </div>
+</body>
+</html>
