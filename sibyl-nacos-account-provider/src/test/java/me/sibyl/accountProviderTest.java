@@ -35,7 +35,6 @@ public class accountProviderTest {
         Stream.iterate(1, i -> i + 1).limit(10).parallel().forEach(i -> {
             RLock redissonLock = redisson.getLock("sibyl");
             synchronized (this) {
-
                 UserAccount account = userAccountMapper.selectOne(
                         Wrappers.lambdaQuery(new UserAccount())
                                 .eq(UserAccount::getUserId, "dl3213")

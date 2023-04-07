@@ -10,8 +10,6 @@ import me.sibyl.entity.User;
 import me.sibyl.entity.UserAccount;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
-import org.redisson.Redisson;
-import org.redisson.api.RLock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
@@ -85,45 +83,45 @@ public class springboot2test {
         a.forEach(System.out::print);
     }
 
-    @Resource
-    private UserAccountMapper userAccountMapper;
-    @Resource
-    private Redisson redisson;
-
-    @Test
-    public void testLock() {
-
-        Stream.iterate(1, i -> i + 1).limit(10).parallel().forEach(i -> {
-            RLock redissonLock = redisson.getLock("sibyl");
-            synchronized (this) {
-
-                UserAccount account = userAccountMapper.selectOne(
-                        Wrappers.lambdaQuery(new UserAccount())
-                                .eq(UserAccount::getUserId, "dl3213")
-                                .eq(UserAccount::getState, "1")
-                );
-                System.err.println(i + " b4 =>" + account.getBalance());
-
-                redissonLock.lock();
+//    @Resource
+//    private UserAccountMapper userAccountMapper;
+//    @Resource
+//    private Redisson redisson;
 //
-                BigDecimal balance = new BigDecimal(account.getBalance());
-                if (balance.compareTo(BigDecimal.ZERO) <= 0) return;
-                account.setBalance(balance.subtract(BigDecimal.ONE).toString());
-                int update = userAccountMapper.updateById(account);
-                System.err.println(i + " update => " + update);
-
-                System.err.println(i + " after => " + account.getBalance());
+//    @Test
+//    public void testLock() {
 //
-                redissonLock.unlock();
-            }
-        });
-
-        System.err.println("end");
-
-//        try {
-//            Thread.currentThread().join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-    }
+//        Stream.iterate(1, i -> i + 1).limit(10).parallel().forEach(i -> {
+//            RLock redissonLock = redisson.getLock("sibyl");
+//            synchronized (this) {
+//
+//                UserAccount account = userAccountMapper.selectOne(
+//                        Wrappers.lambdaQuery(new UserAccount())
+//                                .eq(UserAccount::getUserId, "dl3213")
+//                                .eq(UserAccount::getState, "1")
+//                );
+//                System.err.println(i + " b4 =>" + account.getBalance());
+//
+//                redissonLock.lock();
+////
+//                BigDecimal balance = new BigDecimal(account.getBalance());
+//                if (balance.compareTo(BigDecimal.ZERO) <= 0) return;
+//                account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+//                int update = userAccountMapper.updateById(account);
+//                System.err.println(i + " update => " + update);
+//
+//                System.err.println(i + " after => " + account.getBalance());
+////
+//                redissonLock.unlock();
+//            }
+//        });
+//
+//        System.err.println("end");
+//
+////        try {
+////            Thread.currentThread().join();
+////        } catch (InterruptedException e) {
+////            e.printStackTrace();
+////        }
+//    }
 }

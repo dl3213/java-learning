@@ -26,7 +26,7 @@ public class UserAccount extends BaseEntity {
     private String userId;
     private String balance;
     private String state;
-    @Version
+//    @Version
     private Integer version;
 
 
