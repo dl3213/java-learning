@@ -1,5 +1,6 @@
 package me.sibyl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.dao.PsychoPassRecordMapper;
@@ -11,6 +12,8 @@ import me.sibyl.entity.UserAccount;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -31,6 +34,27 @@ import java.util.stream.Stream;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = SpringBoot2xApplication.class)
 @Slf4j
 public class springboot2test {
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Test
+    public void rest(){
+        System.err.println(restTemplate);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.15)");
+        headers.set(HttpHeaders.CONTENT_TYPE, MediaType.ALL.getType());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity obj = restTemplate.exchange(
+                "https://api.bilibili.com/x/web-interface/view?bvid=BV1eX4y1f7Aa",
+                HttpMethod.GET,
+                entity,
+                JSONObject.class
+        );
+
+        System.err.println(obj);
+    }
 
     @Resource
     private PsychoPassRecordMapper psychoPassRecordMapper;

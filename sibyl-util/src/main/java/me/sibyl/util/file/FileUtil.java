@@ -227,9 +227,12 @@ public final class FileUtil {
     public static String getFileTypeFromByte(byte[] src) {
         byte[] to = Arrays.copyOfRange(src, 0, 4);
         String key = bytesToHexString(to);
+        System.err.println(key);
         if (StringUtils.startsWith(key, "FFD8FF")) {
             key = key.substring(0, 6);
         }
+        System.err.println("key");
+        System.err.println(key);
         return mFileTypes.get(key);
     }
 

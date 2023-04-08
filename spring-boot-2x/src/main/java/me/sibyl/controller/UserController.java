@@ -54,10 +54,10 @@ public class UserController {
     public Response update(@PathVariable String id){
         try {
             User detail = userService.detail(id);
-            detail.setUsername(String.valueOf(RandomUtils.nextDouble()));
+            //detail.setUsername(String.valueOf(RandomUtils.nextDouble()));
             detail.setAge(RandomUtils.nextInt());
             userService.updateById(detail);
-            return Response.success(userService.detail(id));
+            return Response.success(System.currentTimeMillis());
         }catch (Exception e){
             e.printStackTrace();
             return Response.error(e.getMessage());

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.util.concurrent.Future;
 
 /**
@@ -121,6 +122,16 @@ public class AppController {
             System.err.println(c.getKey());
             System.err.println(c.getValue());
         });
+        return Response.success(System.currentTimeMillis());
+    }
+
+    @Resource
+    private DataSource dataSource;
+
+    @GetMapping("/datasource")
+    public Response datasource() {
+        System.err.println(dataSource);
+        System.err.println(dataSource.getClass());
         return Response.success(System.currentTimeMillis());
     }
 }

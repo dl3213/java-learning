@@ -2,6 +2,7 @@ package me.sibyl.util.stream;
 
 import lombok.SneakyThrows;
 import me.sibyl.util.file.FileUtil;
+import org.springframework.util.StreamUtils;
 
 import java.io.*;
 
@@ -12,7 +13,7 @@ import java.io.*;
  * @Author by Qin Yazhi
  */
 
-public final class StreamUtil {
+public final class StreamUtil extends StreamUtils {
 
     @SneakyThrows
     public static void main(String[] args) {
