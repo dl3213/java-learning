@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
 import me.sibyl.entity.PsychoPassRecord;
 import me.sibyl.service.PsychoPassService;
+import me.sibyl.vo.PsychoPassQueryRequest;
 import org.apache.commons.lang3.RandomUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,15 @@ public class PsychoPassController {
 
     @Resource
     private PsychoPassService psychoPassService;
+
+    @GetMapping("/page")
+    public Response page(@Validated PsychoPassQueryRequest psychoPassQueryRequest){
+        return Response.success(psychoPassService.queryPage(psychoPassQueryRequest));
+    }
+    @GetMapping("/list")
+    public Response list(@Validated PsychoPassQueryRequest psychoPassQueryRequest){
+        return Response.success(psychoPassService.queryList(psychoPassQueryRequest));
+    }
 
     @GetMapping("/list/{userId}")
     public Response list(@PathVariable String userId){

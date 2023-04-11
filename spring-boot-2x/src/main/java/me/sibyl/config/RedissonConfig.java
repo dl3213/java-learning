@@ -4,6 +4,7 @@ import org.redisson.Redisson;
 import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * @author dyingleaf3213
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedissonConfig {
 
+    @Lazy
     @Bean
     public Redisson redisson(){
         Config config = new Config();

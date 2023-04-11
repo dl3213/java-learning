@@ -6,7 +6,8 @@ spring:
     name: sibyl-cas
   profiles:
     include: data
-
+  main:
+    lazy-initialization: true
 debug: false
 
 logging:

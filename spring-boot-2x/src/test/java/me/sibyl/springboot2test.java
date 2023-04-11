@@ -18,6 +18,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -39,7 +42,7 @@ public class springboot2test {
     private RestTemplate restTemplate;
 
     @Test
-    public void rest(){
+    public void rest() {
         System.err.println(restTemplate);
 
         HttpHeaders headers = new HttpHeaders();
@@ -61,7 +64,7 @@ public class springboot2test {
     @Resource
     private UserMapper userMapper;
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         System.err.println("test");
         System.out.println("test");
     }
@@ -76,22 +79,46 @@ public class springboot2test {
 //            System.err.println(psychoPassRecord);
 //        }
 
-        List<String> strings = Arrays.asList("sibyl", "test", "dev", "prod", "dl3213", "steam");
+        List<String> strings = Arrays.asList("sibyl", "test", "dev", "prod",
+                "dl3213", "steam", "reactive", "python", "java", "cpp", "bolshevik");
+        List<String> types = Arrays.asList("00", "01", "02");
 
         Stream.iterate(1, a -> a + 1).limit(1000000).parallel().forEach(i -> {
             User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
+            //String uid = "dl3213";
             record.setUid(user.getId());
             record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 500.00d)));
-            record.setType("0");
+            record.setType(types.get(RandomUtils.nextInt(0, types.size() - 1)));
             record.setCreateId(user.getId());
             record.setFlag(String.valueOf(System.currentTimeMillis() % 5));
             record.setState(String.valueOf(System.currentTimeMillis() % 5));
             record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));
-            record.setCreateTime(LocalDateTime.now());
+            LocalDateTime createTime = randomTime("2023-03");
+            record.setCreateTime(createTime);
             psychoPassRecordMapper.insert(record);
         });
 
+    }
+
+    public static void main(String[] args) {
+        System.err.println(randomTime("2023-03"));
+        System.err.println(randomTime("2023-03"));
+        System.err.println(randomTime("2023-03"));
+        System.err.println(randomTime("2023-03"));
+    }
+
+    private static LocalDateTime randomTime(String str) {
+        DateTimeFormatter DATEFORMATTER1 = DateTimeFormatter.ofPattern("yyyy-MM");
+        DateTimeFormatter DATEFORMATTER = new DateTimeFormatterBuilder().append(DATEFORMATTER1)
+                .parseDefaulting(ChronoField.DAY_OF_MONTH, RandomUtils.nextInt(1, 31))
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, RandomUtils.nextInt(0, 23))
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, RandomUtils.nextInt(0, 59))
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, RandomUtils.nextInt(0, 59))
+                .parseDefaulting(ChronoField.NANO_OF_SECOND, RandomUtils.nextInt(0, 99))
+                .toFormatter();
+        LocalDateTime time = LocalDateTime.parse(str, DATEFORMATTER);
+        return time;
     }
 
     @Test

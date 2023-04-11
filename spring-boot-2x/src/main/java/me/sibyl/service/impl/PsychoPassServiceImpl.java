@@ -2,12 +2,12 @@ package me.sibyl.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import me.sibyl.dao.BusinessOrderMapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import me.sibyl.dao.PsychoPassRecordMapper;
-import me.sibyl.entity.BusinessOrder;
 import me.sibyl.entity.PsychoPassRecord;
-import me.sibyl.service.BusinessOrderService;
 import me.sibyl.service.PsychoPassService;
+import me.sibyl.vo.PsychoPassQueryRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,5 +26,23 @@ public class PsychoPassServiceImpl extends ServiceImpl<PsychoPassRecordMapper, P
                 Wrappers.lambdaQuery(new PsychoPassRecord())
                         .eq(PsychoPassRecord::getUid, userId)
         );
+    }
+
+    @Override
+    public Object queryPage(PsychoPassQueryRequest queryRequest) {
+        PageHelper.startPage(queryRequest.getPageNum(), queryRequest.getPageSize());
+        List<PsychoPassRecord> query = this.getBaseMapper().query(queryRequest);
+        System.err.println("query.size() = " + query.size());
+        PageInfo<PsychoPassRecord> pageInfo = new PageInfo<>(query);
+        return pageInfo;
+    }
+
+    @Override
+    public Object queryList(PsychoPassQueryRequest queryRequest) {
+        queryRequest.setPageNum(null);
+        queryRequest.setPageSize(null);
+        List<PsychoPassRecord> query = this.getBaseMapper().query(queryRequest);
+        System.err.println("query.size() = " + query.size());
+        return query;
     }
 }

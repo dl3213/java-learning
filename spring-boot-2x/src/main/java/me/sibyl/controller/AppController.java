@@ -1,6 +1,7 @@
 package me.sibyl.controller;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
 import me.sibyl.aspect.TargetMode;
@@ -34,6 +35,7 @@ import java.util.concurrent.Future;
  * @Create 2022/02/26 09:54
  */
 @RestController
+@Slf4j
 public class AppController {
     //
 //    @Resource
@@ -133,6 +135,17 @@ public class AppController {
         System.err.println(dataSource);
         System.err.println(dataSource.getClass());
         return Response.success(System.currentTimeMillis());
+    }
+
+
+    @GetMapping("test")
+    public Response test(){
+        log.trace("i am trace.");
+        log.debug("i am debug.");
+        log.info("i am info.");
+        log.warn("i am warn.");
+        log.error("i am error.");
+        return Response.success();
     }
 }
 

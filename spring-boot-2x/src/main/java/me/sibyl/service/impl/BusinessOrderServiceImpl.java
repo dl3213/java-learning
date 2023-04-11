@@ -26,7 +26,7 @@ public class BusinessOrderServiceImpl extends ServiceImpl<BusinessOrderMapper, B
     public String createOrder(OrderCreateRequest orderCreateRequest) {
         BusinessOrder order = BusinessOrder
                 .builder()
-                .orderId(UUID.randomUUID().toString().replaceAll("-", ""))
+                //.orderId(UUID.randomUUID().toString().replaceAll("-", ""))
                 .amount(String.valueOf(orderCreateRequest.getAmount()))
                 .orderState("0")
                 .linkId(orderCreateRequest.getLinkId())
@@ -34,6 +34,6 @@ public class BusinessOrderServiceImpl extends ServiceImpl<BusinessOrderMapper, B
                 .createTime(LocalDateTime.now())
                 .build();
         this.getBaseMapper().insert(order);
-        return order.getOrderId();
+        return order.getId();
     }
 }

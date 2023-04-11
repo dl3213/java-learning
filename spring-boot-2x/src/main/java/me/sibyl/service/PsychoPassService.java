@@ -3,6 +3,7 @@ package me.sibyl.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import me.sibyl.entity.BusinessOrder;
 import me.sibyl.entity.PsychoPassRecord;
+import me.sibyl.vo.PsychoPassQueryRequest;
 
 import java.util.List;
 
@@ -15,4 +16,8 @@ import java.util.List;
 
 public interface PsychoPassService extends IService<PsychoPassRecord> {
     List<PsychoPassRecord> list(String userId);
+
+    Object queryPage(PsychoPassQueryRequest psychoPassQueryRequest);
+
+    Object queryList(PsychoPassQueryRequest psychoPassQueryRequest);
 }

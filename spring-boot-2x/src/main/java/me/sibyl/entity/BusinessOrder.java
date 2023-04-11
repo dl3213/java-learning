@@ -25,7 +25,7 @@ public class BusinessOrder extends BaseEntity {
 
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
-    private String orderId;
+
     private String amount;
     private String orderState;
     private String linkId;

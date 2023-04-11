@@ -16,5 +16,4 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface BusinessOrderMapper extends BaseMapper<BusinessOrder> {
 
-    User queryById(String id);
 }
