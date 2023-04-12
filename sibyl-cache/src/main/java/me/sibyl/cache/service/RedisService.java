@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @Author dyingleaf3213
  * @Create 2022/02/26 11:52
  */
-@Component
+
 public class RedisService {
 
     @Resource

@@ -19,6 +19,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -113,12 +114,17 @@ public class AppController {
 
     @Resource
     private CacheManager cacheManager;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @GetMapping("/cache/query")
     public Response cacheQuery() {
         Cache cache = cacheManager.getCache("sibyl-cache");
         System.err.println(cache);
         System.err.println(cache.getClass());
+        System.err.println(redisTemplate);
+        System.err.println(redisTemplate.getClass());
+        System.err.println(redisTemplate.getExpire("test"));
         CaffeineCache caffeineCache = (CaffeineCache) cache;
         caffeineCache.getNativeCache().asMap().entrySet().forEach(c ->{
             System.err.println(c.getKey());

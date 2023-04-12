@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * @Author dyingleaf3213
  * @Create 2022/05/04 22:34
  */
-@Configuration
-@EnableCaching
+
 public class CacheConfig {
 
 }

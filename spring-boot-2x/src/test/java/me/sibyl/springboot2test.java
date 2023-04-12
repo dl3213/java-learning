@@ -83,7 +83,7 @@ public class springboot2test {
                 "dl3213", "steam", "reactive", "python", "java", "cpp", "bolshevik");
         List<String> types = Arrays.asList("00", "01", "02");
 
-        Stream.iterate(1, a -> a + 1).limit(1000000).parallel().forEach(i -> {
+        Stream.iterate(1, a -> a + 1).limit(100000).parallel().forEach(i -> {
             User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
             //String uid = "dl3213";
@@ -94,8 +94,8 @@ public class springboot2test {
             record.setFlag(String.valueOf(System.currentTimeMillis() % 5));
             record.setState(String.valueOf(System.currentTimeMillis() % 5));
             record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));
-            LocalDateTime createTime = randomTime("2023-03");
-            record.setCreateTime(createTime);
+            //LocalDateTime createTime = randomTime("2023-03");
+            record.setCreateTime(LocalDateTime.now());
             psychoPassRecordMapper.insert(record);
         });
 
