@@ -83,14 +83,14 @@ public class springboot2test {
                 "dl3213", "steam", "reactive", "python", "java", "cpp", "bolshevik");
         List<String> types = Arrays.asList("00", "01", "02");
 
-        Stream.iterate(1, a -> a + 1).limit(100000).parallel().forEach(i -> {
+        Stream.iterate(1, a -> a + 1).limit(300000).parallel().forEach(i -> {
             User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
             //String uid = "dl3213";
-            record.setUid(user.getId());
+            record.setUid(String.valueOf(user.getId()));
             record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 500.00d)));
             record.setType(types.get(RandomUtils.nextInt(0, types.size() - 1)));
-            record.setCreateId(user.getId());
+            record.setCreateId(String.valueOf(user.getId()));
             record.setFlag(String.valueOf(System.currentTimeMillis() % 5));
             record.setState(String.valueOf(System.currentTimeMillis() % 5));
             record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));

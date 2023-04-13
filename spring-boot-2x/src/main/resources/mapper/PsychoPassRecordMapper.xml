@@ -4,14 +4,14 @@
 <mapper namespace="me.sibyl.dao.PsychoPassRecordMapper">
 
     <select id="query" resultType="me.sibyl.entity.PsychoPassRecord">
-        select *
+        select r.id, r.uid, r.psycho_pass, r.create_time, r.type, r.flag, r.state, r.code
         from psycho_pass_record r
         <where>
             r.is_deleted = '0'
-            <if test="userId != null and userId !=''">
-                and r.uid = #{userId}
+            <if test="uid != null and uid !=''">
+                and r.uid = #{uid}
             </if>
         </where>
-        order by r.create_time desc
+        order by r.uid,r.create_time desc
     </select>
 </mapper>

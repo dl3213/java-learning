@@ -3,6 +3,7 @@ package me.sibyl.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Druid数据源配置
@@ -41,7 +43,7 @@ public class DruidConfig {
 //		servletRegistrationBean.addInitParameter("deny", "192.168.1.108");
 //		// 控制台管理用户
 		servletRegistrationBean.addInitParameter("loginUsername", "admin");
-		servletRegistrationBean.addInitParameter("loginPassword", "admin");
+		servletRegistrationBean.addInitParameter("loginPassword", "123456");
 //		// 是否能够重置数据 禁用HTML页面上的“Reset All”功能
 //		servletRegistrationBean.addInitParameter("resetEnable", "false");
 		return servletRegistrationBean;
@@ -63,14 +65,16 @@ public class DruidConfig {
 	 *
 	 */
 	@ConfigurationProperties(prefix = "spring.datasource")
-	@Getter
-	@Setter
+	@Data
 	@Lazy
 	class DataSourceProperties {
 		private String url;
 		private String username;
 		private String password;
 		private String driverClassName;
+
+		private Map<String, Object> druid;
+
 //		private int initialSize;
 //		private int minIdle;
 //		private int maxActive;
@@ -95,6 +99,8 @@ public class DruidConfig {
 			datasource.setUsername(username);
 			datasource.setPassword(password);
 			datasource.setDriverClassName(driverClassName);
+
+			System.err.println(druid);
 
 //			datasource.setInitialSize(initialSize);
 //			datasource.setMinIdle(minIdle);

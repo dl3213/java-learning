@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class UserAccount extends BaseEntity {
 
-    private String id;
+    private Long id;
     private String userId;
     private String balance;
     private String state;

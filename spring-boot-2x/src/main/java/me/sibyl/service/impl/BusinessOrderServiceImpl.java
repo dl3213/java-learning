@@ -23,7 +23,7 @@ import java.util.UUID;
 public class BusinessOrderServiceImpl extends ServiceImpl<BusinessOrderMapper, BusinessOrder> implements BusinessOrderService {
 
     @Override
-    public String createOrder(OrderCreateRequest orderCreateRequest) {
+    public Object createOrder(OrderCreateRequest orderCreateRequest) {
         BusinessOrder order = BusinessOrder
                 .builder()
                 //.orderId(UUID.randomUUID().toString().replaceAll("-", ""))

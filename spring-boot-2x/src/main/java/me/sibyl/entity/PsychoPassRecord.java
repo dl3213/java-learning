@@ -27,7 +27,7 @@ import org.springframework.data.annotation.Id;
 public class PsychoPassRecord extends BaseEntity {
 
     @TableId(type = IdType.ASSIGN_ID)
-    private String id;
+    private Long id;
     private String uid;
     private String psychoPass;
     private String type;

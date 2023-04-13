@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 public class BusinessOrder extends BaseEntity {
 
     @TableId(type = IdType.ASSIGN_UUID)
-    private String id;
+    private Long id;
 
     private String amount;
     private String orderState;

@@ -25,7 +25,7 @@ import org.springframework.data.annotation.Id;
 public class User extends BaseEntity
 {
     @TableId(type = IdType.ASSIGN_ID)
-    private String id;
+    private Long id;
     private String username;
     private String name;
     private String password;
