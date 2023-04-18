@@ -30,7 +30,7 @@ public class AppTestController {
 
     @GetMapping("/test")
     public String test() {
-        User u = userService.queryById("dl3213");
+        User u = userService.queryById("3213");
         System.err.println(u);
         appService.service();
         return String.valueOf(System.currentTimeMillis());

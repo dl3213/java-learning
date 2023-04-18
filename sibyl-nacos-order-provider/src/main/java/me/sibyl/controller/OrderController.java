@@ -31,13 +31,13 @@ public class OrderController {
         log.info("[order-service] now is order-service");
         System.err.println(request);
         System.err.println(dubboOrderService);
-        String data = dubboOrderService.create(request);
+        Long data = dubboOrderService.create(request);
         //int i = 1/0;
         return Response.success(data);
     }
 
     @GetMapping(value = "/query/{userId}")
-    public Response query(@PathVariable String userId) {
+    public Response query(@PathVariable Long userId) {
         System.err.println(orderService.queryList(userId));
         return Response.success(System.currentTimeMillis());
     }

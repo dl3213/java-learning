@@ -10,5 +10,5 @@ import me.sibyl.microservice.request.OrderCreateRequest;
  */
 
 public interface DubboOrderService {
-    String create(OrderCreateRequest request);
+    Long create(OrderCreateRequest request);
 }

@@ -29,9 +29,9 @@ public class AppService {
     @GlobalTransactional(name = "consume-test", rollbackFor = Exception.class)
     public void service() {
         AccountConsumeRequest requestVO = new AccountConsumeRequest();
-        requestVO.setUserId("dl3213");
+        requestVO.setUserId("3213");
         requestVO.setAmount(BigDecimal.ONE);
-        String consume = dubboAccountService.consume(requestVO);
+        Long consume = dubboAccountService.consume(requestVO);
         System.err.println(consume);
 
         //int i = 1 / 0;
@@ -39,7 +39,7 @@ public class AppService {
         OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
         orderCreateRequest.setAmount(requestVO.getAmount());
         orderCreateRequest.setLinkId(requestVO.getUserId());
-        String orderId = dubboOrderService.create(orderCreateRequest);
+        Long orderId = dubboOrderService.create(orderCreateRequest);
         System.err.println("[test]order create = " + orderId);
 
         //int i = 1 / 0;

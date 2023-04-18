@@ -23,12 +23,11 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 public class BusinessOrder extends BaseEntity {
 
-    @TableId(type = IdType.NONE)
-    private String id;
-    private String orderId;
+    @TableId(type = IdType.ASSIGN_ID)
+    private Long id;
     private String amount;
     private String orderState;
-    private String linkId;
+    private Long linkId;
 
 
 }

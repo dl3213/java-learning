@@ -22,7 +22,7 @@ public class OrderService {
     @Resource
     private BusinessOrderMapper businessOrderMapper;
 
-    public List<BusinessOrder> queryList(String userId) {
+    public List<BusinessOrder> queryList(Long userId) {
         return businessOrderMapper.selectList(
                 Wrappers.lambdaQuery(BusinessOrder.class)
                         .eq(BusinessOrder::getLinkId, userId)

@@ -1,5 +1,7 @@
 package me.sibyl.dubbo;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.dao.UserAccountMapper;
@@ -32,7 +34,12 @@ public class DubboAccountServiceImpl implements DubboAccountService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String consume(AccountConsumeRequest orderCreateRequest) {
+    @SentinelResource(
+            value = "DubboAccountService.consume",
+            blockHandler = "blockHandler",
+            fallback = "fallback"
+    )
+    public Long consume(AccountConsumeRequest orderCreateRequest) {
         log.info("[dubbo]now consume");
         List<UserAccount> userAccountList = userAccountMapper.selectList(
                 Wrappers.lambdaQuery(new UserAccount())
@@ -41,7 +48,7 @@ public class DubboAccountServiceImpl implements DubboAccountService {
         UserAccount account = CollectionUtils.isEmpty(userAccountList) ? null : userAccountList.get(0);
         if (Objects.isNull(account)) {
             account = UserAccount.builder()
-                    .userId(orderCreateRequest.getUserId())
+                    .userId(Long.valueOf(orderCreateRequest.getUserId()))
                     .balance(String.valueOf(100))
                     .state("01")
                     .version(1)
@@ -63,5 +70,18 @@ public class DubboAccountServiceImpl implements DubboAccountService {
 //        int i = 1 / 0;
 
         return account.getUserId();
+    }
+
+    /**
+     * 降级触发
+     */
+    public Long blockHandler(AccountConsumeRequest orderCreateRequest, BlockException e) {
+        return -1L;
+    }
+    /**
+     *  熔断触发
+     */
+    public Long fallback(AccountConsumeRequest orderCreateRequest) {
+        return 0L;
     }
 }

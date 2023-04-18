@@ -26,17 +26,16 @@ public class DubboOrderServiceImpl implements DubboOrderService {
     private BusinessOrderMapper businessOrderMapper;
 
     @Override
-    public String create(OrderCreateRequest request) {
+    public Long create(OrderCreateRequest request) {
         BusinessOrder order = BusinessOrder
                 .builder()
-                .orderId(UUID.randomUUID().toString().replaceAll("-", ""))
                 .amount(String.valueOf(request.getAmount()))
                 .orderState("0")
-                .linkId(request.getLinkId())
+                .linkId(Long.valueOf(request.getLinkId()))
                 .createId("0")
                 .createTime(LocalDateTime.now())
                 .build();
         this.businessOrderMapper.insert(order);
-        return order.getOrderId();
+        return order.getId();
     }
 }

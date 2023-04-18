@@ -23,7 +23,7 @@ public class AccountService {
     @Resource
     private UserAccountMapper userAccountMapper;
 
-    public UserAccount queryByUserId(String userId) {
+    public UserAccount queryByUserId(Long userId) {
         List<UserAccount> userAccounts = userAccountMapper.selectList(
                 Wrappers.lambdaQuery(UserAccount.class)
                         .eq(UserAccount::getUserId, userId)

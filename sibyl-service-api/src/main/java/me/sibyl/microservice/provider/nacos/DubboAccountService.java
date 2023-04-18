@@ -11,5 +11,5 @@ import me.sibyl.microservice.request.AccountConsumeRequest;
 
 public interface DubboAccountService {
 
-    String consume(AccountConsumeRequest requestVO);
+    Long consume(AccountConsumeRequest requestVO);
 }

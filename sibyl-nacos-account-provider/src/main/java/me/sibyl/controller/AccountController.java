@@ -36,13 +36,13 @@ public class AccountController {
 
     @PostMapping("/consume")
     public String consume(AccountConsumeRequest request) {
-        String consume = dubboAccountService.consume(request);
+        Long consume = dubboAccountService.consume(request);
         System.err.println(consume);
         return String.valueOf(System.currentTimeMillis());
     }
 
     @GetMapping("/query/{userId}")
-    public String query(@PathVariable String userId) {
+    public String query(@PathVariable Long userId) {
         System.err.println(accountService.queryByUserId(userId));
         return String.valueOf(System.currentTimeMillis());
     }
@@ -58,8 +58,8 @@ public class AccountController {
         redissonLock.lock();
         UserAccount account = userAccountMapper.selectOne(
                 Wrappers.lambdaQuery(new UserAccount())
-                        .eq(UserAccount::getUserId, "dl3213")
-                        .eq(UserAccount::getState, "1")
+                        .eq(UserAccount::getUserId, "3213")
+                        .eq(UserAccount::getState, "01")
         );
 //
         BigDecimal balance = new BigDecimal(account.getBalance());
