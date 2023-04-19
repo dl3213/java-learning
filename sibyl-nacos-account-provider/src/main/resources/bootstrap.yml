@@ -25,6 +25,17 @@ spring:
         register-enabled: true
         namespace: sibyl-dev
         group: sibyl-nacos
+    sentinel:
+      datasource:
+        ds1:
+          nacos:
+            serverAddr: 127.0.0.1:8848
+            dataId: springboot-sentinel
+            groupId: sentinel-group
+            dataType: json
+            ruleType: flow
+            username: nacos
+            password: nacos
 
 dubbo:
   protocol:

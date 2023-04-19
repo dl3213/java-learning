@@ -1,5 +1,6 @@
 package me.sibyl;
 
+import cn.hutool.core.util.ServiceLoaderUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.PsychoPassRecord;
 import me.sibyl.entity.User;
 import me.sibyl.entity.UserAccount;
+import me.sibyl.service.UserService;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +23,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -43,6 +42,8 @@ public class springboot2test {
 
     @Test
     public void rest() {
+        //ServiceLoader<UserService> loader = ServiceLoaderUtil.getServiceLoader(UserService.class);
+
         System.err.println(restTemplate);
 
         HttpHeaders headers = new HttpHeaders();

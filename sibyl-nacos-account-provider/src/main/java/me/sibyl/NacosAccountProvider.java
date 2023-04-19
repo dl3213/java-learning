@@ -20,18 +20,7 @@ import java.util.List;
 public class NacosAccountProvider {
 
     public static void main(String[] args) {
-        intFlowRule();
         SpringApplication.run(NacosAccountProvider.class, args);
-    }
-
-    private static void intFlowRule() {
-        List<FlowRule> ruleList = new ArrayList<>();
-        FlowRule rule = new FlowRule();
-        rule.setResource("DubboAccountService.consume");
-        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
-        rule.setCount(2);
-        ruleList.add(rule);
-        FlowRuleManager.loadRules(ruleList);
     }
 
 }

@@ -35,9 +35,10 @@ public class DubboAccountServiceImpl implements DubboAccountService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @SentinelResource(
-            value = "DubboAccountService.consume",
-            blockHandler = "blockHandler",
-            fallback = "fallback"
+            value = "DubboAccountService.consume"
+//            ,
+//            blockHandler = "blockHandler",
+//            fallback = "fallback"
     )
     public Long consume(AccountConsumeRequest orderCreateRequest) {
         log.info("[dubbo]now consume");
