@@ -1,6 +1,5 @@
 package me.sibyl.controller;
 
-import com.google.common.util.concurrent.RateLimiter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
@@ -39,9 +38,9 @@ import java.util.concurrent.Future;
 @RestController
 @Slf4j
 public class AppController {
-    //
-//    @Resource
-//    private UserMapper userMapper;
+
+    @Resource
+    private UserMapper userMapper;
     @Resource
     private AppService appService;
     @Resource
@@ -144,8 +143,16 @@ public class AppController {
         return Response.success(System.currentTimeMillis());
     }
 
-    @GetMapping("test")
+
+    @GetMapping("/log/test")
+    @SqlLogging
     public Response test(){
+        System.err.println(Thread.currentThread().getName() + " in method");
+
+        if(true){
+            User user = userMapper.selectById(3213);
+        }
+
         log.trace("i am trace.");
         log.debug("i am debug.");
         log.info("i am info.");

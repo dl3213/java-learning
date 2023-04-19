@@ -17,5 +17,6 @@ public class SibylListener {
     @EventListener
     public void listener(SibylEvent event) {
         log.info(String.format("%s监听到事件源：%s.", SibylListener.class.getName(), event.getSource()));
+
     }
 }
