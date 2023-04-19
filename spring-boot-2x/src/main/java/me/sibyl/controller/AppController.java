@@ -4,10 +4,12 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
+import me.sibyl.annotation.SqlLogging;
 import me.sibyl.aspect.TargetMode;
 import me.sibyl.annotation.Watching;
 import me.sibyl.common.response.Response;
 import me.sibyl.common.response.ResponseVO;
+import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
 import me.sibyl.listener.SibylEvent;
 import me.sibyl.service.AppService;
@@ -38,9 +40,9 @@ import java.util.concurrent.Future;
 @RestController
 @Slf4j
 public class AppController {
-    //
-//    @Resource
-//    private UserMapper userMapper;
+
+    @Resource
+    private UserMapper userMapper;
     @Resource
     private AppService appService;
     @Resource
@@ -144,8 +146,15 @@ public class AppController {
     }
 
 
-    @GetMapping("test")
+    @GetMapping("/log/test")
+    @SqlLogging
     public Response test(){
+        System.err.println(Thread.currentThread().getName() + " in method");
+
+        if(true){
+            User user = userMapper.selectById(3213);
+        }
+
         log.trace("i am trace.");
         log.debug("i am debug.");
         log.info("i am info.");
