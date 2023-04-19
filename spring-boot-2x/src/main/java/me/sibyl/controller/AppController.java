@@ -4,11 +4,15 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
+import me.sibyl.annotation.SqlLogging;
 import me.sibyl.aspect.TargetMode;
 import me.sibyl.annotation.Watching;
 import me.sibyl.common.response.Response;
 import me.sibyl.common.response.ResponseVO;
+import me.sibyl.dao.UserAccountMapper;
+import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
+import me.sibyl.entity.UserAccount;
 import me.sibyl.listener.SibylEvent;
 import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
@@ -41,6 +45,8 @@ public class AppController {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private UserAccountMapper userAccountMapper;
     @Resource
     private AppService appService;
     @Resource
@@ -150,7 +156,16 @@ public class AppController {
         System.err.println(Thread.currentThread().getName() + " in method");
 
         if(true){
-            User user = userMapper.selectById(3213);
+            System.err.println("sql executing...");
+
+            User selectById = userMapper.selectById(3213L);
+            System.err.println(selectById);
+//
+            UserAccount account = userAccountMapper.selectById(3213);
+            System.err.println(account);
+
+//            User queryById = userMapper.queryById(3213L);
+//            System.err.println(queryById);
         }
 
         log.trace("i am trace.");

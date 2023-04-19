@@ -1,6 +1,5 @@
 package me.sibyl.dao;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import me.sibyl.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -15,5 +14,5 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    User queryById(String id);
+    public User queryById(Long id);
 }

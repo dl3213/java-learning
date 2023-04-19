@@ -8,7 +8,7 @@ spring:
     active: dev
     include: single-data
   main:
-    lazy-initialization: true
+    lazy-initialization: false
 
 debug: false
 logging:
