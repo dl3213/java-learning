@@ -61,6 +61,7 @@ public class SqlLoggingAop {
         Object proceed = pjp.proceed();
         //applicationContext.publishEvent(new SqlLoggingEvent(this, pjp, Thread.currentThread()));
 
+        //https://blog.csdn.net/sdzhangshulong/article/details/104393244
         Collection<MappedStatement> mappedStatements = SqlSessionUtils
                 .getSqlSession(sqlSessionFactory)
                 .getConfiguration()
