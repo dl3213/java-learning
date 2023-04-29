@@ -11,6 +11,7 @@ import me.sibyl.entity.PsychoPassRecord;
 import me.sibyl.entity.User;
 import me.sibyl.entity.UserAccount;
 import me.sibyl.service.UserService;
+import me.sibyl.util.thread.ThreadUtil;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +74,7 @@ public class springboot2test {
     @Test
     public void dbTest() {
 
-        List<User> userList = userMapper.selectList(null);
+//        List<User> userList = userMapper.selectList(null);
 
 //        List<PsychoPassRecord> psychoPassRecords = psychoPassRecordMapper.selectList(null);
 //        for (PsychoPassRecord psychoPassRecord : psychoPassRecords) {
@@ -84,20 +85,21 @@ public class springboot2test {
                 "dl3213", "steam", "reactive", "python", "java", "cpp", "bolshevik");
         List<String> types = Arrays.asList("00", "01", "02");
 
-        Stream.iterate(1, a -> a + 1).limit(300000).parallel().forEach(i -> {
-            User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
+        Stream.iterate(1, a -> a + 1).limit(100000).forEach(i -> {
+            //User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
-            //String uid = "dl3213";
-            record.setUid(String.valueOf(user.getId()));
-            record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 500.00d)));
+            String uid = "3213";
+            record.setUid(String.valueOf(uid));
+            record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 100.00d)));
             record.setType(types.get(RandomUtils.nextInt(0, types.size() - 1)));
-            record.setCreateId(String.valueOf(user.getId()));
+            record.setCreateId(String.valueOf(uid));
             record.setFlag(String.valueOf(System.currentTimeMillis() % 5));
             record.setState(String.valueOf(System.currentTimeMillis() % 5));
             record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));
             //LocalDateTime createTime = randomTime("2023-03");
             record.setCreateTime(LocalDateTime.now());
             psychoPassRecordMapper.insert(record);
+            ThreadUtil.sleep(1000);
         });
 
     }
