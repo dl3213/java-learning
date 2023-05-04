@@ -9,6 +9,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
+import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -28,12 +29,10 @@ public class BilibiliTool {
 
     public static void main(String[] args) {
 
-        //
         List<String> strings = Arrays.asList(
-
         );
         System.err.println(strings.size());
-        strings.parallelStream().forEach(item -> {
+        strings.stream().forEach(item -> {
             try {
                 bilibiliDownloadVideo(item);
             } catch (Exception e) {
@@ -44,7 +43,7 @@ public class BilibiliTool {
     }
 
     private static String getCookie() {
-        return "buvid3=FB0D9A25-F265-4664-8B7F-98AC45C5D743167642infoc; LIVE_BUVID=AUTO9216307616704348; CURRENT_BLACKGAP=0; buvid_fp_plain=undefined; CURRENT_FNVAL=4048; blackside_state=1; i-wanna-go-feeds=-1; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; b_ut=5; _uuid=7D6A710DA-F152-46EE-1AC3-E4D43CDF477A60250infoc; i-wanna-go-back=2; b_nut=100; rpdid=|(JRuY~mkkYl0J'uYY)~RR)Rk; buvid4=E1055CD8-564A-51CF-38E9-24171148CF9382090-022012118-+QGnwQAgbpqebIu3OwJxFA==; hit-new-style-dyn=1; go-back-dyn=1; nostalgia_conf=2; fingerprint=f3b71061c297b34d09f4f35e693f70e9; CURRENT_PID=d74fee80-cde8-11ed-a8d9-4b5bbdd32469; hit-dyn-v2=1; CURRENT_QUALITY=80; SESSDATA=d68267bf,1697636738,19e67*42; bili_jct=02a022d86c549161f12cdbe5cc86d5f2; sid=7zdy74c9; buvid_fp=f3b71061c297b34d09f4f35e693f70e9; bsource=search_baidu; b_lsid=1A5EA4C8_187A7ECA8F7; _dfcaptcha=ee21055ae6340482b83184f71b2038f0; innersign=1; PVID=6; bp_video_offset_11885873=787318847644368900";
+        return "buvid3=AF0A31A6-BC9A-05CC-89D3-1BF864F898BD50462infoc; i-wanna-go-back=-1; _uuid=BBF544A1-C62A-9F105-10F3D-8B8F6310510551050602infoc; buvid4=AA7A843C-D065-808C-C698-B3BDD5CE990D52798-023042618-+QGnwQAgbpquv09GHIJjKg==; b_nut=1682504553; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; hit-new-style-dyn=1; hit-dyn-v2=1; CURRENT_PID=735745f0-e41c-11ed-ae01-45e765b28087; rpdid=|(JRuY~muYYk0J'uY)kl|RYJ~; b_ut=5; LIVE_BUVID=AUTO4616825111741214; go-back-dyn=1; fingerprint=cf261abc460dde3f89a457c532225ffc; buvid_fp_plain=undefined; home_feed_column=5; CURRENT_QUALITY=80; nostalgia_conf=-1; CURRENT_FNVAL=4048; browser_resolution=1920-975; buvid_fp=cf261abc460dde3f89a457c532225ffc; bp_video_offset_11885873=791080938333274100; FEED_LIVE_VERSION=undefined; header_theme_version=undefined; innersign=1; SESSDATA=73bfdc9e,1698584838,697b4*52; bili_jct=8b286990b4fc56c5845b62346a58940f; sid=6eg3isbo; b_lsid=DA89EDE6_187DCA26E55; PVID=32";
     }
 
     private static void bilibiliDownloadVideo(String bvid) {
@@ -89,7 +88,7 @@ public class BilibiliTool {
                 String url = durl.getJSONArray("backup_url").getString(0);
                 System.err.println("url => " + url);
 
-                downloadNew(url, "D:\\" + title + "-" + bvid + "-" + cid + ".mp4");
+                downloadNew(url, "D:\\"+ bvid + "-" + cid + ".mp4");
 
                 System.err.println();
             }
@@ -111,14 +110,19 @@ public class BilibiliTool {
 
             System.err.println("共:" + (urlConnection.getContentLength() / 1024) + "Kb");
             System.err.println("开始下载...");
-            InputStream input = urlConnection.getInputStream();
-
-            byte[] bytes = ByteUtils.toByteArray(input);
-            //FileUtils.copyInputStreamToFile(input, new File(descFileName));
-
+            //使用bufferedInputStream 缓存流的方式来获取下载文件，不然大文件会出现内存溢出的情况
+            InputStream input = new BufferedInputStream(urlConnection.getInputStream());
             FileOutputStream imageOutput = new FileOutputStream(descFileName);
-            imageOutput.write(bytes, 0, bytes.length);//将byte写入硬盘
-            imageOutput.close();
+            byte[] buffer = new byte[1024 * 1024 * 5];// 5MB
+            int len = 0;
+            while ((len = input.read(buffer)) != -1) {
+                imageOutput.write(buffer, 0, len);
+            }
+            //只适合小文件
+//            byte[] bytes = ByteUtils.toByteArray(input);
+//            FileOutputStream imageOutput = new FileOutputStream(descFileName);
+//            imageOutput.write(bytes, 0, bytes.length);//将byte写入硬盘
+//            imageOutput.close();
 
             long end = System.currentTimeMillis();
             System.err.println("耗时：" + (end - begin) / 1000 + "秒");
