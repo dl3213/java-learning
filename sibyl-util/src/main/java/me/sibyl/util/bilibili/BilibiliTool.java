@@ -30,6 +30,7 @@ public class BilibiliTool {
     public static void main(String[] args) {
 
         List<String> strings = Arrays.asList(
+                "BV13o4y14774"
         );
         System.err.println(strings.size());
         strings.stream().forEach(item -> {
@@ -43,7 +44,7 @@ public class BilibiliTool {
     }
 
     private static String getCookie() {
-        return "buvid3=AF0A31A6-BC9A-05CC-89D3-1BF864F898BD50462infoc; i-wanna-go-back=-1; _uuid=BBF544A1-C62A-9F105-10F3D-8B8F6310510551050602infoc; buvid4=AA7A843C-D065-808C-C698-B3BDD5CE990D52798-023042618-+QGnwQAgbpquv09GHIJjKg==; b_nut=1682504553; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; hit-new-style-dyn=1; hit-dyn-v2=1; CURRENT_PID=735745f0-e41c-11ed-ae01-45e765b28087; rpdid=|(JRuY~muYYk0J'uY)kl|RYJ~; b_ut=5; LIVE_BUVID=AUTO4616825111741214; go-back-dyn=1; fingerprint=cf261abc460dde3f89a457c532225ffc; buvid_fp_plain=undefined; home_feed_column=5; CURRENT_QUALITY=80; nostalgia_conf=-1; CURRENT_FNVAL=4048; browser_resolution=1920-975; buvid_fp=cf261abc460dde3f89a457c532225ffc; bp_video_offset_11885873=791080938333274100; FEED_LIVE_VERSION=undefined; header_theme_version=undefined; innersign=1; SESSDATA=73bfdc9e,1698584838,697b4*52; bili_jct=8b286990b4fc56c5845b62346a58940f; sid=6eg3isbo; b_lsid=DA89EDE6_187DCA26E55; PVID=32";
+        return "buvid3=AF0A31A6-BC9A-05CC-89D3-1BF864F898BD50462infoc; i-wanna-go-back=-1; _uuid=BBF544A1-C62A-9F105-10F3D-8B8F6310510551050602infoc; buvid4=AA7A843C-D065-808C-C698-B3BDD5CE990D52798-023042618-+QGnwQAgbpquv09GHIJjKg==; b_nut=1682504553; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; hit-new-style-dyn=1; hit-dyn-v2=1; CURRENT_PID=735745f0-e41c-11ed-ae01-45e765b28087; rpdid=|(JRuY~muYYk0J'uY)kl|RYJ~; b_ut=5; LIVE_BUVID=AUTO4616825111741214; go-back-dyn=1; fingerprint=cf261abc460dde3f89a457c532225ffc; buvid_fp_plain=undefined; home_feed_column=5; CURRENT_QUALITY=80; nostalgia_conf=-1; FEED_LIVE_VERSION=V8; header_theme_version=CLOSE; CURRENT_FNVAL=4048; SESSDATA=973449c1,1699180475,05f71*52; bili_jct=5c6b94a4729e01afc7ed6387396e3009; sid=8uh5oud3; browser_resolution=1920-975; buvid_fp=cf261abc460dde3f89a457c532225ffc; _dfcaptcha=755def52451c43161fa4ef736f2511ef; PVID=16; b_lsid=610102BA89_18800A59667; innersign=0; bp_video_offset_11885873=793712297314877400";
     }
 
     private static void bilibiliDownloadVideo(String bvid) {
