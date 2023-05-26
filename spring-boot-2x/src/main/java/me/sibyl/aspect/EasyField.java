@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.lang.annotation.Annotation;
+
 /**
  * @Classname EasyField
  * @Description TODO
@@ -18,5 +20,6 @@ public final class EasyField {
     private String name;
     private Class clazz;
     private Object value;
-
+    private Integer index;
+    private Annotation[] declaredAnnotationList;
 }

@@ -12,6 +12,7 @@ import me.sibyl.vo.AppRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.CodeSignature;
+import org.aspectj.lang.reflect.MethodSignature;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -65,14 +66,16 @@ public class AopJoinPointUtil {
     }
 
     private static String builderByWatching(JoinPoint joinPoint, String noRepeatSubmitKey) {
-        //Gson gson = new GsonBuilder().create();//gson处理比较好?
-        //参数位置固定 todo 需要做校验？
-        //参数名称
-        String[] paramArr = ((CodeSignature) joinPoint.getSignature()).getParameterNames();
+        CodeSignature signature = (CodeSignature) joinPoint.getSignature();
+        String[] paramArr = signature.getParameterNames();// 这些数组的数量相同
         //参数类型 此时不知道参数是否有注解
-        Class[] typeArr = ((CodeSignature) joinPoint.getSignature()).getParameterTypes();
+        Class[] typeArr = signature.getParameterTypes();// 这些数组的数量相同
         //参数值
-        Object[] args = joinPoint.getArgs();
+        Object[] args = joinPoint.getArgs();// 这些数组的数量相同
+        //
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Method targetMethod = methodSignature.getMethod();
+        Parameter[] parameters = targetMethod.getParameters();// 这些数组的数量相同
 
         //先构造方式所有参数列表
         LinkedList<EasyField> fileList = new LinkedList<>();
@@ -81,53 +84,17 @@ public class AopJoinPointUtil {
                     .name(paramArr[i])
                     .clazz(typeArr[i])
                     .value(args[i])
+                    .index(i)
+                    .declaredAnnotationList(parameters[i].getDeclaredAnnotations())
                     .build();
             fileList.add(easyField);
         }
-
-        Method targetMethod = Arrays.stream(joinPoint.getTarget().getClass().getDeclaredMethods())
-                .filter(Objects::nonNull)
-                .filter(method -> joinPoint.getSignature().getName().equals(method.getName()))
-                .findFirst()
-                .orElse(null);
-
-        JSONObject json = new JSONObject();
-        for (int i = 0; i < targetMethod.getParameters().length; i++) {
-            Parameter parameter = targetMethod.getParameters()[i];
-//                    Class<?> parameterType = parameter.getType();
-//                    System.err.println(parameterType.getName());
-            Watching watching = parameter.getAnnotation(Watching.class);
-            EasyField easyField = fileList.get(i);
-            if (Objects.isNull(easyField.getValue())) continue;
-            if (Objects.nonNull(watching)) {
-                json.put(easyField.getName(), String.valueOf(easyField.getValue()));
-            } else {
-                //检查参数的参数
-                Type parameterizedType = parameter.getParameterizedType();
-                Object value = easyField.getValue();
-                Field[] declaredFields = value.getClass().getDeclaredFields();
-                for (Field declaredField : declaredFields) {
-                    if (Objects.isNull(declaredField)) continue;
-                    Annotation annotation = declaredField.getAnnotation(Watching.class);
-                    if (Objects.isNull(annotation)) continue;
-                    try {
-                        declaredField.setAccessible(true);
-                        Object o = declaredField.get(value);
-                        if (Objects.isNull(o)) continue;
-                        json.put(declaredField.getName(), String.valueOf(o));
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
-
-        }
-
-        String collect = json.entrySet()
+        // todo 选出被Watching的参数，拼接成：名称=值， 多个以-连接
+        String collect = fileList
                 .stream()
                 .filter(Objects::nonNull)
-                .filter(e -> Objects.nonNull(e.getKey()) && Objects.nonNull(e.getValue()))
-                .map(entry -> entry.getKey() + "=" + String.valueOf(entry.getValue()))
+                .filter(easyField -> Arrays.stream(easyField.getDeclaredAnnotationList()).anyMatch(e -> e.annotationType().equals(Watching.class)))
+                .map(easyField -> easyField.getName() + "=" + String.valueOf(easyField.getValue()))
                 .collect(Collectors.joining("-"));
         noRepeatSubmitKey += collect;
         return noRepeatSubmitKey;
