@@ -1,6 +1,7 @@
 package me.sibyl.vo;
 
 import lombok.Data;
+import me.sibyl.annotation.Watching;
 import org.springframework.lang.NonNull;
 
 import java.math.BigDecimal;
@@ -15,5 +16,7 @@ import java.math.BigDecimal;
 public class OrderCreateRequest {
     @NonNull
     private BigDecimal amount;
+
+    @Watching
     private String linkId;
 }

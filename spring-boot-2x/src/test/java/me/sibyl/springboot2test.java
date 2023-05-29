@@ -74,7 +74,7 @@ public class springboot2test {
     @Test
     public void dbTest() {
 
-//        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.selectList(null);
 
 //        List<PsychoPassRecord> psychoPassRecords = psychoPassRecordMapper.selectList(null);
 //        for (PsychoPassRecord psychoPassRecord : psychoPassRecords) {
@@ -85,10 +85,10 @@ public class springboot2test {
                 "dl3213", "steam", "reactive", "python", "java", "cpp", "bolshevik");
         List<String> types = Arrays.asList("00", "01", "02");
 
-        Stream.iterate(1, a -> a + 1).limit(100000).forEach(i -> {
-            //User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
+        Stream.iterate(1, a -> a + 1).limit(1000000).forEach(i -> {
+            User user = userList.get(RandomUtils.nextInt(0, userList.size() - 1));
             PsychoPassRecord record = new PsychoPassRecord();
-            String uid = "3213";
+            Long uid = user.getId();//"3213";
             record.setUid(String.valueOf(uid));
             record.setPsychoPass(String.valueOf(RandomUtils.nextDouble(0.01d, 100.00d)));
             record.setType(types.get(RandomUtils.nextInt(0, types.size() - 1)));
@@ -98,6 +98,7 @@ public class springboot2test {
             record.setCode(strings.get(RandomUtils.nextInt(0, strings.size() - 1)) + (UUID.randomUUID().toString().substring(0, 10)));
             //LocalDateTime createTime = randomTime("2023-03");
             record.setCreateTime(LocalDateTime.now());
+            record.setCreateId(String.valueOf(uid));
             psychoPassRecordMapper.insert(record);
             ThreadUtil.sleep(1000);
         });

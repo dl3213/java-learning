@@ -1,6 +1,7 @@
 package me.sibyl.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jodd.util.ThreadUtil;
 import me.sibyl.dao.BusinessOrderMapper;
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.BusinessOrder;
@@ -23,7 +24,8 @@ import java.util.UUID;
 public class BusinessOrderServiceImpl extends ServiceImpl<BusinessOrderMapper, BusinessOrder> implements BusinessOrderService {
 
     @Override
-    public Object createOrder(OrderCreateRequest orderCreateRequest) {
+    public Long createOrder(OrderCreateRequest orderCreateRequest) {
+        ThreadUtil.sleep(3000);
         BusinessOrder order = BusinessOrder
                 .builder()
                 //.orderId(UUID.randomUUID().toString().replaceAll("-", ""))

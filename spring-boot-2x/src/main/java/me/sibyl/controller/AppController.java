@@ -1,6 +1,8 @@
 package me.sibyl.controller;
 
+import jodd.util.ThreadUtil;
 import lombok.SneakyThrows;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
@@ -18,6 +20,8 @@ import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
+import org.redisson.Redisson;
+import org.redisson.api.RLock;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -132,7 +136,7 @@ public class AppController {
         System.err.println(redisTemplate.getClass());
         System.err.println(redisTemplate.getExpire("test"));
         CaffeineCache caffeineCache = (CaffeineCache) cache;
-        caffeineCache.getNativeCache().asMap().entrySet().forEach(c ->{
+        caffeineCache.getNativeCache().asMap().entrySet().forEach(c -> {
             System.err.println(c.getKey());
             System.err.println(c.getValue());
         });
@@ -152,10 +156,10 @@ public class AppController {
 
     @GetMapping("/log/test")
     @SqlLogging
-    public Response test(){
+    public Response test() {
         System.err.println(Thread.currentThread().getName() + " in method");
 
-        if(true){
+        if (true) {
             System.err.println("sql executing...");
 
             User selectById = userMapper.selectById(3213L);
@@ -176,6 +180,22 @@ public class AppController {
         return Response.success();
     }
 
+    @Resource
+    private Redisson redisson;
 
+    @GetMapping("/lock/test")
+    @NoRepeatBeforeSubmit(expire = 10, mode = TargetMode.watching)
+    public Response test(@Watching String code) {
+
+        System.err.println(Thread.currentThread().getName() + " in ");
+        long currentTimeMillis = 0L;
+        synchronized (code.intern()){
+            System.err.println(Thread.currentThread().getName() + " get ");
+            currentTimeMillis = System.currentTimeMillis();
+            ThreadUtil.sleep(3000);
+        }
+        System.err.println(Thread.currentThread().getName() + " out ");
+        return Response.success(currentTimeMillis);
+    }
 }
 

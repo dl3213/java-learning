@@ -20,7 +20,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-@TableName("psycho_pass_record")
+@TableName("psycho_pass_record_202305")
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)

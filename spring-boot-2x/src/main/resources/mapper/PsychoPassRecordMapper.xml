@@ -5,13 +5,13 @@
 
     <select id="query" resultType="me.sibyl.entity.PsychoPassRecord">
         select r.id, r.uid, r.psycho_pass, r.create_time, r.type, r.flag, r.state, r.code
-        from psycho_pass_record r
+        from psycho_pass_record_202305 r
         <where>
             r.is_deleted = '0'
             <if test="uid != null and uid !=''">
                 and r.uid = #{uid}
             </if>
         </where>
-        order by r.uid,r.create_time desc
+        order by r.create_time desc
     </select>
 </mapper>

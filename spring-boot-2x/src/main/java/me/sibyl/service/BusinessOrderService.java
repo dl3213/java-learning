@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface BusinessOrderService extends IService<BusinessOrder> {
 
-    Object createOrder(OrderCreateRequest orderCreateRequest);
+    Long createOrder(OrderCreateRequest orderCreateRequest);
 }

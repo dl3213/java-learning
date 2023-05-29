@@ -72,7 +72,7 @@ public class NoRepeatSubmitBeforeAspect {
             log.error("[请求重复切片处理]重复提交");
             throw new RuntimeException("重复提交");
         }
-        opsForValue.set(noRepeatSubmitKey, 0, submit.expire(), TimeUnit.SECONDS);
+        opsForValue.set(noRepeatSubmitKey, 1, submit.expire(), TimeUnit.SECONDS);
 
     }
 
