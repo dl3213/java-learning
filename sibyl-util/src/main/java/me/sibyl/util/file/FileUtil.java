@@ -27,7 +27,7 @@ public final class FileUtil {
     public static String testFilePath = "D:\\图片1.png";
 
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         File file = new File(testFilePath);
         System.err.println("file.length() = " + file.length());
         ByteArrayInputStream byteInputStream = FileUtil.getByteInputStream(file);

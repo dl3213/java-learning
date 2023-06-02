@@ -1,7 +1,5 @@
 package me.sibyl.util.file;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import lombok.SneakyThrows;
 import net.coobird.thumbnailator.Thumbnails;
 
@@ -118,7 +116,7 @@ public final class PictureUtil {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main23(String[] args) throws Exception {
 
         String path = "D:\\图片1.png";
 

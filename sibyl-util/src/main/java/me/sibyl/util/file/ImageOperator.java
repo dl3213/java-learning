@@ -49,7 +49,7 @@ public class ImageOperator {
     @Setter
     private Integer degree;
 
-    public static void main(String[] args) throws Exception {
+    public static void main2(String[] args) throws Exception {
         String filePath = "D:\\test\\图片1.png";
         File file = new File(filePath);
         System.err.println(file.getAbsolutePath());

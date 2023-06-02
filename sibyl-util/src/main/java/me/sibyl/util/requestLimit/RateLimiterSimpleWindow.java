@@ -27,7 +27,7 @@ public class RateLimiterSimpleWindow {
         return REQ_COUNT.incrementAndGet() <= QPS;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         for (int i = 0; i < 10; i++) {
             Thread.sleep(250);
             LocalTime now = LocalTime.now();

@@ -10,7 +10,7 @@ import java.util.Observable;
  */
 
 public class Test {
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
 //当前:同步非阻塞
         MyObserverable observerable = new MyObserverable();
         System.err.println("observerable add=>");

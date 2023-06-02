@@ -176,7 +176,7 @@ public class ColumnUtils {
     /**
      * 参考示例
      */
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
 
         //实体类原字段名称返回
         System.out.println();

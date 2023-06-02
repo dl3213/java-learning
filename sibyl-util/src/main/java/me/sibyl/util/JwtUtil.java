@@ -35,7 +35,7 @@ public class JwtUtil  {
         this.timeOut = timeOut;
     }
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("key","value");
         String dl3213 = createJwt("3213", "dl3213",map);

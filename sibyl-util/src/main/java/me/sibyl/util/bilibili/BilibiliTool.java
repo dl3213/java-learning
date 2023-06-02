@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.deepoove.poi.util.ByteUtils;
 import me.sibyl.util.stream.StreamUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -27,7 +28,7 @@ import java.util.List;
 
 public class BilibiliTool {
 
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
 
         List<String> strings = Arrays.asList(
                 "BV13o4y14774"
@@ -53,7 +54,7 @@ public class BilibiliTool {
             HttpGet get = new HttpGet("https://api.bilibili.com/x/web-interface/view?bvid=" + bvid);
             CloseableHttpResponse response = httpClient.execute(get);
             InputStream content = response.getEntity().getContent();
-            String string = StreamUtil.copyToString(content, Charset.forName("utf-8"));
+            String string = IOUtils.toString(content, Charset.forName("utf-8"));
             System.err.println("bvstring => " + string);
             StreamUtil.close(content);
             JSONObject bvJson = JSONObject.parseObject(string);
@@ -78,7 +79,7 @@ public class BilibiliTool {
                 CloseableHttpResponse urlResponse = httpClient.execute(vGet);
 
                 InputStream urlContent = urlResponse.getEntity().getContent();
-                String urlStr = StreamUtil.copyToString(urlContent, Charset.forName("utf-8"));
+                String urlStr = IOUtils.toString(urlContent, Charset.forName("utf-8"));
                 System.err.println("urlStr => " + urlStr);
                 StreamUtil.close(urlContent);
 

@@ -81,7 +81,7 @@ public class RateLimiterSlidingWindow {
         // get...set...
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         int qps = 2, count = 20, sleep = 300, success = count * sleep / 1000 * qps;
         System.out.println(String.format("当前QPS限制为:%d,当前测试次数:%d,间隔:%dms,预计成功次数:%d", qps, count, sleep, success));
         success = 0;

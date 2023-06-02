@@ -59,7 +59,7 @@ public class RateLimiterSildingLog {
         return sum <= qps;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main2(String[] args) throws InterruptedException {
         RateLimiterSildingLog rateLimiterSildingLog = new RateLimiterSildingLog(3);
         for (int i = 0; i < 10; i++) {
             Thread.sleep(250);

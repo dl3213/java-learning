@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public class genericTest {
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
         //List<? extends Number> list = new ArrayList<Number>();
         List<? super Number> list = new ArrayList<Number>();
 

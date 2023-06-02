@@ -14,7 +14,7 @@ import java.io.FileInputStream;
 
 public class Test {
 
-    public static void main(String[] args) throws Exception {
+    public static void main2(String[] args) throws Exception {
         String filePath = "D:\\4test\\TPbQ2K2l.jpeg";
         File file = new File(filePath);
         System.err.println(file.getAbsolutePath());

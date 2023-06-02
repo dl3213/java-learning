@@ -1,8 +1,6 @@
 package me.sibyl.util.stream;
 
 import lombok.SneakyThrows;
-import me.sibyl.util.file.FileUtil;
-import org.springframework.util.StreamUtils;
 
 import java.io.*;
 
@@ -13,10 +11,10 @@ import java.io.*;
  * @Author by Qin Yazhi
  */
 
-public final class StreamUtil extends StreamUtils {
+public final class StreamUtil {
 
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
 
         try (CloseTest closeTest = new CloseTest()) {
             int i = 1 / 0;

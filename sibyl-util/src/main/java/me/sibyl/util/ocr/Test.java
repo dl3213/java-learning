@@ -18,7 +18,7 @@ import java.io.*;
  */
 public class Test {
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main2(String[] args) {
 
         //图片路径
         String path = "D:\\4test\\批注 2023-03-21 221001.png";
