@@ -4,6 +4,7 @@ import jodd.util.ThreadUtil;
 import lombok.SneakyThrows;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
+import me.sibyl.advice.GlobalExceptionAdvice;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
 import me.sibyl.annotation.SqlLogging;
@@ -18,6 +19,7 @@ import me.sibyl.entity.UserAccount;
 import me.sibyl.listener.SibylEvent;
 import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
+import me.sibyl.util.SpringUtil;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
 import org.redisson.Redisson;
@@ -72,6 +74,7 @@ public class AppController {
         Thread.sleep(10000);
         //System.err.println(" end ");
         //System.out.printf("test");
+        System.err.println(SpringUtil.getBean(GlobalExceptionAdvice.class));
     }
 
     @GetMapping("/hello")
