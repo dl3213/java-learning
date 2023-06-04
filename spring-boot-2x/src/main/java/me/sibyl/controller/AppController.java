@@ -200,5 +200,12 @@ public class AppController {
         System.err.println(Thread.currentThread().getName() + " out ");
         return Response.success(currentTimeMillis);
     }
+
+    @GetMapping("/getBean")
+    public void getBean(){
+        System.err.println(SpringUtil.getBean(AppService.class));
+        System.err.println(SpringUtil.getBean(AppController.class));
+        System.err.println(this);
+    }
 }
 
