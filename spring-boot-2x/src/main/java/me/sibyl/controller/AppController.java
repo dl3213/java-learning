@@ -19,6 +19,7 @@ import me.sibyl.entity.UserAccount;
 import me.sibyl.listener.SibylEvent;
 import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
+import me.sibyl.util.BeanContextUtil;
 import me.sibyl.util.SpringUtil;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
@@ -204,6 +205,7 @@ public class AppController {
     @GetMapping("/getBean")
     public void getBean(){
         System.err.println(SpringUtil.getBean(AppService.class));
+        System.err.println(BeanContextUtil.getBean("appService"));
         System.err.println(SpringUtil.getBean(AppController.class));
         System.err.println(this);
     }
