@@ -9,7 +9,7 @@ package me.sibyl.structure.test;
 
 public class Test20220604 {
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
 
     }
 
@@ -20,6 +20,7 @@ public class Test20220604 {
     }
 
     public static void main1(String[] args) {
+        System.err.println("start");
         temp:
         for (int i = 0; i < 5; i++) {
             System.err.println(i);
@@ -27,5 +28,6 @@ public class Test20220604 {
                 if (j == 3) break temp;
             }
         }
+        System.err.println("end");
     }
 }
