@@ -10,6 +10,8 @@ spring:
   main:
     lazy-initialization: false
 
+runnerEnabled: true
+
 debug: false
 logging:
   level:
