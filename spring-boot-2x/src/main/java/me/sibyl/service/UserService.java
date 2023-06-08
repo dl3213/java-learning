@@ -9,4 +9,12 @@ public interface UserService extends IService<User> {
     List<User> listAll();
 
     User detail(String id);
+
+    boolean updateTimeEqNow();
+    boolean updateTimeEqNowError();
+
+    boolean updateAccount();
+    boolean updateAccountError();
+
+
 }

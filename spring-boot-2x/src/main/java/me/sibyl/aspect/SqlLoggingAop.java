@@ -38,7 +38,7 @@ public class SqlLoggingAop {
     /**
      * 指定mapper
      */
-    @Pointcut("execution(public * me.sibyl.dao.BaseMapper+.*(..))")
+//    @Pointcut("execution(public * me.sibyl.dao.BaseMapper+.*(..))")
 //    @Pointcut("execution(public * me.sibyl.dao..*.*(..))")
     public void pointCut() {
     }
@@ -52,7 +52,7 @@ public class SqlLoggingAop {
     private ApplicationContext applicationContext;
 
 
-    @AfterReturning("pointCut()")
+//    @AfterReturning("pointCut()")
     public void AfterReturning(JoinPoint joinPoint) throws Throwable {
         System.err.println(Thread.currentThread().getName() + " in aop");
         System.err.println("++++++++++AfterReturning开始+++++++++++");
