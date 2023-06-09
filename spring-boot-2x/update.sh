@@ -9,7 +9,8 @@ echo "$git_file_list"
 echo " ========> "
 # 替换.java => .class
 # 替换src/main/java => target/classes -- sed 不会改变字符串,所以需要echo来接收结果再赋值
-target_file_list=$( echo "$git_file_list" | sed 's/\.java/\.class/g' | sed 's/src\/main\/java/\.\/target\/classes/g')
+# 替换src/main/resources =>  -- sed 不会改变字符串,所以需要echo来接收结果再赋值
+target_file_list=$( echo "$git_file_list" | sed 's/\.java/\.class/g' | sed 's/src\/main\/java/\.\/target\/classes/g' | sed 's/src\/main\/resources/\.\/target\/classes/g' )
 echo "$target_file_list"
 echo "copy ing......"
 
