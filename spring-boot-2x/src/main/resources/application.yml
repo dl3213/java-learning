@@ -9,6 +9,10 @@ spring:
     include: single-data
   main:
     lazy-initialization: false
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+    cache: false
 
 runnerEnabled: true
 

@@ -1,6 +1,8 @@
 package me.sibyl.util.thread;
 
-import java.util.function.Consumer;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Classname ThreadUtil
@@ -9,13 +11,21 @@ import java.util.function.Consumer;
  * @Create 2023/02/20 21:05
  */
 
-public final class ThreadUtil {
+public final class ThreadUtil extends cn.hutool.core.thread.ThreadUtil {
 
-    public static void sleep(long millis) {
+    public static <T> CompletableFuture<T> anyOf(CompletableFuture<T>... tasks) {
+        return (CompletableFuture<T>) CompletableFuture.anyOf(tasks);
+    }
+
+    public static <T> T get(CompletableFuture<T> task) {
         try {
-            Thread.sleep(millis);
-        } catch (Exception e) {
+            return task.get();
+        } catch (InterruptedException e) {
             e.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
