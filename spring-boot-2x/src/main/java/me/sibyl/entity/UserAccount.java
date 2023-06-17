@@ -6,6 +6,8 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 /**
  * @Classname BusinessOrder
  * @Description TODO
@@ -19,12 +21,13 @@ import lombok.experimental.SuperBuilder;
 @TableName("user_account")
 @EqualsAndHashCode
 @Accessors(chain = true)
-@ToString(callSuper = true)
+//@ToString(callSuper = true)
+@ToString
 public class UserAccount extends BaseEntity {
 
     private Long id;
     private String userId;
-    private String balance;
+    private BigDecimal balance;
     private String state;
 //    @Version
     private Integer version;

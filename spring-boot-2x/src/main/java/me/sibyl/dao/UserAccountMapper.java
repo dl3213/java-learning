@@ -2,7 +2,10 @@ package me.sibyl.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import me.sibyl.entity.UserAccount;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
 
 /**
  * @Classname UserMapper
@@ -12,4 +15,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserAccountMapper extends BaseMapper<UserAccount> {
+
+    int consume(@Param("uid") String uid, @Param("amount") BigDecimal amount);
+    UserAccount queryByIdWithForUpdate(String id);
 }

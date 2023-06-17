@@ -68,8 +68,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                         .eq(UserAccount::getUserId, 3213L)
                         .eq(UserAccount::getState, "01")
         );
-        BigDecimal balance = new BigDecimal(account.getBalance());
-        account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+        BigDecimal balance = (account.getBalance());
+        account.setBalance(balance.subtract(BigDecimal.ONE));
         account.setUpdateTime(LocalDateTime.now());
         return userAccountMapper.updateById(account) == 1;
     }
@@ -83,8 +83,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                         .eq(UserAccount::getUserId, 3213L)
                         .eq(UserAccount::getState, "01")
         );
-        BigDecimal balance = new BigDecimal(account.getBalance());
-        account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+        BigDecimal balance = (account.getBalance());
+        account.setBalance(balance.subtract(BigDecimal.ONE));
         account.setUpdateTime(LocalDateTime.now());
         boolean update = userAccountMapper.updateById(account) == 1;
         int i = 1 / 0;

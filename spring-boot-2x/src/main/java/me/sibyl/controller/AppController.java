@@ -208,6 +208,10 @@ public class AppController {
         System.err.println(BeanContextUtil.getBean("appService"));
         System.err.println(SpringUtil.getBean(AppController.class));
         System.err.println(this);
+        System.err.println(new Object() {
+        }.getClass().getEnclosingMethod());
     }
+
+
 }
 

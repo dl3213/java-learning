@@ -214,6 +214,7 @@ public class CompletableFutureDemo {
             System.err.println(Thread.currentThread().getName());
             ThreadUtil.sleep(100);
             return "supplyAsync100";
+            // thenComposeAsync
         }).thenCompose(task -> CompletableFuture.supplyAsync(() -> {
             System.err.println(Thread.currentThread().getName());
             ThreadUtil.sleep(50);
@@ -234,7 +235,8 @@ public class CompletableFutureDemo {
             System.err.println(Thread.currentThread().getName());
             ThreadUtil.sleep(100);
             return "supplyAsync100";
-        }).thenApply(task -> task + " => thenApply");
+        }).thenApplyAsync(task -> task + " => thenApply");
+//        }).thenApply(task -> task + " => thenApply");
 
         long start = System.currentTimeMillis();
         String getTask100 = task100.get();

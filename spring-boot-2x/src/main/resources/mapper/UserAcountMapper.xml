@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.sibyl.dao.UserAccountMapper">
+
+    <update id="consume">
+        update user_account
+        set balance = balance - #{amount}
+        where user_id = #{uid}
+          and state = '01'
+    </update>
+    <select id="queryByIdWithForUpdate" resultType="me.sibyl.entity.UserAccount">
+        select *
+        from user_account
+        where id = #{id}
+    </select>
+</mapper>

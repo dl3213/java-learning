@@ -7,7 +7,7 @@ import me.sibyl.dao.UserAccountMapper;
 import me.sibyl.entity.UserAccount;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -31,6 +31,32 @@ public class AccountController {
     @Resource
     private Redisson redisson;
 
+    @GetMapping("/test/consume/one")
+    @Transactional
+    public Response consumeOne() {
+        System.err.println(new Object() {
+        }.getClass().getEnclosingMethod());
+//        int one = userAccountMapper.consume("3213", BigDecimal.ONE);
+        UserAccount account = userAccountMapper.queryByIdWithForUpdate("3213");
+        System.err.println("locking");
+        System.err.println(account);
+        cn.hutool.core.thread.ThreadUtil.sleep(10000);
+        account.setBalance(account.getBalance().subtract(BigDecimal.ONE));
+        userAccountMapper.updateById(account);
+        System.err.println(account);
+        System.err.println("end");
+        return Response.success();
+    }
+
+    @GetMapping("/test/query/one")
+    public Response query() {
+        System.err.println(new Object() {
+        }.getClass().getEnclosingMethod());
+        UserAccount account = userAccountMapper.queryByIdWithForUpdate("3213");
+        System.err.println(account);
+        return Response.success();
+    }
+
     @GetMapping("/redisson/consume")
     public String redissonLock() {
         System.err.println(Thread.currentThread().getName() + " => " + LocalDateTime.now());
@@ -43,15 +69,15 @@ public class AccountController {
                             .eq(UserAccount::getState, "01")
             );
 
-            BigDecimal balance = new BigDecimal(account.getBalance());
+            BigDecimal balance = (account.getBalance());
             ThreadUtil.sleep(3000);
 
-            account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+            account.setBalance(balance.subtract(BigDecimal.ONE));
             int update = userAccountMapper.updateById(account);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }finally {
+        } finally {
             redissonLock.unlock();
         }
 
@@ -60,23 +86,23 @@ public class AccountController {
 
     @GetMapping("/synchronized/consume")
     public Response synchronizedConsume(String userId) {
-        synchronized (userId.intern()){
+        synchronized (userId.intern()) {
             UserAccount account = userAccountMapper.selectOne(
                     Wrappers.lambdaQuery(new UserAccount())
                             .eq(UserAccount::getUserId, userId)
                             .eq(UserAccount::getState, "01")
             );
-            if(Objects.isNull(account)){
+            if (Objects.isNull(account)) {
                 account = new UserAccount()
-                        .setBalance(String.valueOf(BigDecimal.TEN))
+                        .setBalance((BigDecimal.TEN))
                         .setUserId(userId)
                         .setState(String.valueOf("01"))
                         .setVersion(0);
                 userAccountMapper.insert(account);
             }
-            BigDecimal balance = new BigDecimal(account.getBalance());
+            BigDecimal balance = (account.getBalance());
             ThreadUtil.sleep(3000);
-            account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+            account.setBalance(balance.subtract(BigDecimal.ONE));
             int update = userAccountMapper.updateById(account);
         }
         System.err.println(LocalDateTime.now());
@@ -95,14 +121,14 @@ public class AccountController {
                             .eq(UserAccount::getUserId, "3213")
                             .eq(UserAccount::getState, "01")
             );
-            BigDecimal balance = new BigDecimal(account.getBalance());
+            BigDecimal balance = (account.getBalance());
             ThreadUtil.sleep(3000);
-            account.setBalance(balance.subtract(BigDecimal.ONE).toString());
+            account.setBalance(balance.subtract(BigDecimal.ONE));
             int update = userAccountMapper.updateById(account);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        }finally {
+        } finally {
             reentrantLock.unlock();
         }
         return Response.success(System.currentTimeMillis());
