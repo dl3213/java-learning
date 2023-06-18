@@ -1,7 +1,10 @@
 package me.sibyl.util.lock;
 
 import lombok.Data;
+import lombok.SneakyThrows;
+import me.sibyl.util.thread.ThreadUtil;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 /**
@@ -13,17 +16,39 @@ import java.util.stream.Stream;
 
 public class SynchronizedTest {
 
-    public static Object object = new Object();
+    public static Object lock = new Object();
 
+    static int target = 0;
+
+    @SneakyThrows
     public static void main(String[] args) {
-        final Integer[] target = {1};
-        Stream.iterate(1, i -> i + 1).limit(4).parallel().forEach(i -> {
-            synchronized (object){
-                target[0] = target[0] + 1;
+
+        int times = 100000;
+        boolean isLock = true;
+        CompletableFuture<Void> add = CompletableFuture.runAsync(() -> {
+            for (int j = 0; j < times; j++) {
+                if (isLock) {
+                    synchronized (lock) {
+                        target++;
+                    }
+                } else {
+                    target++;
+                }
             }
         });
-
-        System.err.println("fin target = " + target[0]);
+        CompletableFuture<Void> sub = CompletableFuture.runAsync(() -> {
+            for (int j = 0; j < times; j++) {
+                if (isLock) {
+                    synchronized (lock) {
+                        target--;
+                    }
+                } else {
+                    target--;
+                }
+            }
+        });
+        CompletableFuture.allOf(add, sub).join();
+        System.err.println("fin target = " + target);
     }
 
 

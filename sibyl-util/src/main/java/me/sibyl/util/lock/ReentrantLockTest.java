@@ -1,5 +1,8 @@
 package me.sibyl.util.lock;
 
+import lombok.SneakyThrows;
+
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
@@ -12,18 +15,46 @@ import java.util.stream.Stream;
 
 public class ReentrantLockTest {
 
+    static int target = 0;
+
+    public static ReentrantLock lock = new ReentrantLock();
+
+    @SneakyThrows
     public static void main(String[] args) {
-        final Integer[] target = {1};
-        ReentrantLock lock = new ReentrantLock();
-        Stream.iterate(1, i -> i + 1).limit(4).parallel().forEach(i -> {
-            lock.lock();
-            try {
-                target[0] = target[0] + 1;
-            }finally {
-                lock.unlock();
+
+        int times = 100000;
+        boolean isLock = true;
+        CompletableFuture<Void> add = CompletableFuture.runAsync(() -> {
+            for (int j = 0; j < times; j++) {
+                if (isLock) {
+                    lock.lock();
+                    try {
+                        target++;
+                    } finally {
+                        lock.unlock();
+                    }
+
+                } else {
+                    target++;
+                }
             }
         });
-
-        System.err.println("fin target = " + target[0]);
+        CompletableFuture<Void> sub = CompletableFuture.runAsync(() -> {
+            for (int j = 0; j < times; j++) {
+                if (isLock) {
+                    lock.lock();
+                    try {
+                        target--;
+                    } finally {
+                        lock.unlock();
+                    }
+                } else {
+                    target--;
+                }
+            }
+        });
+        CompletableFuture.allOf(add, sub).join();
+        System.err.println("fin target = " + target);
     }
+
 }
