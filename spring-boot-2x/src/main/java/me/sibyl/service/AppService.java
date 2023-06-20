@@ -2,10 +2,13 @@ package me.sibyl.service;
 
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.concurrent.Future;
 
 /**
  * @Classname AppService
@@ -31,4 +34,16 @@ public class AppService {
 //        asyncService.test(user.getId());
     }
 
+    @Async
+    public void asyncTask() {
+        System.err.println(Thread.currentThread().getName());
+        System.err.println(Thread.currentThread().getThreadGroup().getName());
+    }
+
+    @Async
+    public Future<String> asyncString(){
+        System.err.println(Thread.currentThread().getName());
+        System.err.println(Thread.currentThread().getThreadGroup().getName());
+        return new AsyncResult<>("test");
+    }
 }

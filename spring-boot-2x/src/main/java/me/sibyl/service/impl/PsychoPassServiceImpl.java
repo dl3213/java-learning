@@ -30,7 +30,7 @@ public class PsychoPassServiceImpl extends ServiceImpl<PsychoPassRecordMapper, P
 
     @Override
     public Object queryPage(PsychoPassQueryRequest queryRequest) {
-//        PageHelper.startPage(queryRequest.getPageNum(), queryRequest.getPageSize());
+        PageHelper.startPage(queryRequest.getPageNum(), queryRequest.getPageSize());
         List<PsychoPassRecord> query = this.getBaseMapper().query(queryRequest);
         System.err.println("query.size() = " + query.size());
         PageInfo<PsychoPassRecord> pageInfo = new PageInfo<>(query);

@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public class genericTest {
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         //List<? extends Number> list = new ArrayList<Number>();
         List<? super Number> list = new ArrayList<Number>();
 
@@ -19,6 +19,9 @@ public class genericTest {
         System.err.println(list);
 
         Object object = list.get(0);
+
+        System.err.println(new Object() {
+        }.getClass().getEnclosingMethod());
 
     }
 }

@@ -4,20 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
+ * @author dyingleaf3213
  * @Classname Type
- * @Description Type
- * @Date 2023/6/16 11:24
- * @Author by Qin Yazhi
+ * @Description TODO
+ * @Create 2023/06/19 22:10
  */
-@EnumList
-@AllArgsConstructor
 @Getter
-public enum Type {
+@AllArgsConstructor
+public enum Type implements EnumInterface {
 
-    type1(1, "type1"),
-    type2(2, "type2"),
+    type1("1", "type1"),
+    type2("2", "type2"),
     ;
 
-    private int key;
+    private String code;
     private String value;
 }

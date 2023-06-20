@@ -34,4 +34,9 @@ public class RequestLimitController {
         }
 
     }
+
+    @GetMapping("/guava/test01")
+    public Response test01(){
+        return Response.success(System.currentTimeMillis());
+    }
 }

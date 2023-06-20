@@ -21,6 +21,13 @@
 <!--            <version>0.0.1</version>-->
 <!--        </dependency>-->
 
+        <!--thymeleaf模板引擎配置-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
