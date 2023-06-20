@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class SystemCommandLineRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
-        System.err.println("SystemBootStarter");
+        System.err.println("CommandLineRunner");
         System.err.println(SpringUtil.getBean(AppService.class));
     }
 }

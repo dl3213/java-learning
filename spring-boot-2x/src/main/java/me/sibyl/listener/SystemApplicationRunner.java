@@ -4,6 +4,7 @@ import me.sibyl.service.AppService;
 import me.sibyl.util.SpringUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +16,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(8)
+@ConditionalOnExpression("${runnerEnabled:false}")
 public class SystemApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.err.println("SystemApplicationRunner");
+        System.err.println("ApplicationRunner");
         System.err.println(SpringUtil.getBean(AppService.class));
     }
 }
