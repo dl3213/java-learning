@@ -1,10 +1,8 @@
 package me.sibyl.cas.domain;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import me.sibyl.base.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,16 +32,15 @@ public class LoginUser implements UserDetails {
         this.permissions = permissions;
     }
 
-    @JSONField(serialize = false)
     private List<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(!CollectionUtils.isEmpty(authorities)){
+        if (!CollectionUtils.isEmpty(authorities)) {
             return authorities;
         }
         authorities = permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        return authorities ;
+        return authorities;
     }
 
     @Override

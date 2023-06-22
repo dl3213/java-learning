@@ -1,23 +1,23 @@
 package me.sibyl.cas.filter;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.cache.service.RedisService;
 import me.sibyl.cas.domain.SecurityUser;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 /**
  * @Classname MyTokenAuthenticationFilte
@@ -30,17 +30,12 @@ import java.io.UnsupportedEncodingException;
 @Component
 public class SibylTokenAuthenticationFilter extends OncePerRequestFilter {
 
-    private final RedisService redisService;
-
-    public static final String login_cache_key = "sibyl-login-";
-
-    public SibylTokenAuthenticationFilter(RedisService redisService) {
-        this.redisService = redisService;
-    }
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-//        log.info("请求头类型： {}" , httpServletRequest.getContentType());
+        log.info("请求头类型： {}" , httpServletRequest.getContentType());
 
 //        MultiReadHttpServletRequest wrappedRequest = new MultiReadHttpServletRequest(httpServletRequest);
 //        MultiReadHttpServletResponse wrappedResponse = new MultiReadHttpServletResponse(httpServletResponse);
@@ -55,9 +50,9 @@ public class SibylTokenAuthenticationFilter extends OncePerRequestFilter {
             //String token = wrappedRequest.getHeader(Constants.REQUEST_HEADER);
             String token = httpServletRequest.getHeader("token");
             log.info("[MyTokenAuthenticationFilter]token=" + token);
-            if (StringUtils.isNotBlank(token)) {
+            if (StringUtils.hasText(token)) {
                 // 检查token
-                SecurityUser securityUser = (SecurityUser) redisService.get(token);
+                SecurityUser securityUser = (SecurityUser) redisTemplate.opsForValue().get(token);
                 if (securityUser == null || securityUser.getCurrentUserInfo() == null) {
                     throw new AccessDeniedException("TOKEN已过期，请重新登录！");
                 }
@@ -69,50 +64,15 @@ public class SibylTokenAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } catch (AuthenticationException e) {
             log.error(e.getLocalizedMessage());
+            e.printStackTrace();
             // 清空当前线程中的 SecurityContext
             SecurityContextHolder.clearContext();
             // 执行 认证失败方法
             //this.adminAuthenticationEntryPoint.commence(wrappedRequest, wrappedResponse, e);
         } finally {
             stopWatch.stop();
-            //long usedTimes = stopWatch.getTotalTimeMillis();
-            // 打印消息
-            //logResponseBody(wrappedRequest, wrappedResponse, usedTimes);
         }
     }
-
-//    // 处理请求
-//    private void logRequestBody(MultiReadHttpServletRequest request) {
-//        MultiReadHttpServletRequest wrapper = request;
-//        if (wrapper != null) {
-//            try {
-//                String bodyJson = wrapper.getBodyJsonStrByJson(request);
-//                String url = wrapper.getRequestURI().replace("//", "/");
-//                log.info("-------------------------------- 请求url: " + url + " --------------------------------");
-//                Constants.URL_MAPPING_MAP.put(url, url);
-//                log.info("`{}` 接收到的参数: {}",url , bodyJson);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-//    // 处理返回
-//    private void logResponseBody(MultiReadHttpServletRequest request, MultiReadHttpServletResponse response, long useTime) {
-//        MultiReadHttpServletResponse wrapper = response;
-//        if (wrapper != null) {
-//            byte[] buf = wrapper.getBody();
-//            if (buf.length > 0) {
-//                String payload;
-//                try {
-//                    payload = new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
-//                } catch (UnsupportedEncodingException ex) {
-//                    payload = "[unknown]";
-//                }
-//                log.info("`{}`  耗时:{}ms  返回的参数: {}", Constants.URL_MAPPING_MAP.get(request.getRequestURI()), useTime, payload);
-//                log.info("");
-//            }
-//        }
-//    }
 
 }
 

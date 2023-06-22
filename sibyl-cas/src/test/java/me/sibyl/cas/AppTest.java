@@ -1,12 +1,7 @@
 package me.sibyl.cas;
 
-import me.sibyl.cache.service.RedisService;
-import me.sibyl.cas.mapper.PermissionMapper;
-import me.sibyl.cas.mapper.UserMapper;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 
 /**
  * @Classname AppTest
@@ -18,19 +13,4 @@ import javax.annotation.Resource;
 @SpringBootTest
 public class AppTest {
 
-    @Resource
-    private UserMapper userMapper;
-    @Resource
-    private PermissionMapper permissionMapper;
-    @Resource
-    private RedisService redisService;
-
-    @Test
-    public void test(){
-        System.err.println(userMapper.selectList(null));
-
-        //userMapper.selectList(null).forEach(System.err::println);
-//        System.err.println(redisUtil);
-//        redisUtil.set("test", LocalDateTime.now());
-    }
 }

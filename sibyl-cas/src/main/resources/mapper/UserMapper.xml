@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.sibyl.cas.mapper.UserMapper">
+
+    <select id="queryByUsername" resultType="me.sibyl.cas.domain.User">
+        select *
+        from sys_user
+        where username = #{username}
+          and is_deleted = '0'
+    </select>
+    <select id="queryUserRoles" resultType="me.sibyl.cas.domain.Role">
+        select distinct r.*
+        from sys_role r
+                 left join sys_user_role ur on ur.role_id = r.id
+        where ur.user_id = #{uid}
+    </select>
+    <select id="queryUserRolePermissions" resultType="me.sibyl.cas.domain.Permission">
+        select distinct p.*
+        from sys_permission p
+                 left join sys_role_permission rp on rp.p_id = p.id
+                 left join sys_role r on r.id = rp.role_id
+                 left join sys_user_role ur on ur.role_id = r.id
+        where ur.user_id = #{uid}
+    </select>
+
+    <select id="selectKeysByUserId" resultType="java.lang.String">
+        SELECT DISTINCT m.code
+        FROM sys_user_role ur
+                 LEFT JOIN sys_role r on ur.role_id = r.id
+                 LEFT JOIN sys_role_permission rm on ur.role_id = rm.role_id
+                 LEFT JOIN sys_permission m on m.id = rm.p_id
+        where ur.user_id = #{uid};
+    </select>
+
+</mapper>

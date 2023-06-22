@@ -1,9 +1,9 @@
 package me.sibyl.cas.handler;
 
 import com.alibaba.fastjson.JSON;
-import me.sibyl.cache.service.RedisService;
+import me.sibyl.cas.util.WebUtil;
 import me.sibyl.common.response.Response;
-import me.sibyl.util.web.WebUtil;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -25,12 +25,12 @@ import java.io.IOException;
 public class AdminLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Resource
-    private RedisService redisService;
+    private RedisTemplate redisTemplate;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         String token = httpServletRequest.getHeader("token");
-        redisService.delete(token);
+        redisTemplate.delete(token);
         Object result = Response.success("退出成功");
         WebUtil.renderString(httpServletResponse, JSON.toJSONString(result));
     }

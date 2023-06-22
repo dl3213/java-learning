@@ -1,6 +1,6 @@
 package me.sibyl.cas.config;
 
-import me.sibyl.util.MD5Util;
+import me.sibyl.cas.util.MD5Util;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -18,6 +18,6 @@ public class MyPasswordEncoder implements PasswordEncoder {
 
     @Override
     public String encode(CharSequence rawPassword) {
-        return MD5Util.encode((String)rawPassword);
+        return MD5Util.encode(String.valueOf(rawPassword));
     }
 }

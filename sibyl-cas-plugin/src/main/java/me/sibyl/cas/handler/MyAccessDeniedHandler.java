@@ -1,8 +1,8 @@
 package me.sibyl.cas.handler;
 
 import com.alibaba.fastjson.JSON;
+import me.sibyl.cas.util.WebUtil;
 import me.sibyl.common.response.Response;
-import me.sibyl.util.web.WebUtil;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;

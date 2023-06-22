@@ -157,13 +157,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        // 自定义验证管理器
-//        //auth.authenticationProvider(adminAuthenticationProvider);
-//        // super.configure(auth);
-//    }
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         // ignoring 允许添加 RequestMatcher Spring Security 应该忽略的实例。

@@ -2,8 +2,8 @@ package me.sibyl.cas.handler;
 
 import com.alibaba.fastjson.JSON;
 import me.sibyl.cas.domain.SecurityUser;
+import me.sibyl.cas.util.WebUtil;
 import me.sibyl.common.response.Response;
-import me.sibyl.util.web.WebUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;

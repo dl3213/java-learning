@@ -1,14 +1,11 @@
 package me.sibyl.cas.controller;
 
 
-import com.alibaba.fastjson.JSONObject;
-import me.sibyl.base.entity.User;
 import me.sibyl.cas.service.UserLoginService;
 import me.sibyl.cas.vo.request.LoginRequest;
 import me.sibyl.common.response.Response;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;

@@ -28,6 +28,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(rateLimiterInterceptor).addPathPatterns("/request/limit/guava/**");
-        registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/**");
+//        registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/repeat/submit");
     }
 }

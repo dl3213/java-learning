@@ -79,7 +79,7 @@ public class AppController {
     }
 
     @GetMapping("/hello")
-    @NoRepeatAroundSubmit(mode = TargetMode.classParam, watchClass = {AppRequest.class, AppRequest2.class}, classParamName = {"id", "name"})
+    //@NoRepeatAroundSubmit(mode = TargetMode.classParam, watchClass = {AppRequest.class, AppRequest2.class}, classParamName = {"id", "name"})
     public Response hello(@Validated AppRequest request, AppRequest2 request2) {
         // 目的 == 需求 == 出发点
 //        System.err.println("hello");

@@ -1,13 +1,14 @@
-package me.sibyl.cas.expression;
+package me.sibyl.cas.config;
 
 import lombok.extern.slf4j.Slf4j;
-import me.sibyl.base.entity.Permission;
+import me.sibyl.cas.domain.Permission;
 import me.sibyl.cas.domain.SecurityUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
 
 /**
  * @Classname SibylExpressionRoot

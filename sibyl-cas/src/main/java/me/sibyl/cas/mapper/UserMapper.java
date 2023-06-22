@@ -1,8 +1,12 @@
 package me.sibyl.cas.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.sibyl.base.entity.User;
+import me.sibyl.cas.domain.Permission;
+import me.sibyl.cas.domain.Role;
+import me.sibyl.cas.domain.User;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @Classname UserMapper
@@ -11,5 +15,10 @@ import org.springframework.stereotype.Repository;
  * @Created by dyingleaf3213
  */
 @Repository
-public interface UserMapper extends BaseMapper<User> {
+public interface UserMapper {
+    User queryByUsername(@Param("username") String username);
+
+    List<Role> queryUserRoles(@Param("uid")String uid);
+
+    List<Permission> queryUserRolePermissions(@Param("uid") String uid);
 }
