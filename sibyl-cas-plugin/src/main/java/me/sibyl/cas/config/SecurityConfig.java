@@ -1,11 +1,14 @@
 package me.sibyl.cas.config;
 
+import me.sibyl.cas.annotation.AnonymousAuth;
 import me.sibyl.cas.filter.SibylTokenAuthenticationFilter;
 import me.sibyl.cas.handler.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,9 +19,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @EnableWebSecurity
 // 开启注解权限资源控制
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
     /**
@@ -93,12 +101,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new MyPasswordEncoder();
     }
 
     @Value("#{'${url.anonymous:}'.trim().split(',')}")
     private String[] anonymousList;
+
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -112,9 +123,20 @@ public class SecurityConfig {
 //        System.err.println(Arrays.stream(anonymousList).collect(Collectors.toList()));
         registry
                 .antMatchers(anonymousList)
-                .permitAll();
+//                .permitAll();
+                .anonymous();
         registry.antMatchers("/user/login", "/druid/login.html")
                 .anonymous();
+        // 注解支持
+        Map<RequestMappingInfo, HandlerMethod> handlerMethods = requestMappingHandlerMapping.getHandlerMethods();
+        handlerMethods.entrySet()
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(entry-> Objects.nonNull(entry.getValue().getMethodAnnotation(AnonymousAuth.class)))
+                .map(Map.Entry::getKey)
+                .map(RequestMappingInfo::getPatternsCondition)
+                .flatMap(condition -> condition.getPatterns().stream())
+                .forEach(pattern -> registry.antMatchers(pattern).anonymous());
 
         // OPTIONS(选项):查找适用于一个特定网址资源的通讯选择。 在不需执行具体的涉及数据传输的动作情况下， 允许客户端来确定与资源相关的选项以及 / 或者要求， 或是一个服务器的性能
         // registry.antMatchers(HttpMethod.OPTIONS, Constants.CONTEXT_PATH+"/**").denyAll();
@@ -173,18 +195,18 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() throws Exception {
         // ignoring 允许添加 RequestMatcher Spring Security 应该忽略的实例。
 
-        return (web) ->{
+        return (web) -> {
             web.ignoring().antMatchers(HttpMethod.GET,
                     "/favicon.ico",
                     "/*.html",
                     "/**/*.css",
                     "/**/*.js");
-            web.ignoring().antMatchers(HttpMethod.GET,"/swagger-resources/**");
-            web.ignoring().antMatchers(HttpMethod.GET,"/webjars/**");
-            web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs");
-            web.ignoring().antMatchers(HttpMethod.GET,"/v2/api-docs-ext");
-            web.ignoring().antMatchers(HttpMethod.GET,"/configuration/ui");
-            web.ignoring().antMatchers(HttpMethod.GET,"/configuration/security");
+            web.ignoring().antMatchers(HttpMethod.GET, "/swagger-resources/**");
+            web.ignoring().antMatchers(HttpMethod.GET, "/webjars/**");
+            web.ignoring().antMatchers(HttpMethod.GET, "/v2/api-docs");
+            web.ignoring().antMatchers(HttpMethod.GET, "/v2/api-docs-ext");
+            web.ignoring().antMatchers(HttpMethod.GET, "/configuration/ui");
+            web.ignoring().antMatchers(HttpMethod.GET, "/configuration/security");
         };
     }
 
