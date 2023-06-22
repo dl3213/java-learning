@@ -23,3 +23,6 @@ logging:
     root: info
   file:
     name: ${spring.application.name}/log/${spring.application.name}.log
+
+url:
+  anonymous: /home/**,/auth/no/required,/hello/**

@@ -2,6 +2,7 @@ package me.sibyl.cas.config;
 
 import me.sibyl.cas.filter.SibylTokenAuthenticationFilter;
 import me.sibyl.cas.handler.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Classname SecurityConfig
@@ -92,6 +97,9 @@ public class SecurityConfig {
         return new MyPasswordEncoder();
     }
 
+    @Value("#{'${url.anonymous:}'.trim().split(',')}")
+    private String[] anonymousList;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.antMatcher("/**").authorizeRequests();
@@ -100,9 +108,13 @@ public class SecurityConfig {
         // registry.antMatchers("/").hasIpAddress("127.0.0.1");
 
         // 允许匿名的url - 可理解为放行接口 - 多个接口使用,分割
-        registry.antMatchers("/home").permitAll();
-//        registry.antMatchers("/user/login", "/druid/login.html")
-//                .anonymous();
+//        System.err.println(new Object(){}.getClass().getEnclosingMethod().getName());
+//        System.err.println(Arrays.stream(anonymousList).collect(Collectors.toList()));
+        registry
+                .antMatchers(anonymousList)
+                .permitAll();
+        registry.antMatchers("/user/login", "/druid/login.html")
+                .anonymous();
 
         // OPTIONS(选项):查找适用于一个特定网址资源的通讯选择。 在不需执行具体的涉及数据传输的动作情况下， 允许客户端来确定与资源相关的选项以及 / 或者要求， 或是一个服务器的性能
         // registry.antMatchers(HttpMethod.OPTIONS, Constants.CONTEXT_PATH+"/**").denyAll();

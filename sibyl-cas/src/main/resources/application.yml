@@ -21,3 +21,6 @@ logging:
 #      clean-history-on-start: false
 #      max-file-size: 10MB
 #      max-history: 7
+
+url:
+  anonymous: /home/**,/auth/no/required
