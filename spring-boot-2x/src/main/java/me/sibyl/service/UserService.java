@@ -17,4 +17,5 @@ public interface UserService extends IService<User> {
     boolean updateAccountError();
 
 
+    void updateUser(User detail);
 }

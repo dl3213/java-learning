@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -27,11 +28,10 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@Lazy
+@ConditionalOnProperty(prefix = "datasource", name = "dynamic", havingValue = "false")
 public class DruidConfig {
 
 	@Bean
-	@Lazy
 	public ServletRegistrationBean druidServlet() {
 		log.info("init Druid Servlet Configuration ");
 		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new StatViewServlet(),
@@ -50,7 +50,6 @@ public class DruidConfig {
 	}
 
 	@Bean
-	@Lazy
 	public FilterRegistrationBean filterRegistrationBean() {
 		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean(new WebStatFilter());
 		filterRegistrationBean.addUrlPatterns("/*");
@@ -66,7 +65,6 @@ public class DruidConfig {
 	 */
 	@ConfigurationProperties(prefix = "spring.datasource")
 	@Data
-	@Lazy
 	class DataSourceProperties {
 		private String url;
 		private String username;
@@ -92,7 +90,6 @@ public class DruidConfig {
 
 		@Bean
 		@Primary
-		@Lazy
 		public DataSource dataSource() {
 			DruidDataSource datasource = new DruidDataSource();
 			datasource.setUrl(url);

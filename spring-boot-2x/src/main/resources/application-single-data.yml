@@ -1,3 +1,6 @@
+datasource:
+  dynamic: false
+
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

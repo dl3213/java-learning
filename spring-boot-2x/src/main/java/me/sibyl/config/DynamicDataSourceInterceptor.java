@@ -23,7 +23,7 @@ import java.util.Properties;
  * @Create 2023/04/09 01:58
  */
 @Component
-@ConditionalOnProperty(prefix = "datasource", name = "dynamic", havingValue = "true")
+@ConditionalOnProperty(prefix = "datasource", name = "type", havingValue = "rw")
 @Slf4j
 //指定拦截哪些方法,update包括增删改
 @Intercepts({@Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),

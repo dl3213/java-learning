@@ -1,5 +1,6 @@
 package me.sibyl.service.impl;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,6 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @DS("slave_1")
     public User detail(String id) {
         User user = this.getBaseMapper().queryById(Long.valueOf(id));
         return user;
@@ -89,5 +91,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         boolean update = userAccountMapper.updateById(account) == 1;
         int i = 1 / 0;
         return update;
+    }
+
+    @Override
+    @DS("mater")
+    public void updateUser(User detail) {
+        this.getBaseMapper().updateById(detail);
     }
 }

@@ -23,7 +23,7 @@ import java.util.Map;
  */
 
 @Configuration
-@ConditionalOnProperty(prefix = "datasource", name = "dynamic", havingValue = "true")
+@ConditionalOnProperty(prefix = "datasource", name = "type", havingValue = "rw")
 public class DynamicDataSourceConfig {
 
 
