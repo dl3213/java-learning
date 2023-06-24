@@ -11,8 +11,8 @@ import me.sibyl.annotation.Watching;
  */
 @Data
 public class AppRequest {
-    private String id;
     @Watching
+    private String id;
     private String value;
     @Watching
     private int get;

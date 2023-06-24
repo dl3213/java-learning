@@ -20,7 +20,7 @@ import java.util.HashMap;
 @RequestMapping("/api/v1")
 @Slf4j
 @RestController
-public class TestController {
+public class DocxTempleteController {
 
     @GetMapping("/byTemplate/create")
     public void create(HttpServletResponse response, @Validated Object exportVO) throws Exception {

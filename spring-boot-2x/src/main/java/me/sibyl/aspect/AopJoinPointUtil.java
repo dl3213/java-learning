@@ -78,7 +78,7 @@ public class AopJoinPointUtil {
         Parameter[] parameters = targetMethod.getParameters();// 这些数组的数量相同
 
         //先构造方式所有参数列表
-        LinkedList<EasyField> fileList = new LinkedList<>();
+        ArrayList<EasyField> fields = new ArrayList<>();
         for (int i = 0; i < args.length; i++) {
             EasyField easyField = EasyField.builder()
                     .name(paramArr[i])
@@ -87,10 +87,11 @@ public class AopJoinPointUtil {
                     .index(i)
                     .declaredAnnotationList(parameters[i].getDeclaredAnnotations())
                     .build();
-            fileList.add(easyField);
+            fields.add(easyField);
         }
+        System.err.println(fields);
         // todo 选出被Watching的参数，拼接成：名称=值， 多个以-连接
-        String collect = fileList
+        String collect = fields
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(easyField -> Arrays.stream(easyField.getDeclaredAnnotationList()).anyMatch(e -> e.annotationType().equals(Watching.class)))

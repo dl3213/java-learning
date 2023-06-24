@@ -29,8 +29,11 @@ public class SpringAsyncConfig implements AsyncConfigurer {
         executor.setCorePoolSize(4);
         executor.setMaxPoolSize(16);
         executor.setQueueCapacity(16);
-        // RejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
-        // CallerRunsPolicy：不在新线程中执行任务，而是有调用者所在的线程来执行
+
+        //AbortPolicy:丢弃任务并抛出RejectedExecutionException异常
+        //DiscardPolicy:丢弃任务，但是不抛出异常。如果线程队列已满，则后续提交的任务都会被丢弃，且是静默丢弃。
+        //DiscardOldestPolicy:丢弃队列最前面的任务，然后重新提交被拒绝的任务。
+        //CallerRunsPolicy:由调用线程处理该任务
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;

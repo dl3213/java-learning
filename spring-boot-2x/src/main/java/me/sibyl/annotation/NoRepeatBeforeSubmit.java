@@ -3,6 +3,7 @@ package me.sibyl.annotation;
 import me.sibyl.aspect.TargetMode;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Classname NoRepeatSubmit
@@ -20,6 +21,12 @@ public @interface NoRepeatBeforeSubmit {
      *  过期时间 秒
      **/
     long expire() default 10;
+
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
+
+    String msg() default "重复提交";
+
+    boolean cacheKeyWithUrl() default true;
 
     /**
      *  指定方法的参数类

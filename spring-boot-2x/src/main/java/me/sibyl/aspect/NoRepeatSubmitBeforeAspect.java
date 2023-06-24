@@ -53,6 +53,7 @@ public class NoRepeatSubmitBeforeAspect {
 
     @Before("pointCut(submit)")
     public void before(JoinPoint jp, NoRepeatBeforeSubmit submit) {
+        log.info(String.valueOf(submit));
         ValueOperations<String, Integer> opsForValue = redisTemplate.opsForValue();
         //构建缓存key
 
@@ -63,16 +64,15 @@ public class NoRepeatSubmitBeforeAspect {
                 submit.watchClass(),
                 submit.classParamName()
         );
-
         Integer ret = opsForValue.get(noRepeatSubmitKey);
-        log.info("[请求重复切片处理]redis-key: {} , value:{}", noRepeatSubmitKey, ret);
+        log.info("[请求重复切片处理]cache-key: {} , value:{}", noRepeatSubmitKey, ret);
 
         // 如果缓存中有这个key视为重复提交
         if (Objects.nonNull(ret)) {
             log.error("[请求重复切片处理]重复提交");
-            throw new RuntimeException("重复提交");
+            throw new RuntimeException(submit.msg());
         }
-        opsForValue.set(noRepeatSubmitKey, 1, submit.expire(), TimeUnit.SECONDS);
+        opsForValue.set(noRepeatSubmitKey, 1, submit.expire(), submit.timeUnit());
 
     }
 
