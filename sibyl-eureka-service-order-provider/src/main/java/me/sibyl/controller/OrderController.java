@@ -23,8 +23,9 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping(value = "/create")
-    public Response create(@RequestBody OrderCreateRequest request) {
+    public Response create(@RequestBody OrderCreateRequest request, @RequestHeader("token") String token) {
         log.info("[order-service] now is order-service");
+        System.err.println(token);
         String data = orderService.create(request);
 
         //int i = 1/0;

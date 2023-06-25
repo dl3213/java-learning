@@ -28,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
     public String create(OrderCreateRequest orderCreateRequest) {
         BusinessOrder order = BusinessOrder
                 .builder()
-                .orderId(UUID.randomUUID().toString().replaceAll("-", ""))
+//                .orderId(UUID.randomUUID().toString().replaceAll("-", ""))
                 .amount(String.valueOf(orderCreateRequest.getAmount()))
                 .orderState("0")
                 .linkId(orderCreateRequest.getLinkId())
@@ -36,6 +36,6 @@ public class OrderServiceImpl implements OrderService {
                 .createTime(LocalDateTime.now())
                 .build();
         this.businessOrderMapper.insert(order);
-        return order.getOrderId();
+        return order.getId();
     }
 }

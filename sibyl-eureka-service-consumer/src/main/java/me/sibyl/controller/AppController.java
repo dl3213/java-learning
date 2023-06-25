@@ -10,6 +10,7 @@ import me.sibyl.microservice.provider.eureka.AccountConsumeFallbackFactoryFactor
 import me.sibyl.microservice.provider.eureka.AccountServiceProvider;
 import me.sibyl.microservice.provider.eureka.OrderServiceProvider;
 import me.sibyl.microservice.request.AccountConsumeRequest;
+import me.sibyl.microservice.request.OrderCreateRequest;
 import me.sibyl.vo.ConsumeRequest;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,13 +51,13 @@ public class AppController{
         User user = userMapper.selectById(request.getUserId());
         log.info("[test] user => " + JSONObject.toJSONString(user));
 
-//        OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
-//        orderCreateRequest.setAmount(request.getAmount());
-//        orderCreateRequest.setLinkId(request.getUserId());
-//        Response orderCreate = orderServiceProvider.create(orderCreateRequest);
-//        log.info("[test]order create :"+JSONObject.toJSONString(orderCreate));
+        OrderCreateRequest orderCreateRequest = new OrderCreateRequest();
+        orderCreateRequest.setAmount(request.getAmount());
+        orderCreateRequest.setLinkId(request.getUserId());
+        Response orderCreate = orderServiceProvider.create(orderCreateRequest);
+        log.info("[test]order create :"+JSONObject.toJSONString(orderCreate));
 
-        int i = 1/0;
+//        int i = 1/0;
 
         AccountConsumeRequest accountConsumeRequest = new AccountConsumeRequest();
         accountConsumeRequest.setUserId(request.getUserId());
