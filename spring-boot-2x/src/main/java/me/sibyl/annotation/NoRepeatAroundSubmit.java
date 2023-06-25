@@ -15,6 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
+@Deprecated
 public @interface NoRepeatAroundSubmit {
     /**
      *  过期时间 秒

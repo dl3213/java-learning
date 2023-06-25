@@ -210,6 +210,8 @@ public class AppController {
         System.err.println(this);
         System.err.println(new Object() {
         }.getClass().getEnclosingMethod());
+        System.err.println(log);
+        System.err.println(log.getClass().getName());// 默认是logback
     }
 
 

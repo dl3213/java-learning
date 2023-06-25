@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 @Order(12)
+@Deprecated
 public class NoRepeatSubmitAroundAspect {
 
     public static final String keyPrefix = "noRepeatSubmit-";

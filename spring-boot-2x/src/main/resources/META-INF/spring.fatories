@@ -1,0 +1,2 @@
+org.springframework.boot.SpringApplicationRunListener=\
+    me.sibyl.listener.AppRunner

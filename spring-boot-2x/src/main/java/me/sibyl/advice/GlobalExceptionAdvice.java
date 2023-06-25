@@ -23,27 +23,36 @@ public class GlobalExceptionAdvice {
 
     /**
      * 处理自定义的业务异常
+     *
      * @param req
      * @param e
      * @return
      */
     @ExceptionHandler(value = SibylException.class)
     @ResponseBody
-    public  Response bizExceptionHandler(HttpServletRequest req, SibylException e){
-        log.error("发生业务异常！原因是：{}",e.getMsg());
-        return Response.error(e.getCode(),e.getMsg());
+    public Response bizExceptionHandler(HttpServletRequest req, SibylException e) {
+        log.error("发生业务异常！原因是：{}", e.getMsg());
+        return Response.error(e.getCode(), e.getMsg());
+    }
+
+    @ExceptionHandler(value = RepeatSubmitException.class)
+    @ResponseBody
+    public Response repeatSubmitExceptionHandler(HttpServletRequest req, RepeatSubmitException e) {
+        log.error("发生业务异常！原因是：{}", e.getMsg());
+        return Response.error(e.getCode(), e.getMsg());
     }
 
     /**
      * 处理空指针的异常
+     *
      * @param req
      * @param e
      * @return
      */
-    @ExceptionHandler(value =NullPointerException.class)
+    @ExceptionHandler(value = NullPointerException.class)
     @ResponseBody
-    public Response exceptionHandler(HttpServletRequest req, NullPointerException e){
-        log.error("发生空指针异常！原因是:",e);
+    public Response exceptionHandler(HttpServletRequest req, NullPointerException e) {
+        log.error("发生空指针异常！原因是:", e);
         return Response.error(CommonEnum.NOT_FOUND);
     }
 
@@ -51,9 +60,9 @@ public class GlobalExceptionAdvice {
     /**
      * 处理其他异常
      */
-    @ExceptionHandler(value =Exception.class)
+    @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public Response exceptionHandler(Exception e){
+    public Response exceptionHandler(Exception e) {
         log.error("未知异常！原因是:{}", e);
         return Response.error(500, e.getMessage());
     }

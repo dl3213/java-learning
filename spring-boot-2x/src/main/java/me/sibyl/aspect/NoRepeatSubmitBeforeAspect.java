@@ -4,6 +4,7 @@ package me.sibyl.aspect;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import me.sibyl.advice.RepeatSubmitException;
 import me.sibyl.annotation.NoRepeatAroundSubmit;
 import me.sibyl.annotation.NoRepeatBeforeSubmit;
 import me.sibyl.common.response.Response;
@@ -70,7 +71,7 @@ public class NoRepeatSubmitBeforeAspect {
         // 如果缓存中有这个key视为重复提交
         if (Objects.nonNull(ret)) {
             log.error("[请求重复切片处理]重复提交");
-            throw new RuntimeException(submit.msg());
+            throw new RepeatSubmitException(201, submit.msg());
         }
         opsForValue.set(noRepeatSubmitKey, 1, submit.expire(), submit.timeUnit());
 
