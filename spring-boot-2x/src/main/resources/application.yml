@@ -17,6 +17,7 @@ spring:
     cache: false
 
 runnerEnabled: true
+auth: false
 
 debug: false
 logging:

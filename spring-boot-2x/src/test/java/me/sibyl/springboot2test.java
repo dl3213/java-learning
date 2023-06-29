@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class springboot2test {
 
+
     @Resource
     private RestTemplate restTemplate;
 
