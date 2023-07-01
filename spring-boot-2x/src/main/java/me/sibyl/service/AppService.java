@@ -2,6 +2,7 @@ package me.sibyl.service;
 
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class AppService {
     private AsyncService asyncService;
 
     @Transactional
-    public void save(User user){
+    public void save(User user) {
 //        if(user.getName().equals("String")){
 //            throw new RuntimeException("test");
 //        }
@@ -41,9 +42,13 @@ public class AppService {
     }
 
     @Async
-    public Future<String> asyncString(){
+    public Future<String> asyncString() {
         System.err.println(Thread.currentThread().getName());
         System.err.println(Thread.currentThread().getThreadGroup().getName());
         return new AsyncResult<>("test");
+    }
+
+    public void retryTest() {
+        throw new RuntimeException("test");
     }
 }
