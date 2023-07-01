@@ -25,6 +25,9 @@ public class WebSocketConfig {
         return new ServerEndpointExporter();
     }
 
+    /**
+    *  注不进，因为需要跑起来才能连接
+    */
 //    @Bean
 //    @DependsOn(value = {"webSocket", "serverEndpointExporter"})
     public WebSocketClient webSocketClient() {

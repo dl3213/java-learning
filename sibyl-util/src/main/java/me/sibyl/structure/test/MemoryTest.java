@@ -52,7 +52,7 @@ public class MemoryTest {
      * 栈是线程私有的而堆是线程共有的，也就是说不同的线程可以得到相同的对象。
      * 堆中的数据即便与栈中的数据相同，也不会与栈中的数据共享。
      */
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 
     }
 }

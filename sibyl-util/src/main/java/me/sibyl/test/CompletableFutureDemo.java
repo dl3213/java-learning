@@ -21,7 +21,7 @@ public class CompletableFutureDemo {
      *   supplyAsync -> 有返回值
      *   runAsync -> 无返回值
      */
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 //        applyToEither();
 //        acceptEither();
 //        runAfterEither();

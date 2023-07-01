@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 
 public class ShellSort {
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         int[] data = SortUtil.getData_100000();
         long start = System.currentTimeMillis();
 

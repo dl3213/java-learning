@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 /**
  * @author dyingleaf3213
  * @Classname InsertionSort
- * @Description 插入排序，属于插入排序
+ * @Description 插入排序，属于插入排序，时间=O（n²），空间=O(1)
  * @Create 2023/06/05 22:25
  */
 
 public class InsertionSort {
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         int[] data = SortUtil.getData_100000();
         long start = System.currentTimeMillis();
         int length = data.length;

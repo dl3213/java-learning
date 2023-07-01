@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 /**
  * @author dyingleaf3213
  * @Classname PopoSort
- * @Description 冒泡排序，属于交换排序
+ * @Description 冒泡排序，属于交换排序，时间=O（n²），空间=O(1)
  * @Create 2023/06/05 22:09
  */
 
 public class PopoSort {
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         int[] data = SortUtil.getData_100000();
         //System.err.println(Arrays.stream(data).boxed().collect(Collectors.toList()));
         long start = System.currentTimeMillis();

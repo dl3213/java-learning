@@ -21,7 +21,7 @@ public class SynchronizedTest {
     static int target = 0;
 
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 
         int times = 100000;
         boolean isLock = true;

@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 /**
  * @author dyingleaf3213
- * @Classname 选择排序
+ * @Classname 选择排序，时间=O（n²），空间=O(1)
  * @Description TODO
  * @Create 2023/06/06 20:18
  */
 
 public class SelectionSort {
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         int[] data = SortUtil.getData_100000();
         //System.err.println(Arrays.stream(data).boxed().collect(Collectors.toList()));
         long start = System.currentTimeMillis();

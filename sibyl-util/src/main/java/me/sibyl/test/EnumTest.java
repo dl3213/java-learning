@@ -19,7 +19,7 @@ import java.util.Set;
 public class EnumTest {
 
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         String packageName = "me.sibyl.test";
         packageName = packageName.replaceAll("\\.", "/");
         System.err.println(packageName);

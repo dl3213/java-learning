@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class ObjectTest {
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         Obj obj1 = Obj.builder().id(1).name("test1").build();
         Obj obj2 = Obj.builder().id(1).name("test1").build();
         System.err.println(obj1);

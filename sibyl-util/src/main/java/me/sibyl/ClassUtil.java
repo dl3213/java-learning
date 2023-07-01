@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
  */
 public class ClassUtil {
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         ArrayList<Class> classArrayList = getAllClassByInterface(EnumInterface.class);
         classArrayList.forEach(System.err::println);
     }

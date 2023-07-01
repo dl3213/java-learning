@@ -22,7 +22,7 @@ public class ReentrantLockTest {
     public static ReentrantLock lock = new ReentrantLock();
 
     @SneakyThrows
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 
         int times = 100000;
         boolean isLock = true;

@@ -33,7 +33,7 @@ public class TreeUtil {
                 .collect(Collectors.toList());
     }
 
-    public static void main(String... args) {
+    public static void main1(String... args) {
         //模拟从数据库查询出来
         List<TreeNode> menus = Arrays.asList(
                 new TreeNode(1, "0-1", 0),
