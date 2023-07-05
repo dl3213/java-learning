@@ -37,6 +37,14 @@ public class TransactionalController {
     @Resource
     private BusinessOrderService businessOrderService;
 
+    @GetMapping("/test01")
+    @Transactional
+    public Response test01() {
+        userService.updateTimeEqNow();
+        int i = 1 / 0;
+        return Response.success();
+    }
+
     /**
      * 全局事务：整个方法事务
      */

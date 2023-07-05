@@ -26,6 +26,12 @@ logging:
     root: info
   file:
     name: ${spring.application.name}/log/${spring.application.name}.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+
+remote-server:
+  ip: 127.0.0.1
 
 url:
   anonymous: /home/**,/auth/no/required,/hello/**

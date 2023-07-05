@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TopicMqConfig {
     public static final String topic_exchange = "topic_exchange";
-    public static final String topic_queue1 = "topic_queue1#";
-    public static final String topic_queue2 = "topic_queue2*";
+    public static final String topic_queue1 = "topic_queue1#"; // 路由键的一个或多个词
+    public static final String topic_queue2 = "topic_queue2*";//路由键的一个词
     public static final String topic_routing_key = "sibyl.mq";
 
 

@@ -23,8 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @Create 2023/03/19 04:49
  */
 @RestController
-@RequestMapping("/api/v1/account")
-public class AccountController {
+@RequestMapping("/api/v1/lock")
+public class LockController {
 
     @Resource
     private UserAccountMapper userAccountMapper;

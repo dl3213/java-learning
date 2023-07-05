@@ -41,6 +41,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @Transactional
     public boolean updateTimeEqNow() {
         System.err.println(TransactionSynchronizationManager.getCurrentTransactionName());
         User user = this.getById(3213L);

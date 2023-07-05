@@ -26,11 +26,11 @@ public class TopicMqProvider {
                 TopicMqConfig.topic_routing_key + ".test",
                 msg
         );
-        rabbitTemplate.convertAndSend(
-                TopicMqConfig.topic_exchange,
-                TopicMqConfig.topic_routing_key + ".test.topic",
-                msg
-        );
+//        rabbitTemplate.convertAndSend(
+//                TopicMqConfig.topic_exchange,
+//                TopicMqConfig.topic_routing_key + ".test.topic",
+//                msg
+//        );
     }
 
     public void batchSend() {

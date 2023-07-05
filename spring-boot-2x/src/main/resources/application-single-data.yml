@@ -5,7 +5,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${remote-server.ip}:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
     druid:
@@ -74,7 +74,7 @@ spring:
         allow: 127.0.0.1           # 允许访问的地址，如果allow没有配置或者为空，则允许所有访问
         deny:                                        # 拒绝访问的地址，deny优先于allow，如果在deny列表中，就算在allow列表中，也会被拒绝
   redis:
-    host: 127.0.0.1
+    host: ${remote-server.ip}
     port: 6379
     database: 0
 #    password:
