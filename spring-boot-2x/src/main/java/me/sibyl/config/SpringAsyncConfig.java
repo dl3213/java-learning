@@ -35,7 +35,7 @@ public class SpringAsyncConfig implements AsyncConfigurer {
         //DiscardOldestPolicy:丢弃队列最前面的任务，然后重新提交被拒绝的任务。
         //CallerRunsPolicy:由调用线程处理该任务
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.initialize();
+        executor.initialize();// 非完全托管spring bean，需要手动初始化
         return executor;
     }
 

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BeanContextUtil implements BeanFactoryAware {
 
-    private  static BeanFactory beanFactory;
+    private static BeanFactory beanFactory;
 
     public static Object getContextBean(String  beanName){
         return beanFactory.getBean(beanName);

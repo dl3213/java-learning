@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author dyingleaf3213
- * @Classname RepeatSubmitInterceptor
+ * @Classname @Deprecated HandlerInterceptorAdapter +  HandlerInterceptor
  * @Description TODO
  * @Create 2023/06/20 20:43
  */

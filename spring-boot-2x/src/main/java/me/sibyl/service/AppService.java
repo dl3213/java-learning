@@ -2,12 +2,15 @@ package me.sibyl.service;
 
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.concurrent.Future;
 
@@ -18,7 +21,12 @@ import java.util.concurrent.Future;
  * @Create 2022/05/30 21:36
  */
 @Service
-public class AppService {
+public class AppService implements InitializingBean, DisposableBean {
+
+    @PostConstruct
+    public void init(){
+        System.err.println("AppService.init");
+    }
 
     @Resource
     private UserMapper userMapper;
@@ -50,5 +58,15 @@ public class AppService {
 
     public void retryTest() {
         throw new RuntimeException("test");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.err.println("afterPropertiesSet");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.err.println("destroy");
     }
 }

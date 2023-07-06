@@ -21,6 +21,7 @@ import me.sibyl.service.AppService;
 import me.sibyl.service.AsyncService;
 import me.sibyl.util.BeanContextUtil;
 import me.sibyl.util.SpringUtil;
+import me.sibyl.util.AppUtil;
 import me.sibyl.vo.AppRequest;
 import me.sibyl.vo.AppRequest2;
 import org.redisson.Redisson;
@@ -204,9 +205,10 @@ public class AppController {
 
     @GetMapping("/getBean")
     public void getBean(){
-        System.err.println(SpringUtil.getBean(AppService.class));
-        System.err.println(BeanContextUtil.getBean("appService"));
-        System.err.println(SpringUtil.getBean(AppController.class));
+        System.err.println("SpringUtil => " + SpringUtil.getBean(AppService.class));
+        System.err.println("AppUtil => " +  AppUtil.getBean("appService"));
+        System.err.println("BeanContextUtil => " + BeanContextUtil.getBean("appService"));
+        System.err.println("SpringUtil => " + SpringUtil.getBean(AppController.class));
         System.err.println(this);
         System.err.println(new Object() {
         }.getClass().getEnclosingMethod());
