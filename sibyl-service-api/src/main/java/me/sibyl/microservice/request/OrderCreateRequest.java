@@ -23,5 +23,5 @@ public class OrderCreateRequest implements Serializable {
 
     @NonNull
     private BigDecimal amount;
-    private String linkId;
+    private Long linkId;
 }

@@ -22,7 +22,7 @@ public class AccountConsumeRequest implements Serializable {
     private static final long serialVersionUID = -1L;
 
     @NonNull
-    private String userId;
+    private Long userId;
     @NonNull
     private BigDecimal amount;
 

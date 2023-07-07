@@ -17,6 +17,9 @@ public class LogController {
 
     @GetMapping("test01")
     public Response test01(AppRequest request){
+        System.err.println("test");
+        System.err.println("test0101");
+        System.err.println("test111");
         log.trace("i am trace.{}", request);
         log.debug("i am debug.");
         log.info("i am info.");

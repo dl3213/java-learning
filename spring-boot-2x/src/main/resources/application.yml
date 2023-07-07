@@ -15,6 +15,11 @@ spring:
     prefix: classpath:/static/
     suffix: .html
     cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      additional-exclude: static/**
 
 runnerEnabled: true
 auth: false
@@ -29,6 +34,7 @@ logging:
   logback:
     rollingpolicy:
       max-file-size: 100MB
+      max-history: 360
 
 remote-server:
   ip: 127.0.0.1

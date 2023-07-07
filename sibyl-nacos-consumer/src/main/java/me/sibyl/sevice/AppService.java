@@ -29,7 +29,7 @@ public class AppService {
     @GlobalTransactional(name = "consume-test", rollbackFor = Exception.class)
     public void service() {
         AccountConsumeRequest requestVO = new AccountConsumeRequest();
-        requestVO.setUserId("3213");
+        requestVO.setUserId(Long.valueOf("3213"));
         requestVO.setAmount(BigDecimal.ONE);
         Long consume = dubboAccountService.consume(requestVO);
         System.err.println(consume);
