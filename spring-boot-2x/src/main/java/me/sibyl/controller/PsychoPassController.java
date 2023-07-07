@@ -34,7 +34,13 @@ public class PsychoPassController {
 
     @GetMapping("/page")
     public Response page(@Validated PsychoPassQueryRequest psychoPassQueryRequest){
+        System.err.println(psychoPassQueryRequest);
         return Response.success(psychoPassService.queryPage(psychoPassQueryRequest));
+    }
+    @GetMapping("/wrapper/page")
+    public Response wrapperPage(@Validated PsychoPassQueryRequest psychoPassQueryRequest){
+        System.err.println(psychoPassQueryRequest);
+        return Response.success(psychoPassService.wrapperPage(psychoPassQueryRequest));
     }
     @GetMapping("/list")
     public Response list(@Validated PsychoPassQueryRequest psychoPassQueryRequest){

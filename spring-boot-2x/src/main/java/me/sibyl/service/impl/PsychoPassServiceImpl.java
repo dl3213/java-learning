@@ -1,6 +1,8 @@
 package me.sibyl.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -8,6 +10,7 @@ import me.sibyl.dao.PsychoPassRecordMapper;
 import me.sibyl.entity.PsychoPassRecord;
 import me.sibyl.service.PsychoPassService;
 import me.sibyl.vo.PsychoPassQueryRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,5 +47,25 @@ public class PsychoPassServiceImpl extends ServiceImpl<PsychoPassRecordMapper, P
         List<PsychoPassRecord> query = this.getBaseMapper().query(queryRequest);
         System.err.println("query.size() = " + query.size());
         return query;
+    }
+
+    @Override
+    public Page wrapperPage(PsychoPassQueryRequest request) {
+
+        Page<PsychoPassRecord> page = new Page<>();
+        LambdaQueryWrapper<PsychoPassRecord> queryWrapper = Wrappers.lambdaQuery(PsychoPassRecord.class);
+        queryWrapper
+                .select(
+                        PsychoPassRecord::getId,
+                        PsychoPassRecord::getUid,
+//                        PsychoPassRecord::getUsername,
+//                        PsychoPassRecord::getName,
+                        PsychoPassRecord::getPsychoPass,
+                        PsychoPassRecord::getCreateTime
+                );
+
+        queryWrapper.eq(StringUtils.isNotBlank(request.getUid()), PsychoPassRecord::getUid, request.getUid());
+        queryWrapper.orderByDesc(PsychoPassRecord::getCreateTime);
+        return this.getBaseMapper().selectPage(page, queryWrapper);
     }
 }

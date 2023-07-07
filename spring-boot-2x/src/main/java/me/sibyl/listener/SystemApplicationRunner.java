@@ -32,7 +32,7 @@ public class SystemApplicationRunner implements ApplicationRunner {
         System.err.println(SpringUtil.getBean(AppService.class));
 //        System.err.println(SpringUtil.getBean(SecurityConfig.class));
 
-        WebSocketClient webSocketClient = new WebSocketClient(new URI("ws://127.0.0.1:80/web/socket/test"), new Draft_6455()) {
+        WebSocketClient webSocketClient = new WebSocketClient(new URI("ws://127.0.0.1:8080/web/socket/test"), new Draft_6455()) {
             //连接服务端时触发
             @Override
             public void onOpen(ServerHandshake handshakedata) {

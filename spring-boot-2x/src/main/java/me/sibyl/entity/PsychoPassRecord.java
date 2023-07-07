@@ -29,6 +29,10 @@ public class PsychoPassRecord extends BaseEntity {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private String uid;
+    @TableField(exist = false)
+    private String username;
+    @TableField(exist = false)
+    private String name;
     private String psychoPass;
     private String type;
     private String code;
