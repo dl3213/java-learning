@@ -1,5 +1,6 @@
 package me.sibyl.controller;
 
+import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jodd.util.ThreadUtil;
 import me.sibyl.common.response.Response;
@@ -81,6 +82,24 @@ public class LockController {
             redissonLock.unlock();
         }
 
+        return String.valueOf(System.currentTimeMillis());
+    }
+
+    @GetMapping("/lock4j/test")
+    @Lock4j(keys = "#uid", expire = 10000, acquireTimeout = 5000)
+    public String lock4jTest(String uid) {
+        System.err.println(Thread.currentThread().getName() + " => " + LocalDateTime.now());
+        UserAccount account = userAccountMapper.selectOne(
+                Wrappers.lambdaQuery(new UserAccount())
+                        .eq(UserAccount::getUserId, uid)
+                        .eq(UserAccount::getState, "01")
+        );
+
+        BigDecimal balance = (account.getBalance());
+        ThreadUtil.sleep(2000);
+//
+        account.setBalance(balance.subtract(BigDecimal.ONE));
+        int update = userAccountMapper.updateById(account);
         return String.valueOf(System.currentTimeMillis());
     }
 

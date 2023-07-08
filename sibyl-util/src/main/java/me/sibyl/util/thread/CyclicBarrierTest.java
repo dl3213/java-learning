@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class CyclicBarrierTest {
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
 
         AtomicInteger counter = new AtomicInteger();
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(

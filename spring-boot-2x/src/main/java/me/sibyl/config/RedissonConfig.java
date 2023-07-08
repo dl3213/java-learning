@@ -21,8 +21,7 @@ public class RedissonConfig {
     @Value("${remote-server.ip}")
     private String remoteServerIp;
 
-    @Lazy
-    @Bean
+//    @Bean
     public Redisson redisson() {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://" + remoteServerIp + ":6379").setDatabase(0);

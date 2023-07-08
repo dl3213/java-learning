@@ -38,6 +38,7 @@ logging:
 
 remote-server:
   ip: 127.0.0.1
+#  ip: 192.168.106.128
 
 url:
   anonymous: /home/**,/auth/no/required,/hello/**
