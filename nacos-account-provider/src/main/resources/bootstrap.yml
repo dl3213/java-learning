@@ -1,0 +1,68 @@
+
+server:
+  port: 8082
+
+remote-server:
+  #  ip: 127.0.0.1
+  ip: 192.168.106.128
+
+spring:
+  application:
+    name: sibyl-nacos-account-provider
+  profiles:
+    active: dev
+  redis:
+    host: ${remote-server.ip}
+    port: 6379
+    database: 0
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      config:
+        server-addr: localhost:8848
+        namespace: sibyl-dev
+        file-extension: yml
+        prefix: sibyl-provider
+        group: provider
+        extension-configs:
+          - data-id: provider-datasource.yml
+            group: provider
+            refresh: true
+      discovery:
+        server-addr: localhost:8848
+        register-enabled: true
+        namespace: sibyl-dev
+        group: sibyl-nacos
+    sentinel:
+      datasource:
+        ds1:
+          nacos:
+            serverAddr: 127.0.0.1:8848
+            dataId: springboot-sentinel
+            groupId: sentinel-group
+            dataType: json
+            ruleType: flow
+            username: nacos
+            password: nacos
+
+dubbo:
+  protocol:
+    name: dubbo
+    port: -1
+  scan:
+    base-packages: me.sibyl.dubbo
+  consumer:
+    check: false
+
+# seata 配置
+seata:
+  # 使用哪个事务组
+  tx-service-group: my-tx-group
+  service:
+    # 事务组对应的集群民称
+    vgroup-mapping.my-tx-group: seata-server
+    # seata-server的地址
+    grouplist.seata-server: 127.0.0.1:8091
+  enabled: true
+
