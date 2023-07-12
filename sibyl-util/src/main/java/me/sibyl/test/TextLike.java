@@ -1,3 +1,5 @@
+package me.sibyl.test;
+
 public class TextLike {
 
     /**

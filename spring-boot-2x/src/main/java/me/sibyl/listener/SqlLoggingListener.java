@@ -61,6 +61,6 @@ public class SqlLoggingListener {
             System.err.println(traceElement.getClassName() + "." + traceElement.getMethodName());
         }
 
-        ThreadUtil.sleep(50000);
+//        ThreadUtil.sleep(50000);
     }
 }

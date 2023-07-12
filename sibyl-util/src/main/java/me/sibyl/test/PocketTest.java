@@ -1,4 +1,4 @@
-
+package me.sibyl.test;
 
 /**
  * 抢红包算法 ;https://zhuanlan.zhihu.com/p/489459972

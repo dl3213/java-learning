@@ -31,7 +31,6 @@ public class BilibiliTool {
     public static void main2(String[] args) {
 
         List<String> strings = Arrays.asList(
-                "BV13o4y14774"
         );
         System.err.println(strings.size());
         strings.stream().forEach(item -> {
