@@ -22,8 +22,8 @@ import java.util.Map;
  * @Create 2023/04/09 01:24
  */
 
-@Configuration
-@ConditionalOnProperty(prefix = "datasource", name = "type", havingValue = "rw")
+//@Configuration
+//@ConditionalOnProperty(prefix = "datasource", name = "type", havingValue = "rw-self")
 public class DynamicDataSourceConfig {
 
 

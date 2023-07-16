@@ -29,7 +29,7 @@ public class UserAccount extends BaseEntity {
     private String userId;
     private BigDecimal balance;
     private String state;
-//    @Version
+    @Version
     private Integer version;
 
 

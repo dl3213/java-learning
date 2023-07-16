@@ -4,7 +4,7 @@ server:
 
 remote-server:
   #  ip: 127.0.0.1
-  ip: 192.168.106.128
+  ip: 192.168.101.128
 
 spring:
   application:
@@ -20,7 +20,7 @@ spring:
       username: nacos
       password: nacos
       config:
-        server-addr: localhost:8848
+        server-addr: ${remote-server.ip}:8848
         namespace: sibyl-dev
         file-extension: yml
         prefix: sibyl-provider
@@ -30,7 +30,7 @@ spring:
             group: provider
             refresh: true
       discovery:
-        server-addr: localhost:8848
+        server-addr: ${remote-server.ip}:8848
         register-enabled: true
         namespace: sibyl-dev
         group: sibyl-nacos
@@ -38,7 +38,7 @@ spring:
       datasource:
         ds1:
           nacos:
-            serverAddr: 127.0.0.1:8848
+            serverAddr: ${remote-server.ip}:8848
             dataId: springboot-sentinel
             groupId: sentinel-group
             dataType: json
@@ -63,6 +63,6 @@ seata:
     # 事务组对应的集群民称
     vgroup-mapping.my-tx-group: seata-server
     # seata-server的地址
-    grouplist.seata-server: 127.0.0.1:8091
+    grouplist.seata-server: ${remote-server.ip}:8091
   enabled: true
 

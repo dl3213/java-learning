@@ -3,6 +3,7 @@ package me.sibyl.controller;
 import com.baomidou.lock.annotation.Lock4j;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jodd.util.ThreadUtil;
+import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
 import me.sibyl.dao.UserAccountMapper;
 import me.sibyl.entity.UserAccount;
@@ -25,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @RestController
 @RequestMapping("/api/v1/lock")
+@Slf4j
 public class LockController {
 
     @Resource
@@ -105,7 +107,9 @@ public class LockController {
 
     @GetMapping("/synchronized/consume")
     public Response synchronizedConsume(String userId) {
+        log.info("{} get => {}", Thread.currentThread().getName(), userId);
         synchronized (userId.intern()) {
+            log.info("{} in => {}", Thread.currentThread().getName(), userId);
             UserAccount account = userAccountMapper.selectOne(
                     Wrappers.lambdaQuery(new UserAccount())
                             .eq(UserAccount::getUserId, userId)
@@ -120,28 +124,30 @@ public class LockController {
                 userAccountMapper.insert(account);
             }
             BigDecimal balance = (account.getBalance());
-            ThreadUtil.sleep(3000);
+            ThreadUtil.sleep(1000);
             account.setBalance(balance.subtract(BigDecimal.ONE));
             int update = userAccountMapper.updateById(account);
         }
-        System.err.println(LocalDateTime.now());
+        log.info("{} out => {}", Thread.currentThread().getName(), userId);
         return Response.success(System.currentTimeMillis());
     }
 
     public static ReentrantLock reentrantLock = new ReentrantLock();
 
-    @GetMapping("/lock/consume")
+    @GetMapping("/reentrantLock/consume")
     public Response lockConsume(String userId) {
-        System.err.println(Thread.currentThread().getName() + " => " + LocalDateTime.now());
+        log.info("{} get => {}", Thread.currentThread().getName(), userId);
+        //reentrantLock.newCondition()
         reentrantLock.lock();
         try {
+            log.info("{} in => {}", Thread.currentThread().getName(), userId);
             UserAccount account = userAccountMapper.selectOne(
                     Wrappers.lambdaQuery(new UserAccount())
-                            .eq(UserAccount::getUserId, "3213")
+                            .eq(UserAccount::getUserId, userId)
                             .eq(UserAccount::getState, "01")
             );
             BigDecimal balance = (account.getBalance());
-            ThreadUtil.sleep(3000);
+            ThreadUtil.sleep(1000);
             account.setBalance(balance.subtract(BigDecimal.ONE));
             int update = userAccountMapper.updateById(account);
         } catch (Exception e) {
@@ -150,6 +156,7 @@ public class LockController {
         } finally {
             reentrantLock.unlock();
         }
+        log.info("{} out => {}", Thread.currentThread().getName(), userId);
         return Response.success(System.currentTimeMillis());
     }
 }

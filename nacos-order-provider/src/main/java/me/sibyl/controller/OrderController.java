@@ -1,5 +1,6 @@
 package me.sibyl.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import me.sibyl.common.response.Response;
 import me.sibyl.dubbo.DubboOrderServiceImpl;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/api/v1/order")
 @Slf4j
+@Api(value = "订单接口")
 public class OrderController {
 
     @Autowired

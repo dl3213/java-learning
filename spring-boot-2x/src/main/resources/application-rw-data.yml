@@ -1,23 +1,23 @@
 datasource:
   dynamic: true
-  type: rw
+  type: rw-self
 
 spring:
   datasource:
     master:
-      jdbc-url: jdbc:mysql://localhost:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+      jdbc-url: jdbc:mysql://${remote-server.ip}:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
       username: root
       password: 123456
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.cj.jdbc.Driver # 3.2.0开始支持SPI可省略此配置
     slave:
-      jdbc-url: jdbc:mysql://localhost:3306/sibyl-2023?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+      jdbc-url: jdbc:mysql://${remote-server.ip}:3306/sibyl_2023?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
       username: root
       password: 123456
       type: com.alibaba.druid.pool.DruidDataSource
       driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
-    host: 127.0.0.1
+    host: ${remote-server.ip}
     port: 6379
     database: 0
 #    password:
