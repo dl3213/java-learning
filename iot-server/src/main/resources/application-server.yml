@@ -1,0 +1,8 @@
+
+netty:
+  port: 1883
+  bossThreadNum: 2
+
+mqtt:
+  serverIp: 127.0.0.1
+  serverPort: 1883

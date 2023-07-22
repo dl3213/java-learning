@@ -1,0 +1,43 @@
+
+server:
+  port: 18081
+  shutdown: graceful
+spring:
+  application:
+    name: iot-client
+  profiles:
+    active: dev
+    include: mqtt
+  main:
+    lazy-initialization: false
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+    cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      additional-exclude: static/**
+
+runnerEnabled: true
+auth: false
+
+debug: false
+logging:
+  level:
+    me.sibyl: debug
+    root: info
+  file:
+    name: ${spring.application.name}/log/${spring.application.name}.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 360
+
+remote-server:
+  #  ip: 127.0.0.1
+  ip: 192.168.101.128
+
+url:
+  anonymous: /home/**,/auth/no/required,/hello/**
