@@ -1,4 +1,4 @@
-package org.example.mqtt;
+package org.example.mqtt.message.strategy;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
 public class SubscribeAckMessageStrategy implements MessageStrategy {
     @Override
     public void sendResponseMessage(Channel channel, MqttMessage mqttMessage) {

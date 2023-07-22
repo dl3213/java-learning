@@ -4,12 +4,6 @@ import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 
 import java.lang.reflect.Method;
 
-/**
- * @author dyingleaf3213
- * @Classname CustomAsyncExceptionHandler
- * @Description TODO
- * @Create 2023/03/26 07:06
- */
 public class CustomAsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
     @Override

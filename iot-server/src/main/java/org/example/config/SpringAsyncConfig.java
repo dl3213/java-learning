@@ -9,13 +9,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * @author dyingleaf3213
- * @Classname SpringAsyncConfig
- * @Description TODO
- * @Create 2023/03/26 07:08
- */
-
 @Configuration
 @EnableAsync
 public class SpringAsyncConfig implements AsyncConfigurer {

@@ -1,6 +1,5 @@
 
 server:
-  port: 18080
   shutdown: graceful
 spring:
   application:
@@ -8,12 +7,6 @@ spring:
   profiles:
     active: dev
     include: server
-  main:
-    lazy-initialization: false
-  thymeleaf:
-    prefix: classpath:/static/
-    suffix: .html
-    cache: false
   devtools:
     livereload:
       enabled: true
@@ -38,6 +31,3 @@ logging:
 remote-server:
   #  ip: 127.0.0.1
   ip: 192.168.101.128
-
-url:
-  anonymous: /home/**,/auth/no/required,/hello/**

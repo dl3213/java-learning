@@ -16,11 +16,11 @@ public class ProcessorDemo {
 
     @SneakyThrows
     public static void main(String[] args) {
-        SubmissionPublisher<String> publisher = new SubmissionPublisher<>();
+        SubmissionPublisher<String> publisher = new SubmissionPublisher();
         TestProcessor processor = new TestProcessor();
         publisher.subscribe(processor);
 
-        Flow.Subscriber<String> subscriber = new Flow.Subscriber<>() {
+        Flow.Subscriber<String> subscriber = new Flow.Subscriber<String>() {
             private Flow.Subscription subscription;
 
             @Override

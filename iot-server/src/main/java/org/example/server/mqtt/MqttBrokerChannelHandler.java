@@ -4,20 +4,20 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.mqtt.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.mqtt.MessageStrategy;
+import org.example.mqtt.message.strategy.MessageStrategy;
 import org.example.mqtt.MessageStrategyManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 @Component
 @Slf4j
 @ChannelHandler.Sharable
+@RequiredArgsConstructor
 public class MqttBrokerChannelHandler extends ChannelInboundHandlerAdapter  {
 
-    @Autowired
-    MessageStrategyManager messageStrategyManager;
+    private final MessageStrategyManager messageStrategyManager;
 
     @Override
     public void channelRead(ChannelHandlerContext channelHandlerContext, Object msg) throws Exception {

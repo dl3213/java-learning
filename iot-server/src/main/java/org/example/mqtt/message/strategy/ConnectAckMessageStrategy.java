@@ -1,4 +1,4 @@
-package org.example.mqtt;
+package org.example.mqtt.message.strategy;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;

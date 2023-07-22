@@ -7,12 +7,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-/**
- * @author dyingleaf3213
- * @Classname SystemBootStarter
- * @Description TODO
- * @Create 2023/06/05 20:30
- */
 @Component
 @Order(9)
 @ConditionalOnExpression("${runnerEnabled:false}")

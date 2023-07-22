@@ -4,6 +4,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,35 +12,30 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ *  简易mqtt-server
+ */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MqttBroker {
-    @Value("${mqtt.serverIp}")
+    @Value("${mqtt.server-ip}")
     private String serverIp;
-    @Value("${mqtt.serverPort}")
+    @Value("${mqtt.server-port}")
     private int serverPort;
-
-
-    @Resource
-    private MqttBrokerChannelInitializer mqttBrokerChannelInitializer;
+    private final MqttBrokerChannelInitializer mqttBrokerChannelInitializer;
 
     // 多线程事件循环器:接收的连接
     private EventLoopGroup bossGroup;
     // 实际工作的线程组 多线程事件循环器:处理已经被接收的连接
     private EventLoopGroup workGroup;
 
-
     private ChannelFuture channelFuture;
     private volatile Channel channel;
 
     private final AtomicInteger nextMessageId = new AtomicInteger(1);
 
-
-    public MqttBroker() {
-    }
-
     public void start() {
-        log.info("mqtt server start:" + serverPort);
 
         bossGroup = new NioEventLoopGroup();
         workGroup = new NioEventLoopGroup();
@@ -59,6 +55,8 @@ public class MqttBroker {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        log.info("mqtt server started in " + serverPort);
     }
 
     public void stop() {

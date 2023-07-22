@@ -1,8 +1,14 @@
 
+server-ip: 127.0.0.1
+
+bio:
+  server-ip: ${server-ip}
+  server-port: 11081
+
 netty:
   port: 1883
   bossThreadNum: 2
 
 mqtt:
-  serverIp: 127.0.0.1
-  serverPort: 1883
+  server-ip: ${server-ip}
+  server-port: 1883

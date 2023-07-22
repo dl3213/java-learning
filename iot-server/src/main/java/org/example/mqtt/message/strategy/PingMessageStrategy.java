@@ -1,4 +1,4 @@
-package org.example.mqtt;
+package org.example.mqtt.message.strategy;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttFixedHeader;
@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class PingMessageStrategy implements MessageStrategy {
     @Override
     public void sendResponseMessage(Channel channel, MqttMessage mqttMessage) {

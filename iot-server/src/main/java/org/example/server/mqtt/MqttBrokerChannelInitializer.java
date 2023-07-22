@@ -6,20 +6,19 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.mqtt.MqttDecoder;
 import io.netty.handler.codec.mqtt.MqttEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class MqttBrokerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    @Resource
-    MqttBrokerChannelHandler mqttBrokerChannelHandler;
-
-    public MqttBrokerChannelInitializer() {
-        super();
-    }
+    private final MqttBrokerChannelHandler mqttBrokerChannelHandler;
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
