@@ -2,13 +2,32 @@
 server-ip: 127.0.0.1
 
 bio:
+  enable: false
+  server-ip: ${server-ip}
+  server-port: 11081
+
+nio:
+  enable: false
   server-ip: ${server-ip}
   server-port: 11081
 
 netty:
-  port: 1883
+  enable: false
+  server-ip: ${server-ip}
+  server-port: 11091
   bossThreadNum: 2
 
+http:
+  enable: true
+  server-ip: ${server-ip}
+  server-port: 8081
+
+socket:
+  enable: true
+  server-ip: ${server-ip}
+  server-port: 8082
+
 mqtt:
+  enable: true
   server-ip: ${server-ip}
   server-port: 1883

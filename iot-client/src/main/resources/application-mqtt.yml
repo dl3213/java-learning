@@ -18,7 +18,7 @@ mqtt:
 #mqtt配置
 com:
   mqtt:
-    url: tcp://127.0.0.1:61613
+    url: mqtt://127.0.0.1:61613
     clientId: mqtt_test1234
     topics: topic01,topic02
     username: admin

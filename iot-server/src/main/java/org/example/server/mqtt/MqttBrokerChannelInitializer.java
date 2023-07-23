@@ -25,8 +25,7 @@ public class MqttBrokerChannelInitializer extends ChannelInitializer<SocketChann
         socketChannel.pipeline().addLast("mqttDecoder", new MqttDecoder());
         socketChannel.pipeline().addLast("mqttEncoder", MqttEncoder.INSTANCE);
         //心跳超时控制
-        socketChannel.pipeline().addLast("idle",
-                new IdleStateHandler(15, 0, 0, TimeUnit.MINUTES));
+        socketChannel.pipeline().addLast("idle", new IdleStateHandler(15, 0, 0, TimeUnit.MINUTES));
         socketChannel.pipeline().addLast("mqttHandler", mqttBrokerChannelHandler);
     }
 }
