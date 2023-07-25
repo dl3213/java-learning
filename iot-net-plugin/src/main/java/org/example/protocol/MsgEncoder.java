@@ -1,9 +1,8 @@
-package org.example.client.netty;
+package org.example.protocol;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.example.protocol.MsgProtocol;
 
 public class MsgEncoder extends MessageToByteEncoder<MsgProtocol> {
     @Override

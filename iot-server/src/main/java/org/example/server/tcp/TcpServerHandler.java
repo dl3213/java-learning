@@ -32,8 +32,12 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<MsgProtocol> {
         System.err.println(count);
         count++;
 
-        ByteBuf response = Unpooled.copiedBuffer(UUID.randomUUID().toString(), StandardCharsets.UTF_8);
-        channelHandlerContext.writeAndFlush(response);
+        String retMsg = UUID.randomUUID().toString();
+        //ByteBuf response = Unpooled.copiedBuffer(retMsg, StandardCharsets.UTF_8);
+        MsgProtocol msgProtocol = new MsgProtocol();
+        msgProtocol.setLen(retMsg.getBytes(StandardCharsets.UTF_8).length);
+        msgProtocol.setContent(retMsg.getBytes(StandardCharsets.UTF_8));
+        channelHandlerContext.writeAndFlush(msgProtocol);
     }
 
     @Override

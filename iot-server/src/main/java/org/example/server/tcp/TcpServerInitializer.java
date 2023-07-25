@@ -5,6 +5,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.protocol.MsgDecoder;
+import org.example.protocol.MsgEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +18,7 @@ public class TcpServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
+        socketChannel.pipeline().addLast(new MsgEncoder());
         socketChannel.pipeline().addLast(new MsgDecoder());
         socketChannel.pipeline().addLast(tcpServerHandler);
     }
