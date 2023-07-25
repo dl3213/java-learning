@@ -18,7 +18,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-@Configuration
+//@Configuration
 public class MqttConfigV2 {
 
     @Autowired

@@ -17,17 +17,22 @@ netty:
   server-port: 11091
   bossThreadNum: 2
 
-http:
+tcp:
   enable: true
+  server-ip: ${server-ip}
+  server-port: 11111
+
+http:
+  enable: false
   server-ip: ${server-ip}
   server-port: 8081
 
 socket:
-  enable: true
+  enable: false
   server-ip: ${server-ip}
   server-port: 8082
 
 mqtt:
-  enable: true
+  enable: false
   server-ip: ${server-ip}
   server-port: 1883
