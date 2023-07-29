@@ -20,9 +20,9 @@ import java.net.URI;
  * @Description TODO
  * @Create 2023/06/05 20:36
  */
-@Component
-@Order(8)
-@ConditionalOnExpression("${runnerEnabled:false}")
+//@Component
+//@Order(8)
+//@ConditionalOnExpression("${runnerEnabled:false}")
 @Slf4j
 public class SystemApplicationRunner implements ApplicationRunner {
 

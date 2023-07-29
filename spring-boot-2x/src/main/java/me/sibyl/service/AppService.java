@@ -1,5 +1,6 @@
 package me.sibyl.service;
 
+import lombok.extern.slf4j.Slf4j;
 import me.sibyl.dao.UserMapper;
 import me.sibyl.entity.User;
 import org.springframework.beans.factory.DisposableBean;
@@ -21,6 +22,7 @@ import java.util.concurrent.Future;
  * @Create 2022/05/30 21:36
  */
 @Service
+@Slf4j
 public class AppService implements InitializingBean, DisposableBean {
 
     @PostConstruct
@@ -67,6 +69,6 @@ public class AppService implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        System.err.println("destroy");
+        log.error("destroy");
     }
 }

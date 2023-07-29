@@ -14,7 +14,7 @@ public class ParentTest {
         //Method test = son.getClass().getSuperclass().getMethod("test",String.class); // x
         //test.invoke(((Parent) son),"123"); // x
 
-        ((Parent)Son.class.getSuperclass().newInstance()).test("123");// 1
+//        ((Parent)Son.class.getSuperclass().newInstance()).test("123");// 1
         ((Parent)son.getClass().getSuperclass().newInstance()).test("123");// 1
     }
 }

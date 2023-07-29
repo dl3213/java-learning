@@ -13,7 +13,9 @@ import me.sibyl.entity.UserAccount;
 import me.sibyl.service.UserService;
 import me.sibyl.util.thread.ThreadUtil;
 import org.apache.commons.lang3.RandomUtils;
+import org.jasypt.encryption.StringEncryptor;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -38,6 +40,15 @@ import java.util.stream.Stream;
 @Slf4j
 public class springboot2test {
 
+    @Autowired
+    private StringEncryptor encryptor;
+
+    @Test
+    public void jasypt() {
+        String name = encryptor.encrypt("123456");
+        System.out.println("en: " + name);
+        System.out.println("de: " + encryptor.decrypt(name));
+    }
 
     @Resource
     private RestTemplate restTemplate;

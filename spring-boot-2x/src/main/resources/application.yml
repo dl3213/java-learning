@@ -41,3 +41,9 @@ remote-server:
 
 url:
   anonymous: /home/**,/auth/no/required,/hello/**
+
+
+jasypt:
+  encryptor:
+    password: jasypt!di@soc
+    algorithm: PBEWithMD5AndDES
