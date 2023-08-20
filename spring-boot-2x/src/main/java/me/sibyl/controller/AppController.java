@@ -55,8 +55,7 @@ public class AppController {
     private UserMapper userMapper;
     @Resource
     private UserAccountMapper userAccountMapper;
-    @Resource
-    private AppService appService;
+
     @Resource
     private AsyncService asyncService;
 

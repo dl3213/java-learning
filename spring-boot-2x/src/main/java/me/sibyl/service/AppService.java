@@ -23,12 +23,14 @@ import java.util.concurrent.Future;
  */
 @Service
 @Slf4j
-public class AppService implements InitializingBean, DisposableBean {
+public class AppService
+//        implements InitializingBean, DisposableBean
+{
 
-    @PostConstruct
-    public void init(){
-        System.err.println("AppService.init");
-    }
+//    @PostConstruct
+//    public void init(){
+//        System.err.println("AppService.init");
+//    }
 
     @Resource
     private UserMapper userMapper;
@@ -62,13 +64,13 @@ public class AppService implements InitializingBean, DisposableBean {
         throw new RuntimeException("test");
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        System.err.println("afterPropertiesSet");
-    }
+//    @Override
+//    public void afterPropertiesSet() throws Exception {
+//        System.err.println("afterPropertiesSet");
+//    }
 
-    @Override
-    public void destroy() throws Exception {
-        log.error("destroy");
-    }
+//    @Override
+//    public void destroy() throws Exception {
+//        log.error("destroy");
+//    }
 }

@@ -27,12 +27,4 @@ public class SystemTool {
         return new RestTemplate();
     }
 
-//    @Bean
-//    public FilterRegistrationBean registrationBean() {
-//        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-//        registrationBean.setFilter(new RepeatableFilter());
-//        registrationBean.addUrlPatterns("/repeat/submit");
-//        registrationBean.setEnabled(true);
-//        return registrationBean;
-//    }
 }

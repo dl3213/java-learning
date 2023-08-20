@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/websocket")
 public class WebSocketController {
-    @Autowired
-    private SocketClient webSocketClient;
+//    @Autowired
+//    private SocketClient webSocketClient;
 
 
     @GetMapping("/sendMessage")
     public String sendMessage(String message) {
-        webSocketClient.groupSending(message);
+        //webSocketClient.groupSending(message);
         return message;
     }
 }

@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
  * @Description TODO
  * @Create 2023/06/18 19:51
  */
-@Component
+//@Component
 @Slf4j
 public class RateLimiterInterceptor implements HandlerInterceptor {
 

@@ -5,6 +5,7 @@ import me.sibyl.interceptor.RateLimiterInterceptor;
 import me.sibyl.interceptor.RepeatSubmitInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -18,14 +19,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    @Autowired
-    private RateLimiterInterceptor rateLimiterInterceptor;
-    @Autowired
-    private RepeatSubmitInterceptor repeatSubmitInterceptor;
+//    @Autowired
+//    private RateLimiterInterceptor rateLimiterInterceptor;
+//    @Autowired
+//    private RepeatSubmitInterceptor repeatSubmitInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(rateLimiterInterceptor).addPathPatterns("/request/limit/guava/**");
+//        registry.addInterceptor(rateLimiterInterceptor).addPathPatterns("/request/limit/guava/**");
 //        registry.addInterceptor(repeatSubmitInterceptor).addPathPatterns("/repeat/submit");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry
+                .addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowCredentials(true).allowedMethods("GET","POST")
+                .allowedHeaders("*")
+                .maxAge(3600)
+        ;
     }
 }

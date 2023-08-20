@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @Description TODO
  * @Create 2023/06/20 20:43
  */
-@Component
+//@Component
 @Slf4j
 public class RepeatSubmitInterceptor implements HandlerInterceptor {
 

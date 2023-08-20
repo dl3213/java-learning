@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Lazy;
  * @Description TODO
  * @Create 2023/04/05 21:10
  */
-@Configuration
+//@Configuration
 public class RedissonConfig {
 
     @Value("${remote-server.ip}")

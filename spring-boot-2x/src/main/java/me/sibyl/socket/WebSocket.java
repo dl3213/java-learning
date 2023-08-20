@@ -13,7 +13,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-@Component
+//@Component
 //@RestController // 鉴权 todo
 @ServerEndpoint("/web/socket/{name}")
 public class WebSocket {

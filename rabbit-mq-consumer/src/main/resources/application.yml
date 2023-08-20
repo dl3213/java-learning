@@ -2,11 +2,15 @@
 server:
   port: 9002
 
+remote-server:
+  #  ip: 127.0.0.1
+  ip: 192.168.101.128
+
 spring:
   application:
     name: sibyl-boot
   rabbitmq:
-    host: 127.0.0.1
+    host: ${remote-server.ip}
     port: 5672
     username: guest
     password: guest

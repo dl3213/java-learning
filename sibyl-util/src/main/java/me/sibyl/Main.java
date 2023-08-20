@@ -1,5 +1,10 @@
 package me.sibyl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         int a= 0;
@@ -13,5 +18,7 @@ public class Main {
             }
         }
         System.err.println(a);
+
+        System.err.println("3".compareTo("2"));
     }
 }

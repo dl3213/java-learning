@@ -34,31 +34,7 @@ public class DynamicDataSourceInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        boolean synchronizationActive = TransactionSynchronizationManager.isActualTransactionActive();
-        log.info("当前执行语句是否有事务：{}", synchronizationActive);
-        String lookupKey = DynamicDataSourceHolder.DB_MASTER;
-        if (!synchronizationActive) {
-            Object[] objects = invocation.getArgs();
-            MappedStatement ms = (MappedStatement) objects[0];
-            if (ms.getSqlCommandType().equals(SqlCommandType.SELECT)) {
-                // 如果selectKey为自增id查询主键,使用主库
-                if (ms.getId().contains(SelectKeyGenerator.SELECT_KEY_SUFFIX)) {
-                    lookupKey = DynamicDataSourceHolder.DB_MASTER;
-                } else {
-                    BoundSql boundSql = ms.getSqlSource().getBoundSql(objects[1]);
-                    String sql = boundSql.getSql().toLowerCase(Locale.CHINA).replaceAll("[\\t\\n\\r]", " ");
-                    if (sql.matches(REGEX)) {
-                        lookupKey = DynamicDataSourceHolder.DB_MASTER;
-                    } else {
-                        // 这里如果有多个从数据库，则添加挑选过程
-                        lookupKey = DynamicDataSourceHolder.DB_SLAVE;
-                    }
-                }
-            }
-        } else {
-            lookupKey = DynamicDataSourceHolder.DB_MASTER;
-        }
-        DynamicDataSourceHolder.setDBType(lookupKey);
+
         return invocation.proceed();
     }
 

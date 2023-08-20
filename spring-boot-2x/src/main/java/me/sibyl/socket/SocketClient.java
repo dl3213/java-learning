@@ -4,7 +4,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class SocketClient implements WebSocketService{
 
     @Autowired(required = false)

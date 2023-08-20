@@ -12,7 +12,7 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import java.net.URI;
 
-@Configuration
+//@Configuration
 @Slf4j
 public class WebSocketConfig {
 

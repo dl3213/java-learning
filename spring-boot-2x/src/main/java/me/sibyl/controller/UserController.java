@@ -21,7 +21,7 @@ import java.util.List;
  * @Author dyingleaf3213
  * @Create 2022/02/26 09:54
  */
-@RestController
+//@RestController
 public class UserController {
 
     @Resource

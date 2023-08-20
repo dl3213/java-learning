@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @Order(9)
 @ConditionalOnExpression("${runnerEnabled:false}")
 public class SystemCommandLineRunner implements CommandLineRunner {

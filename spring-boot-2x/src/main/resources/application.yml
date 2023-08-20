@@ -7,11 +7,11 @@ spring:
     name: spring-boot-2x
   profiles:
     active: dev
-    include: single-data
+    include: db
   main:
     lazy-initialization: false
   thymeleaf:
-    prefix: classpath:/static/
+    prefix: classpath:/templates/
     suffix: .html
     cache: false
   devtools:
