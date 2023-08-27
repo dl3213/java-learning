@@ -19,12 +19,17 @@ public class IndexController {
         view.addObject("title", "xx系统");
 
         List<MenuDTO> menuTree = Arrays.asList(
-                new MenuDTO().setCode("user").setName("用户管理").setChildren(Arrays.asList(new MenuDTO().setName("用户列表1"),new MenuDTO().setName("用户列表2"))),
+                new MenuDTO().setCode("user").setName("用户管理").setChildren(Arrays.asList(new MenuDTO().setName("用户列表1").setLinkUrl("/sys/user/index"),new MenuDTO().setName("用户列表2").setLinkUrl("/sys/user/index"))),
                 new MenuDTO().setCode("menu").setName("菜单管理"),
                 new MenuDTO().setCode("role").setName("角色管理")
         );
         view.addObject("menuTree", menuTree);
         return view;
+    }
+
+    @GetMapping({"sys/main",})
+    public String sys_main() {
+        return "welcome";
     }
 
     @GetMapping({"pages/main",})

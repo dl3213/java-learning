@@ -1,7 +1,6 @@
 package me.sibyl.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.archivers.zip.ZipEightByteInteger;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;

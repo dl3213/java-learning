@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/bootstrap.bundle.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/popper.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="container">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary" onclick="download()">download</button>
+            </div>
+            <div class="col">
+                Column
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <table id="table" class="table" data-click-to-select="true">
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+    });
+    function download(){
+        console.log("test");
+        const xhr = new XMLHttpRequest()
+        xhr.open('get','/api/v1/sys/user/export')
+        xhr.responseType = "blob";
+        xhr.send()
+        xhr.onload = function(){
+            const blob = new Blob([xhr.response], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            const a = document.createElement('a');
+            const href = window.URL.createObjectURL(blob); // 创建下载连接
+            a.href = href;
+            a.download = decodeURI("1" );
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a); // 下载完移除元素
+            window.URL.revokeObjectURL(href); // 释放掉blob对象
+
+
+            // var link = document.createElement('a');
+            // var body = document.querySelector('body');
+            // link.href = window.URL.createObjectURL(blob);
+            // link.download = "filename";
+            // link.style.display = 'none';
+            // body.appendChild(link);
+            // link.click();
+            // body.removeChild(link);
+            // window.URL.revokeObjectURL(link.href);
+
+            // const element = document.createElement("a");
+            // const href = URL.createObjectURL(blob);
+            // element.href = href;
+            // element.setAttribute("download", "123");
+            // element.style.display = "none";
+            // element.click();
+            // //调用这个方法来让浏览器知道不用在内存中继续保留对这个文件的引用了
+            // URL.revokeObjectURL(href);
+            // element.remove();
+        }
+    }
+</script>
+</body>
+</html>

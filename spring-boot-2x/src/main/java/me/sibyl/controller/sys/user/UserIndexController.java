@@ -14,7 +14,7 @@ public class UserIndexController {
     @GetMapping("index")
     public ModelAndView index(){
         ModelAndView view = new ModelAndView();
-        view.setViewName("welcome");
+        view.setViewName("sys/user/user-index");
         return view;
     }
 }
