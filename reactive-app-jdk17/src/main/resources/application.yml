@@ -1,18 +1,30 @@
-
 server:
-  port: 10001
-
+  port: 8080
+  shutdown: graceful
 spring:
+  application:
+    name: sibyl-server
   profiles:
     active: dev
-  application:
-    name: sibyl-reactive-app
-  r2dbc:
-    url: r2dbc:mysql://localhost:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=GMT%2B8&SSL=false&sslMode=DISABLED
-    username: root
-    password: 123456
-    pool:
-      enabled: true
-      initial-size: 10
-      max-size: 100
+    include: db
+  main:
+    lazy-initialization: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
 
+debug: false
+logging:
+  level:
+    me.sibyl: debug
+    root: info
+#    org:
+#      springframework:
+#        security: DEBUG
+  file:
+    name: log/${spring.application.name}.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 360

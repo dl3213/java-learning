@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.bi.SupplierOutReturnDailyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.bi.SupplierOutReturnDaily">
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="supplierCode" column="supplier_code" jdbcType="VARCHAR"/>
+            <result property="supplierName" column="supplier_name" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="sendType" column="send_type" jdbcType="VARCHAR"/>
+            <result property="vanNum" column="van_num" jdbcType="NUMERIC"/>
+            <result property="totalTon" column="total_ton" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,date,supplier_code,
+        supplier_name,is_deleted,create_time,
+        create_by,send_type,van_num,
+        total_ton
+    </sql>
+</mapper>

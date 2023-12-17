@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.bi.BIMaterStoreInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.bi.BIMaterStoreInfo">
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="storeCode" column="store_code" jdbcType="VARCHAR"/>
+            <result property="storeName" column="store_name" jdbcType="VARCHAR"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+            <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+            <result property="region" column="region" jdbcType="VARCHAR"/>
+            <result property="province" column="province" jdbcType="VARCHAR"/>
+            <result property="city" column="city" jdbcType="VARCHAR"/>
+            <result property="area" column="area" jdbcType="VARCHAR"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="linkMan" column="link_man" jdbcType="VARCHAR"/>
+            <result property="linkTelphone" column="link_telphone" jdbcType="VARCHAR"/>
+            <result property="consignee" column="consignee" jdbcType="VARCHAR"/>
+            <result property="consigneePhone" column="consignee_phone" jdbcType="VARCHAR"/>
+            <result property="createUser" column="create_user" jdbcType="VARCHAR"/>
+            <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="update_user" jdbcType="VARCHAR"/>
+            <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+            <result property="isDel" column="is_del" jdbcType="VARCHAR"/>
+            <result property="warehouseType" column="warehouse_type" jdbcType="VARCHAR"/>
+            <result property="shape" column="shape" jdbcType="VARCHAR"/>
+            <result property="storeVolume" column="store_volume" jdbcType="NUMERIC"/>
+            <result property="ncId" column="nc_id" jdbcType="VARCHAR"/>
+            <result property="crmId" column="crm_id" jdbcType="VARCHAR"/>
+            <result property="updatetime" column="updatetime" jdbcType="TIMESTAMP"/>
+            <result property="lng" column="lng" jdbcType="VARCHAR"/>
+            <result property="lat" column="lat" jdbcType="VARCHAR"/>
+            <result property="coordinateType" column="coordinate_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,store_code,store_name,
+        org_code,org_name,dept_code,
+        dept_name,region,province,
+        city,area,address,
+        link_man,link_telphone,consignee,
+        consignee_phone,create_user,create_date,
+        update_user,update_date,is_del,
+        warehouse_type,shape,store_volume,
+        nc_id,crm_id,updatetime,
+        lng,lat,coordinate_type
+    </sql>
+</mapper>

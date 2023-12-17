@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.bi.RegionStoreTargetIndexDailyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.bi.RegionStoreTargetIndexDaily">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="purchaseToStoreTon" column="purchase_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="subleaseToStoreTon" column="sublease_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="returnToStoreTon" column="return_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="allocateToStoreTon" column="allocate_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="displaceToStoreTon" column="displace_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="totalToStoreTon" column="total_to_store_ton" jdbcType="NUMERIC"/>
+            <result property="sendFromStoreTon" column="send_from_store_ton" jdbcType="NUMERIC"/>
+            <result property="subleaseFromStoreTon" column="sublease_from_store_ton" jdbcType="NUMERIC"/>
+            <result property="allocateFromStoreTon" column="allocate_from_store_ton" jdbcType="NUMERIC"/>
+            <result property="displaceFromStoreTon" column="displace_from_store_ton" jdbcType="NUMERIC"/>
+            <result property="totalFromStoreTon" column="total_from_store_ton" jdbcType="NUMERIC"/>
+            <result property="storeToSiteTon" column="store_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="directToSiteTon" column="direct_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="subleaseToSiteTon" column="sublease_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="allocateToSiteTon" column="allocate_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="displaceToSiteTon" column="displace_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="siteToSiteTon" column="site_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="totalToSiteTon" column="total_to_site_ton" jdbcType="NUMERIC"/>
+            <result property="storeFromSiteTon" column="store_from_site_ton" jdbcType="NUMERIC"/>
+            <result property="siteFromSiteTon" column="site_from_site_ton" jdbcType="NUMERIC"/>
+            <result property="subleaseFromSiteTon" column="sublease_from_site_ton" jdbcType="NUMERIC"/>
+            <result property="totalFromSiteTon" column="total_from_site_ton" jdbcType="NUMERIC"/>
+            <result property="netSendTon" column="net_send_ton" jdbcType="NUMERIC"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,date,org_code,
+        org_name,is_deleted,create_time,
+        create_by,purchase_to_store_ton,sublease_to_store_ton,
+        return_to_store_ton,allocate_to_store_ton,displace_to_store_ton,
+        total_to_store_ton,send_from_store_ton,sublease_from_store_ton,
+        allocate_from_store_ton,displace_from_store_ton,total_from_store_ton,
+        store_to_site_ton,direct_to_site_ton,sublease_to_site_ton,
+        allocate_to_site_ton,displace_to_site_ton,site_to_site_ton,
+        total_to_site_ton,store_from_site_ton,site_from_site_ton,
+        sublease_from_site_ton,total_from_site_ton,net_send_ton
+    </sql>
+</mapper>

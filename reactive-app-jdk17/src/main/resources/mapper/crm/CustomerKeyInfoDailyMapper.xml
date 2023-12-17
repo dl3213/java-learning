@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.crm.CustomerKeyInfoDailyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.crm.CustomerKeyInfoDaily">
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+            <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+            <result property="customerId" column="customer_id" jdbcType="VARCHAR"/>
+            <result property="customerCode" column="customer_code" jdbcType="VARCHAR"/>
+            <result property="customerName" column="customer_name" jdbcType="VARCHAR"/>
+            <result property="customerLevel" column="customer_level" jdbcType="VARCHAR"/>
+            <result property="customerType" column="customer_type" jdbcType="VARCHAR"/>
+            <result property="salesman" column="salesman" jdbcType="VARCHAR"/>
+            <result property="businessModel" column="business_model" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="deptId" column="dept_id" jdbcType="VARCHAR"/>
+            <result property="isKey" column="is_key" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,org_code,org_name,
+        date,dept_code,dept_name,
+        customer_id,customer_code,customer_name,
+        customer_level,customer_type,salesman,
+        business_model,is_deleted,create_by,
+        create_time,dept_id,is_key
+    </sql>
+</mapper>

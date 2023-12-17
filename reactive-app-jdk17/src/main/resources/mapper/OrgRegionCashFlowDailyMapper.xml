@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.bi.OrgRegionCashFlowDailyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.bi.OrgRegionCashFlowDaily">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="incomeCollect" column="income_collect" jdbcType="NUMERIC"/>
+            <result property="otherCollect" column="other_collect" jdbcType="NUMERIC"/>
+            <result property="subleaseRent" column="sublease_rent" jdbcType="NUMERIC"/>
+            <result property="freight" column="freight" jdbcType="NUMERIC"/>
+            <result property="employeeSalary" column="employee_salary" jdbcType="NUMERIC"/>
+            <result property="taxes" column="taxes" jdbcType="NUMERIC"/>
+            <result property="bidSecurity" column="bid_security" jdbcType="NUMERIC"/>
+            <result property="placeRentalExpenses" column="place_rental_expenses" jdbcType="NUMERIC"/>
+            <result property="warehousingCostExpenses" column="warehousing_cost_expenses" jdbcType="NUMERIC"/>
+            <result property="laborCostExpenses" column="labor_cost_expenses" jdbcType="NUMERIC"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,org_code,org_name,
+        date,income_collect,other_collect,
+        sublease_rent,freight,employee_salary,
+        taxes,bid_security,place_rental_expenses,
+        warehousing_cost_expenses,labor_cost_expenses,create_time,
+        is_deleted
+    </sql>
+</mapper>

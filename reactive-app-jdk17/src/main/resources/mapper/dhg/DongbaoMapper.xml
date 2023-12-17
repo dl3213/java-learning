@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.dhg.DongbaoMapper">
+
+
+    <select id="queryStaffNumOfStore" resultType="java.lang.Integer">
+        SELECT count(r.id)
+        from  member_r_NC r
+        LEFT JOIN dept_nc d on d.id = r.deptid
+        WHERE
+            r.deptid= #{storeId}
+          and r.isenable = '1'
+    </select>
+    <select id="queryOrgList" resultType="com.tanghe.dto.dhg.DongBaoOrg">
+        WITH cte(id,code,name,fatherpk) as
+                 (
+                     SELECT id,code, name, fatherpk
+                     FROM corp_nc
+                     where
+                         id='1455394147843239938'
+                     UNION ALL
+                     SELECT n.id,n.code, n.name, n.fatherpk
+                     FROM corp_nc n
+                              INNER JOIN cte c
+                                         ON n.fatherpk = c.id
+                 )
+        SELECT *
+        FROM cte
+            OPTION (MAXRECURSION 0)
+
+    </select>
+    <select id="queryDeptList" resultType="com.tanghe.dto.dhg.DongBaoDept">
+        WITH cte(id,code,name,pk_fathedept,orgid ) as
+                 (
+                     SELECT id,code,name,pk_fathedept,orgid
+                     FROM dept_nc
+                     where
+                         pk_fathedept='1458325348249776130' and isenable = '1'
+                     UNION ALL
+                     SELECT n.id,n.code,n.name,n.pk_fathedept,n.orgid
+                     FROM dept_nc n
+                              INNER JOIN cte c
+                                         ON n.pk_fathedept = c.id and n.isenable = '1'
+                 )
+        SELECT *
+        FROM cte
+    </select>
+    <select id="queryDeptListById" resultType="com.tanghe.dto.dhg.DongBaoDept">
+        WITH cte(id, code, name, pk_fathedept, orgid) as
+                 (SELECT id, code, name, pk_fathedept, orgid
+                  FROM dept_nc
+                  where id = #{deptId}
+                    and isenable = '1'
+                  UNION ALL
+                  SELECT n.id, n.code, n.name, n.pk_fathedept, n.orgid
+                  FROM dept_nc n
+                           INNER JOIN cte c
+                                      ON n.pk_fathedept = c.id and n.isenable = '1')
+        SELECT *
+        FROM cte
+    </select>
+    <select id="countStaffNumByDeptIdList" resultType="java.lang.Integer">
+        SELECT count(*) from member_r_NC
+        where deptid in
+        <foreach collection="deptIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and isenable = '1';
+
+    </select>
+</mapper>

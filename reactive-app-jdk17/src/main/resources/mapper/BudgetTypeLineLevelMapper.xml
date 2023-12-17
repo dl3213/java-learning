@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.BudgetTypeLineLevelMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.BudgetTypeLineLevel">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="codeLevel1" column="code_level_1" jdbcType="VARCHAR"/>
+            <result property="nameLevel1" column="name_level_1" jdbcType="VARCHAR"/>
+            <result property="codeLevel2" column="code_level_2" jdbcType="VARCHAR"/>
+            <result property="nameLevel2" column="name_level_2" jdbcType="VARCHAR"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,code_level_1,name_level_1,
+        code_level_2,name_level_2,remark,
+        is_deleted,create_time,create_by,
+        update_time,update_by
+    </sql>
+</mapper>

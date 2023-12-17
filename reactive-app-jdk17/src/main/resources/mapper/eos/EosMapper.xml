@@ -1,0 +1,3109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.eos.EosMapper">
+    <insert id="insertContarctNcLinker">
+        insert into th_crm_contract_nc(id, contract_code, project_name, nc_contract_code, nc_project_name,
+                                       nc_project_id)
+        values (#{id}, #{contractCode}, #{projectName}, #{projectCode_nc}, #{projectName_nc}, #{pkProject});
+    </insert>
+    <update id="updateDeptOfSalesContract">
+        update th_crm_contract
+        set dept_name= #{deptName}
+        where contract_code = #{contractCode};
+
+        update th_crm_plan_deliver
+        set department= #{deptName}
+        where contract_code = #{contractCode};
+
+        update th_crm_rent_out
+        set dept_name= #{deptName}
+        where sales_contract = #{contractCode};
+
+        update th_crm_lease_freight
+        set dept_name= #{deptName}
+        where sales_contract = #{contractCode};
+    </update>
+    <update id="updateDeptOfThCrmPlanDeliver">
+        update th_crm_plan_deliver
+        set department= #{deptName}
+        where contract_code = #{contractCode}
+    </update>
+    <update id="updateDeptOfThCrmRentOut">
+        update th_crm_rent_out
+        set dept_name= #{deptName}
+        where sales_contract = #{contractCode}
+    </update>
+    <update id="updateDeptOfThCrmLeaseFreight">
+        update th_crm_lease_freight
+        set dept_name= #{deptName}
+        where sales_contract = #{contractCode}
+    </update>
+    <update id="updateOrgOfSalesContract">
+
+    </update>
+    <update id="updateMatNameOfSalesContract">
+        UPDATE th_crm_contract_scheme_price p
+        set p.material_name = (SELECT material_name from th_material_info where material_code = p.material_code)
+        where sales_contract = #{contractCode};
+
+        update th_crm_plan_deliver_mat mat
+            left join th_crm_plan_deliver main on main.id = mat.deliver_plan_id
+        set mat.material_name= (SELECT material_name from th_material_info where material_code = mat.material_code)
+        where main.contract_code = #{contractCode};
+
+        update th_crm_rent_out_mat mat
+            left join th_crm_rent_out main on main.id = mat.p_id
+        set mat.material_name= (SELECT material_name from th_material_info where material_code = mat.material_code)
+        where main.sales_contract = #{contractCode};
+    </update>
+    <update id="executeSql">
+        ${sql}
+    </update>
+    <update id="update_CGDD_Price_">
+        UPDATE th_purchase_order_mat b
+        set b.unit_price_including_tax = #{price},                                                      -- 含税单价
+            b.unit_price_excluding_tax = round(b.unit_price_including_tax / (1 + b.tax_rate / 100), 5), -- 无税单价
+            b.amount_including_tax     = round(b.unit_price_including_tax * b.quantity, 5),             -- 含税金额
+            b.amount_excluding_tax     = round(b.unit_price_excluding_tax * b.quantity, 5),             -- 无税金额
+            b.tax_amount               = round(b.amount_including_tax - b.amount_excluding_tax, 5)      -- 税额
+        where b.id = #{matId}
+    </update>
+    <update id="update_CGDH_Price_">
+        UPDATE th_war_pur_aog_mat b
+        set b.unit_price_including_tax = #{price},                                                        -- 含税单价
+            b.amount_including_tax     = round(b.unit_price_including_tax * b.quantity, 5),               -- 含税金额
+            b.amount_excluding_tax     = round(
+                        (round(b.unit_price_including_tax / (1 + b.tax_rate / 100), 5)) * b.quantity, 5), -- 无税金额
+            b.tax_amount               = round(b.amount_including_tax - b.amount_excluding_tax, 5)        -- 税额
+        where b.id = #{matId}
+    </update>
+    <update id="update_CGRK_Price_">
+        UPDATE th_war_god_house_mat b
+        set b.unit_price_including_tax = #{price},                                                        -- 含税单价
+            b.amount_including_tax     = round(b.unit_price_including_tax * b.quantity, 5),               -- 含税金额
+            b.amount_excluding_tax     = round(
+                        (round(b.unit_price_including_tax / (1 + b.tax_rate / 100), 5)) * b.quantity, 5), -- 无税金额
+            b.tax_amount               = round(b.amount_including_tax - b.amount_excluding_tax, 5),       -- 税额
+            b.total_price_and_tax      = round(b.amount_excluding_tax + b.freight_amount_tax, 5),         -- 无税金额合计(含运费)
+            b.total_price              = round(b.amount_including_tax + b.freight_amount, 5)              -- 含税金额合计(含运费)
+        where b.id = #{matId}
+    </update>
+    <update id="update_war_init_cost_mat">
+        update th_war_init_cost_mat
+        set amount_excluding_tax = #{price}
+        where receipt_lot_no = #{receiptLotNo}
+          and material_code = #{matInfo}
+    </update>
+    <update id="updateRentOutNobackNum2Zero">
+        update th_crm_rent_out_mat
+        set no_back_num = 0
+        where p_id = (select id from th_crm_rent_out where code = #{rentCode})
+          and material_code = #{materialCode}
+    </update>
+    <select id="maxIdFrom" resultType="java.lang.Long">
+        select max(id)
+        from ${tableName}
+    </select>
+
+    <select id="orgListFromStore" resultType="com.tanghe.dto.eos.OrgDTO">
+        -- select distinct org_code,org_name from th_mater_store_info where is_del = '0'
+        select distinct org_name, org_code
+        from th_mater_store_info
+        where org_code != '3201'
+          and is_del = '0'
+    </select>
+    <select id="storeList" resultType="com.tanghe.dto.eos.StoreDTO">
+        select distinct store_code,
+                        store_name,
+                        org_code,
+                        org_name,
+                        store_volume
+        from th_mater_store_info
+        where is_del = '0'
+    </select>
+    <select id="rentRateList" resultType="com.tanghe.dto.eos.StoreRentRateDTO">
+        SELECT org_code                                          orgCode,
+               org_name                                          orgName,
+               store_code                                        storeCode,
+               store_name                                        storeName,
+               ROUND(sum(renting_mat) / sum(total_mat) * 100, 2) monthRate,
+               DATE_FORMAT(create_time, '%Y-%m-%d')              dateStr
+        FROM `th_mat_occupancy_rate`
+        where DATE_FORMAT(create_time, '%Y-%m-%d') = '2023-09-01'
+        GROUP BY org_code, store_name, DATE_FORMAT(create_time, '%Y-%m-%d')
+        ORDER BY org_name, store_name, DATE_FORMAT(create_time, '%Y-%m-%d');
+    </select>
+    <select id="queryQuantityByStoreCode" resultType="java.math.BigDecimal">
+        select
+            -- r.warehousing_warehouse,
+            -- r.material_code,
+            -- r.material_name,
+            -- r.data_type,
+            -- r.quantity_on_hand,
+            -- tmi.theorentical_weight,
+            sum(r.quantity_on_hand * tmi.theorentical_weight)
+        from th_war_init_repert_mat r -- 库存表
+                 left join th_material_info tmi on r.material_code = tmi.material_code -- 物料档案
+        where r.is_del = '0'
+          and tmi.is_del = 'n'
+          and r.warehousing_warehouse = #{storeCode}
+          and DATE_FORMAT(r.create_time, '%Y-%m-%d') &lt;= #{targetDate} -- 小于等于目标时间
+          and r.data_type in ('0', '1') -- 数据类型：0合格、1维修、2报废、非我司
+    </select>
+    <select id="queryCrmRentoutList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT a.code       as document_code,
+               a.cust_name     customer_name,
+               a.sales_contract,
+               a.project_name,
+               a.license_plate_number,
+               project_address,
+               a.rent_date_start,
+               a.cust_code     customer_code,
+               a.dept_name,
+               a.remarks    as aremarks,
+               a.org_code,
+               a.org_name,
+               r.DICTNAME   as region,
+               w.store_name as warehousing_warehouse,
+               w.org_code   as store_org_code,
+               b.*,
+               case
+                   when
+                       b.shipment_type = '1'
+                       then '仓库发'
+                   when b.shipment_type = '2'
+                       then '供应商直发'
+                   when b.shipment_type = '3'
+                       then '供应商转租'
+                   when b.shipment_type = '4'
+                       then '工地发工地'
+                   when b.shipment_type = '5'
+                       then '仓库调拨'
+                   end         shipmentType,
+               c.scheme_name,
+               e.DICTNAME      price_type,
+               f.DICTNAME      primary_uom_name,
+               g.DICTNAME      company_name
+        FROM th_crm_rent_out a
+                 left JOIN `th_crm_rent_out_mat` b on b.p_id = a.id
+                 left JOIN th_crm_price_scheme c on b.calculation_scheme = c.scheme_code
+                 left JOIN th_crm_contract d on a.sales_contract = d.contract_code
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `e`
+                           ON `b`.`pricing_type` = `e`.`DICTID` AND `e`.`DICTTYPEID` =
+                                                                    'crm_price_type'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `r`
+                           ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `f`
+                           ON `b`.`primary_uom` = `f`.`DICTID` AND `f`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `g`
+                           ON `b`.`company` = `g`.`DICTID` AND `g`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `th_mater_store_info` `w` ON `a`.`warehousing_warehouse` = `w`.`store_code`
+        where a.document_status = '70'
+          and d.contract_status != '7'
+        <![CDATA[
+          and date_format(a.rent_date_start, '%Y-%m-%d') <= date_format(#{map.endTime}, '%Y-%m-%d')
+        ]]>
+        and a.sales_contract = #{map.salesContract}
+        <![CDATA[
+          and if(d.is_over != 0,
+                 date_format(#{map.endTime}, '%Y-%m-%d') <= date_format(d.contract_termination_date, '%Y-%m-%d'), 1 = 1)
+        ]]>
+    </select>
+    <select id="queryCrmRecycletList" resultType="com.alibaba.fastjson2.JSONObject">
+
+        SELECT
+        a.code as document_code,
+        a.sales_contract,
+        a.project_name,
+        project_address,
+        a.org_code,a.org_name,
+        a.remarks as aremarks,
+        a.license_plate_number,
+        a.cust_name customer_name,
+        a.cust_code customer_code,
+        a.dept_name,
+        a.off_lease_date aoff_lease_date,
+        r.DICTNAME as region,
+        w.store_name as warehousing_warehouse,
+        w.org_code as store_org_code,
+        case when
+        a.back_type = '1'
+        then '工地--仓库'
+        when a.back_type = '2'
+        then '工地--工地'
+        when a.back_type = '3'
+        then '工地--转租商'
+        end shipmentType,
+        b.* ,
+        c.scheme_name,
+        e.DICTNAME price_type,
+        f.DICTNAME primary_uom_name,
+        g.DICTNAME company_name
+        FROM
+        `th_war_rent_recycle_mat` b
+        left JOIN th_war_rent_recycle a on b.p_id = a.id
+        left JOIN th_crm_price_scheme c on b.calculation_scheme = c.scheme_code
+        left JOIN th_crm_contract d on a.sales_contract = d.contract_code
+        LEFT JOIN `thlease_eos`.`eos_dict_entry` `e` ON `b`.`pricing_type` = `e`.`DICTID` AND `e`.`DICTTYPEID` =
+        'crm_price_type'
+        LEFT JOIN `thlease_eos`.`eos_dict_entry` `f` ON `b`.`primary_uom` = `f`.`DICTID` AND `f`.`DICTTYPEID` = 'units'
+        LEFT JOIN `thlease_eos`.`eos_dict_entry` `g` ON `b`.`unit_secondary` = `g`.`DICTID` AND `g`.`DICTTYPEID` =
+        'units'
+        LEFT JOIN `th_mater_store_info` `w` ON `a`.`warehousing_warehouse` = `w`.`store_code`
+        LEFT JOIN `thlease_eos`.`eos_dict_entry` `r` ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+        where
+
+        a.document_status='70'
+        <!-- <![CDATA[
+          and date_format(a.off_lease_date,'%Y-%m-%d') >= date_format(#startTime#,'%Y-%m-%d')
+          and
+          date_format(a.off_lease_date,'%Y-%m-%d') <= date_format(#endTime#,'%Y-%m-%d')
+          ]]>	-->
+
+        <![CDATA[
+			   and
+			   date_format(a.off_lease_date,'%Y-%m-%d')<=date_format(#{map.endTime},'%Y-%m-%d')
+			   ]]>
+        and a.sales_contract =#{map.salesContract}
+        <![CDATA[
+			and if(d.is_over!=0, date_format(#{map.endTime},'%Y-%m-%d')<=date_format(d.contract_termination_date,'%Y-%m-%d'),1=1)
+			]]>
+    </select>
+    <select id="queryCollect_project" resultType="com.alibaba.fastjson2.JSONObject">
+        select sales_contract,
+        a.project_name,
+        a.customer_code,
+        c.customer_name,
+        c.region,
+        a.update_time,
+        a.id,
+        a.update_user,
+        c.dept_name,
+        sum(month_price) month_price,
+        c.org_code,
+        c.org_name
+        from th_finance_collection_book a
+        LEFT JOIN th_crm_contract c on a.sales_contract = c.contract_code
+        where 1 = 1
+        <if test="contractCode != null and contractCode != ''">
+            and a.sales_contract = #{contractCode}
+        </if>
+        GROUP BY a.sales_contract
+
+    </select>
+    <select id="queryThFinanceRentCollect" resultType="com.alibaba.fastjson2.JSONObject">
+        select b.contract_code sales_contract,
+        sum(collect_amount)collect_amount
+        from th_fin_rent_collection a
+        LEFT JOIN th_crm_contract_nc b on a.sales_contract=b.contract_code
+        where a.collect_type ='60101' and a.sales_contract is not null and b.contract_code is not null
+        and b.contract_code in
+        <foreach collection="contractCodes" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        group by b.contract_code
+    </select>
+    <select id="queryThFinanceRentCollect_Deposit" resultType="com.alibaba.fastjson2.JSONObject">
+        select b.contract_code sales_contract,
+        sum(collect_amount)collect_amount
+        from th_fin_rent_collection a
+        LEFT JOIN th_crm_contract_nc b on a.sales_contract=b.nc_contract_code
+
+        where a.collect_type ='60127' and a.sales_contract is not null and b.contract_code is not null
+        and b.contract_code in
+        <foreach collection="contractCodes" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        group by b.contract_code
+    </select>
+    <select id="queryCollectBook_detail" resultType="com.alibaba.fastjson2.JSONObject">
+        select sales_contract, collect_date, sum(month_price)month_price
+        from th_finance_collection_book
+        where sales_contract in
+        <foreach collection="contractCodes" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        group by sales_contract,collect_date
+        order by collect_date
+    </select>
+    <select id="queryCollectBook_year" resultType="com.alibaba.fastjson2.JSONObject">
+        select sales_contract ,sum(rent_price)month_price, DATE_FORMAT(end_time,'%Y') collect_year
+        from th_crm_rent_month
+        where is_exceed=1 and is_del='0' and sales_contract in
+        <foreach collection="contractCodes" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        GROUP BY sales_contract, DATE_FORMAT(end_time,'%Y')
+        order by DATE_FORMAT(end_time,'%Y') asc
+    </select>
+    <select id="queryThFinanceRentCollect_year" resultType="com.alibaba.fastjson2.JSONObject">
+        select b.contract_code sales_contract,
+        DATE_FORMAT(collect_date,'%Y')collect_year,
+        sum(collect_amount)collect_amount
+        from th_fin_rent_collection a
+        LEFT JOIN th_crm_contract_nc b on a.sales_contract=b.nc_contract_code
+        where collect_type ='60101' and a.sales_contract is not null and b.contract_code is not null
+
+        and b.contract_code in
+        <foreach collection="contractCodes" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+        GROUP BY b.contract_code, DATE_FORMAT(collect_date,'%Y')
+        order by b.contract_code, DATE_FORMAT(collect_date,'%Y') asc
+    </select>
+
+    <select id="pr_material_freight_YF_report" statementType="CALLABLE" resultType="com.alibaba.fastjson2.JSONObject">
+        {call pr_material_freight_YF_report(null, null, null, null, null, null, null,
+                                            #{targetDate,mode=IN, jdbcType=VARCHAR},
+                                            #{targetDate,mode=IN, jdbcType=VARCHAR}, null, null)}
+    </select>
+    <select id="queryCrmReplenishList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT a.customer_name,
+               a.contract_code sales_contract,
+               a.project_name,
+               a.project_address,
+               a.replenish_date,
+               a.replenish_price,
+               a.document_code,
+               a.dept_name,
+               a.org_code,
+               a.org_name,
+               a.customer_name,
+               a.customer_code customer_code,
+               r.DICTNAME as   region
+        FROM th_crm_rentout_replenish a
+                 left JOIN th_crm_contract d on a.contract_code = d.contract_code
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `r`
+                           ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+        where a.document_status = '70'
+          and a.price_Type != '6'
+			<![CDATA[
+          and date_format(a.replenish_Date, '%Y-%m-%d') >= date_format(#{map.startTime}, '%Y-%m-%d')
+          and date_format(a.replenish_Date, '%Y-%m-%d') <= date_format(#{map.endTime}, '%Y-%m-%d')
+        ]]>
+          and a.contract_code like concat("%", #{map.salesContract}, "%")
+        <![CDATA[
+          and if(d.is_over != 0,
+                 date_format(#{map.endTime}, '%Y-%m-%d') <= date_format(d.contract_termination_date, '%Y-%m-%d'), 1 = 1)
+        ]]>
+
+    </select>
+    <select id="queryCrmReplenishList_dunwei" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT
+        a.customer_name, a.contract_code sales_contract, a.project_name,
+        a.project_address, a.replenish_date,a.replenish_price,
+        a.document_code,a.dept_name,
+        a.org_code,a.org_name,
+        a.customer_name,a.customer_code customer_code,r.DICTNAME as region
+        FROM
+        th_crm_rentout_replenish a
+        left JOIN th_crm_contract d on a.contract_code = d.contract_code
+        LEFT JOIN `thlease_eos`.`eos_dict_entry` `r` ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+        where
+        a.document_status='70' and a.price_Type = '6'
+        <!--<![CDATA[
+            and date_format(a.replenish_Date,'%Y-%m-%d') >= date_format(#startTime#,'%Y-%m-%d')
+        ]]> -->
+        and a.contract_code like concat("%",#{map.salesContract},"%")
+        <![CDATA[
+			and if(d.is_over!=0, date_format(#{map.endTime},'%Y-%m-%d')<=date_format(d.contract_termination_date,'%Y-%m-%d'),1=1)
+			]]>
+
+    </select>
+    <select id="queryCrmfreeList" resultType="com.alibaba.fastjson2.JSONObject">
+
+        SELECT a.cust_name,
+               a.sales_contract,
+               a.project_name,
+               a.project_address,
+               a.document_code,
+               rent_date_start,
+               rent_date_end,
+               tenancy_term,
+               adjust_prices,
+               a.org_code,
+               a.org_name,
+               a.dept_name,
+               a.cust_name   customer_name,
+               a.cust_code   customer_code,
+               r.DICTNAME as region
+        from `th_crm_rent_free` a
+                 left JOIN th_crm_contract d on a.sales_contract = d.contract_code
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `r`
+                           ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+        where a.document_status = '70'
+
+        <![CDATA[
+			   and date_format(a.rent_date_start, '%Y-%m-%d') >= date_format(#{map.startTime}, '%Y-%m-%d')
+          and date_format(a.rent_date_start, '%Y-%m-%d') <= date_format(#{map.endTime}, '%Y-%m-%d')
+			 ]]>
+
+            and a.sales_contract like concat("%", #{map.salesContract}, "%")
+
+        <![CDATA[
+			and if(d.is_over != 0,
+                 date_format(#{map.endTime}, '%Y-%m-%d') <= date_format(d.contract_termination_date, '%Y-%m-%d'), 1 = 1)
+        ]]>
+    </select>
+    <select id="queryThRentLossassBfList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT a.code                                                 as document_code,
+               a.document_date,
+               a.cust_name,
+               a.sales_contract,
+               a.project_name,
+               a.warehousing_warehouse,
+               b.material_code,
+               material_name,
+               b.specification_and_model,
+               b.repair,
+               b.wx_money,
+               b.wx_price,
+               (b.repair * b.theory_ton_weight)                       as wx_theory_ton_weight,
+               (b.scrap + b.scrap_repairable)                            scrap,
+               b.bf_money,
+               b.bf_price,
+               ((b.scrap + b.scrap_repairable) * b.theory_ton_weight) as bf_theory_ton_weight
+        FROM `th_war_rent_check_mat` b
+                 left JOIN th_war_rent_check a on b.p_id = a.id
+                 left JOIN th_crm_contract d on a.sales_contract = d.contract_code
+        where a.document_status = '70'
+        <![CDATA[
+          and date_format(a.document_date, '%Y-%m-%d') >= date_format(#{map.startTime}, '%Y-%m-%d')
+          and date_format(a.document_date, '%Y-%m-%d') <= date_format(#{map.endTime}, '%Y-%m-%d')
+		 ]]>
+            and a.sales_contract = #{map.salesContract}
+        <![CDATA[
+          and if(d.is_over != 0,
+                 date_format(#{map.endTime}, '%Y-%m-%d') <= date_format(d.contract_termination_date, '%Y-%m-%d'), 1 = 1)
+        ]]>
+    </select>
+    <select id="contractList" resultType="com.tanghe.dto.eos.EosContractDTO">
+        select *
+        from th_crm_contract
+        where is_del = '0'
+          and org_code = #{orgCode}
+    </select>
+    <select id="occupancyRate" resultType="com.tanghe.domain.eos.EosOccupancyRate">
+<![CDATA[
+        SELECT b.org_code                                                                       as orgCode,
+               b.store_code,
+               e.orgname                                                                        as orgName,
+               b.data_type                                                                      as dataType,
+               b.material_code                                                                  as materialCode,
+               CONCAT(d.material_name, d.material_model)                                        as materialName,
+               ROUND((IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0)) * d.theorentical_weight, 5) AS rentingMat,
+               ROUND(c.quantity_on_hand * d.theorentical_weight, 5)                             as inStockMat,
+               ROUND((IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0) + IFNULL(c.quantity_on_hand, 0))
+                         * d.theorentical_weight, 5)                                            as totalMat,
+               if(IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0) > 0,
+                  ROUND((IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0)) / (IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0)
+                      + IFNULL(c.quantity_on_hand, 0)), 4), 0)                                  as occupancyRate
+        FROM (SELECT c.org_code,
+                     c.store_code,
+                     '0'                                    data_type,
+                     b.material_code,
+                     sum((b.primary_quantity - b.back_num)) no_back_num
+              FROM th_crm_rent_out a
+                       INNER JOIN th_crm_rent_out_mat b ON a.id = b.p_id
+                       inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+              WHERE a.is_del = 0
+              GROUP BY c.org_code,
+                       c.store_code,
+                       b.material_code) b
+                 LEFT JOIN (SELECT org_code,
+                                   store_code,
+                                   '0'       data_type,
+                                   material_code,
+                                   sum(zrrk) zrrk
+                            FROM (SELECT c.org_code,
+                                         c.store_code,
+                                         b.material_code,
+                                         sum(ifnull(primary_quantity, 0) - ifnull(amount_repaid, 0)) zrrk
+                                  FROM `th_lease_in_doc_mat` b
+                                           INNER JOIN th_lease_in_doc a ON b.docment_no = a.id
+                                           inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+                                  WHERE a.type = '0'
+                                    AND a.is_del = '0'
+                                  group by c.org_code, c.store_code,
+                                           b.material_code
+                                  UNION ALL
+                                  SELECT c.org_code,
+                                         c.store_code,
+                                         b.material_code,
+                                         sum(ifnull(primary_quantity, 0) - ifnull(return_num, 0)) zrrk
+                                  FROM th_lease_receipt_doc a
+                                           INNER JOIN th_lease_receipt_doc_mat b ON a.id = b.docment_no
+                                           inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+                                  WHERE a.is_del = 0
+                                  group by c.org_code, c.store_code, b.material_code) a
+                            GROUP BY org_code,
+                                     store_code,
+                                     material_code) a
+                           ON a.org_code = b.org_code and a.store_code = b.store_code AND a.data_type = b.data_type AND
+                              a.material_code = b.material_code
+                 left join (select c.org_code,
+                                   c.store_code,
+                                   '0'                                data_type,
+                                   material_code,
+                                   case
+                                       when sum(quantity_on_hand) < 0 then 0
+                                       else sum(quantity_on_hand) end quantity_on_hand
+                            from th_war_init_repert_mat a
+                                     inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+                            group by org_code, store_code, material_code) c
+                           on c.material_code = b.material_code and c.org_code = b.org_code and
+                              c.store_code = b.store_code and c.data_type = b.data_type
+                 left join th_material_info d on d.material_code = b.material_code
+                 inner join thlease_eos.org_organization e on b.org_code = e.ORGCODE
+        ]]>
+    </select>
+    <select id="queryStock_category" resultType="com.tanghe.dto.eos.MaterialCategory">
+        select category_codes, category_name, id
+        from th_material_category
+        where is_del = 'n'
+          and LENGTH(category_codes) = #{codeLength}
+    </select>
+    <select id="queryData_rents" resultType="com.alibaba.fastjson2.JSONObject">
+        select (IFNULL(aa.material_quantity, 0) - Ifnull(bb.dzhj, 0)) material_quantity,
+               aa.warehousing_warehouse,
+               aa.parent_id,
+               cc.category_name
+        from v_th_war_rent_for_category aa
+                 left JOIN v_material_sup_cz_report bb
+                           on aa.warehousing_warehouse = bb.warehousing_warehouse and aa.parent_id = bb.parent_id
+                 LEFT JOIN th_material_category cc on aa.parent_id = cc.id
+        where aa.parent_id is not null
+    </select>
+    <select id="queryData_rentTotals" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, warehousing_warehouse
+        from (select (IFNULL(aa.material_quantity, 0) - Ifnull(bb.dzhj, 0)) material_quantity,
+                     aa.warehousing_warehouse
+              from v_th_war_rent_for_category aa
+                       left JOIN v_material_sup_cz_report bb on aa.warehousing_warehouse = bb.warehousing_warehouse and
+                                                                aa.parent_id = bb.parent_id) tt
+        GROUP BY warehousing_warehouse
+    </select>
+    <select id="queryData_unuseds" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(quantity_on_hand * theorentical_weight) material_quantity,
+               warehousing_warehouse,
+               c.parent_id
+        from th_war_init_repert_mat a
+                 LEFT JOIN th_material_info b on a.material_code = b.material_code
+                 LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+        where c.is_del = 'n'
+          and b.is_del = 0
+          and a.data_Type in (0, 1, 2)
+        GROUP BY warehousing_warehouse, c.parent_id
+    </select>
+    <select id="queryData_unused_totals" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, dd.org_code
+        from (select sum(quantity_on_hand * theorentical_weight) material_quantity,
+                     warehousing_warehouse
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+              where b.is_del = 0
+                and a.data_Type in (0, 1, 2)
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="queryData_stock_total" resultType="com.alibaba.fastjson2.JSONObject">
+        select (aa.quantity_on_hand + b.material_quantity - c.dzhj) material_quantity,
+               aa.warehousing_warehouse,
+               aa.parent_id
+        from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                     warehousing_warehouse,
+                     c.parent_id
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+                       LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+              where c.is_del = 'n'
+                and b.is_del = 0
+                and a.data_Type in (0, 1, 2)
+              GROUP BY warehousing_warehouse, c.parent_id) aa
+                 left join v_th_war_rent_for_category b on aa.warehousing_warehouse = b.warehousing_warehouse
+                 left join v_material_sup_cz_report c on aa.warehousing_warehouse = c.warehousing_warehouse
+        where aa.parent_id = b.parent_id
+          and aa.parent_id = c.parent_id
+    </select>
+    <select id="queryData_Stock_total_all" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(quantity_on_hand + category_quantity - dzhj) material_quantity,
+               aa.warehousing_warehouse
+        from (select (quantity_on_hand * theorentical_weight) quantity_on_hand,
+                     bb.material_quantity                     category_quantity,
+                     cc.dzhj,
+                     a.warehousing_warehouse
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+                       inner join v_th_war_rent_for_category bb on a.warehousing_warehouse = bb.warehousing_warehouse
+                       inner join v_material_sup_cz_report cc on a.warehousing_warehouse = cc.warehousing_warehouse
+              where b.is_del = 0
+                and a.data_Type in (0, 1, 2)) aa
+        GROUP BY warehousing_warehouse
+    </select>
+    <select id="query_stock_rent_rate" resultType="com.alibaba.fastjson2.JSONObject">
+    <![CDATA[
+        select IFNULL((bb.material_quantity - cc.dzhj) / (aa.quantity_on_hand + bb.material_quantity - cc.dzhj), 0)
+                   as material_quantity,
+               aa.warehousing_warehouse,
+               aa.parent_id
+        from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                     warehousing_warehouse,
+                     c.parent_id
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+                       LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+              where c.is_del = 'n'
+                and b.is_del = 0
+                and a.data_Type in (0, 1, 2)
+              GROUP BY warehousing_warehouse, c.parent_id) aa
+                 left join v_th_war_rent_for_category bb on aa.warehousing_warehouse = bb.warehousing_warehouse
+                 left join v_material_sup_cz_report cc on aa.warehousing_warehouse = cc.warehousing_warehouse
+        where aa.parent_id = bb.parent_id
+          and aa.parent_id = cc.parent_id
+        ]]>
+    </select>
+    <select id="query_stock_rent_rate_total" resultType="com.alibaba.fastjson2.JSONObject">
+    <![CDATA[
+        select ((sum(bb.material_quantity) - sum(cc.dzhj)) /
+                (sum(aa.quantity_on_hand) + sum(bb.material_quantity) - sum(cc.dzhj)))
+                   as material_quantity,
+               aa.warehousing_warehouse
+        from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                     warehousing_warehouse,
+                     c.parent_id
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+                       LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+              where c.is_del = 'n'
+                and b.is_del = 0
+              GROUP BY warehousing_warehouse, c.parent_id) aa
+                 inner join v_th_war_rent_for_category bb on aa.warehousing_warehouse = bb.warehousing_warehouse
+                 inner join v_material_sup_cz_report cc on aa.warehousing_warehouse = cc.warehousing_warehouse
+        where aa.parent_id = bb.parent_id
+          and aa.parent_id = cc.parent_id
+        GROUP BY warehousing_warehouse
+        ]]>
+    </select>
+    <select id="query_rentAogs" resultType="com.alibaba.fastjson2.JSONObject">
+        <![CDATA[
+        select sum(org_actual_weight) material_quantity, warehousing_warehouse
+        from th_war_rent_aog
+        where document_status = '70'
+        GROUP BY warehousing_warehouse
+        ]]>
+    </select>
+    <select id="query_totalRates" resultType="com.alibaba.fastjson2.JSONObject">
+        select ((aaa.material_quantity - aaa.dzhj) /
+                (aaa.quantity_on_hand + bbb.aog_material_quantity + aaa.material_quantity - aaa.dzhj))
+                   as material_quantity,
+               aaa.warehousing_warehouse
+        from (select aa.warehousing_warehouse,
+                     sum(aa.quantity_on_hand)  quantity_on_hand,
+                     sum(bb.material_quantity) material_quantity,
+                     sum(cc.dzhj)              dzhj
+              from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                           warehousing_warehouse,
+                           c.parent_id
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                             LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+                    where c.is_del = 'n'
+                      and b.is_del = 0
+                      and a.data_Type in (0, 1, 2)
+                    GROUP BY warehousing_warehouse, c.parent_id) as aa
+                       left join v_th_war_rent_for_category bb on aa.warehousing_warehouse = bb.warehousing_warehouse
+                       left join v_material_sup_cz_report cc on aa.warehousing_warehouse = cc.warehousing_warehouse
+              where aa.parent_id = bb.parent_id
+                and aa.parent_id = cc.parent_id
+              GROUP BY warehousing_warehouse) aaa
+                 inner JOIN
+             (select sum(org_actual_weight) aog_material_quantity, warehousing_warehouse
+              from th_war_rent_aog
+              where document_status = '70'
+              GROUP BY warehousing_warehouse) as bbb
+             on aaa.warehousing_warehouse = bbb.warehousing_warehouse
+    </select>
+    <select id="query_store_list" resultType="com.alibaba.fastjson2.JSONObject">
+       <![CDATA[
+        select org_code, store_code, store_name, store_volume
+        from th_mater_store_info
+        where org_code != '3201'
+        ]]>
+    </select>
+    <select id="queryStock_rent_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, parent_id, category_name, dd.org_code
+        from (select (IFNULL(aa.material_quantity, 0) - Ifnull(bb.dzhj, 0)) material_quantity,
+                     aa.warehousing_warehouse,
+                     aa.parent_id,
+                     cc.category_name
+              from v_th_war_rent_for_category aa
+                       left JOIN v_material_sup_cz_report bb
+                                 on aa.warehousing_warehouse = bb.warehousing_warehouse and aa.parent_id = bb.parent_id
+                       LEFT JOIN th_material_category cc on aa.parent_id = cc.id
+              where aa.parent_id is not null) tt
+                 left JOIN th_mater_store_info dd on tt.warehousing_warehouse = dd.store_code
+        GROUP BY parent_id, category_name, dd.org_code
+    </select>
+    <select id="queryStock_rent_total_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, dd.org_code
+        from (select sum(material_quantity) material_quantity, warehousing_warehouse
+              from (select (IFNULL(aa.material_quantity, 0) - Ifnull(bb.dzhj, 0)) material_quantity,
+                           aa.warehousing_warehouse
+                    from v_th_war_rent_for_category aa
+                             left JOIN v_material_sup_cz_report bb
+                                       on aa.warehousing_warehouse = bb.warehousing_warehouse and
+                                          aa.parent_id = bb.parent_id) tt
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="queryStock_unused_right" resultType="com.alibaba.fastjson2.JSONObject">
+
+        select sum(material_quantity) material_quantity, dd.org_code, parent_id
+        from (select sum(quantity_on_hand * theorentical_weight) material_quantity,
+                     warehousing_warehouse,
+                     c.parent_id
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+                       LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+              where c.is_del = 'n'
+                and b.is_del = 0
+                and a.data_Type in (0, 1, 2)
+              GROUP BY warehousing_warehouse, c.parent_id) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY parent_id, dd.org_code
+    </select>
+    <select id="queryStock_unused_total_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, dd.org_code
+        from (select sum(quantity_on_hand * theorentical_weight) material_quantity,
+                     warehousing_warehouse
+              from th_war_init_repert_mat a
+                       LEFT JOIN th_material_info b on a.material_code = b.material_code
+              where b.is_del = 0
+                and a.data_Type in (0, 1, 2)
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="queryStock_total_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, dd.org_code, parent_id
+        from (select (aa.quantity_on_hand + b.material_quantity - c.dzhj) material_quantity,
+                     aa.warehousing_warehouse,
+                     aa.parent_id
+              from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                           warehousing_warehouse,
+                           c.parent_id
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                             LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+                    where c.is_del = 'n'
+                      and b.is_del = 0
+                      and a.data_Type in (0, 1, 2)
+                    GROUP BY warehousing_warehouse, c.parent_id) aa
+                       left join v_th_war_rent_for_category b on aa.warehousing_warehouse = b.warehousing_warehouse
+                       left join v_material_sup_cz_report c on aa.warehousing_warehouse = c.warehousing_warehouse
+              where aa.parent_id = b.parent_id
+                and aa.parent_id = c.parent_id) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code, parent_id
+    </select>
+    <select id="queryStock_total_all_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity, dd.org_code
+        from (select sum(quantity_on_hand + category_quantity - dzhj) material_quantity,
+                     aa.warehousing_warehouse
+              from (select (quantity_on_hand * theorentical_weight) quantity_on_hand,
+                           bb.material_quantity                     category_quantity,
+                           cc.dzhj,
+                           a.warehousing_warehouse
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                             inner join v_th_war_rent_for_category bb
+                                        on a.warehousing_warehouse = bb.warehousing_warehouse
+                             inner join v_material_sup_cz_report cc
+                                        on a.warehousing_warehouse = cc.warehousing_warehouse
+                    where b.is_del = 0
+                      and a.data_Type in (0, 1, 2)) aa
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="queryStock_rent_rate_right" resultType="com.alibaba.fastjson2.JSONObject">
+         <![CDATA[
+        select sum(material_quantity) material_quantity,
+               dd.org_code,
+               parent_id
+        from (select IFNULL((bb.material_quantity - cc.dzhj) / (aa.quantity_on_hand + bb.material_quantity - cc.dzhj),
+                            0)
+                         as material_quantity,
+                     aa.warehousing_warehouse,
+                     aa.parent_id
+              from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                           warehousing_warehouse,
+                           c.parent_id
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                             LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+                    where c.is_del = 'n'
+                      and b.is_del = 0
+                      and a.data_Type in (0, 1, 2)
+                    GROUP BY warehousing_warehouse, c.parent_id) aa
+                       left join v_th_war_rent_for_category bb on aa.warehousing_warehouse = bb.warehousing_warehouse
+                       left join v_material_sup_cz_report cc on aa.warehousing_warehouse = cc.warehousing_warehouse
+              where aa.parent_id = bb.parent_id
+                and aa.parent_id = cc.parent_id) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code, parent_id
+        ]]>
+    </select>
+    <select id="queryStock_rent_rate_total_right" resultType="com.alibaba.fastjson2.JSONObject">
+        <![CDATA[
+        select sum(material_quantity) material_quantity, dd.org_code
+        from (select ((sum(bb.material_quantity) - sum(cc.dzhj)) /
+                      (sum(aa.quantity_on_hand) + sum(bb.material_quantity) - sum(cc.dzhj)))
+                         as material_quantity,
+                     aa.warehousing_warehouse
+              from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                           warehousing_warehouse,
+                           c.parent_id
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                             LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+                    where c.is_del = 'n'
+                      and b.is_del = 0
+                    GROUP BY warehousing_warehouse, c.parent_id) aa
+                       inner join v_th_war_rent_for_category bb on aa.warehousing_warehouse = bb.warehousing_warehouse
+                       inner join v_material_sup_cz_report cc on aa.warehousing_warehouse = cc.warehousing_warehouse
+              where aa.parent_id = bb.parent_id
+                and aa.parent_id = cc.parent_id
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+        ]]>
+    </select>
+    <select id="queryStock_rent_aog_right" resultType="com.alibaba.fastjson2.JSONObject">
+        <![CDATA[
+        select sum(material_quantity) material_quantity,
+               dd.org_code
+        from (select sum(org_actual_weight) material_quantity, warehousing_warehouse
+              from th_war_rent_aog
+              where document_status = '70'
+              GROUP BY warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+        ]]>
+    </select>
+    <select id="queryStock_total_rate_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity) material_quantity,
+               dd.org_code
+        from (select ((aaa.material_quantity - aaa.dzhj) /
+                      (aaa.quantity_on_hand + bbb.aog_material_quantity + aaa.material_quantity - aaa.dzhj))
+                         as material_quantity,
+                     aaa.warehousing_warehouse
+              from (select aa.warehousing_warehouse,
+                           sum(aa.quantity_on_hand)  quantity_on_hand,
+                           sum(bb.material_quantity) material_quantity,
+                           sum(cc.dzhj)              dzhj
+                    from (select sum(quantity_on_hand * theorentical_weight) quantity_on_hand,
+                                 warehousing_warehouse,
+                                 c.parent_id
+                          from th_war_init_repert_mat a
+                                   LEFT JOIN th_material_info b on a.material_code = b.material_code
+                                   LEFT JOIN th_material_category c on b.material_codes = c.category_codes
+                          where c.is_del = 'n'
+                            and b.is_del = 0
+                            and a.data_Type in (0, 1, 2)
+                          GROUP BY warehousing_warehouse, c.parent_id) as aa
+                             left join v_th_war_rent_for_category bb
+                                       on aa.warehousing_warehouse = bb.warehousing_warehouse
+                             left join v_material_sup_cz_report cc
+                                       on aa.warehousing_warehouse = cc.warehousing_warehouse
+                    where aa.parent_id = bb.parent_id
+                      and aa.parent_id = cc.parent_id
+                    GROUP BY warehousing_warehouse) aaa
+                       inner JOIN
+                   (select sum(org_actual_weight) aog_material_quantity, warehousing_warehouse
+                    from th_war_rent_aog
+                    where document_status = '70'
+                    GROUP BY warehousing_warehouse) as bbb
+                   on aaa.warehousing_warehouse = bbb.warehousing_warehouse) ddd
+                 left JOIN th_mater_store_info dd on ddd.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="queryStore_list_right" resultType="com.alibaba.fastjson2.JSONObject">
+<![CDATA[
+        select org_code, sum(ifnull(store_volume, 0)) store_volume
+        from th_mater_store_info
+        where org_code != '3201'
+        group by org_code
+        ]]>
+    </select>
+    <select id="query_material_quantity_store_right" resultType="com.alibaba.fastjson2.JSONObject">
+        select sum(material_quantity_hand + material_quantity_aog) material_quantity_store, org_code
+        from (SELECT ifnull(material_quantity_hand, 0) material_quantity_hand,
+                     ifnull(material_quantity_aog, 0)  material_quantity_aog,
+                     ddd.warehousing_warehouse
+              from (select sum(quantity_on_hand * theorentical_weight) material_quantity_hand,
+                           warehousing_warehouse
+                    from th_war_init_repert_mat a
+                             LEFT JOIN th_material_info b on a.material_code = b.material_code
+                    where b.is_del = 0
+                      and a.data_Type in (0, 1, 2)
+                    GROUP BY warehousing_warehouse) ddd
+                       LEFT JOIN
+                   (select sum(org_actual_weight) material_quantity_aog, warehousing_warehouse
+                    from th_war_rent_aog
+                    where document_status = '70'
+                    GROUP BY warehousing_warehouse) ttt
+                   ON ddd.warehousing_warehouse = ttt.warehousing_warehouse) aaaa
+                 left JOIN th_mater_store_info dd on aaaa.warehousing_warehouse = dd.store_code
+        GROUP BY dd.org_code
+    </select>
+    <select id="usingContractList" resultType="java.lang.String">
+        <![CDATA[
+        SELECT DISTINCT contract_code
+        from th_crm_contract
+        where delivery_warehouse in
+              (SELECT store_code from th_mater_store_info where is_del = '0' and org_code = #{orgCode})
+          and (contract_termination_date is null or DATE_FORMAT(contract_termination_date, '%Y-%m-%d') <= #{targetDate})
+          and is_over = '0'
+          and is_del = '0'
+        ]]>
+    </select>
+    <select id="thWarRentChecks" resultType="com.alibaba.fastjson2.JSONObject">
+        select a.id,
+               a.code                                             as document_code,
+               a.cust_name                                        as customer_name,
+               a.sales_contract,
+               a.project_name,
+               a.project_address,
+               a.cust_code                                        as customer_code,
+               a.dept_name,
+               a.org_code,
+               a.org_name,
+               r.DICTNAME                                         as region,
+               w.store_name                                       as warehousing_warehouse,
+               a.license_plate_number,
+               date_format(a.arrival_time, '%Y-%m-%d')            as arrival_time,
+               a.actual_weight,
+               b.material_code,
+               b.material_name,
+               b.specification_and_model,
+               b.primary_quantity,
+               f.DICTNAME                                         as primary_uom_name,
+               ifnull(b.repair, 0)                                   repair,
+               b.wx_price                                         as wxPrice,
+               b.wx_money                                         as wxMoney,
+               ifnull(b.scrap_repairable, 0) + ifnull(b.scrap, 0) as scrap,
+               b.bf_price                                         as bfPrice,
+               b.bf_money                                         as bfMoney,
+               e.DICTNAME                                         as lossUnitSchemeType
+
+        from th_war_rent_check a
+                 left join th_war_rent_check_mat b on a.id = b.p_id
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `r`
+                           ON `a`.`region` = `r`.`DICTID` AND `r`.`DICTTYPEID` = 'crm_region'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `f`
+                           ON `b`.`primary_uom` = `f`.`DICTID` AND `f`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `e`
+                           ON `b`.`loss_unit_scheme_type` = `e`.`DICTID` AND `e`.`DICTTYPEID` = 'loss_unit_scheme_type'
+                 LEFT JOIN `th_mater_store_info` `w` ON `a`.`warehousing_warehouse` = `w`.`store_code`
+        where 1 = 1
+          and a.document_status = '110'
+            <![CDATA[
+          and DATE_FORMAT(a.arrival_time, '%Y-%m-%d') >= DATE_FORMAT('2023-09-01', '%Y-%m-%d')
+		   	]]>
+            <![CDATA[
+			   and DATE_FORMAT(a.arrival_time, '%Y-%m-%d') <= DATE_FORMAT('2023-09-30', '%Y-%m-%d')
+		   	]]>
+
+            and a.warehousing_warehouse in (
+                                          '32110103',
+                                          '32160102',
+                                          '32120102',
+                                          '32130102',
+                                          '32110101',
+                                          'CKBM20220513110261',
+                                          'CKBM20220829110281',
+                                          'CKBM20220916050301',
+                                          'CKBM20220919100302',
+                                          'CKBM20221107020321',
+                                          'CKBM20221110100341',
+                                          'CKBM20221227040361',
+                                          'CKBM20230130050381',
+                                          'CKBM20230210100401',
+                                          'CKBM20230509020421',
+                                          'CKBM20230513100441',
+                                          'CKBM20230517110461',
+                                          'CKBM20230517110462',
+                                          'CKBM20230517110463',
+                                          'CKBM20230519030464',
+                                          'CKBM20230523050481',
+                                          'CKBM20230605090501',
+                                          'CKBM20230609080521',
+                                          'CKBM20230916030541'
+            )
+
+    </select>
+
+    <select id="getContractCodeByName" resultType="java.lang.String">
+        select contract_code
+        from th_crm_contract
+        where is_del = '0'
+          and project_name = #{projectName}
+        limit 1
+    </select>
+    <select id="materialRentOutWeight" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT mat.warehousing_warehouse                                             as store_code,
+
+               mat.material_code                                                     as material_code,
+               sum(ifnull(mat.primary_quantity, 0) * ifnull(mat.unit_ton_weight, 0)) as weight
+        FROM th_crm_rent_out main
+                 left join th_crm_rent_out_mat mat on main.id = mat.p_id
+                 left join th_material_info tmi on tmi.material_code = mat.material_code
+                 left join th_mater_store_info store on mat.warehousing_warehouse = store.store_code
+        where main.is_del = '0'
+          and (main.god_house_code is null or main.god_house_code like 'CGRK%')
+          and tmi.material_code like concat(#{parentCode}, '%')
+          and DATE_FORMAT(main.document_date, '%Y-%m-%d') = #{targetDate}
+        group by mat.warehousing_warehouse, mat.material_code
+    </select>
+    <select id="materialWeightInHand" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT init.warehousing_warehouse                                                       as store_code,
+               init.material_code                                                               as material_code,
+               sum(ifnull(init.purchase_receipt_qty, 0))                                        as purchaseReceiptQty, -- 采购数量
+               sum(ifnull(init.sales_out_qty, 0))                                               as salesOutQty,        -- 售出数量
+               -- init.lease_in_receipt_qty    as leaseInReceiptQty,  -- 租入数量
+               -- init.lease_in_rentin_qty     as leaseInRentinQty,   -- 租入退还数量
+               material.theorentical_weight                                                     as theorenticalWeight, -- 理论吨重
+               -- init.rent_check_qty          as rentCheckQty,        -- 翻包数量,
+               (sum(ifnull(init.purchase_receipt_qty, 0)) - sum(ifnull(init.sales_out_qty, 0))) as now_primary_quantity,
+               (sum(ifnull(init.purchase_receipt_qty, 0)) - sum(ifnull(init.sales_out_qty, 0))) *
+               (material.theorentical_weight)                                                   as weight
+        FROM th_war_init_repert_mat init
+                 LEFT JOIN th_material_info material ON init.material_code = material.material_code
+                 LEFT JOIN th_mater_store_info store ON init.warehousing_warehouse = store.store_code
+        WHERE init.is_del = 0
+          and material.material_code like concat(#{parentCode}, '%')
+        group by init.warehousing_warehouse, init.material_code
+    </select>
+    <select id="materialRentOutWeightZRRK" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT mat.warehousing_warehouse                                             as store_code,
+               mat.material_code                                                     as material_code,
+               sum(ifnull(mat.primary_quantity, 0) * ifnull(mat.unit_ton_weight, 0)) as weight
+        FROM th_crm_rent_out main
+                 left join th_crm_rent_out_mat mat on main.id = mat.p_id
+                 left join th_material_info tmi on tmi.material_code = mat.material_code
+                 left join th_mater_store_info store on mat.warehousing_warehouse = store.store_code
+        where main.is_del = '0'
+          and (main.god_house_code like 'ZRRK%')
+          and tmi.material_code like concat(#{parentCode}, '%')
+          and DATE_FORMAT(main.document_date, '%Y-%m-%d') = #{targetDate}
+        group by mat.warehousing_warehouse, mat.material_code
+    </select>
+    <select id="queryStoreList" resultType="com.tanghe.domain.DailyWarehouseSituation">
+        select distinct store_code   as warehouse_code,
+                        store_name   as warehouse_name,
+                        org_code,
+                        org_name,
+                        store_volume as max_store_volume
+        from th_mater_store_info
+        where is_del = '0'
+    </select>
+    <select id="queryInHouseTonOfStore" resultType="java.math.BigDecimal">
+        select sum(ifnull(库存.quantity_on_hand, 0) * ifnull(物料.theorentical_weight, 0)) as 在库量
+        from th_war_init_repert_mat 库存
+                 LEFT JOIN th_material_info 物料 on 物料.material_code = 库存.material_code
+        where 库存.warehousing_warehouse = #{storeCode}
+        group by 库存.warehousing_warehouse
+    </select>
+    <select id="queryNoCheckGoods" resultType="java.math.BigDecimal">
+        select sum(ifnull(归还到货.weighing_weight, 0)) as 未翻包物资
+        from th_war_rent_aog 归还到货
+        where 归还到货.is_del = '0'
+          and 归还到货.document_status = '10'
+          and 归还到货.warehousing_warehouse = #{storeCode}
+        group by 归还到货.warehousing_warehouse
+    </select>
+    <select id="queryContractList" resultType="com.tanghe.domain.bi.ContractTargetIndexDaily">
+<![CDATA[
+        select contract_code, project_name, date_format(document_date, '%Y-%m-%d')
+        from th_crm_contract
+        where date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+          and is_over = '0'
+        ]]>
+    </select>
+    <select id="sumMonthPriceOfCollectionBook" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(month_price)
+        from th_finance_collection_book
+        where trim(sales_contract) = #{contractCode}
+          and date_format(create_time, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumCollectAmountOfRentCollection" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(collect_amount) collect_amount
+        from th_fin_rent_collection
+        where trim(sales_contract) = #{contractCode}
+          and date_format(collect_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumInRentTonOfContract" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+        where a.sales_contract = #{contractCode}
+          and date_format(a.document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="countInspectionNum" resultType="java.lang.Integer">
+        <![CDATA[
+        select count(*)
+        from th_crm_inspection
+        where is_del = '0'
+          and sales_contract = #{contractCode}
+          and date_format(inspecte_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumLossCost" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(ifnull(wx_money, 0) + ifnull(bf_money, 0))
+        from th_war_rent_check
+        where is_del = '0'
+          and sales_contract = #{contractCode}
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumLossCostOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(ifnull(wx_money, 0) + ifnull(bf_money, 0))
+        from th_war_rent_check
+        where is_del = '0'
+          and org_code = #{orgCode}
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumCheckCost" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(ifnull(check_amount, 0))
+        from th_war_rent_check
+        where is_del = '0'
+          and sales_contract = #{contractCode}
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumCheckCostOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(ifnull(check_amount, 0))
+        from th_war_rent_check
+        where is_del = '0'
+          and org_code = #{orgCode}
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumFreightCost" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(unit_price)
+        from report_mat_freight_view
+        where trim(project_name) = trim(#{projectName})
+          and dom_type != '采购运费'
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="sumFreightCostOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(view.unit_price)
+        from report_mat_freight_view view
+                 left join th_mater_store_info store on store.store_code = view.warehousing_warehouse
+        where trim(store.org_code) = trim(#{orgCode})
+          and date_format(document_date, '%Y-%m-%d') <= #{targetDate}
+        ]]>
+    </select>
+    <select id="queryOrgList" resultType="com.tanghe.domain.bi.OrgTargetIndexDaily">
+        select orgcode as org_code, orgname as org_name
+        from thlease_eos.org_organization
+        where orglevel = '1'
+    </select>
+    <select id="queryThLeaseInDocList" resultType="com.alibaba.fastjson2.JSONObject">
+
+        SELECT a.commencement_date document_date,
+               a.document_no,
+               organization,
+               a.organization_code,
+               customer_name,
+               a.customer_code,
+               sales_contract,
+               project_name,
+               department,
+               department_code,
+               a.salesman,
+               salesman_code,
+               lease_in_order_no,
+               rent_contract_no,
+               lease_receipt_no,
+               purchasing_department,
+               buyer,
+               s.name       as     supplier,
+               a.supplier_code,
+               w.store_name as     warehousing_warehouse_name,
+               warehousing_warehouse,
+               logistics_carrier,
+               license_plate_number,
+               w.org_code   as     store_org_code,
+               b.*,
+               c.scheme_name,
+               d.name       as     carrier_name,
+               e.store_name,
+
+               h.DICTNAME          price_type,
+               f.DICTNAME          primary_uom_name,
+               g.DICTNAME          company_name
+
+        FROM th_lease_in_doc a
+                 left JOIN `th_lease_in_doc_mat` b on b.docment_no = a.id
+                 left JOIN th_crm_price_scheme c on b.pricing_scheme = c.scheme_code
+                 left JOIN th_crm_carrier_info d on a.logistics_carrier = d.code
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `f`
+                           ON `b`.`primary_uom` = `f`.`DICTID` AND `f`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `g`
+                           ON `b`.`company` = `g`.`DICTID` AND `g`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `h`
+                           ON `b`.`pricing_type` = `h`.`DICTID` AND `h`.`DICTTYPEID` = 'crm_price_type'
+                 LEFT JOIN `th_sup_supplier_info` s on a.supplier_code = s.code
+                 LEFT JOIN th_mater_store_info w on a.warehousing_warehouse = w.store_code
+        where a.is_del = '0'
+          and document_Status = '70'
+        <![CDATA[
+          and date_format(a.commencement_date, '%Y-%m-%d') <= date_format(#{targetDate}, '%Y-%m-%d')
+			 ]]>
+            and e.org_code = #{orgCode}
+        order by commencement_date
+    </select>
+    <select id="queryThLeaseRecyleList" resultType="com.alibaba.fastjson2.JSONObject">
+
+        SELECT a.rent_off_date document_date,
+               a.document_no,
+               a.warehousing_warehouse,
+               organization,
+               a.organization_code,
+               a.supplier_code,
+               s.name       as supplier_name,
+               contract_no,
+               purchasing_department,
+               buyer,
+               a.buyer,
+               buyer_code,
+               logistics_carrier,
+               license_plate_number,
+               w.store_name as warehousing_warehouse_name,
+               w.org_code   as store_org_code,
+               b.*,
+               c.scheme_name,
+               d.name       as carrier_name,
+               e.store_name,
+               h.DICTNAME      price_type,
+               f.DICTNAME      primary_uom_name,
+               g.DICTNAME      company_name
+        FROM th_sup_recycle a
+                 left JOIN `th_sup_recycle_mat` b on b.p_id = a.id
+                 left JOIN th_crm_price_scheme c on b.pricing_scheme = c.scheme_code
+                 left JOIN th_crm_carrier_info d on a.logistics_carrier = d.code
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `f`
+                           ON `b`.`primary_uom` = `f`.`DICTID` AND `f`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `g`
+                           ON `b`.`company` = `g`.`DICTID` AND `g`.`DICTTYPEID` = 'units'
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `h`
+                           ON `b`.`pricing_type` = `h`.`DICTID` AND `h`.`DICTTYPEID` = 'crm_price_type'
+                 LEFT JOIN `th_sup_supplier_info` s on a.supplier_code = s.code
+                 LEFT JOIN th_mater_store_info w on a.warehousing_warehouse = w.store_code
+        where a.is_del = '0'
+          and a.document_Status = '70'
+        <![CDATA[
+          and date_format(a.rent_off_date, '%Y-%m-%d') <= date_format(#{targetDate}, '%Y-%m-%d')
+			   ]]>
+            and e.org_code = #{orgCode}
+        order by rent_off_date
+    </select>
+    <select id="queryThSupReplenishList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT a.*,
+               b.dictname typeName
+        FROM th_sup_rentin_replenish a
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `b`
+                           ON `a`.`price_type` = `b`.`DICTID` AND `b`.`DICTTYPEID` = 'rent_price_type'
+        where a.price_type != '6'
+          and a.document_status = '70'
+            <![CDATA[
+          and date_format(a.replenish_Date, '%Y-%m-%d') >= date_format(#{startTime}, '%Y-%m-%d')
+          and date_format(a.replenish_Date, '%Y-%m-%d') <= date_format(#{endTime}, '%Y-%m-%d')
+			 ]]>
+            and a.org_code = #{orgCode}
+        order by replenish_Date
+    </select>
+    <select id="customerListWithoutNCCode" resultType="com.alibaba.fastjson2.JSONObject">
+        select *
+        from th_crm_customer_info
+        where customer_code_nc is null
+    </select>
+    <select id="selectMaterialCodeList" resultType="java.lang.String">
+        select material_code
+        from th_material_info
+        where material_code like concat(#{categoryCodes}, '%');
+    </select>
+    <select id="pr_material_sup_cz_report" resultType="com.alibaba.fastjson2.JSONObject">
+        call pr_material_sup_cz_report_2023_09_17(null, #{materialCode}, null, null, null, #{targetDate});
+
+    </select>
+
+    <select id="queryOrgDTOList" resultType="com.tanghe.dto.OrgDTO">
+        select orgcode as org_code, orgname as org_name
+        from thlease_eos.org_organization
+        where orglevel = '1'
+    </select>
+    <select id="sumInRentTonOfOrgWithYYYYMM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and d.org_code = #{orgCode}
+          and date_format(a.document_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumInRentTonOfMatWithYYYYMM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and b.material_code = #{matCode}
+          and date_format(a.document_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumInRentTonOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and d.org_code = #{orgCode}
+          and date_format(a.document_date, '%Y-%m') <= #{yyyyMM}
+          and b.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseAmountOfOrg" resultType="java.math.BigDecimal">
+<![CDATA[
+        select sum(ifnull(mat.total_price, 0))
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+        left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and s.org_code = #{orgCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseAmountOfMat_with_yyyy_MM" resultType="java.math.BigDecimal">
+<![CDATA[
+        select sum(mat.total_price)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and mat.material_code = #{matCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseAmountOfOrgMaterial" resultType="java.math.BigDecimal">
+<![CDATA[
+        select sum(mat.total_price)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+        where date_format(main.document_date, '%Y-%m') <= #{yyyyMM}
+          and main.org_code = #{orgCode}
+          and mat.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseTonOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.primary_quantity * e.theorentical_weight)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+                 left join th_material_info e on e.material_code = mat.material_code
+                left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and s.org_code = #{orgCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseTonOfMat_with_yyyy_MM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.primary_quantity * e.theorentical_weight)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+                 left join th_material_info e on e.material_code = mat.material_code
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and mat.material_code = #{matCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseTonOfOrgWithDate" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.primary_quantity * e.theorentical_weight)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+                 left join th_material_info e on e.material_code = mat.material_code
+                 left join th_mater_store_info store on store.store_code = main.warehousing_warehouse
+        where date_format(main.document_date, '%Y-%m-%d') <= #{yyyyMMdd}
+          and date_format(main.document_date, '%Y-%m-%d') >= #{startDate}
+          and store.org_code = #{orgCode}
+        ]]>
+    </select>
+    <select id="sumPurchaseTonOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.primary_quantity * e.theorentical_weight)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+                 left join th_material_info e on e.material_code = mat.material_code
+        where date_format(main.document_date, '%Y-%m') <= #{yyyyMM}
+          and main.org_code = #{orgCode}
+          and mat.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumSubleaseCostOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.amount_including_tax)
+        from th_lease_in_doc main
+                 left join th_lease_in_doc_mat mat on mat.docment_no = main.id
+        left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and s.org_code = #{orgCode}
+        ]]>
+    </select>
+    <select id="sumSubleaseCostOfMat_with_yyyy_MM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.amount_including_tax)
+        from th_lease_in_doc main
+                 left join th_lease_in_doc_mat mat on mat.docment_no = main.id
+        where date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+          and mat.material_code = #{matCode}
+        ]]>
+    </select>
+    <select id="sumSubleaseCostOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(mat.amount_including_tax)
+        from th_lease_in_doc main
+                 left join th_lease_in_doc_mat mat on mat.docment_no = main.id
+        where date_format(main.document_date, '%Y-%m') <= #{yyyyMM}
+          and main.organization_code = #{orgCode}
+          and mat.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumSubleaseTonOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(main.actual_weight)
+        from th_lease_in_doc main
+        where date_format(main.document_date, '%Y-%m') <= #{yyyyMM}
+          and main.organization_code = #{orgCode}
+        ]]>
+    </select>
+    <select id="sumSubleaseTonOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(main.actual_weight)
+        from th_lease_in_doc main
+                 left join th_lease_in_doc_mat mat on mat.docment_no = main.id
+        where date_format(main.document_date, '%Y-%m') <= #{yyyyMM}
+          and main.organization_code = #{orgCode}
+          and mat.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumLeaseInTonOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_lease_in_doc a
+                 left JOIN `th_lease_in_doc_mat` b on b.docment_no = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where e.org_code = #{orgCode}
+          and date_format(a.commencement_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumLeaseInTonOfMat_with_yyyy_MM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_lease_in_doc a
+                 left JOIN `th_lease_in_doc_mat` b on b.docment_no = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where b.material_code = #{matCode}
+          and date_format(a.commencement_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumLeaseInTonOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_lease_in_doc a
+                 left JOIN `th_lease_in_doc_mat` b on b.docment_no = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where e.org_code = #{orgCode}
+          and date_format(a.commencement_date, '%Y-%m') <= #{yyyyMM}
+          and b.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="sumLeaseRecycleTonOfOrg" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_sup_recycle a
+                 left JOIN `th_sup_recycle_mat` b on b.p_id = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where e.org_code = #{orgCode}
+          and date_format(a.rent_off_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumLeaseRecycleTonOfMat_with_yyyy_MM" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_sup_recycle a
+                 left JOIN `th_sup_recycle_mat` b on b.p_id = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where b.material_code = #{matCode}
+          and date_format(a.rent_off_date, '%Y-%m') = #{yyyyMM}
+        ]]>
+    </select>
+    <select id="sumLeaseRecycleTonOfOrgMaterial" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum(b.primary_quantity * mat.theorentical_weight)
+        FROM th_sup_recycle a
+                 left JOIN `th_sup_recycle_mat` b on b.p_id = a.id
+                 left JOIN th_mater_store_info e on a.warehousing_warehouse = e.store_code
+                 left JOIN th_material_info mat on mat.material_code = b.material_code
+        where e.org_code = #{orgCode}
+          and date_format(a.rent_off_date, '%Y-%m') <= #{yyyyMM}
+          and b.material_code = #{materialCode}
+        ]]>
+    </select>
+    <select id="queryMaterialDTOList" resultType="com.tanghe.dto.MaterialDTO">
+        select material_code, material_name
+        from th_material_info
+    </select>
+    <select id="queryMaterialList" resultType="com.tanghe.domain.bi.MaterialTargetIndexDaily">
+        select material_code, material_name
+        from th_material_info
+        where is_del = 'n'
+    </select>
+    <select id="sumRepairAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumRepairAmountOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumRepairAmountOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumRepairAmountOfMaterial" resultType="java.math.BigDecimal">
+        select sum(check_mat.wx_money)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumScrapAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumScrapAmountOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumScrapAmountOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_money)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumScrapAmountOfMaterial" resultType="java.math.BigDecimal">
+        select sum(check_mat.wx_money)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumCheckAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.check_amount)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumCheckAmountOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.check_amount)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumCheckAmountOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.check_amount)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumCheckAmountOfMaterial" resultType="java.math.BigDecimal">
+        select sum((check_mat.wx_money + check_mat.bf_money))
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumCheckTonOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.check_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumCheckTonOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.check_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumCheckTonOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.check_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumCheckTonOfMaterial" resultType="java.math.BigDecimal">
+        select sum((check_mat.repair + check_mat.scrap_repairable + check_mat.scrap) * check_mat.theory_ton_weight)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumRepairTonOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumRepairTonOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumRepairTonOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.wx_weight)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumRepairTonOfMaterial" resultType="java.math.BigDecimal">
+        select sum((check_mat.scrap) * check_mat.theory_ton_weight)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumScrapTonOfOrg" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumScrapTonOfContract" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumScrapTonOfCustomer" resultType="java.math.BigDecimal">
+        select sum(check_main.bf_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumScrapTonOfMaterial" resultType="java.math.BigDecimal">
+        select sum((check_mat.scrap + check_mat.scrap_repairable) * check_mat.theory_ton_weight)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumReturnTonOfOrg" resultType="java.math.BigDecimal">
+        select sum(aog.weighing_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+                 left join th_war_rent_aog aog on aog.code = check_main.rental_arrival_order_no
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="sumReturnTonOfContract" resultType="java.math.BigDecimal">
+        select sum(aog.weighing_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+                 left join th_war_rent_aog aog on aog.code = check_main.rental_arrival_order_no
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.sales_contract) = #{contractCode}
+    </select>
+    <select id="sumReturnTonOfCustomer" resultType="java.math.BigDecimal">
+        select sum(aog.weighing_weight)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+                 left join th_war_rent_aog aog on aog.code = check_main.rental_arrival_order_no
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_main.cust_code) = #{customerCode}
+    </select>
+    <select id="sumReturnTonOfMaterial" resultType="java.math.BigDecimal">
+        select sum(check_mat.primary_quantity * check_mat.theory_ton_weight)
+        from th_war_rent_check check_main
+                 left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+                 left join th_war_rent_aog aog on aog.code = check_main.rental_arrival_order_no
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and trim(check_mat.material_code) = #{materialCode}
+    </select>
+    <select id="sumInRentTonOfOrgWithDate" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and d.org_code = #{orgCode}
+          and date_format(a.document_date, '%Y-%m') >= #{startDate}
+          and date_format(a.document_date, '%Y-%m') <= #{endDate}
+        ]]>
+    </select>
+    <select id="queryRentOutRateOfOrg" resultType="java.math.BigDecimal">
+        SELECT
+#        r.org_code orgCode,r.org_name orgName,
+ROUND(sum(r.renting_mat) / (sum(r.total_mat) + ifnull(aog.actual_weight, 0)), 4) monthRate
+#        DATE_FORMAT(create_time,"%Y-%m-%d") dateStr,
+#        1 as ret
+        FROM `th_mat_occupancy_rate` r
+                 LEFT JOIN (SELECT a.org_code,
+                                   DATE_FORMAT(a.arrival_time, "%Y-%m-%d") aog_date,
+                                   sum(a.org_actual_weight) as             actual_weight
+                            from th_war_rent_aog a
+                            where a.is_del = '0'
+                              and a.document_status = '70'
+                              and NOT EXISTS(SELECT c.id
+                                             from th_war_rent_check c
+                                             where c.rental_arrival_order_no = a.code)
+                            GROUP BY a.org_code, DATE_FORMAT(a.arrival_time, "%Y-%m-%d")) aog
+                           on aog.org_code = r.org_code and aog.aog_date = DATE_FORMAT(r.create_time, "%Y-%m-%d")
+        where r.org_code = #{orgCode}
+          and DATE_FORMAT(r.create_time, "%Y-%m-%d") = #{yyyyMMdd}
+        GROUP BY r.org_code, DATE_FORMAT(r.create_time, "%Y-%m-%d")
+        ORDER BY r.org_name, DATE_FORMAT(r.create_time, "%Y-%m-%d")
+    </select>
+    <select id="sumInRentTonOfOrgWithYYYYMMDD" resultType="java.math.BigDecimal">
+        <![CDATA[
+        select sum((b.primary_quantity - b.back_num) * c.theorentical_weight)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and d.org_code = #{orgCode}
+          and date_format(a.document_date, '%Y-%m-%d') <= #{yyyyMMdd}
+        ]]>
+    </select>
+    <select id="sumInStockSelfTonOfOrg" resultType="java.math.BigDecimal">
+        SELECT sum((purchase_receipt_qty - sales_out_qty) * theorentical_weight)
+        FROM th_war_init_repert_mat a
+                 LEFT JOIN th_material_info b ON a.material_code = b.material_code
+                 LEFT JOIN th_mater_store_info c ON a.warehousing_warehouse = c.store_code
+        WHERE a.is_del = 0
+          and c.org_code = #{orgCode}
+    </select>
+    <select id="sumInStockAllTonOfOrg" resultType="java.math.BigDecimal">
+        SELECT
+        <!-- sum((purchase_receipt_qty - sales_out_qty + lease_in_receipt_qty - lease_in_rentin_qty ) * theorentical_weight)-->
+        sum((quantity_on_hand) * theorentical_weight)
+        FROM
+        th_war_init_repert_mat a
+        LEFT JOIN th_material_info b ON a.material_code = b.material_code
+        LEFT JOIN th_mater_store_info c ON a.warehousing_warehouse = c.store_code
+        WHERE
+        a.is_del = 0 and c.org_code = #{orgCode}
+    </select>
+    <select id="sumInStockSubleaseTonOfOrg" resultType="java.math.BigDecimal">
+        SELECT sum((lease_in_receipt_qty - lease_in_rentin_qty) * theorentical_weight)
+        FROM th_war_init_repert_mat a
+                 LEFT JOIN th_material_info b ON a.material_code = b.material_code
+                 LEFT JOIN th_mater_store_info c ON a.warehousing_warehouse = c.store_code
+        WHERE a.is_del = 0
+          and c.org_code = #{orgCode}
+    </select>
+    <select id="sumInternalSettlementAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(book.month_price)
+        from th_finance_collection_book book
+        left join th_crm_contract c on c.contract_code = book.sales_contract
+        where c.org_code = #{orgCode}
+        <if test="startDate != null ">
+            and date_format(book.create_time,'%Y-%m-%d') &gt;= #{startDate}
+        </if>
+        and date_format(book.create_time,'%Y-%m-%d') &lt;= #{yyyyMMdd}
+    </select>
+    <select id="sumInternalSettlementAmountOfOrg_with_yyyy_MM" resultType="java.math.BigDecimal">
+        select sum(book.month_price)
+        from th_finance_collection_book book
+                 left join th_crm_contract c on c.contract_code = book.sales_contract
+        where c.org_code = #{orgCode}
+          and date_format(book.create_time, '%Y-%m') = #{yyyyMM}
+    </select>
+    <select id="sumCollectAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(book.collect_amount)
+        from th_fin_rent_collection book
+        left join th_crm_contract c on c.contract_code = book.sales_contract
+        where c.org_code = #{orgCode}
+        <if test="startDate != null ">
+            and date_format(book.collect_date,'%Y-%m-%d') &gt;= #{startDate}
+        </if>
+        and date_format(book.collect_date,'%Y-%m-%d') &lt;= #{yyyyMMdd}
+    </select>
+    <select id="sumCollectAmountOfOrg_with_yyyy_MM" resultType="java.math.BigDecimal">
+        select sum(book.collect_amount)
+        from th_fin_rent_collection book
+                 left join th_crm_contract c on c.contract_code = book.sales_contract
+        where c.org_code = #{orgCode}
+          and date_format(book.collect_date, '%Y-%m') = #{yyyyMM}
+    </select>
+    <select id="sumCollectAmountOfOrg_with_yyyy" resultType="java.math.BigDecimal">
+        select sum(book.collect_amount)
+        from th_fin_rent_collection book
+                 left join th_crm_contract c on c.contract_code = book.sales_contract
+        where c.org_code = #{orgCode}
+          and date_format(book.collect_date, '%Y') = #{yyyy}
+    </select>
+    <select id="sumStoreCapacityOfOrg" resultType="java.math.BigDecimal">
+        select sum(store_volume)
+        from th_mater_store_info
+        where is_del = '0'
+          and org_code = #{orgCode}
+          and date_format(create_date, '%Y-%m-%d') &lt;= #{yyyyMMdd}
+    </select>
+    <select id="pr_th_lease_in_return_doc_mat_update">
+        call pr_th_lease_in_return_doc_mat_update()
+    </select>
+    <select id="innodb_trx" resultType="com.alibaba.fastjson2.JSONObject">
+        select *
+        from information_schema.innodb_trx
+    </select>
+    <select id="queryCustomerList" resultType="com.tanghe.domain.bi.CustomerTargetIndexDaily">
+        select customer_code_nc as customer_code, customer_name
+        from th_crm_customer_info
+        where is_del = '0'
+          and customer_code is not null
+          and customer_code_nc is not null
+    </select>
+    <select id="countRentOutDeliveryNumOfOrg" resultType="java.math.BigDecimal">
+        select count(a.license_plate_number)
+        from th_crm_rent_out a
+             -- left join th_crm_rent_out_mat b on a.id = b.p_id
+             -- left join th_material_info c on b.material_code = c.material_code
+        left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where s.org_code = #{orgCode}
+          and date_format(a.document_date, '%Y-%m-%d') = #{yyyyMMdd}
+    </select>
+    <select id="countAogReturnNumOfOrg" resultType="java.math.BigDecimal">
+        select count(aog.license_plate_number)
+        from th_war_rent_check check_main
+                 -- left join th_war_rent_check_mat check_mat on check_mat.p_id = check_main.id
+                 left join th_mater_store_info store on store.store_code = check_main.warehousing_warehouse
+                 left join th_war_rent_aog aog on aog.code = check_main.rental_arrival_order_no
+        where 1 = 1
+          and date_format(check_main.arrival_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+    </select>
+    <select id="selectSupplierList" resultType="com.tanghe.domain.bi.SupplierTargetIndexDaily">
+        SELECT code as supplier_code, name as supplier_name
+        from th_sup_supplier_info
+        where is_del = '0'
+    </select>
+    <select id="countRentOutVanNumOfStore" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_crm_rent_out
+        where is_del = '0'
+          and warehousing_warehouse = #{storeCode}
+          and date_format(document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumRentOutTonOfStore" resultType="java.math.BigDecimal">
+        select sum(actual_weight)
+        from th_crm_rent_out
+        where is_del = '0'
+          and warehousing_warehouse = #{storeCode}
+          and date_format(document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="countReturnVanNumOfStore" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_war_rent_aog
+        where is_del = '0'
+          and warehousing_warehouse = #{storeCode}
+          and date_format(arrival_time, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumReturnTonOfStore" resultType="java.math.BigDecimal">
+        select sum(weighing_weight)
+        from th_war_rent_aog
+        where is_del = '0'
+          and warehousing_warehouse = #{storeCode}
+          and date_format(arrival_time, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="countRentOutTotalOfStoreGroupByShipmentCategory" resultType="com.alibaba.fastjson2.JSONObject">
+        select type_name, count(license_plate_number) as van_num, sum(ton) as total_ton
+        from (select rent.code,
+                     rent.shipment_category,
+                     rent.license_plate_number,
+                     rent.actual_weight,
+                     mat.delivery_plan_no,
+                     plan.shipment_type,
+                     case when plan.shipment_type is null then '未选择' else dict.dictname end  as type_name,
+                     sum(ifnull(mat.primary_quantity, 0) * ifnull(info.theorentical_weight, 0)) as ton,
+                     1                                                                          as ret
+              from th_crm_rent_out rent
+                       left join th_crm_rent_out_mat mat on mat.p_id = rent.id
+                       left join th_material_info info on info.material_code = mat.material_code
+                       left join th_crm_plan_deliver plan on plan.code = mat.delivery_plan_no
+                       left join thlease_eos.eos_dict_entry dict
+                                 on dict.dictid = plan.shipment_type and dict.dicttypeid = 'deliver_goods_type'
+              where rent.is_del = '0'
+                and rent.warehousing_warehouse = #{storeCode}
+                and date_format(rent.document_date, '%Y-%m-%d') = #{targetDate}
+              group by rent.code,
+                       rent.shipment_category,
+                       rent.license_plate_number,
+                       rent.actual_weight,
+                       mat.delivery_plan_no,
+                       plan.shipment_type) t
+        group by type_name
+        order by type_name
+    </select>
+    <select id="countRentOutTotalOfContractGroupByShipmentCategory" resultType="com.alibaba.fastjson2.JSONObject">
+        select type_name, count(license_plate_number) as van_num, sum(actual_weight) as total_ton
+        from (select rent.code,
+                     rent.shipment_category,
+                     rent.license_plate_number,
+                     rent.actual_weight,
+                     mat.delivery_plan_no,
+                     plan.shipment_type,
+                     case when plan.shipment_type is null then '未选择' else dict.dictname end  as type_name,
+                     sum(ifnull(mat.primary_quantity, 0) * ifnull(info.theorentical_weight, 0)) as ton,
+                     1                                                                          as ret
+              from th_crm_rent_out rent
+                       left join th_crm_rent_out_mat mat on mat.p_id = rent.id
+                       left join th_material_info info on info.material_code = mat.material_code
+                       left join th_crm_plan_deliver plan on plan.code = mat.delivery_plan_no
+                       left join thlease_eos.eos_dict_entry dict
+                                 on dict.dictid = plan.shipment_type and dict.dicttypeid = 'deliver_goods_type'
+              where rent.is_del = '0'
+                and rent.sales_contract = #{contractCode}
+                and date_format(rent.document_date, '%Y-%m-%d') = #{targetDate}
+              group by rent.code,
+                       rent.shipment_category,
+                       rent.license_plate_number,
+                       rent.actual_weight,
+                       mat.delivery_plan_no,
+                       plan.shipment_type) t
+        group by type_name
+        order by type_name
+    </select>
+    <select id="countRentInVanNumOfSupplier" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_lease_receipt_doc main
+        where main.is_del = '0'
+          and main.supplier_code = #{supplierCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumRentInTonOfSupplier" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.primary_quantity, 0) * ifnull(info.theorentical_weight, 0))
+        from th_lease_receipt_doc main
+                 left join th_lease_receipt_doc_mat mat on mat.docment_no = main.id
+                 left join th_material_info info on info.material_code = mat.material_code
+        where main.is_del = '0'
+          and main.supplier_code = #{supplierCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="countReturnTotalOfStoreGroupByShipmentCategory" resultType="com.alibaba.fastjson2.JSONObject">
+        select back_type_name, count(license_plate_number) as van_num, sum(weighing_weight) as total_ton
+        from (select id,
+                     code,
+                     back_type,
+                     license_plate_number,
+                     weighing_weight,
+                     case when back_type is null then '未选择' else dict.dictname end as back_type_name
+              from th_war_rent_aog aog
+                       left join thlease_eos.eos_dict_entry dict
+                                 on dict.dictid = aog.back_type and dict.dicttypeid = 'back_type'
+              where is_del = '0'
+                and warehousing_warehouse = #{storeCode}
+                and date_format(arrival_time, '%Y-%m-%d') = #{targetDate}) t
+        group by back_type_name
+    </select>
+    <select id="countReturnTotalOfContractGroupByShipmentCategory" resultType="com.alibaba.fastjson2.JSONObject">
+        select back_type_name, count(license_plate_number) as van_num, sum(weighing_weight) as total_ton
+        from (select id,
+                     code,
+                     back_type,
+                     license_plate_number,
+                     weighing_weight,
+                     case when back_type is null then '未选择' else dict.dictname end as back_type_name
+              from th_war_rent_aog aog
+                       left join thlease_eos.eos_dict_entry dict
+                                 on dict.dictid = aog.back_type and dict.dicttypeid = 'back_type'
+              where is_del = '0'
+                and aog.sales_contract = #{storeCode}
+                and date_format(arrival_time, '%Y-%m-%d') = #{targetDate}) t
+        group by back_type_name
+    </select>
+    <select id="get_CGDHCode_from_CGDDCode" resultType="java.lang.String">
+        select code
+        from th_war_pur_aog
+        where purchase_order_no = #{CGDD}
+    </select>
+    <select id="get_CGRKCode_from_CGDHCode" resultType="java.lang.String">
+        select code
+        from th_war_god_house
+        where purchase_order_no = #{CGDH}
+    </select>
+    <select id="get_CGDDCode_from_CGDHCode" resultType="java.lang.String">
+        select purchase_order_no
+        from th_war_pur_aog
+        where code = #{CGDH}
+    </select>
+    <select id="get_CGDHCode_from_CGRKCode" resultType="java.lang.String">
+        select purchase_order_no
+        from th_war_god_house
+        where code = #{CGRK}
+    </select>
+    <select id="get_warehosingNo_from_CGRK" resultType="java.lang.String">
+        select warehousing_no
+        from th_war_god_house
+        where code = #{CGRK}
+    </select>
+    <select id="get_CGDD_matId_from" resultType="java.lang.String">
+        select id
+        from th_purchase_order_mat
+        where document_id = (select id from th_purchase_order where document_no = #{CGDD})
+          and (
+                    trim(material_code) = trim(#{matInfo})
+                or trim(material_name) = trim(#{matInfo})
+                or trim(specification_and_model) = trim(#{matInfo})
+            )
+    </select>
+    <select id="get_CGDH_matId_from" resultType="java.lang.String">
+        select id
+        from th_war_pur_aog_mat
+        where pur_id = (select id from th_war_pur_aog where code = #{CGDH})
+          and (
+                    trim(material_code) = trim(#{matInfo})
+                or trim(material_name) = trim(#{matInfo})
+                or trim(specification_and_model) = trim(#{matInfo})
+            )
+    </select>
+    <select id="get_CGRK_matId_from" resultType="java.lang.String">
+        select id
+        from th_war_god_house_mat
+        where p_id = (select id from th_war_god_house where code = #{CGRK})
+          and (
+                    trim(material_code) = trim(#{matInfo})
+                or trim(material_name) = trim(#{matInfo})
+                or trim(specification_and_model) = trim(#{matInfo})
+            )
+    </select>
+    <select id="select_value_from_CGRK" resultType="com.alibaba.fastjson2.JSONObject">
+        select material_code, total_price_and_tax
+        from th_war_god_house_mat
+        where id = #{matId}
+    </select>
+    <select id="queryThSupReplenishList_dunwei" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT a.*,
+               b.dictname typeName
+        FROM th_sup_rentin_replenish a
+                 LEFT JOIN `thlease_eos`.`eos_dict_entry` `b`
+                           ON `a`.`price_type` = `b`.`DICTID` AND `b`.`DICTTYPEID` = 'rent_price_type'
+        where a.price_type = '6'
+          and a.document_status = '70'
+        <![CDATA[
+          and date_format(a.replenish_Date, '%Y-%m-%d') <= date_format(#{endTime}, '%Y-%m-%d')
+			 ]]>
+            and a.org_code = #{orgCode}
+        order by replenish_Date
+    </select>
+    <select id="sumPayableAmountOfOrg_with_yyyy_MM" resultType="java.math.BigDecimal">
+        select sum(mat.total_price)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+        where main.is_del = '0'
+          and main.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m') = #{yyyyMM}
+    </select>
+    <select id="notOverContractList" resultType="com.tanghe.dto.eos.EosContractDTO">
+        select *
+        from th_crm_contract
+        where is_del = '0'
+          and (is_over = '0' or contract_termination_date > now() or contract_termination_date is null)
+    </select>
+    <select id="countReturnVanNumOfSupplier" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_sup_recycle main
+        where main.is_del = '0'
+          and main.supplier_code = #{supplierCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumReturnTonOfSupplier" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.primary_quantity, 0) * ifnull(m.theorentical_weight, 0))
+        from th_sup_recycle main
+                 left join th_sup_recycle_mat mat on mat.p_id = main.id
+                 left join th_material_info m on m.material_code = mat.material_code
+        where main.is_del = '0'
+          and main.supplier_code = #{supplierCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumQuantityOfStoreMat" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.purchase_receipt_qty_init, 0))
+        from th_war_init_repert_mat mat
+                 left join th_material_info m on m.material_code = mat.material_code
+                 left join th_mater_store_info store on store.store_code = mat.warehousing_warehouse
+        where flage = '1'
+          and trim(store.store_name) = trim(#{storeName})
+          and mat.material_code = #{matCode}
+    </select>
+    <select id="pr_material_rent_CZ_report" resultType="com.alibaba.fastjson2.JSONObject">
+        call pr_material_rent_CZ_report(null, null, null, null, null, null, null);
+    </select>
+    <select id="sumReturnNumOfStoreMat" resultType="java.math.BigDecimal">
+        SELECT sum(twrrm.primary_quantity) as back_num
+        FROM th_war_rent_recycle twrr
+                 INNER JOIN th_war_rent_recycle_mat twrrm ON twrr.id = twrrm.p_id
+        WHERE twrrm.material_code = #{matCode}
+          and twrr.warehousing_warehouse = #{storeCode}
+
+    </select>
+    <select id="sumLossNumOfStoreMat" resultType="java.math.BigDecimal">
+        SELECT sum(all_loss.loss_num) as loss_num
+        from th_crm_contract_loss loss
+                 LEFT JOIN th_crm_contract_loss_all_mat all_loss on all_loss.p_id = loss.id
+        where loss.is_del = '0'
+          and all_loss.material_code = #{matCode}
+          and all_loss.warehousing_warehouse = #{storeCode}
+    </select>
+    <select id="pr_material_code_XC_report" resultType="com.alibaba.fastjson2.JSONObject">
+        call pr_material_code_XC_report(null, null, null, null);
+    </select>
+    <select id="sumRentingMatList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT b.store_code                                                                     as store_code,
+               b.material_code                                                                  as material_code,
+               ROUND((IFNULL(b.no_back_num, 0) - IFNULL(a.zrrk, 0)) * d.theorentical_weight, 5) AS renting_mat
+        FROM (SELECT c.store_code,
+                     b.material_code,
+                     sum((b.primary_quantity - b.back_num)) no_back_num
+              FROM th_crm_rent_out a
+                       INNER JOIN th_crm_rent_out_mat b ON a.id = b.p_id
+                       inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+              WHERE a.is_del = 0
+              GROUP BY c.store_code, b.material_code) b
+                 LEFT JOIN (SELECT store_code,
+                                   material_code,
+                                   sum(zrrk) zrrk
+                            FROM (SELECT c.store_code,
+                                         b.material_code,
+                                         sum(ifnull(primary_quantity, 0) - ifnull(amount_repaid, 0)) zrrk
+                                  FROM `th_lease_in_doc_mat` b
+                                           INNER JOIN th_lease_in_doc a ON b.docment_no = a.id
+                                           inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+                                  WHERE a.type = '0'
+                                    AND a.is_del = '0'
+                                  group by c.store_code, b.material_code
+                                  UNION ALL
+                                  SELECT c.store_code,
+                                         b.material_code,
+                                         sum(ifnull(primary_quantity, 0) - ifnull(return_num, 0)) zrrk
+                                  FROM th_lease_receipt_doc a
+                                           INNER JOIN th_lease_receipt_doc_mat b ON a.id = b.docment_no
+                                           inner join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+                                  WHERE a.is_del = 0
+                                  group by c.store_code, b.material_code) a
+                            GROUP BY store_code, material_code) a
+                           ON a.store_code = b.store_code AND a.material_code = b.material_code
+                 left join th_material_info d on d.material_code = b.material_code
+    </select>
+    <select id="sumInStockMatList" resultType="com.alibaba.fastjson2.JSONObject">
+        <![CDATA[
+        select c.store_code,
+               a.material_code,
+               sum((case when (quantity_on_hand) < 0 then 0 else (quantity_on_hand) end) *
+                   ifnull(m.theorentical_weight, 0)) as total_ton
+        from th_war_init_repert_mat a
+                 left join th_material_info m on m.material_code = a.material_code
+                 left join th_mater_store_info c on a.warehousing_warehouse = c.store_code
+        group by c.store_code, a.material_code
+        ]]>
+    </select>
+    <select id="sumCGRKAmountOfOrg" resultType="java.math.BigDecimal">
+        select sum(mat.total_price)
+        from th_war_god_house main
+                 left join th_war_god_house_mat mat on mat.p_id = main.id
+                 left join th_mater_store_info store on store.store_code = main.warehousing_warehouse
+        where store.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyyMMdd}
+          and main.is_del = '0'
+    </select>
+    <select id="sum_th_finance_leasein_month_amount_1" resultType="java.math.BigDecimal">
+        select sum(month.rent_Price)
+        from th_finance_leasein_month month
+                 left join th_mater_store_info store on store.store_code = month.warehousing_warehouse
+        where date_format(month.create_time, '%Y-%m-%d') = #{yyyyMMdd}
+          and store.org_code = #{orgCode}
+          and month.issue_an_invoice = '1'
+    </select>
+    <select id="selectMatListOfHSDJ" resultType="com.alibaba.fastjson2.JSONObject">
+        select *
+        from th_war_rent_recycle_mat
+        where p_id in (select id from th_war_rent_recycle where code = #{HSDJCode})
+    </select>
+    <select id="selectContraCodeOfHSDJ" resultType="java.lang.String">
+        select sales_contract
+        from th_war_rent_recycle
+        where code = #{HSDJCode}
+    </select>
+    <select id="selectMatListOfRentOut" resultType="com.alibaba.fastjson2.JSONObject">
+        select main.code, main.sales_contract, mat.material_code, mat.primary_quantity, mat.back_num, mat.no_back_num
+        from th_crm_rent_out_mat mat
+                 left join th_crm_rent_out main on main.id = mat.p_id
+        where main.code = #{rentCode}
+          and mat.material_code = #{materialCode}
+    </select>
+    <select id="sumReturnNumOfMat" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.primary_quantity, 0))
+        from th_war_rent_recycle_mat mat
+                 left join th_war_rent_recycle main on main.id = mat.p_id
+        where mat.rent_code = #{rentCode}
+          and main.is_del = '0'
+          and mat.material_code = #{materialCode}
+    </select>
+    <select id="selectRentOutMatTotal" resultType="com.alibaba.fastjson2.JSONObject">
+        select main.sales_contract, mat.material_code,
+        sum(mat.primary_quantity) as 出租数量,
+        sum(mat.back_num) as 归还数量,
+        sum(mat.no_back_num) as 未归还数量
+        from th_crm_rent_out main
+        left join th_crm_rent_out_mat mat on mat.p_id = main.id
+        where 1=1
+        <if test="salesContract != null and salesContract !=''">
+            and main.sales_contract = #{salesContract}
+        </if>
+        group by main.sales_contract,mat.material_code
+        ;
+    </select>
+    <select id="sumReturnNum" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.primary_quantity, 0))
+        from th_war_rent_recycle_mat mat
+                 left join th_war_rent_recycle main on main.id = mat.p_id
+        where main.sales_contract = #{salesContract}
+          and main.is_del = '0'
+          and mat.material_code = #{materialCode}
+    </select>
+    <select id="selectRenOutDateList" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT main.code, main.sales_contract,mat.material_code,mat.primary_quantity,mat.back_num,mat.no_back_num
+        from th_crm_rent_out_mat mat
+        left join th_crm_rent_out main on main.id = mat.p_id
+        where 1=1 and main.sales_contract=#{salesContract} and mat.material_code in
+        <foreach collection="materialCodeList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectHSDJMatList" resultType="com.alibaba.fastjson2.JSONObject">
+        select main.code, main.sales_contract, mat.rent_code, mat.material_code, mat.primary_quantity
+        from th_war_rent_recycle_mat mat
+                 left join th_war_rent_recycle main on main.id = mat.p_id
+        where main.code = #{code}
+    </select>
+    <select id="selectRentOutMatList" resultType="com.alibaba.fastjson2.JSONObject">
+        select main.sales_contract,
+               main.code,
+               mat.id as m_id,
+               mat.material_code,
+               mat.primary_quantity,
+               mat.back_num,
+               mat.no_back_num
+        from th_crm_rent_out main
+                 left join th_crm_rent_out_mat mat on mat.p_id = main.id
+        where 1 = 1
+          and main.sales_contract = #{salesContract}
+          and mat.material_code = #{matCode}
+        order by main.id asc
+    </select>
+    <select id="renturnRenOut" resultType="java.lang.Integer">
+        update th_crm_rent_out_mat
+        set back_num    = primary_quantity,
+            no_back_num = '0'
+        where id = #{mId}
+    </select>
+    <select id="sumPurchase2StoreTon" resultType="java.math.BigDecimal">
+        select sum(a.weighing_ton) weighing_ton,
+               a.warehousing_warehouse
+        from th_war_god_house a
+                 left join th_war_pur_aog b on a.purchase_order_no = b.code
+                 left join th_purchase_order c on c.document_no = b.purchase_order_no
+                 left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where c.order_type = '2'
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSublease2StoreTon" resultType="java.math.BigDecimal">
+        select sum(a.weighing_ton) weighing_ton
+        from th_lease_receipt_doc a
+                 LEFT JOIN th_rentin_order b on a.lease_in_order_no = b.document_no
+                 left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where b.order_type = '2'
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+    </select>
+    <select id="sumReturn2StoreTon" resultType="java.math.BigDecimal">
+        select sum(weighing_weight) weighing_ton
+        from th_war_rent_aog aa
+                 left JOIN th_mater_store_info bb on aa.warehousing_warehouse = bb.store_code
+        where 1 = 1
+          and DATE_FORMAT(aa.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(aa.document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and bb.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and aa.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and aa.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and back_type = '1'
+          and aa.is_del = '0'
+          and document_status in (70, 110)
+    </select>
+    <select id="sumAllocate2StoreTon" resultType="java.math.BigDecimal">
+        select sum(weighing_ton) weighing_ton
+        from th_war_allocation a
+                 left JOIN th_mater_store_info s on a.warehouse = s.store_code
+        where project_name is null
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+    </select>
+    <select id="sumDisplace2StoreTon" resultType="java.math.BigDecimal">
+        select sum(total_ton_weight) weighing_ton
+        from th_purchase_order a
+                 left JOIN th_mater_store_info s on a.warehousing_warehouse = s.store_code
+        where 1 = 1
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+          and s.org_code = #{orgCode}
+          and is_changed = '1'
+    </select>
+    <select id="sumSendFromStoreTon" resultType="java.math.BigDecimal">
+        select sum(weighing_ton) weighing_ton
+        from th_crm_rent_out a
+        left JOIN th_mater_store_info s on a.warehousing_warehouse = s.store_code
+        where 1 = 1
+        and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+        and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+        and shipment_category in ('2', '3')
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSubleaseFromStoreTon" resultType="java.math.BigDecimal">
+        select sum(a.total_ton_weight) weighing_ton
+        from th_lease_in_return_doc a
+                 left join th_lease_in_return_apply b on a.lease_return_apply_no = b.document_no
+                 left JOIN th_mater_store_info s on a.warehousing_warehouse = s.store_code
+        where b.goback_plan_code is null
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+    </select>
+    <select id="sumAllocateFromStoreTon" resultType="java.math.BigDecimal">
+        select sum(weighing_ton) weighing_ton
+        from th_war_allocation a
+                 left join th_mater_store_info s on s.store_code = a.ex_warehouse
+        where 1 = 1
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.ex_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.ex_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumDisplaceFromStoreTon" resultType="java.math.BigDecimal">
+        select sum(weighing_weight) weighing_ton
+        from th_war_sales_delivery a
+                 left join th_mater_store_info s on s.store_code = a.warehouse_code
+        where 1 = 1
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') &lt;= #{endDate}
+          and s.org_code = #{orgCode}
+    </select>
+    <select id="sumStore2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '1'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and b.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and b.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumDirect2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '2'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and b.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and b.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSublease2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '3'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumAllocate2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '5'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and b.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and b.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumDisplace2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '4'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and b.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and b.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSite2SiteTon" resultType="java.math.BigDecimal">
+        select sum(a.unit_ton_weight * a.primary_quantity) weighing_ton
+
+        from th_crm_rent_out_mat a
+                 left join th_crm_rent_out b on a.p_id = b.id
+                 left join th_mater_store_info s on s.store_code = b.warehousing_warehouse
+        where shipment_type = '4'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and b.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and b.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumStoreFromSiteTon" resultType="java.math.BigDecimal">
+        select sum(weighing_weight) weighing_ton,
+               back_type,
+               warehousing_warehouse
+        from th_war_rent_aog a
+                 left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where back_type = '1'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSiteFromSiteTon" resultType="java.math.BigDecimal">
+        select sum(weighing_weight) weighing_ton,
+               back_type,
+               warehousing_warehouse
+        from th_war_rent_aog a
+                 left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where back_type = '2'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="sumSubleaseFromSiteTon" resultType="java.math.BigDecimal">
+        select sum(weighing_weight) weighing_ton
+        from th_war_rent_aog a
+                 left join th_mater_store_info s on s.store_code = a.warehousing_warehouse
+        where back_type = '3'
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &gt;= #{startDate}
+          and DATE_FORMAT(document_date, '%Y-%m-%d') &lt;= #{endDate}
+        <if test="orgCode != null">
+            and s.org_code = #{orgCode}
+        </if>
+        <if test="storeCode != null">
+            and a.warehousing_warehouse = #{storeCode}
+        </if>
+        <if test="storeCodeList != null">
+            and a.warehousing_warehouse in
+            <foreach collection="storeCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="countOutVanNumOfstoreAllocation" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_war_allocation a
+        where 1 = 1
+          and a.ex_warehouse = #{storeCode}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumOutTonOfstoreAllocation" resultType="java.math.BigDecimal">
+        select sum(weighing_ton) weighing_ton
+        from th_war_allocation a
+        where 1 = 1
+          and a.ex_warehouse = #{storeCode}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="countInVanNumOfstoreAllocation" resultType="java.math.BigDecimal">
+        select count(license_plate_number)
+        from th_war_allocation a
+        where project_name is null
+          and a.warehouse = #{storeCode}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="sumInTonOfstoreAllocation" resultType="java.math.BigDecimal">
+        select sum(weighing_ton) weighing_ton
+        from th_war_allocation a
+        where project_name is null
+          and a.warehouse = #{storeCode}
+          and DATE_FORMAT(a.document_date, '%Y-%m-%d') = #{targetDate}
+    </select>
+    <select id="checkIsExcit" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT *
+        from th_crm_contract_nc
+        where trim(project_name) = trim(#{name})
+    </select>
+    <select id="selectContractList" resultType="com.alibaba.fastjson2.JSONObject">
+        select *
+        from th_crm_contract
+        where trim(project_name) like trim(#{name})
+    </select>
+    <select id="selectSqlTest" resultType="com.alibaba.fastjson2.JSONObject">
+        SELECT DISTINCT m.sales_contract,m.project_name,m.region,m.finance_month, nc.nc_project_id,nc.project_name
+        from th_finance_rent_month m
+                 LEFT JOIN th_crm_contract_nc nc on trim(nc.project_name) = trim(m.project_name)
+        where m.finance_month = '2023-11' and nc.nc_project_id is null
+          and m.region like '%安华%'
+    </select>
+    <select id="selectCustomerList" resultType="com.alibaba.fastjson2.JSONObject">
+        select * from th_crm_customer_info
+    </select>
+    <select id="avgRentalPriceOfMatWithYYYYMM" resultType="java.math.BigDecimal">
+        select avg(unit_price)
+        from th_crm_rent_out a
+                 left join th_crm_rent_out_mat b on a.id = b.p_id
+                 left join th_material_info c on b.material_code = c.material_code
+                 left join th_mater_store_info d on b.warehousing_warehouse = d.store_code
+        where b.warehousing_warehouse is not null
+          and b.material_code = #{matCode} and b.unit_price is not null
+          and date_format(a.document_date, '%Y-%m') = #{yyyy_MM}
+    </select>
+    <select id="sum_payable_amount_of_purchase" resultType="java.math.BigDecimal">
+        select sum(mat.total_price)
+        from th_war_god_house main
+        left join th_war_god_house_mat mat on mat.p_id = main.id
+        left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0' and s.org_code = #{orgCode} and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="sum_invoiced_amount_of_purchase" resultType="java.math.BigDecimal">
+        select sum(ifnull(main.amount_including_tax, 0))
+        from th_purchase_account_check main
+        left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_zcd_signed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.document_status = '10'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_paper_passed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.sign_status = '是'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_czd_stard_receipt_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.signed_status = '1'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_czd_receipt_passed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.signed_status = '2'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_czd_passed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.signed_status = '2'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="count_supply_project_num" resultType="java.math.BigDecimal">
+        select count(distinct main.sales_contract)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.signed_status = '2'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m') = #{yyyy_MM}
+    </select>
+    <select id="sum_ys_num" resultType="java.math.BigDecimal">
+        select count(ys.id)
+        from th_finance_rent_month ys
+                 left join th_crm_contract c on trim(c.contract_code) = trim(ys.sales_contract)
+        where date_format(ys.create_time, '%Y-%m-%d') =  #{yyyy_MM_dd} and c.org_code = #{orgCode}
+
+    </select>
+    <select id="sum_yf_num" resultType="java.math.BigDecimal">
+        select count(yf.id)
+        from th_finance_leasein_month yf
+        where  date_format(yf.create_time, '%Y-%m-%d') = #{yyyy_MM_dd}
+          and yf.organization_code =#{orgCode}
+    </select>
+    <select id="sum_internal_num" resultType="java.math.BigDecimal">
+        select count(internal.id)
+        from th_finance_internal_transaction internal
+                 left join th_crm_contract c on trim(c.contract_code) = trim(internal.sales_contract)
+        where date_format(internal.create_time, '%Y-%m-%d') =  #{yyyy_MM_dd} and c.org_code = #{orgCode}
+    </select>
+    <select id="count_settled_project_num" resultType="java.math.BigDecimal">
+        select count(c.id)
+        from th_crm_contract c
+        where c.is_del = '0'
+          and c.contract_termination_date is not null
+          and date_format(c.contract_termination_date, '%Y-%m-%d') = #{yyyy_MM}
+    </select>
+    <select id="count_invoiced_loss_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_war_rent_loss_ass main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_signed_loss_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_war_rent_loss_ass main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and s.org_code = #{orgCode} and main.document_status = '70'
+          and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}
+    </select>
+    <select id="count_czd_attachment_not_upload_num" resultType="java.math.BigDecimal">
+        select count(t.code)
+        from (select rent.code,
+                     rent.submit_time,
+                     f.CREATDATE
+              from th_crm_rent_out rent
+                       left join th_mater_store_info store on store.store_code = rent.warehousing_warehouse
+                       left join (select FILEID, ATTACHMENTTYPE, CREATDATE, CREATOR
+                                  from thlease_eos.iwork_file_list list
+                                  where ATTACHMENTTYPE = '出租单（客户签收）'
+                                  group by FILEID) f on f.FILEID = rent.fileid
+              where rent.is_del = '0'
+                and store.org_code = #{orgCode}
+                and date_format(rent.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}) t
+        where CREATDATE is null
+           or (date_format(CREATDATE, '%Y-%m-%d') &lt; date_format(submit_time, '%Y-%m-%d'))
+
+    </select>
+    <select id="count_cgdh_attachment_not_upload_num" resultType="java.math.BigDecimal">
+        select count(t.code)
+        from (select main.code,
+                     main.submit_time,
+                     f.CREATDATE
+              from th_war_pur_aog main
+                       left join th_mater_store_info store on store.store_code = main.warehousing_warehouse
+                       left join (select FILEID, ATTACHMENTTYPE, CREATDATE, CREATOR
+                                  from thlease_eos.iwork_file_list list
+                                  group by FILEID) f on f.FILEID = main.fileid
+              where main.is_del = '0'
+                and store.org_code = #{orgCode}
+                and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}) t
+        where CREATDATE is null
+           or (date_format(CREATDATE, '%Y-%m-%d') &lt; date_format(submit_time, '%Y-%m-%d'))
+
+    </select>
+    <select id="count_fbdj_attachment_not_upload_num" resultType="java.math.BigDecimal">
+        select count(t.code)
+        from (select main.code,
+                     main.submit_time,
+                     f.CREATDATE
+              from th_war_rent_check main
+                       left join th_mater_store_info store on store.store_code = main.warehousing_warehouse
+                       left join (select FILEID, ATTACHMENTTYPE, CREATDATE, CREATOR
+                                  from thlease_eos.iwork_file_list list
+                                  group by FILEID) f on f.FILEID = main.fileid
+              where main.is_del = '0'
+                and store.org_code = #{orgCode}
+                and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}) t
+        where CREATDATE is null
+           or (date_format(CREATDATE, '%Y-%m-%d') &lt; date_format(submit_time, '%Y-%m-%d'))
+    </select>
+    <select id="count_zrrk_attachment_not_upload_num" resultType="java.math.BigDecimal">
+        select count(t.document_no)
+        from (select main.document_no,
+                     main.submit_time,
+                     f.CREATDATE
+              from th_lease_receipt_doc main
+                       left join th_mater_store_info store on store.store_code = main.warehousing_warehouse
+                       left join (select FILEID, ATTACHMENTTYPE, CREATDATE, CREATOR
+                                  from thlease_eos.iwork_file_list list
+                                  group by FILEID) f on f.FILEID = main.fileid
+              where main.is_del = '0'
+                and store.org_code = #{orgCode}
+                and date_format(main.document_date, '%Y-%m-%d') = #{yyyy_MM_dd}) t
+        where CREATDATE is null
+           or (date_format(CREATDATE, '%Y-%m-%d') &lt; date_format(submit_time, '%Y-%m-%d'))
+    </select>
+    <select id="sum_czd_signed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.document_status = '70'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="sum_czd_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="sum_czd_pass_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_crm_rent_out main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.signed_status = '2'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="count_loss_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_war_rent_loss_ass main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="count_loss_signed_num" resultType="java.math.BigDecimal">
+        select count(main.id)
+        from th_war_rent_loss_ass main
+                 left join th_mater_store_info s on s.store_code = main.warehousing_warehouse
+        where main.is_del = '0'
+          and main.document_status = '70'
+          and s.org_code = #{orgCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="sumContractTon" resultType="java.math.BigDecimal">
+        select sum(ifnull(c.total_weight, 0))
+        from th_crm_contract c
+        where c.is_del = '0'
+          and c.delivery_warehouse = #{storeCode}
+          and date_format(c.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="sumSentTon" resultType="java.math.BigDecimal">
+        select sum(ifnull(mat.primary_quantity, 0) * ifnull(m.theorentical_weight, 0))
+        from th_crm_rent_out main
+                 left join th_crm_rent_out_mat mat on mat.p_id = main.id
+        left join th_material_info m on m.material_code = mat.material_code
+        where main.is_del = '0'
+          and main.warehousing_warehouse = #{storeCode}
+          and date_format(main.document_date, '%Y-%m-%d') &lt;= #{yyyy_MM_dd}
+    </select>
+    <select id="sumDepositAmount" resultType="java.math.BigDecimal">
+        select sum(ifnull(c.collect_amount,0))
+        from th_fin_rent_collection c
+        where c.is_del = '0' and c.org_code = #{orgCode} and c.collect_type='60127'
+        <if test="startDate != null ">
+            and date_format(c.collect_date,'%Y-%m-%d') &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and date_format(c.collect_date,'%Y-%m-%d') &lt;= #{endDate}
+        </if>
+    </select>
+
+</mapper>

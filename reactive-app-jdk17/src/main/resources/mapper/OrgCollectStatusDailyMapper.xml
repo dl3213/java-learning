@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.OrgCollectStatusDailyMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.OrgCollectStatusDaily">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="capitalFund" column="capital_fund" jdbcType="NUMERIC"/>
+            <result property="relatedPartyLoans" column="related_party_loans" jdbcType="NUMERIC"/>
+            <result property="interestExpense" column="Interest expense" jdbcType="NUMERIC"/>
+            <result property="dividendPayment" column="dividend payment" jdbcType="NUMERIC"/>
+            <result property="bankLoanRepayment" column="bank_loan_repayment" jdbcType="NUMERIC"/>
+            <result property="bankLoans" column="bank_loans" jdbcType="NUMERIC"/>
+            <result property="relatedPartyRepayment" column="related_party_repayment" jdbcType="NUMERIC"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="SMALLINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,org_code,org_name,
+        date,capital_fund,related_party_loans,
+        Interest expense,dividend payment,bank_loan_repayment,
+        bank_loans,related_party_repayment,is_deleted,
+        create_time,create_by
+    </sql>
+</mapper>

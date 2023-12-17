@@ -7,18 +7,13 @@ datasource:
 spring:
   datasource:
     dynamic:
-      primary: mysql-test #设置默认的数据源或者数据源组,默认值即为master
+      primary: postgresql #设置默认的数据源或者数据源组,默认值即为master
       strict: true #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
       datasource:
-        mysql-test:
-          url: jdbc:mysql://${remote-server.ip}:3306/sibyl?useSSL=false&useUnicode=true&autoReconnect=true&serverTimezone=Asia/Shanghai
-          username: root
-          password: 123456
-          driver-class-name: com.mysql.cj.jdbc.Driver
-        postgresql-test:
-          url: jdbc:postgresql://${remote-server.ip}:5432/sibyl_postgres?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&allowMultiQueries=true
-          username: postgres
-          password: 123456
+        postgresql:
+          url: jdbc:postgresql://${remote-server.ip}:5432/sibyl?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&allowMultiQueries=true
+          username: admin
+          password: admin
           driver-class-name: org.postgresql.Driver
   redis:
     host: ${remote-server.ip}

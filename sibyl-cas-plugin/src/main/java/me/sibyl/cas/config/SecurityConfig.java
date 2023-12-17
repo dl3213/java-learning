@@ -1,5 +1,6 @@
 package me.sibyl.cas.config;
 
+import lombok.RequiredArgsConstructor;
 import me.sibyl.cas.annotation.AnonymousAuth;
 import me.sibyl.cas.filter.SibylTokenAuthenticationFilter;
 import me.sibyl.cas.handler.*;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 // 开启注解权限资源控制
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     /**
@@ -82,23 +84,6 @@ public class SecurityConfig {
      */
     private final MyAccessDeniedHandler myAccessDeniedHandler;
 
-    public SecurityConfig(
-            //AdminAuthenticationProvider adminAuthenticationProvider,
-            AdminAuthenticationSuccessHandler adminAuthenticationSuccessHandler,
-            AdminAuthenticationFailureHandler adminAuthenticationFailureHandler,
-            AdminAuthenticationEntryPoint adminAuthenticationEntryPoint,
-            SibylTokenAuthenticationFilter sibylTokenAuthenticationFilter,
-            AdminLogoutSuccessHandler adminLogoutSuccessHandler,
-            MyAccessDeniedHandler myAccessDeniedHandler) {
-        this.sibylTokenAuthenticationFilter = sibylTokenAuthenticationFilter;
-        //this.adminAuthenticationProvider = adminAuthenticationProvider;
-        this.adminAuthenticationSuccessHandler = adminAuthenticationSuccessHandler;
-        this.adminAuthenticationFailureHandler = adminAuthenticationFailureHandler;
-        this.adminAuthenticationEntryPoint = adminAuthenticationEntryPoint;
-        //this.adminLogoutHandler = adminLogoutHandler;
-        this.adminLogoutSuccessHandler = adminLogoutSuccessHandler;
-        this.myAccessDeniedHandler = myAccessDeniedHandler;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

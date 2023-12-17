@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.bi.BIContractMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.bi.BIContract">
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="documentDate" column="document_date" jdbcType="TIMESTAMP"/>
+            <result property="contractCode" column="contract_code" jdbcType="VARCHAR"/>
+            <result property="ncProjectId" column="nc_project_id" jdbcType="VARCHAR"/>
+            <result property="contractStatus" column="contract_status" jdbcType="VARCHAR"/>
+            <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+            <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+            <result property="deptCode" column="dept_code" jdbcType="VARCHAR"/>
+            <result property="deptName" column="dept_name" jdbcType="VARCHAR"/>
+            <result property="customerCode" column="customer_code" jdbcType="VARCHAR"/>
+            <result property="customerName" column="customer_name" jdbcType="VARCHAR"/>
+            <result property="projectName" column="project_name" jdbcType="VARCHAR"/>
+            <result property="salesManCode" column="sales_man_code" jdbcType="VARCHAR"/>
+            <result property="salesMan" column="sales_man" jdbcType="VARCHAR"/>
+            <result property="salesTelephone" column="sales_telephone" jdbcType="VARCHAR"/>
+            <result property="signingDate" column="signing_date" jdbcType="DATE"/>
+            <result property="region" column="region" jdbcType="VARCHAR"/>
+            <result property="province" column="province" jdbcType="VARCHAR"/>
+            <result property="city" column="city" jdbcType="VARCHAR"/>
+            <result property="area" column="area" jdbcType="VARCHAR"/>
+            <result property="siteAddress" column="site_address" jdbcType="VARCHAR"/>
+            <result property="deliveryWarehouse" column="delivery_warehouse" jdbcType="VARCHAR"/>
+            <result property="deliveryMethod" column="delivery_method" jdbcType="VARCHAR"/>
+            <result property="leaseTerm" column="lease_term" jdbcType="VARCHAR"/>
+            <result property="reconciliationDate" column="reconciliation_date" jdbcType="VARCHAR"/>
+            <result property="receiversBy" column="receivers_by" jdbcType="VARCHAR"/>
+            <result property="receiversTelephone" column="receivers_telephone" jdbcType="VARCHAR"/>
+            <result property="kilometers" column="kilometers" jdbcType="VARCHAR"/>
+            <result property="leaseStartRules" column="lease_start_rules" jdbcType="VARCHAR"/>
+            <result property="leaseOffRules" column="lease_off_rules" jdbcType="VARCHAR"/>
+            <result property="contractOffDate" column="contract_off_date" jdbcType="DATE"/>
+            <result property="contractStartDate" column="contract_start_date" jdbcType="DATE"/>
+            <result property="contractTerminationDate" column="contract_termination_date" jdbcType="DATE"/>
+            <result property="totalReceivableAmount" column="total_receivable_amount" jdbcType="NUMERIC"/>
+            <result property="totalCollectionAmount" column="total_collection_amount" jdbcType="NUMERIC"/>
+            <result property="amountOwed" column="amount_owed" jdbcType="NUMERIC"/>
+            <result property="totalInvoicedAmount" column="total_invoiced_amount" jdbcType="NUMERIC"/>
+            <result property="totalAmountOwed" column="total_amount_owed" jdbcType="NUMERIC"/>
+            <result property="totalMaketAmount" column="total_maket_amount" jdbcType="NUMERIC"/>
+            <result property="termOfPayment" column="term_of_payment" jdbcType="VARCHAR"/>
+            <result property="restoreDesc" column="restore_desc" jdbcType="VARCHAR"/>
+            <result property="carrierCode" column="carrier_code" jdbcType="VARCHAR"/>
+            <result property="createUser" column="create_user" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="update_user" jdbcType="VARCHAR"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDel" column="is_del" jdbcType="VARCHAR"/>
+            <result property="totalWeight" column="total_weight" jdbcType="NUMERIC"/>
+            <result property="fileid" column="fileid" jdbcType="VARCHAR"/>
+            <result property="isOver" column="is_over" jdbcType="BIGINT"/>
+            <result property="taxRate" column="tax_rate" jdbcType="BIGINT"/>
+            <result property="innerStatus" column="inner_status" jdbcType="BIGINT"/>
+            <result property="lossTotalMoney" column="loss_total_money" jdbcType="NUMERIC"/>
+            <result property="lossPrice" column="loss_price" jdbcType="NUMERIC"/>
+            <result property="thRentinContract" column="th_rentin_contract" jdbcType="BIGINT"/>
+            <result property="checkPrice" column="check_price" jdbcType="NUMERIC"/>
+            <result property="wxPrice" column="wx_price" jdbcType="NUMERIC"/>
+            <result property="bfPrice" column="bf_price" jdbcType="NUMERIC"/>
+            <result property="documentStatus" column="document_status" jdbcType="VARCHAR"/>
+            <result property="afterSalePerson" column="after_sale_person" jdbcType="VARCHAR"/>
+            <result property="supportPhone" column="support_phone" jdbcType="VARCHAR"/>
+            <result property="auditingUser" column="auditing_user" jdbcType="VARCHAR"/>
+            <result property="auditingTime" column="auditing_time" jdbcType="VARCHAR"/>
+            <result property="paymentPercent" column="payment_percent" jdbcType="VARCHAR"/>
+            <result property="isPushNc" column="is_push_nc" jdbcType="VARCHAR"/>
+            <result property="crmId" column="crm_id" jdbcType="VARCHAR"/>
+            <result property="isPushDz" column="is_push_dz" jdbcType="VARCHAR"/>
+            <result property="crmOverId" column="crm_over_id" jdbcType="VARCHAR"/>
+            <result property="updatetime" column="updatetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,document_date,contract_code,
+        nc_project_id,contract_status,org_code,
+        org_name,dept_code,dept_name,
+        customer_code,customer_name,project_name,
+        sales_man_code,sales_man,sales_telephone,
+        signing_date,region,province,
+        city,area,site_address,
+        delivery_warehouse,delivery_method,lease_term,
+        reconciliation_date,receivers_by,receivers_telephone,
+        kilometers,lease_start_rules,lease_off_rules,
+        contract_off_date,contract_start_date,contract_termination_date,
+        total_receivable_amount,total_collection_amount,amount_owed,
+        total_invoiced_amount,total_amount_owed,total_maket_amount,
+        term_of_payment,restore_desc,carrier_code,
+        create_user,create_time,update_user,
+        update_time,is_del,total_weight,
+        fileid,is_over,tax_rate,
+        inner_status,loss_total_money,loss_price,
+        th_rentin_contract,check_price,wx_price,
+        bf_price,document_status,after_sale_person,
+        support_phone,auditing_user,auditing_time,
+        payment_percent,is_push_nc,crm_id,
+        is_push_dz,crm_over_id,updatetime
+    </sql>
+</mapper>

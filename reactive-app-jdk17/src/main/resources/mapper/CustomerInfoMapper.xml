@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tanghe.mapper.CustomerInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.tanghe.domain.CustomerInfo">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <id property="customerCode" column="customer_code" jdbcType="VARCHAR"/>
+            <result property="customerName" column="customer_name" jdbcType="VARCHAR"/>
+            <result property="customerCodeNc" column="customer_code_nc" jdbcType="VARCHAR"/>
+            <result property="registrationCode" column="registration_code" jdbcType="VARCHAR"/>
+            <result property="region" column="region" jdbcType="VARCHAR"/>
+            <result property="province" column="province" jdbcType="VARCHAR"/>
+            <result property="city" column="city" jdbcType="VARCHAR"/>
+            <result property="area" column="area" jdbcType="VARCHAR"/>
+            <result property="customerAddress" column="customer_address" jdbcType="VARCHAR"/>
+            <result property="customerNature" column="customer_nature" jdbcType="VARCHAR"/>
+            <result property="linkMan" column="link_man" jdbcType="VARCHAR"/>
+            <result property="linkTelphone" column="link_telphone" jdbcType="VARCHAR"/>
+            <result property="isDel" column="is_del" jdbcType="CHAR"/>
+            <result property="createUser" column="create_user" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="update_user" jdbcType="VARCHAR"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="idnumber" column="idnumber" jdbcType="VARCHAR"/>
+            <result property="billingBank" column="billing_bank" jdbcType="VARCHAR"/>
+            <result property="bankAccount" column="bank_account" jdbcType="VARCHAR"/>
+            <result property="creditExtensionWeight" column="credit_extension_weight" jdbcType="DOUBLE"/>
+            <result property="customerLevel" column="customer_level" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,customer_code,customer_name,
+        customer_code_nc,registration_code,region,
+        province,city,area,
+        customer_address,customer_nature,link_man,
+        link_telphone,is_del,create_user,
+        create_time,update_user,update_time,
+        idnumber,billing_bank,bank_account,
+        credit_extension_weight,customer_level
+    </sql>
+</mapper>
