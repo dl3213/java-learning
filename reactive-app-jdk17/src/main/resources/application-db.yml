@@ -1,0 +1,7 @@
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://117.72.34.173:5432/sibyl
+    username: admin
+    password: admin
+

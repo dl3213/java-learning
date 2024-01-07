@@ -24,7 +24,10 @@ public class RedissonConfig {
 //    @Bean
     public Redisson redisson() {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://" + remoteServerIp + ":6379").setDatabase(0);
+        config.useSingleServer()
+                .setAddress("redis://" + remoteServerIp + ":6379")
+                .setPassword("")
+                .setDatabase(0);
         return (Redisson) Redisson.create(config);
     }
 

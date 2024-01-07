@@ -19,7 +19,7 @@ spring:
     host: ${remote-server.ip}
     port: 6379
     database: 0
-#    password:
+    password: sibyl-redis-2023
 mybatis-plus:
   configuration:
     #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

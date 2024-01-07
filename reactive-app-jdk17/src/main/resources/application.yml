@@ -23,7 +23,7 @@ logging:
 #      springframework:
 #        security: DEBUG
   file:
-    name: log/${spring.application.name}.log
+    name: /${spring.application.name}/log/${spring.application.name}.log
   logback:
     rollingpolicy:
       max-file-size: 100MB
