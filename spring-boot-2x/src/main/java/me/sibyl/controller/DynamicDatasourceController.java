@@ -33,7 +33,7 @@ public class DynamicDatasourceController {
         try {
             User detail = userService.detail(id);
             //detail.setUsername(String.valueOf(RandomUtils.nextDouble()));
-            detail.setAge(RandomUtils.nextInt());
+            //detail.setAge(RandomUtils.nextInt());
             userService.updateUser(detail);
             return Response.success(System.currentTimeMillis());
         }catch (Exception e){

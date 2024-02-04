@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  # 给SpringBoot起一个自定义的服务名
+  myappService:
+    # 将来 Dockerfile 构建的镜像名及版本号
+    image: spring-boot-2x:1.0
+    # 指定容器名称
+    container_name: spring-boot-2x
+    # 开放端口
+    ports:
+      - "8080:8080"
+    # 配置容器连接的自定义网络，跟mysql、redis 属于同一个网络
+    networks:
+      - app_net
+    # 容器启动时依赖于以下服务
+    depends_on:
+      - postgresServer
+      - redisServer
+  # mysql服务
+  postgresServer:
+    image: postgres:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - /data/docker/postgres:/var/lib/mysql
+      - /mydocker/mysql/conf.d:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    networks:
+      - app_net
+  # redis 服务
+  redisServer:
+    image: redis:6.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - /data/docker/redis/data:/data
+      - /data/docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - app_net
+    command: redis-server
+networks:
+  app_net:

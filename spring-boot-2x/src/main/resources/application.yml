@@ -16,7 +16,7 @@ spring:
     cache: false
   devtools:
     livereload:
-      enabled: true
+      enabled: false
     restart:
       additional-exclude: static/**
 
@@ -43,6 +43,11 @@ remote-server:
 url:
   anonymous: /home/**,/auth/no/required,/hello/**
 
+jwt:
+  token:
+    header: token
+    secret: sibyl-auth
+    expireTime: 60000
 
 jasypt:
   encryptor:

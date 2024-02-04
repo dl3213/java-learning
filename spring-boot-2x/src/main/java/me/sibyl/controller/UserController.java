@@ -55,7 +55,7 @@ public class UserController {
         try {
             User detail = userService.detail(id);
             //detail.setUsername(String.valueOf(RandomUtils.nextDouble()));
-            detail.setAge(RandomUtils.nextInt());
+            //detail.setAge(RandomUtils.nextInt());
             userService.updateById(detail);
             return Response.success(System.currentTimeMillis());
         }catch (Exception e){

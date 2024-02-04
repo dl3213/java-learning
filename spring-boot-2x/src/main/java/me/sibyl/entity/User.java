@@ -18,7 +18,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-@TableName("sys_user")
+@TableName("t_sys_user")
 @EqualsAndHashCode
 @Accessors(chain = true)
 @ToString(callSuper = true)
@@ -27,10 +27,10 @@ public class User extends BaseEntity
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     private String username;
-    private String name;
+//    private String name;
     private String password;
-    private Integer age;
-    private String email;
-    private String phone;
-    private Integer status;
+//    private Integer age;
+//    private String email;
+//    private String phone;
+//    private Integer status;
 }

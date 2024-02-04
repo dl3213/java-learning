@@ -1,0 +1,62 @@
+server:
+  port: 10001
+  shutdown: graceful
+  tomcat:
+    connection-timeout: 3600000
+spring:
+  application:
+    name: code-runner
+  profiles:
+    active: dev
+    include: db, quartz
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  main:
+    lazy-initialization: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  devtools:
+    livereload:
+      enabled: true
+  r2dbc:
+    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl
+    username: sibyl
+    password: sibyl-h2-2023
+  h2:
+    console:
+      enable: true
+      path: /h2-console
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+  health:
+    redis:
+      enabled: false
+  endpoint:
+    health:
+      show-details: always
+
+runnerEnabled: true
+auth: false
+isDev: true
+logDetail: false
+
+debug: false
+logging:
+  level:
+    root: info
+  file:
+    name: ./${spring.application.name}/logs/log.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 360

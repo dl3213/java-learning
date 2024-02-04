@@ -39,10 +39,12 @@ public class IndexController {
 
     @GetMapping({"/login",})
     public String index1() {
-
         return "loginForm";
     }
-
+    @GetMapping({"/error",})
+    public String error() {
+        return "error";
+    }
     @GetMapping("/welcome")
     public String toWelcome() {
         return "welcome";

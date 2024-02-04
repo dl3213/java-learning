@@ -20,7 +20,7 @@ public class Main {
      */
 
     public static void main(String[] args) {
-        File dir = new File("D:\\game\\steam\\steamapps\\workshop\\content\\431960");
+        File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDateStr = simpleDateFormat.format(beginDate);
