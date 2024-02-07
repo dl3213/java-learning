@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/external")
+@RequestMapping("/api/external")
 @Slf4j
 public class TestController {
     @RequestMapping(value = "/test", method = {RequestMethod.GET, RequestMethod.POST})

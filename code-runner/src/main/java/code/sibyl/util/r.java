@@ -144,12 +144,6 @@ public class r {
         }
     }
 
-    /**
-     * 获取用户id
-     */
-    public static String getUserId() {
-        return UserUtil.getUserId();
-    }
 
     /**
      * 获取bean

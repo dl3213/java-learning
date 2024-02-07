@@ -77,7 +77,7 @@
             console.log('request => '+ field)
             axios({
                 method: 'post',
-                url: '/api/v1' + prefix + '/add',
+                url: '/api/' + prefix + '/add',
                 data: field,
             })
                 .then(function (response) {
@@ -94,7 +94,7 @@
                     }
                 });
             console.log('request sent => '+ field)
-            // $.post('/api/v1'+ prefix + '/add', field, (res) => {
+            // $.post('/api'+ prefix + '/add', field, (res) => {
             //     console.log(res)
             //     if(res && res.code == 200){
             //         layer.msg('操作成功',{time:1500});

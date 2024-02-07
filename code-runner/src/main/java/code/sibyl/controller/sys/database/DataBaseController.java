@@ -1,4 +1,4 @@
-package code.sibyl.controller.database;
+package code.sibyl.controller.sys.database;
 
 import code.sibyl.common.Response;
 import code.sibyl.domain.Database;
@@ -13,18 +13,18 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Controller
-@RequestMapping("/api/v1/database")
+@RequestMapping("/api/system/database")
 @Slf4j
 public class DataBaseController {
 
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        return Mono.create(monoSink -> monoSink.success("/database/list-view"));
+        return Mono.create(monoSink -> monoSink.success("database/list-view"));
     }
 
     @GetMapping("/add-view")
     public Mono<String> add_view(final Model model) {
-        return Mono.create(monoSink -> monoSink.success("/database/add-view"));
+        return Mono.create(monoSink -> monoSink.success("database/add-view"));
     }
 
     @PostMapping("/list")

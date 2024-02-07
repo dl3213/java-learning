@@ -3,24 +3,32 @@ package code.sibyl.controller.sys.user;
 import code.sibyl.common.Response;
 import code.sibyl.domain.SysUser;
 import code.sibyl.service.SysUserService;
+import code.sibyl.util.UserUtil;
 import code.sibyl.util.r;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.server.context.SecurityContextServerWebExchange;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @org.springframework.stereotype.Controller
-@RequestMapping("/api/v1/sys/user")
+@RequestMapping("/api/sys/user")
 @Slf4j
 public class Controller {
 
-    private final static String prefix = "/sys/user";
+    private final static String prefix = "sys/user";
 
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
@@ -36,7 +44,21 @@ public class Controller {
 
     @PostMapping("/list")
     @ResponseBody
-    public Flux<SysUser> list() {
+    public Flux<SysUser> list(ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) throws ExecutionException, InterruptedException {
+        System.err.println(request);
+        System.err.println(userDetails.getUsername());
+        System.err.println(authentication.getName());
+//        System.err.println(ReactiveSecurityContextHolder.getContext().switchIfEmpty());
+//        System.err.println(ReactiveSecurityContextHolder.getContext().map(ctx -> ctx.getAuthentication()).block());
+        ReactiveSecurityContextHolder.getContext()
+                //.switchIfEmpty(Mono.error(new IllegalStateException("ReactiveSecurityContext is empty")))
+                .map(context -> {
+                    System.err.println("ccontext");
+                    System.err.println(context);
+                    return context.getAuthentication().getPrincipal();
+                })
+                .cast(UserDetails.class)
+                .subscribe(s -> System.err.println(s));
         return r.getBean(SysUserService.class).list();
     }
 
@@ -46,6 +68,11 @@ public class Controller {
     public Mono<Response> add(@RequestBody SysUser user, ServerHttpRequest request) {
 //        System.err.println(user);
 //        System.err.println(request.getURI().getPath());
+        System.err.println();
+//        Mono.just(user).map(user -> {
+//            user.setCreateTime(LocalDateTime.now());
+//            user.setCreateId();
+//        })
         return r.getBean(SysUserService.class).save(user).map(Response::success);
     }
 }

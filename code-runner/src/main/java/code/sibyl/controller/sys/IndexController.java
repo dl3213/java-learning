@@ -28,11 +28,11 @@ public class IndexController {
                 new MenuDTO()
                         .setCode("sys-user")
                         .setName("系统用户管理")
-                        .setChildren(Arrays.asList(new MenuDTO().setName("用户列表").setLinkUrl("api/v1/sys/user/list-view"))),
+                        .setChildren(Arrays.asList(new MenuDTO().setName("用户列表").setLinkUrl("api/sys/user/list-view"))),
                 new MenuDTO()
                         .setCode("database-designer")
                         .setName("数据库管理")
-                        .setChildren(Arrays.asList(new MenuDTO().setName("数据库列表").setLinkUrl("api/v1/database/list-view")))
+                        .setChildren(Arrays.asList(new MenuDTO().setName("数据库列表").setLinkUrl("api/database/list-view")))
         );
     }
 

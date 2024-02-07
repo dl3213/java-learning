@@ -36,21 +36,18 @@ public class SysUser {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "last_login_time")
     private LocalDateTime lastLoginTime;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "create_time")
     private LocalDateTime createTime = LocalDateTime.now();
 
     @Column(name = "create_id")
     private Long createId;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 

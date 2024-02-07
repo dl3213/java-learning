@@ -42,7 +42,7 @@
         // 创建渲染实例
         table.render({
             elem: '#test',
-            url: '/api/v1/database/list',
+            url: '/api/database/list',
             response: {
                 statusCode: 0, // 重新规定成功的状态码为 200，table 组件默认为 0
             },
@@ -99,7 +99,7 @@
                         shadeClose: true,
                         maxmin: true, //开启最大化最小化按钮
                         area: ['900px', '600px'],
-                        content: '/api/v1/database/add-view',
+                        content: '/api/database/add-view',
                         end:function (){
                             table.reload('test',{},true)
                         }
