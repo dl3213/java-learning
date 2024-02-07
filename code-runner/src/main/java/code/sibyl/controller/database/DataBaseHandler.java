@@ -24,7 +24,7 @@ public class DataBaseHandler {
     }
 
     public Mono<ServerResponse> save(ServerRequest serverRequest) {
-        System.err.println("add");
+        //System.err.println("add" + serverRequest.path());
         return ServerResponse.ok().contentType(APPLICATION_JSON)
                 .body(databaseRepository.saveAll(serverRequest.bodyToMono(Database.class)), Database.class);
     }

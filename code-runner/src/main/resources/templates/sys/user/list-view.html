@@ -13,6 +13,7 @@
     <script src="/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
+<input id="prefix" disabled style="display: none" th:value="${prefix}">
 <div style="padding: 16px;">
     <table class="layui-hide" id="test" lay-filter="test"></table>
 </div>
@@ -38,11 +39,13 @@
         var table = layui.table;
         var dropdown = layui.dropdown;
         var layer = layui.layer;
+        var prefix = $("#prefix").val()
+        console.log("prefix => " + prefix)
 
         // 创建渲染实例
         table.render({
             elem: '#test',
-            url: '/api/v1/database/list',
+            url: '/api/v1'+prefix+'/list',
             response: {
                 statusCode: 0, // 重新规定成功的状态码为 200，table 组件默认为 0
             },
@@ -71,10 +74,14 @@
             cols: [
                 [
                     {type: 'checkbox', fixed: 'left'},
-                    {field: 'id', width: 500, title: 'id'},
-                    {field: 'name', width: 500, title: 'name'},
-                    {field: 'type', width: 200, title: 'type'},
-                    {field: 'version', width: 200, title: 'version'},
+                    {field: 'id', width: 100, title: 'id'},
+                    {field: 'username', width: 100, title: 'username'},
+                    {field: 'password', width: 100, title: 'password'},
+                    {field: 'phoneNumber', width: 100, title: 'phoneNumber'},
+                    {field: 'isDeleted', width: 100, title: 'isDeleted'},
+                    {field: 'lastLoginTime', width: 100, title: 'lastLoginTime'},
+                    {field: 'createTime', width: 100, title: 'createTime'},
+                    {field: 'createId', width: 100, title: 'createId'},
                 ]
             ],
             done: function () {
@@ -99,7 +106,7 @@
                         shadeClose: true,
                         maxmin: true, //开启最大化最小化按钮
                         area: ['900px', '600px'],
-                        content: '/api/v1/database/add-view',
+                        content: '/api/v1'+prefix+'/add-view',
                         end:function (){
                             table.reload('test',{},true)
                         }

@@ -24,15 +24,23 @@ public class SecurityConfig {
         // @formatter:off
         http
                 .authorizeExchange((authorize) -> authorize
-                        .pathMatchers("/login","/login-view","/css/**","/js/**","/font/**").permitAll()
+                        .pathMatchers(
+                                "/login",
+                                "/login-view",
+                                "/css/**",
+                                "/js/**",
+                                "/font/**",
+                                "/img/**"
+                        ).permitAll()
                         .anyExchange().authenticated()
                 );
         http.csrf(csrf -> csrf.disable());
         http.httpBasic(e -> e.disable());
         http.headers(header -> header.frameOptions(f->f.disable()));
         http
-                .formLogin((form) -> form
-                        .loginPage("/login-view").requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
+                .formLogin((form)-> form
+                        .loginPage("/login-view")
+                        .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
                 );
 
         // @formatter:on
@@ -42,13 +50,18 @@ public class SecurityConfig {
     @Bean
     public MapReactiveUserDetailsService userDetailsService() {
         // @formatter:off
-        UserDetails user = User.withDefaultPasswordEncoder()
+        UserDetails admin = User.withDefaultPasswordEncoder()
                 .username("admin")
                 .password("admin")
                 .roles("admin")
                 .build();
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("user")
+                .password("user")
+                .roles("user")
+                .build();
         // @formatter:on
-        return new MapReactiveUserDetailsService(user);
+        return new MapReactiveUserDetailsService(admin, user);
     }
 
 }

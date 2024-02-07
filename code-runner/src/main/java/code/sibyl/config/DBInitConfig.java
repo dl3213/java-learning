@@ -1,6 +1,7 @@
 package code.sibyl.config;
 
 import io.r2dbc.spi.ConnectionFactory;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 
 @Configuration
+@Slf4j
 public class DBInitConfig {
     @Bean
     public ConnectionFactoryInitializer initializer(@Qualifier("connectionFactory") ConnectionFactory factory) {
@@ -18,6 +20,7 @@ public class DBInitConfig {
         ClassPathResource classPathResource = new ClassPathResource("/db/schema.sql");
         ResourceDatabasePopulator populator = new ResourceDatabasePopulator(classPathResource);
         initializer.setDatabasePopulator(populator);
+        log.info("db-initializer");
         return initializer;
     }
 }

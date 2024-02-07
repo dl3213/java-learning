@@ -3,7 +3,6 @@ package code.sibyl.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -74,9 +73,9 @@ public class r {
     /**
      *
      */
-    public static ThreadPoolTaskExecutor taskExecutor() {
-        return SpringUtil.getBean(ThreadPoolTaskExecutor.class);
-    }
+//    public static ThreadPoolTaskExecutor taskExecutor() {
+//        return SpringUtil.getBean(ThreadPoolTaskExecutor.class);
+//    }
 
     /**
      * 字符串处理

@@ -1,3 +1,6 @@
+app:
+  key: sibyl
+
 server:
   port: 10001
   shutdown: graceful
@@ -22,14 +25,18 @@ spring:
   devtools:
     livereload:
       enabled: true
+    restart:
+      exclude: logs/**
   r2dbc:
-    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl
+    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE
     username: sibyl
     password: sibyl-h2-2023
   h2:
     console:
       enable: true
-      path: /h2-console
+      path: /h2
+      settings:
+        web-allow-others: true
 management:
   endpoints:
     web:
