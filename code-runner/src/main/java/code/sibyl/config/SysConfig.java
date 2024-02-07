@@ -9,6 +9,10 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SysConfig {
 
+    /**
+     * 全局跨域配置
+     * @return
+     */
     @Bean
     public CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

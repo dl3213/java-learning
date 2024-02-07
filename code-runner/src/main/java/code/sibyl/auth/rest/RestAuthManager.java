@@ -5,9 +5,12 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.core.Authentication;
 import reactor.core.publisher.Mono;
 
+/**
+ *
+ */
 //@Component // 注入之后就会被spring security 获取
 @Slf4j
-public class RestReactiveAuthenticationManager implements ReactiveAuthenticationManager {
+public class RestAuthManager implements ReactiveAuthenticationManager {
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         System.err.println("rest RestReactiveAuthenticationManager");

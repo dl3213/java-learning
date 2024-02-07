@@ -12,6 +12,12 @@ import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 @Configuration
 @Slf4j
 public class DBInitConfig {
+
+    /**
+     *  项目启动初始化
+     * @param factory
+     * @return
+     */
     @Bean
     public ConnectionFactoryInitializer initializer(@Qualifier("connectionFactory") ConnectionFactory factory) {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();

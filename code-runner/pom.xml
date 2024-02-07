@@ -117,6 +117,7 @@
         </dependencies>
     </dependencyManagement>
 
+<!--  切换成jdk21打包  -->
     <build>
         <plugins>
             <plugin>

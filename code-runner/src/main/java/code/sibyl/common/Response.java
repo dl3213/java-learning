@@ -5,6 +5,10 @@ import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ *  通用返回格式
+ */
 @Data
 @ToString
 public class Response extends HashMap<String, Object> {

@@ -10,6 +10,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * 系统用户
+ */
 
 @Entity
 @Table("T_SYS_USER")

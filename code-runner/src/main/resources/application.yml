@@ -1,6 +1,11 @@
 app:
   key: sibyl
 
+runnerEnabled: true
+auth: false
+isDev: true
+logDetail: false
+
 server:
   port: 10001
   shutdown: graceful
@@ -28,7 +33,7 @@ spring:
     restart:
       exclude: logs/**
   r2dbc:
-    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE
+    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE #这里因为是内部module就多加一层文件夹
     username: sibyl
     password: sibyl-h2-2023
   h2:
@@ -52,17 +57,12 @@ management:
     health:
       show-details: always
 
-runnerEnabled: true
-auth: false
-isDev: true
-logDetail: false
-
 debug: false
 logging:
   level:
     root: info
   file:
-    name: ./${spring.application.name}/logs/log.log
+    name: ./${spring.application.name}/logs/log.log #这里因为是内部module就多加一层文件夹
   logback:
     rollingpolicy:
       max-file-size: 100MB

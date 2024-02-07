@@ -7,8 +7,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/**
+ *
+ */
 //@Component // 注入之后就会被spring security 获取
-//@Slf4j
+@Slf4j
 //@Primary
 public class SysReactiveAuthenticationManager implements ReactiveAuthenticationManager {
     @Override

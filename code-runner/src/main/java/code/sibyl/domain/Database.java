@@ -11,6 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * 数据库
+ */
 
 @Entity
 @Table("T_DATABASE")

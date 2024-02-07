@@ -13,16 +13,18 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ *  登录失败 处理器
+ */
 //@Component // 注入之后就会被spring security 获取,多入口登录会被同一个处理
 @Slf4j
-public class RestServerAuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
+public class RestAuthFailureHandler implements ServerAuthenticationFailureHandler {
     @Override
     public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange, AuthenticationException exception) {
         log.info("认证失败");

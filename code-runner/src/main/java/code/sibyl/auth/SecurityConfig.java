@@ -1,7 +1,7 @@
 package code.sibyl.auth;
 
 import code.sibyl.auth.rest.*;
-import code.sibyl.util.r;
+import code.sibyl.auth.sys.SysAuthEntryPoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +19,10 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+
+/**
+ * spring security webflux版配置
+ */
 
 @Configuration
 @EnableWebFluxSecurity
@@ -46,16 +50,20 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.httpBasic(e -> e.disable());
         http.headers(header -> header.frameOptions(f->f.disable()));
+        http.exceptionHandling(exceptionHandling ->
+                exceptionHandling
+                        .accessDeniedHandler(new RestAccessDeniedHandler())
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint()) // 未认证的处理,返回json
+        );
         http
-                .formLogin((form)-> form
+                .formLogin(form-> form
                                 .loginPage("/login-view")
                         .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/api/rest/login"))// 注意请求方法及Content-Type,Content-Type默认x-www-form-urlencoded
-                        .authenticationEntryPoint(new RestServerAuthenticationEntryPoint())//限制到 post + json
+//                        .authenticationEntryPoint(new RestServerAuthenticationEntryPoint())// todo 限制到 post + json
 //                        .authenticationManager(new RestReactiveAuthenticationManager())
-                        .authenticationSuccessHandler(new RestServerAuthenticationSuccessHandler())
-                        .authenticationFailureHandler(new RestServerAuthenticationFailureHandler())
+                        .authenticationSuccessHandler(new RestAuthSuccessHandler())
+                        .authenticationFailureHandler(new RestAuthFailureHandler())
                 );
-//        http.exceptionHandling(exceptionHandling ->exceptionHandling.accessDeniedHandler(new RestServerAccessDeniedHandler()));
         http.logout(logout->logout.logoutUrl("/api/rest/logout"));
         // @formatter:on
         return http.build();
@@ -87,6 +95,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.httpBasic(e -> e.disable());
         http.headers(header -> header.frameOptions(f->f.disable()));
+        http.exceptionHandling(exceptionHandling ->
+                exceptionHandling
+                        .authenticationEntryPoint(new SysAuthEntryPoint("/login-view")) // 未认证的处理,跳转到登录页面
+        );
         http
                 .formLogin((form)-> form
                         .loginPage("/login-view")
@@ -99,6 +111,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     *  临时
+     * @return
+     */
     @Bean
     public MapReactiveUserDetailsService userDetailsService() {
         // @formatter:off
@@ -119,11 +135,19 @@ public class SecurityConfig {
         return new MapReactiveUserDetailsService(admin, user);
     }
 
-    @Bean
-    public ServerSecurityContextRepository customServerSecurityContextRepository() {
-        return NoOpServerSecurityContextRepository.getInstance();
-    }
+    /**
+     *  todo
+     * @return
+     */
+//    @Bean
+//    public ServerSecurityContextRepository customServerSecurityContextRepository() {
+//        return NoOpServerSecurityContextRepository.getInstance();
+//    }
 
+    /**
+     *  密码加密解密
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();

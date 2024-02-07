@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ *  日期循环执行类
+ */
 @Data
 public class DateLoopRunner {
 
