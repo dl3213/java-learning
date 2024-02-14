@@ -1,4 +1,4 @@
-package code.sibyl.controller.sys.database;
+package code.sibyl.controller.sys;
 
 import code.sibyl.common.Response;
 import code.sibyl.domain.Database;
@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Controller
-@RequestMapping("/api/system/database")
+@RequestMapping("/database")
 @Slf4j
 public class DataBaseController {
 

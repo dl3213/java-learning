@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("/api/rest")
+@RequestMapping("/api/rest/v1/sys/user")
 @Slf4j
-public class SysUserController {
+public class RestSysUserController {
 
     @PostMapping("/list")
     @ResponseBody

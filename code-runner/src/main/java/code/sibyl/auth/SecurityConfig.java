@@ -2,6 +2,7 @@ package code.sibyl.auth;
 
 import code.sibyl.auth.rest.*;
 import code.sibyl.auth.sys.SysAuthEntryPoint;
+import code.sibyl.auth.sys.SysAuthenticationManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +53,7 @@ public class SecurityConfig {
         http.headers(header -> header.frameOptions(f->f.disable()));
         http.exceptionHandling(exceptionHandling ->
                 exceptionHandling
-                        .accessDeniedHandler(new RestAccessDeniedHandler())
+                        .accessDeniedHandler(new RestAccessDeniedHandler()) // 权限处理
                         .authenticationEntryPoint(new RestAuthenticationEntryPoint()) // 未认证的处理,返回json
         );
         http
@@ -81,6 +82,8 @@ public class SecurityConfig {
         // @formatter:off
         http
                 .authorizeExchange((authorize) -> authorize
+                                .pathMatchers("/admin/**").hasAnyAuthority("admin:api")
+                                .pathMatchers("/user/**").hasAnyAuthority("user:api")
                         .pathMatchers(
 //                                "/login",
                                 "/login-view",
@@ -98,12 +101,17 @@ public class SecurityConfig {
         http.exceptionHandling(exceptionHandling ->
                 exceptionHandling
                         .authenticationEntryPoint(new SysAuthEntryPoint("/login-view")) // 未认证的处理,跳转到登录页面
+                        .accessDeniedHandler(new RestAccessDeniedHandler()) //权限失败 处理
         );
         http
                 .formLogin((form)-> form
                         .loginPage("/login-view")
                         .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
+//                                .authenticationManager(new SysAuthenticationManager()) //  todo
+//                        .authenticationSuccessHandler(new RestAuthSuccessHandler()) // 前后端不分离需要跳转到首页
+//                        .authenticationFailureHandler(new RestAuthFailureHandler()) // 前后端不分离需要跳转到登录页并加提示 todo
                 );
+//        http.addFilterAt(new LoginFilter, ); // 自定义登录操作 ??? 邮箱手机登录可以在ReactiveUserDetailsService中完成
         http.logout(logout->logout.logoutUrl("/logout"));
         //http.securityContextRepository(customServerSecurityContextRepository());
 
@@ -112,28 +120,29 @@ public class SecurityConfig {
     }
 
     /**
-     *  临时
+     * 临时
+     *
      * @return
      */
-    @Bean
-    public MapReactiveUserDetailsService userDetailsService() {
-        // @formatter:off
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .passwordEncoder(passwordEncoder()::encode)
-                .roles("admin")
-                .build();
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("user")
-                .passwordEncoder(passwordEncoder()::encode)
-                .roles("user")
-                .build();
-        // @formatter:on
-        return new MapReactiveUserDetailsService(admin, user);
-    }
+//    @Bean
+//    public MapReactiveUserDetailsService userDetailsService() {
+//        // @formatter:off
+////        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        UserDetails admin = User.withDefaultPasswordEncoder()
+//                .username("admin")
+//                .password("admin")
+//                .passwordEncoder(passwordEncoder()::encode)
+//                .authorities("admin:api","user:api")
+//                .build();
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user")
+//                .password("user")
+//                .passwordEncoder(passwordEncoder()::encode)
+//                .authorities("user:api")// 角色-菜单  权限-接口
+//                .build();
+//        // @formatter:on
+//        return new MapReactiveUserDetailsService(admin, user);
+//    }
 
     /**
      *  todo
@@ -145,12 +154,14 @@ public class SecurityConfig {
 //    }
 
     /**
-     *  密码加密解密
+     * 密码加密解密
+     *
      * @return
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
     }
 }

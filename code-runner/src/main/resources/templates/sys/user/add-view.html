@@ -77,7 +77,7 @@
             console.log('request => '+ field)
             axios({
                 method: 'post',
-                url: '/api/' + prefix + '/add',
+                url: '/user/add',
                 data: field,
             })
                 .then(function (response) {

@@ -45,7 +45,7 @@
         // 创建渲染实例
         table.render({
             elem: '#test',
-            url: '/api/'+prefix+'/list',
+            url: '/user/list',
             response: {
                 statusCode: 0, // 重新规定成功的状态码为 200，table 组件默认为 0
             },
@@ -108,7 +108,7 @@
                         shadeClose: true,
                         maxmin: true, //开启最大化最小化按钮
                         area: ['900px', '600px'],
-                        content: '/api/'+prefix+'/add-view',
+                        content: '/user/add-view',
                         end:function (){
                             table.reload('test',{},true)
                         }

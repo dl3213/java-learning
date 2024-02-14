@@ -18,14 +18,14 @@ public class DBInitConfig {
      * @param factory
      * @return
      */
-    @Bean
-    public ConnectionFactoryInitializer initializer(@Qualifier("connectionFactory") ConnectionFactory factory) {
-        ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
-        initializer.setConnectionFactory(factory);
-        ClassPathResource classPathResource = new ClassPathResource("/db/schema.sql");
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(classPathResource);
-        initializer.setDatabasePopulator(populator);
-        log.info("db-initializer");
-        return initializer;
-    }
+//    @Bean
+//    public ConnectionFactoryInitializer initializer(@Qualifier("connectionFactory") ConnectionFactory factory) {
+//        ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
+//        initializer.setConnectionFactory(factory);
+//        ClassPathResource classPathResource = new ClassPathResource("/db/schema.sql");
+//        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(classPathResource);
+//        initializer.setDatabasePopulator(populator);
+//        log.info("db-initializer");
+//        return initializer;
+//    }
 }

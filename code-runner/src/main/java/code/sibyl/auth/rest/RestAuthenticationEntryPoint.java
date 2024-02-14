@@ -24,7 +24,7 @@ public class RestAuthenticationEntryPoint implements ServerAuthenticationEntryPo
         System.err.println("rest RestServerAuthenticationEntryPoint");
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
-        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.UNAUTHORIZED.value(), "未认证")).getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.UNAUTHORIZED.value(), "认证失败,未认证")).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }

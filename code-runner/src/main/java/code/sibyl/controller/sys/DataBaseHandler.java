@@ -1,4 +1,4 @@
-package code.sibyl.controller.sys.database;
+package code.sibyl.controller.sys;
 
 import code.sibyl.domain.Database;
 import code.sibyl.repository.DatabaseRepository;

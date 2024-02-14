@@ -24,8 +24,8 @@ public class RestAccessDeniedHandler implements ServerAccessDeniedHandler {
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException denied) {
 //        System.err.println("rest 认证失败");
         ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatusCode.valueOf(HttpStatus.UNAUTHORIZED.value()));
-        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.UNAUTHORIZED.value(), "认证失败")).getBytes(StandardCharsets.UTF_8);
+        response.setStatusCode(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()));
+        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.FORBIDDEN.value(), "认证失败,无权操作")).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }
