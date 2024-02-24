@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo</title>
+    <link href="/css/layui.css" rel="stylesheet">
+    <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/bootstrap.bundle.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/popper.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">name</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" value=""
+                   placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">type</label>
+        <div class="layui-input-block">
+            <input type="text" name="type" lay-verify="required" value=""
+                   placeholder="请输入" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+        </div>
+    </div>
+</form>
+
+<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
+<script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/layui.js"></script>
+<script src="/js/common/common.js"></script>
+<script>
+    layui.use(['form', 'laydate', 'util'], function () {
+        var form = layui.form;
+        var layer = layui.layer;
+        var laydate = layui.laydate;
+        var util = layui.util;
+
+        // 提交事件
+        form.on('submit(submit)', function (data) {
+            var field = data.field; // 获取表单字段值
+            console.log(field)
+            axios
+                .post('/database/add', field)
+                .then(response => {
+                    console.log(response)
+                    layer_confirm("操作成功",()=>{
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                    layer.msg(error.message);
+                })
+            return false; // 阻止默认 form 跳转
+        });
+
+        // 日期
+        laydate.render({
+            elem: '#date'
+        });
+    });
+</script>
+
+</body>
+</html>
