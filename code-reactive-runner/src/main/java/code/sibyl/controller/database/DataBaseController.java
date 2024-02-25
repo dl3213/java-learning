@@ -1,5 +1,6 @@
 package code.sibyl.controller.database;
 
+import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
 import code.sibyl.domain.Database;
 import code.sibyl.repository.DatabaseRepository;
@@ -26,6 +27,7 @@ public class DataBaseController {
 
     @GetMapping("/add-view")
     public Mono<String> add_view(final Model model) {
+        model.addAttribute("typeList", DataBaseTypeEnum.values());
         return Mono.create(monoSink -> monoSink.success("database/add-view"));
     }
 }

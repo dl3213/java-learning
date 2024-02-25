@@ -26,6 +26,8 @@ public class IndexController {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
+    private final static String systemName = "未命名";
+
 
     @RequestMapping({"/", "index", "main"})
     public Mono<String> index(final Model model, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
@@ -33,8 +35,8 @@ public class IndexController {
 //        System.err.println(userDetails);
 //        System.err.println(databaseClient);
 //        System.err.println(r2dbcEntityTemplate);
-        model.addAttribute("systemName", "测试系统");
-        model.addAttribute("title", "测试系统");
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
         model.addAttribute("username", userDetails.getUsername());
         List<MenuDTO> menuTree = menuTree();
         model.addAttribute("menuTree", menuTree);

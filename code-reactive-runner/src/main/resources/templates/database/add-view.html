@@ -11,27 +11,69 @@
     <script src="/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-<form class="layui-form" action="">
-    <div class="layui-form-item">
-        <label class="layui-form-label">name</label>
-        <div class="layui-input-block">
-            <input type="text" name="name" lay-verify="required" value=""
-                   placeholder="请输入" autocomplete="off" class="layui-input">
+<div>
+    <form class="layui-form layui-form-pane" action="" style="margin: 50px;">
+        <div class="layui-form-item">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">name</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <label class="layui-form-label">type</label>
+                <div class="layui-input-block">
+                    <select name="type">
+                        <option th:each="t:${typeList}" th:text="${t.code}" th:value="${t.code}"></option>
+                    </select>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">type</label>
-        <div class="layui-input-block">
-            <input type="text" name="type" lay-verify="required" value=""
-                   placeholder="请输入" autocomplete="off" class="layui-input">
+        <div class="layui-form-item">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">host</label>
+                <div class="layui-input-block">
+                    <input type="text" name="host" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <label class="layui-form-label">port</label>
+                <div class="layui-input-block">
+                    <input type="text" name="port" onkeyup="value=value.replace(/[^\d]/g,'')" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="layui-form-item">
-        <div class="layui-input-block">
-            <button type="submit" class="layui-btn" lay-submit lay-filter="submit">立即提交</button>
+        <div class="layui-form-item">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">username</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <label class="layui-form-label">password</label>
+                <div class="layui-input-block">
+                    <input type="text" name="password" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
         </div>
-    </div>
-</form>
+        <div class="layui-form-item">
+            <div class="layui-col-md12">
+                <label class="layui-form-label">database</label>
+                <div class="layui-input-block">
+                    <input type="text" name="database" lay-verify="required" placeholder="请输入" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">立即提交</button>
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="test">测试连接</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 <!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
 <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
@@ -53,7 +95,7 @@
                 .post('/database/add', field)
                 .then(response => {
                     console.log(response)
-                    layer_confirm("操作成功",()=>{
+                    layer_confirm("操作成功", () => {
                         var index = parent.layer.getFrameIndex(window.name);
                         parent.layer.close(index);
                     })

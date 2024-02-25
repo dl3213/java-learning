@@ -111,8 +111,9 @@ public class SecurityConfig {
 //        http.addFilterAt(new LoginFilter, ); // 自定义登录操作 ??? 邮箱手机登录可以在ReactiveUserDetailsService中完成
         http.logout(logout->logout.logoutUrl("/logout"));
         //http.securityContextRepository(customServerSecurityContextRepository());
-
         // @formatter:on
+        http.securityContextRepository(new SessionConfig());
+//        http.se
         return http.build();
     }
 
