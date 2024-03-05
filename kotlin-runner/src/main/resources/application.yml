@@ -1,0 +1,69 @@
+app:
+  key: sibyl
+
+runnerEnabled: true
+auth: false
+isDev: true
+logDetail: false
+
+server:
+  port: 10002
+  shutdown: graceful
+  tomcat:
+    connection-timeout: 3600000
+spring:
+  application:
+    name: kotlin-runner
+  profiles:
+    active: dev
+    include: db, quartz
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  security:
+    strategy: MODE_INHERITABLETHREADLOCAL
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      exclude: logs/**
+  r2dbc:
+    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE #这里因为是内部module就多加一层文件夹
+    username: sibyl
+    password: sibyl-h2-2023
+  h2:
+    console:
+      enable: true
+      path: /h2
+      settings:
+        web-allow-others: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+  health:
+    redis:
+      enabled: false
+  endpoint:
+    health:
+      show-details: always
+
+debug: false
+logging:
+  level:
+    root: info
+  file:
+    name: ./${spring.application.name}/logs/log.log #这里因为是内部module就多加一层文件夹
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 360
