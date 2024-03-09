@@ -5,6 +5,7 @@ import code.sibyl.auth.sys.SysAuthEntryPoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
+
+import java.util.Base64;
 
 /**
  * spring security webflux版配置
@@ -160,9 +163,19 @@ public class SecurityConfig {
      * @return
      */
     @Bean
+    @Primary
     public PasswordEncoder passwordEncoder() {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 //        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
+    }
+
+    @Bean
+    public Base64.Decoder decoder(){
+        return Base64.getDecoder();
+    }
+    @Bean
+    public Base64.Encoder encoder(){
+        return Base64.getEncoder();
     }
 }

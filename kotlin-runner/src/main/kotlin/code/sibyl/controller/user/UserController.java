@@ -1,7 +1,7 @@
 package code.sibyl.controller.user;
 
 import code.sibyl.common.Response;
-import code.sibyl.domain.SysUser;
+import code.sibyl.domain.user.SysUser;
 import code.sibyl.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;

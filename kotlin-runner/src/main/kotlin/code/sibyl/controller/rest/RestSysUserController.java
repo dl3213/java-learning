@@ -1,6 +1,6 @@
 package code.sibyl.controller.rest;
 
-import code.sibyl.domain.SysUser;
+import code.sibyl.domain.user.SysUser;
 import code.sibyl.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;

@@ -1,4 +1,4 @@
-package code.sibyl.domain;
+package code.sibyl.domain.database;
 
 import code.sibyl.dto.DatabaseDTO;
 import jakarta.persistence.*;
@@ -39,11 +39,11 @@ public class Database {
     private String host;
     @Column(name = "port")
     private String port;
-    @Column(name = "port")
+    @Column(name = "username")
     private String username;
-    @Column(name = "port")
+    @Column(name = "password")
     private String password;
-    @Column(name = "port")
+    @Column(name = "database")
     private String database;
 
     @Version

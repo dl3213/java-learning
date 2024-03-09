@@ -12,6 +12,13 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
+import java.lang.management.RuntimeMXBean;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * 系统启动准备
@@ -35,6 +42,16 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        System.err.println(runtimeMXBean.getVmName());
+// 程序运行时间
+        Instant instant = Instant.ofEpochMilli(runtimeMXBean.getStartTime());
+        System.err.println(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toString().replace("T", " "));
+        // 程序已运行时间   System.currentTimeMillis(), runtimeMXBean.getStartTime()
+
+        System.err.println(System.currentTimeMillis() - runtimeMXBean.getStartTime());
 
 //        System.err.println(databaseClient);
 //        System.err.println(r2dbcEntityTemplate);

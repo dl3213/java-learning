@@ -1,7 +1,10 @@
 package code.sibyl.service;
 
-import code.sibyl.domain.Database;
+import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
+import io.r2dbc.pool.ConnectionPool;
+import io.r2dbc.pool.ConnectionPoolConfiguration;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
@@ -44,6 +49,22 @@ public class DataBaseService {
                             .option(PASSWORD, database.getPassword())
                             .option(DATABASE, database.getDatabase())
                             .build());
+            ConnectionPoolConfiguration configuration=ConnectionPoolConfiguration.builder(factory)
+                    .initialSize(10)//启动时连接池大小，默认10
+                    .maxIdleTime(Duration.ofMillis(1000))//最长空闲时间。如果配置为负数，则连接不会因为空闲等待而被释放。默认30分钟。注意：这个配置和backgroundEvictionInterval重复用途，这个后面说明
+                    .maxSize(10)//连接池最大大小，默认10
+                    .maxAcquireTime(Duration.ofMillis(1000))//获取连接的最长时间。也就是说，sql请求过来后，会向连接池请求一个连接，当连接全忙或者需要发起新的连接的时候，请求会处于等待状态。这个值配置最长等待多久，默认没有等待超时时间，如果获取不到会一直等下去。建议配置一下，避免流被卡住
+                    .maxCreateConnectionTime(Duration.ofMillis(1000))//创建连接的超时时间，默认不会超时
+                    .acquireRetry(1)//请求连接的重试次数，默认为1
+                    .name("db-pool")//连接池名称
+                    //.validationQuery()//探活SQL
+                    //.registerJmx()//是否注册JMX
+                    .build();
+
+            ConnectionPool pool=new ConnectionPool(configuration);
+
+            Mono<Connection> connectionMono = pool.create();
+
             DatabaseClient databaseClient = DatabaseClient.create(factory);
             R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
             System.err.println(databaseClient);//  ods_xcl_eos_org_organization

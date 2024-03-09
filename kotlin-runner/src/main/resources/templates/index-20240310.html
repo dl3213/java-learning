@@ -232,8 +232,7 @@
                         <div class="dropdown-divider"></div>
                         <a href="settings.html" class="dropdown-item">Settings</a>
                         <form id="_form" method="post" th:action="@{/logout}">
-                            <a onclick="console.log('logout click');document.getElementById('_form').submit();"
-                               class="dropdown-item" id="logoutBtn">Logout</a>
+                            <a onclick="console.log('logout click');document.getElementById('_form').submit();" class="dropdown-item" id="logoutBtn">Logout</a>
                         </form>
 
                     </div>
@@ -247,7 +246,7 @@
                 <div class="container-xl">
                     <ul class="navbar-nav">
                         <li class="nav-item active">
-                            <a class="nav-link" href="/">
+                            <a class="nav-link" href="./">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -670,12 +669,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/database/list-view">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-database" width="24"
-                           height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
-                           stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"
-                                                                                fill="none"/><path
-                              d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/><path d="M4 6v6a8 3 0 0 0 16 0v-6"/><path
-                              d="M4 12v6a8 3 0 0 0 16 0v-6"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-database" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" /><path d="M4 6v6a8 3 0 0 0 16 0v-6" /><path d="M4 12v6a8 3 0 0 0 16 0v-6" /></svg>
                     </span>
                                 <span class="nav-link-title">
                       Database
@@ -742,51 +736,8 @@
             </div>
         </div>
     </header>
-    <iframe class="page-wrapper" src="/home">
+    <iframe class="page-wrapper" src="/database/list-view">
 
-        <footer class="footer footer-transparent d-print-none">
-            <div class="container-xl">
-                <div class="row text-center align-items-center flex-row-reverse">
-                    <div class="col-lg-auto ms-lg-auto">
-                        <ul class="list-inline list-inline-dots mb-0">
-                            <li class="list-inline-item"><a href="https://tabler.io/docs" target="_blank"
-                                                            class="link-secondary" rel="noopener">Documentation</a></li>
-                            <li class="list-inline-item"><a href="license.html" class="link-secondary">License</a></li>
-                            <li class="list-inline-item"><a href="https://github.com/tabler/tabler" target="_blank"
-                                                            class="link-secondary" rel="noopener">Source code</a></li>
-                            <li class="list-inline-item">
-                                <a href="https://github.com/sponsors/codecalm" target="_blank" class="link-secondary"
-                                   rel="noopener">
-                                    <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                         class="icon text-pink icon-filled icon-inline" width="24" height="24"
-                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                         stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>
-                                    </svg>
-                                    Sponsor
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-                        <ul class="list-inline list-inline-dots mb-0">
-                            <li class="list-inline-item">
-                                Copyright &copy; 2023
-                                <a href="." class="link-secondary">Tabler</a>.
-                                All rights reserved.
-                            </li>
-                            <li class="list-inline-item">
-                                <a href="changelog.html" class="link-secondary" rel="noopener">
-                                    v1.0.0-beta20
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </iframe>
 </div>
 <div class="modal modal-blur fade" id="modal-report" tabindex="-1" role="dialog" aria-hidden="true">
@@ -1179,9 +1130,8 @@
       });
       // @formatter:on
 </script>
-
-<script>
-    // @formatter:off
+    <script>
+      // @formatter:off
       document.addEventListener("DOMContentLoaded", function () {
       	window.ApexCharts && (new ApexCharts(document.getElementById('sparkline-activity'), {
       		chart: {
@@ -1218,7 +1168,7 @@
       	})).render();
       });
       // @formatter:on
-</script>
+    </script>
 <script>
     // @formatter:off
       document.addEventListener("DOMContentLoaded", function () {

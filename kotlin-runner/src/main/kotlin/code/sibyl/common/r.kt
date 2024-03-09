@@ -17,6 +17,7 @@ import java.util.function.Function
  * 通用快捷函数
  */
 object r {
+    const val systemName: String = "未命名 " //常用时间格式
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式

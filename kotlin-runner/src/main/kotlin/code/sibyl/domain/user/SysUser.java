@@ -1,4 +1,4 @@
-package code.sibyl.domain;
+package code.sibyl.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

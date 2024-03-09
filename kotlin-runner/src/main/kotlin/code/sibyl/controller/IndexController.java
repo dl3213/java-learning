@@ -1,6 +1,9 @@
 package code.sibyl.controller;
 
+import code.sibyl.common.r;
+import code.sibyl.domain.database.Database;
 import code.sibyl.dto.MenuDTO;
+import code.sibyl.service.DataBaseService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import reactor.core.publisher.Mono;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,6 +65,12 @@ public class IndexController {
                         .setName("数据库管理")
                         .setChildren(Arrays.asList(new MenuDTO().setName("数据库列表").setLinkUrl("database/list-view")))
         );
+    }
+
+    @GetMapping({"home",})
+    public Mono<String> home() {
+        String welcome = "home";
+        return Mono.create(monoSink -> monoSink.success(welcome));
     }
 
     @GetMapping({"sys/main",})
