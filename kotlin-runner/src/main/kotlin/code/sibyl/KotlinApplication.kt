@@ -34,5 +34,10 @@ fun main(args: Array<String>) {
     println("JVM spec version: ${System.getProperty("java.specification.version")}")
     println("JVM spec vendor: ${System.getProperty("java.specification.vendor")}")
     println("JVM spec name: ${System.getProperty("java.specification.name")}")
+    var obj = object {
+        var id = 1;
+        var name = "test";
+    }
+    println(obj.toString())
 
 }

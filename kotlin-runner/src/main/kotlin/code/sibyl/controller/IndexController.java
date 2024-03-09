@@ -129,4 +129,39 @@ public class IndexController {
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
+    @GetMapping({"/lists.html"})
+    public Mono<String> lists(final Model model) {
+        String s = "/lists";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/tables.html"})
+    public Mono<String> tables(final Model model) {
+        String s = "/tables";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/emails.html"})
+    public Mono<String> emails(final Model model) {
+        String s = "/emails";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/database.html"})
+    public Mono<String> database(final Model model) {
+        String s = "/database";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/buttons.html"})
+    public Mono<String> buttons(final Model model) {
+        String s = "/buttons";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
 }
