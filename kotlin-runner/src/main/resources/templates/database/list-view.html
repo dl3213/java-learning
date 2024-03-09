@@ -80,18 +80,22 @@
 
                             <div class="table-responsive">
                                 <div style="padding: 16px;">
-                                    <table class="layui-hide"  id="test" lay-filter="test"></table>
+                                    <table class="layui-hide" id="test" lay-filter="test"></table>
                                 </div>
                                 <script type="text/html" id="toolbarDemo">
                                     <div class="layui-btn-container">
-                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="add">添加</button>
-                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="update">更新</button>
-                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="del">删除</button>
+                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="add">添加
+                                        </button>
+                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="update">更新
+                                        </button>
+                                        <button class="layui-btn layui-btn-sm layui-bg-black" lay-event="del">删除
+                                        </button>
                                     </div>
                                 </script>
                                 <script type="text/html" id="barDemo">
                                     <div class="layui-clear-space">
-                                        <a class="layui-btn layui-btn-xs layui-bg-black" lay-event="edit">编辑</a>
+                                        <a class="layui-btn layui-btn-xs layui-bg-black"
+                                           lay-event="connect">测试连接</a>
                                         <a class="layui-btn layui-btn-xs layui-bg-black" lay-event="more">
                                             更多
                                             <i class="layui-icon layui-icon-down layui-bg-black"></i>
@@ -148,6 +152,7 @@
                         {field: 'password', title: 'password'},
                         {field: 'database', title: 'database'},
                         {field: 'version', title: 'version'},
+                        {fixed: 'right', title: '操作', width: 125, minWidth: 125, toolbar: '#barDemo'},
                     ]
                 ],
                 parseData: function (res) {
@@ -226,39 +231,54 @@
             table.on('tool(test)', function (obj) { // 双击 toolDouble
                 var data = obj.data; // 获得当前行数据
                 // console.log(obj)
-                if (obj.event === 'edit') {
-                    layer.open({
-                        title: '编辑 - id:' + data.id,
-                        type: 1,
-                        area: ['80%', '80%'],
-                        content: '<div style="padding: 16px;">自定义表单元素</div>'
-                    });
-                } else if (obj.event === 'more') {
-                    // 更多 - 下拉菜单
-                    dropdown.render({
-                        elem: this, // 触发事件的 DOM 对象
-                        show: true, // 外部事件触发即显示
-                        data: [{
-                            title: '查看',
-                            id: 'detail'
-                        }, {
-                            title: '删除',
-                            id: 'del'
-                        }],
-                        click: function (menudata) {
-                            if (menudata.id === 'detail') {
-                                layer.msg('查看操作，当前行 ID:' + data.id);
-                            } else if (menudata.id === 'del') {
-                                layer.confirm('真的删除行 [id: ' + data.id + '] 么', function (index) {
-                                    obj.del(); // 删除对应行（tr）的DOM结构
-                                    layer.close(index);
-                                    // 向服务端发送删除指令
-                                });
-                            }
-                        },
-                        align: 'right', // 右对齐弹出
-                        style: 'box-shadow: 1px 1px 10px rgb(0 0 0 / 12%);' // 设置额外样式
-                    })
+                if (!obj.event) return;
+                switch (obj.event) {
+                    case 'edit':
+                        layer.open({
+                            title: '编辑 - id:' + data.id,
+                            type: 1,
+                            area: ['80%', '80%'],
+                            content: '<div style="padding: 16px;">自定义表单元素</div>'
+                        });
+                        break;
+                    case 'more':
+                        dropdown.render({
+                            elem: this, // 触发事件的 DOM 对象
+                            show: true, // 外部事件触发即显示
+                            data: [{
+                                title: '查看',
+                                id: 'detail'
+                            }, {
+                                title: '删除',
+                                id: 'del'
+                            }],
+                            click: function (menudata) {
+                                if (menudata.id === 'detail') {
+                                    layer.msg('查看操作，当前行 ID:' + data.id);
+                                } else if (menudata.id === 'del') {
+                                    layer.confirm('真的删除行 [id: ' + data.id + '] 么', function (index) {
+                                        obj.del(); // 删除对应行（tr）的DOM结构
+                                        layer.close(index);
+                                        // 向服务端发送删除指令
+                                    });
+                                }
+                            },
+                            align: 'right', // 右对齐弹出
+                            style: 'box-shadow: 1px 1px 10px rgb(0 0 0 / 12%);' // 设置额外样式
+                        })
+                        break;
+                    case 'connect':
+                        axios
+                            .post('/database/connect/' + data.id)
+                            .then(response => {
+                                console.log(response)
+
+                            })
+                            .catch(error => {
+                                console.log(error)
+                                layer.msg(error.message);
+                            })
+                        break;
                 }
             });
 

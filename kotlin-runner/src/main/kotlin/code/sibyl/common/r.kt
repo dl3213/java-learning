@@ -3,7 +3,7 @@ package code.sibyl.common
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
-import java.lang.reflect.Field
+import reactor.core.publisher.Mono
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Function
-import java.util.function.Supplier
 
 
 /**
@@ -30,6 +29,14 @@ object r {
     @JvmStatic
     fun success(data: Any?): Response {
         return Response.success(data)
+    }
+    @JvmStatic
+    fun success(): Response {
+        return Response.success()
+    }
+    @JvmStatic
+    fun successMono(): Mono<Response> {
+        return Mono.just(success());
     }
 
     fun formatDate(date: Date?, formatter: String?): String {
