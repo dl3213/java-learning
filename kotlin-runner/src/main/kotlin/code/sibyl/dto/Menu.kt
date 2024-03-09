@@ -29,8 +29,9 @@ package code.sibyl.dto
     }
 }
 
-fun main() {
+fun main123() {
     var menu = Menu().code("sys-user")
     println(menu)
     println(menu.id)
+    listOf(1,2,34,5,).stream()
 }

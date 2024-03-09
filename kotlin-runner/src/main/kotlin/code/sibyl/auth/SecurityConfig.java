@@ -67,6 +67,8 @@ public class SecurityConfig {
         return http.build();
     }
 
+    private final static String loginView = "/sign-in.html";
+
     /**
      * 前后端不分离
      *
@@ -77,17 +79,18 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         // @formatter:off
-        http
+       http
                 .authorizeExchange((authorize) -> authorize
                                 .pathMatchers("/admin/**").hasAnyAuthority("admin:api")
                                 .pathMatchers("/user/**").hasAnyAuthority("user:api")
                         .pathMatchers(
-//                                "/login",
-                                "/login-view",
+                                "/favicon.ico",
+                                loginView,
                                 "/css/**",
                                 "/js/**",
                                 "/font/**",
-                                "/img/**"
+                                "/img/**",
+                                "/dist/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyExchange().authenticated()
@@ -97,12 +100,12 @@ public class SecurityConfig {
         http.headers(header -> header.frameOptions(f->f.disable()));
         http.exceptionHandling(exceptionHandling ->
                 exceptionHandling
-                        .authenticationEntryPoint(new SysAuthEntryPoint("/login-view")) // 未认证的处理,跳转到登录页面
+                        .authenticationEntryPoint(new SysAuthEntryPoint(loginView)) // 未认证的处理,跳转到登录页面
                         .accessDeniedHandler(new RestAccessDeniedHandler()) //权限失败 处理
         );
         http
                 .formLogin((form)-> form
-                        .loginPage("/login-view")
+                        .loginPage(loginView)
                         .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
 //                                .authenticationManager(new SysAuthenticationManager()) //  todo
 //                        .authenticationSuccessHandler(new RestAuthSuccessHandler()) // 前后端不分离需要跳转到首页

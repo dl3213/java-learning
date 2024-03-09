@@ -28,7 +28,6 @@ public class IndexController {
 
     private final static String systemName = "未命名";
 
-
     @RequestMapping({"/", "index", "main"})
     public Mono<String> index(final Model model, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
 //        System.err.println("首页");
@@ -40,11 +39,15 @@ public class IndexController {
         model.addAttribute("username", userDetails.getUsername());
         List<MenuDTO> menuTree = menuTree();
         model.addAttribute("menuTree", menuTree);
-        return Mono.create(monoSink -> monoSink.success("index"));
+        return Mono.create(monoSink -> monoSink.success("/index"));
     }
 
     private static List<MenuDTO> menuTree() {
         return Arrays.asList(
+                new MenuDTO()
+                        .setCode("system")
+                        .setName("系统管理")
+                        .setChildren(Arrays.asList(new MenuDTO().setName("运行状态").setLinkUrl("sys/main-view"),new MenuDTO().setName("控制面板").setLinkUrl("sys/control-view"))),
                 new MenuDTO()
                         .setCode("sys-user")
                         .setName("用户管理")
@@ -62,28 +65,68 @@ public class IndexController {
 
     @GetMapping({"sys/main",})
     public Mono<String> sys_main() {
-        String welcome = "welcome";
+        String welcome = "default/welcome";
         return Mono.create(monoSink -> monoSink.success(welcome));
     }
 
     @GetMapping({"pages/main",})
     public Mono<String> page_main() {
-        String s = "pages/main";
+        String s = "default/pages/main";
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
     @GetMapping({"/login-view"})
-    public Mono<String> login_view() {
-//        return "sign-in";
-        String s = "login-view";
+    public Mono<String> login_view(final Model model) {
+        String s = "/login-view";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
-
     @GetMapping("/welcome")
     public Mono<String> toWelcome() {
-        String welcome = "welcome";
+        String welcome = "default/welcome";
         return Mono.create(monoSink -> monoSink.success(welcome));
+    }
+
+    @GetMapping({"/sign-in.html"})
+    public Mono<String> sign_in(final Model model) {
+        String s = "/sign-in";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+
+    @GetMapping({"/settings.html"})
+    public Mono<String> settings(final Model model) {
+        String s = "/settings";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+
+    @GetMapping({"/form-elements.html"})
+    public Mono<String> form_elements(final Model model) {
+        String s = "/form-elements";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+
+    @GetMapping({"/layout-vertical.html"})
+    public Mono<String> layout_vertical(final Model model) {
+        String s = "/layout-vertical";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+
+    @GetMapping({"/uptime.html"})
+    public Mono<String> uptime(final Model model) {
+        String s = "/uptime";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
     }
 
 }

@@ -16,12 +16,12 @@ public class DataBaseController {
 
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        return Mono.create(monoSink -> monoSink.success("database/list-view"));
+        return Mono.create(monoSink -> monoSink.success("default/database/list-view"));
     }
 
     @GetMapping("/add-view")
     public Mono<String> add_view(final Model model) {
         model.addAttribute("typeList", DataBaseTypeEnum.values());
-        return Mono.create(monoSink -> monoSink.success("database/add-view"));
+        return Mono.create(monoSink -> monoSink.success("default/database/add-view"));
     }
 }

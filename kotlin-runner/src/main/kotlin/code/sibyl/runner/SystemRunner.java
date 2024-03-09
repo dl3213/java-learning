@@ -35,6 +35,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+
 //        System.err.println(databaseClient);
 //        System.err.println(r2dbcEntityTemplate);
 //        ConnectionFactory connectionFactory = databaseClient.getConnectionFactory();
