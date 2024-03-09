@@ -189,7 +189,18 @@
                         });
                         break;
                     case 'update':
-
+                        var selected = checkStatus.data;
+                        layer.open({
+                            type: 2,
+                            title: '添加',
+                            shadeClose: true,
+                            maxmin: true, //开启最大化最小化按钮
+                            area: ['45%', '50%'],
+                            content: '/database/update-view?id='+selected[0].id,
+                            end: function () {
+                                table.reload('test', {}, true)
+                            }
+                        });
                         break;
                     case 'del':
                         var selected = checkStatus.data;

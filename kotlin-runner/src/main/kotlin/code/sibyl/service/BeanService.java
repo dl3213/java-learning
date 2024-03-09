@@ -1,5 +1,6 @@
 package code.sibyl.service;
 
+import code.sibyl.repository.DatabaseRepository;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
@@ -23,25 +24,13 @@ public class BeanService {
 
     private final Map<String,ConnectionFactoryOptions> map = new HashMap<>();
 
+    private final DatabaseRepository databaseRepository;
+
 
     //static静态块 > 构造方法 > @PostConstruct注解 > InitializingBean接口
     @PostConstruct
     public void init() {
         log.info("BeanService . init ");
-//        ConnectionFactory factory = ConnectionFactories.get(
-//                builder()
-//                        .option(DRIVER, "postgresql")
-//                        .option(HOST, "xxxx")
-//                        .option(PORT, 5432)
-//                        .option(USER, "postgres")
-//                        .option(PASSWORD, "xxxx")
-//                        .option(DATABASE, "postgres")
-//                        .build());
-//        DatabaseClient databaseClient = DatabaseClient.create(factory);
-//        databaseClient.sql("select * from ods_xcl_eos_org_organization").fetch().all().map(m -> {
-//            System.err.println(m);
-//            return m;
-//        }).subscribe();
     }
 
     public long test() {

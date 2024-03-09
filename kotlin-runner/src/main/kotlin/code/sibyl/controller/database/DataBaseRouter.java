@@ -14,6 +14,7 @@ public class DataBaseRouter {
         return RouterFunctions.nest(RequestPredicates.path("/database"),
                 RouterFunctions.route(RequestPredicates.GET("/list"), handler::list)
                         .andRoute(RequestPredicates.POST("/add"), handler::save)
+                        .andRoute(RequestPredicates.POST("/update"), handler::update)
                         .andRoute(RequestPredicates.DELETE("/delete/{id}"), handler::delete));
     }
 }

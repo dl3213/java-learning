@@ -23,7 +23,7 @@ create table IF NOT EXISTS T_BASE_DATABASE(
     username varchar(255),
     password varchar(255),
     database varchar(255),
-    version int not null default 0,
+    version int default 0,
     is_deleted BOOLEAN not null default false,
     create_time TIMESTAMP,
     create_id bigint,

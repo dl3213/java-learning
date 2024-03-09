@@ -6,9 +6,11 @@ import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
@@ -20,6 +22,10 @@ public class DataBaseService {
 
     public Flux<Database> list() {
         return databaseRepository.list();
+    }
+
+    public Mono<Database> findById(Long id) {
+        return databaseRepository.findById(id);
     }
 
     public void connect(String id) {
@@ -39,7 +45,9 @@ public class DataBaseService {
                             .option(DATABASE, database.getDatabase())
                             .build());
             DatabaseClient databaseClient = DatabaseClient.create(factory);
-            databaseClient.sql("select * from ods_xcl_eos_org_organization").fetch().all().map(m -> {
+            R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
+            System.err.println(databaseClient);//  ods_xcl_eos_org_organization
+            databaseClient.sql("select * from r_job").fetch().all().doOnError(e ->  e.printStackTrace()).map(m -> {
                 System.err.println(m);
                 return m;
             }).subscribe();
