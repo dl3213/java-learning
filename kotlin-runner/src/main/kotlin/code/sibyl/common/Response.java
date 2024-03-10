@@ -18,7 +18,7 @@ public class Response extends HashMap<String, Object> {
     private static String MSG_NAME = "msg";
 
     public Response() {
-        put(CODE_NAME, 0);
+        put(CODE_NAME, 200);
         put(MSG_NAME, "操作成功");
         put(DATA_NAME, null);
     }

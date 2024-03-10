@@ -1,13 +1,11 @@
 package code.sibyl.domain.database;
 
-import code.sibyl.dto.DatabaseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -45,6 +43,10 @@ public class Database {
     private String password;
     @Column(name = "database")
     private String database;
+
+    @org.springframework.data.annotation.Transient
+//    @Column(name = "desc")\
+    private String desc;
 
     @Version
     @Column(name = "version")

@@ -1,8 +1,14 @@
 package me.sibyl;
 
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -19,7 +25,7 @@ public class Main {
      *  6.动态规划
      */
 
-    public static void main(String[] args) {
+    public static void main123(String[] args) {
         File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

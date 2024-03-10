@@ -1,5 +1,7 @@
 package code.sibyl.controller.database;
 
+import code.sibyl.common.Response;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,22 +43,19 @@ public class DataBaseHandler {
     }
 
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
-        Mono<Database> entityStream = serverRequest.bodyToMono(Database.class).doOnNext(e -> {
+        Mono<Response> responseMono = serverRequest.bodyToMono(Database.class).map(e -> {
             try {
-                System.err.println(e);
-                System.err.println("get  ==>  ");
                 Database database = databaseRepository.findById(e.getId()).toFuture().get();
-                System.err.println(database);
                 BeanUtils.copyProperties(e, database);
                 database.setVersion(Objects.nonNull(database.getVersion()) ? database.getVersion() + 1 : 0);
-                System.err.println(" b4 =》  " + database);
-                databaseRepository.save(database);
-                System.err.println("update end");
+                databaseRepository.save(database).subscribe();
+                return r.success();
             } catch (Exception exception) {
                 exception.printStackTrace();
+                return r.error(exception.getMessage());
             }
         });
         return ServerResponse.ok().contentType(APPLICATION_JSON)
-                .body(databaseRepository.saveAll(entityStream), Database.class);
+                .body(responseMono, Response.class);
     }
 }

@@ -39,6 +39,14 @@ object r {
     fun successMono(): Mono<Response> {
         return Mono.just(success());
     }
+    @JvmStatic
+    fun error(msg : String): Response {
+        return Response.error(msg)
+    }
+    @JvmStatic
+    fun errorMono(msg : String): Mono<Response> {
+        return Mono.just(Response.error(msg));
+    }
 
     fun formatDate(date: Date?, formatter: String?): String {
         return DateFormatUtils.format(date, formatter)

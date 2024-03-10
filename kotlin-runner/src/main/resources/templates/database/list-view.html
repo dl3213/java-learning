@@ -1422,7 +1422,7 @@
                                     <tr th:each="t:${list}">
                                         <td><input class="form-check-input m-0 align-middle" type="checkbox"
                                                    aria-label="Select invoice"></td>
-                                        <td><span class="text-secondary" th:text="${t?.id}"></span></td>
+                                        <td><span class="text-secondary" th:text="${t?.id}" name="id"></span></td>
                                         <td><a href="invoice.html" class="text-reset" tabindex="-1"
                                                th:text="${t?.name}">Design Works</a></td>
                                         <td>
@@ -1431,11 +1431,11 @@
                                         </td>
                                         <td th:text="${t?.host}"></td>
                                         <td th:text="${t?.port}"></td>
-                                        <td th:text="${t?.username}">
-                                        </td>
+                                        <td th:text="${t?.username}"></td>
                                         <td th:text="${t?.password}"></td>
                                         <td th:text="${t?.database}"></td>
                                         <td th:text="${t?.version}"></td>
+                                        <td th:text="${t?.desc}"></td>
                                         <td th:text="${t?.createTime}"></td>
                                         <td th:text="${t?.createId}"></td>
                                         <td class="text-end">
@@ -1443,11 +1443,11 @@
                               <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
                                       data-bs-toggle="dropdown">Actions</button>
                               <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" id="connect">
-                                  connect
-                                </a>
-                                <a class="dropdown-item" id="edit">
+                                  <a class="dropdown-item" name="edit" th:key="${t?.id}">
                                   edit
+                                </a>
+                                <a class="dropdown-item" name="connect" th:key="${t?.id}">
+                                  connect
                                 </a>
                               </div>
                             </span>
@@ -1513,70 +1513,76 @@
 <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/js/layer.js"></script>
+<script>
+    layer.config({
+        extend: 'myskin/style.css', //加载您的扩展样式
+        // skin: 'layer-ext-yourskin'
+    });
+</script>
 <script src="/js/common/common.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         console.log("database ready...")
-        const edit = document.getElementById("edit");
-        layer.config({
-            extend: 'myskin/style.css', //加载您的扩展样式
-            // skin: 'layer-ext-yourskin'
-        });
-        edit.addEventListener('click', (e)=>{
-            console.log("edit onclick...")
-            var that = this;
-            //多窗口模式，层叠置顶
-            layer.open({
-                type: 2 //此处以iframe举例
-                ,skin: 'layer-ext-yourskin' //样式类名
-                ,title: '当你选择该窗体时，即会在最顶端'
-                ,area: ['75%', '65%']
-                ,shade: 0
-                ,maxmin: true
-                // ,offset: [ //为了演示，随机坐标
-                //     Math.random()*($(window).height()-300)
-                //     ,Math.random()*($(window).width()-390)
-                // ]
-                ,scrollbar: false
-                ,content: ['/home']
-                //,btn: ['继续弹出', '全部关闭'] //只是为了演示
-                // ,yes: function(){
-                //     $(that).click();
-                // }
-                // ,btn2: function(){
-                //     layer.closeAll();
-                // }
-                ,zIndex: layer.zIndex //重点1
-                ,success: function(layero, index){
-                    layer.setTop(layero); //重点2. 保持选中窗口置顶
-                    //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
-                    layer.escIndex = layer.escIndex || [];
-                    layer.escIndex.unshift(index);
-                    //选中当前层时，将当前层索引放置在首位
-                    layero.on('mousedown', function(){
-                        var _index = layer.escIndex.indexOf(index);
-                        if(_index !== -1){
-                            layer.escIndex.splice(_index, 1); //删除原有索引
-                        }
-                        layer.escIndex.unshift(index); //将索引插入到数组首位
-                    });
-                }
-                ,end: function(){
-                    //更新索引
-                    if(typeof layer.escIndex === 'object'){
-                        layer.escIndex.splice(0, 1);
+        const titles = document.getElementsByTagName('title');
+        const title = titles && titles[0] ? titles[0].innerText : "";
+        const edits = document.getElementsByName("edit");
+        edits.forEach(edit => {
+            edit.addEventListener('click', (e) => {
+                console.log("edit onclick...")
+                const id = edit.getAttribute("key");
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2 //此处以iframe举例
+                    , skin: 'layer-ext-yourskin' //样式类名
+                    , title: title
+                    , area: ['85%', '65%']
+                    , shade: 0
+                    , maxmin: true
+                    // ,offset: [ //为了演示，随机坐标
+                    //     Math.random()*($(window).height()-300)
+                    //     ,Math.random()*($(window).width()-390)
+                    // ]
+                    , scrollbar: true
+                    , content: ['/database/update-view?id=' + id]
+                    //,btn: ['继续弹出', '全部关闭'] //只是为了演示
+                    // ,yes: function(){
+                    //     $(that).click();
+                    // }
+                    // ,btn2: function(){
+                    //     layer.closeAll();
+                    // }
+                    , zIndex: layer.zIndex //重点1
+                    , success: function (layero, index) {
+                        layer.setTop(layero); //重点2. 保持选中窗口置顶
+                        //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
+                        layer.escIndex = layer.escIndex || [];
+                        layer.escIndex.unshift(index);
+                        //选中当前层时，将当前层索引放置在首位
+                        layero.on('mousedown', function () {
+                            var _index = layer.escIndex.indexOf(index);
+                            if (_index !== -1) {
+                                layer.escIndex.splice(_index, 1); //删除原有索引
+                            }
+                            layer.escIndex.unshift(index); //将索引插入到数组首位
+                        });
                     }
-                }
-            });
+                    , end: function () {
+                        //更新索引
+                        if (typeof layer.escIndex === 'object') {
+                            layer.escIndex.splice(0, 1);
+                        }
+                    }
+                });
 
+            })
         })
 
-        $('#layerDemo .layui-btn').on('click', function(){
+        $('#layerDemo .layui-btn').on('click', function () {
             var othis = $(this), method = othis.data('method');
             active[method] ? active[method].call(this, othis) : '';
         });
-        $(document).on('keyup', function(e){
-            if(e.keyCode === 27){
+        $(document).on('keyup', function (e) {
+            if (e.keyCode === 27) {
                 layer.close(layer.escIndex ? layer.escIndex[0] : 0);
             }
         });

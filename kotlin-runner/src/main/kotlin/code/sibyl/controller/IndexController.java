@@ -38,8 +38,8 @@ public class IndexController {
 //        System.err.println(userDetails);
 //        System.err.println(databaseClient);
 //        System.err.println(r2dbcEntityTemplate);
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         model.addAttribute("username", userDetails.getUsername());
         List<MenuDTO> menuTree = menuTree();
         model.addAttribute("menuTree", menuTree);
@@ -88,8 +88,8 @@ public class IndexController {
     @GetMapping({"/login-view"})
     public Mono<String> login_view(final Model model) {
         String s = "/login-view";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
@@ -102,40 +102,40 @@ public class IndexController {
     @GetMapping({"/sign-in.html"})
     public Mono<String> sign_in(final Model model) {
         String s = "/sign-in";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
     @GetMapping({"/settings.html"})
     public Mono<String> settings(final Model model) {
         String s = "/settings";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
     @GetMapping({"/form-elements.html"})
     public Mono<String> form_elements(final Model model) {
         String s = "/form-elements";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
     @GetMapping({"/layout-vertical.html"})
     public Mono<String> layout_vertical(final Model model) {
         String s = "/layout-vertical";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
     @GetMapping({"/uptime.html"})
     public Mono<String> uptime(final Model model) {
         String s = "/uptime";
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
+        model.addAttribute("systemName", r.systemName);
+        model.addAttribute("title", r.systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
@@ -170,6 +170,13 @@ public class IndexController {
     @GetMapping({"/buttons.html"})
     public Mono<String> buttons(final Model model) {
         String s = "/buttons";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/msg"})
+    public Mono<String> msg(final Model model) {
+        String s = "/common/msg";
         model.addAttribute("systemName", systemName);
         model.addAttribute("title", systemName);
         return Mono.create(monoSink -> monoSink.success(s));
