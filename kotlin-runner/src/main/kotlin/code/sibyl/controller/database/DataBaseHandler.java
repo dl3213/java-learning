@@ -46,7 +46,13 @@ public class DataBaseHandler {
         Mono<Response> responseMono = serverRequest.bodyToMono(Database.class).map(e -> {
             try {
                 Database database = databaseRepository.findById(e.getId()).toFuture().get();
-                BeanUtils.copyProperties(e, database);
+                database.setName(e.getName());
+                database.setType(e.getType());
+                database.setHost(e.getHost());
+                database.setPort(e.getPort());
+                database.setUsername(e.getUsername());
+                database.setPassword(e.getPassword());
+                database.setDatabase(e.getDatabase());
                 database.setVersion(Objects.nonNull(database.getVersion()) ? database.getVersion() + 1 : 0);
                 databaseRepository.save(database).subscribe();
                 return r.success();

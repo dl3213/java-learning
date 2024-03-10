@@ -219,7 +219,7 @@
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
                        aria-label="Open user menu">
-                        <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)"></span>
+                        <span class="avatar avatar-sm" style="background-image: url(/static/avatars/000m.jpg)"></span>
                         <div class="d-none d-xl-block ps-2">
                             <div>Paweł Kuna</div>
                             <div class="mt-1 small text-secondary">UI Designer</div>
@@ -245,9 +245,9 @@
         <div class="collapse navbar-collapse" id="navbar-menu">
             <div class="navbar">
                 <div class="container-xl">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav" id="sys-nav">
                         <li class="nav-item active">
-                            <a class="nav-link" href="/">
+                            <a class="nav-link" target-link="/home" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -474,7 +474,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="form-elements.html">
+                            <a class="nav-link" target-link="/form-elements.html" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/checkbox -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -668,18 +668,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/database/list-view">
+                            <a class="nav-link" target-link="/database/list-view" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-database" width="24"
                            height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
-                           stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"
-                                                                                fill="none"/><path
-                              d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/><path d="M4 6v6a8 3 0 0 0 16 0v-6"/><path
-                              d="M4 12v6a8 3 0 0 0 16 0v-6"/></svg>
+                           stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path
+                              d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/>
+                          <path d="M4 6v6a8 3 0 0 0 16 0v-6"/><path
+                              d="M4 12v6a8 3 0 0 0 16 0v-6"/>
+                      </svg>
                     </span>
-                                <span class="nav-link-title">
-                      Database
-                    </span>
+                                <span class="nav-link-title">Database</span>
                             </a>
                         </li>
                         <li class="nav-item dropdown">
@@ -742,8 +742,7 @@
             </div>
         </div>
     </header>
-    <iframe class="page-wrapper" src="/home">
-
+    <iframe id="index-main-iframe" class="page-wrapper" src="/home">
         <footer class="footer footer-transparent d-print-none">
             <div class="container-xl">
                 <div class="row text-center align-items-center flex-row-reverse">
@@ -1470,6 +1469,24 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         console.log("index ready...")
+        const triggers = Array.from(document.querySelectorAll('.nav-item'))
+        triggers.forEach(t => {
+            t.addEventListener('click', (e) => {
+                var navs = t.querySelectorAll('.nav-link');
+                var nav = navs && navs[0] ? navs[0] : null;
+                const link = nav ? nav.getAttribute("target-link") : null;
+                //console.log(link)
+                var main = document.getElementById('index-main-iframe');
+                //console.log(main)
+                if (main && link) {
+                    main.src = link
+                    triggers.forEach(o => o.classList.remove('active'));
+                    t.classList.add("active");
+                }
+            })
+        })
+
+
     });
 </script>
 </body>

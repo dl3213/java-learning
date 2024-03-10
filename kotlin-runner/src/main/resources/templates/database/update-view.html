@@ -705,10 +705,15 @@ But that's the difference in our opinions.</textarea>
                         , title: title
                         , area: ['20%', '15%']
                         , shade: 0
-                        , maxmin: false
+                        , maxmin: true
                         , btnAlign: 'c'
                         , time: 0
                         , btn: ['yes', 'no'] //只是为了演示
+                        , yes:function (index, layero){
+                            layer.close(index);
+                            var parentIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(parentIndex);
+                        }
                     });
 
                 })
