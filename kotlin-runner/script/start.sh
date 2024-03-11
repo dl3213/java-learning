@@ -1,0 +1,1 @@
+nohup /data/java/jdk/jdk-21.0.2/bin/java -jar -DisDev=false  -Xms512m -Xmx512m -Xmn512m -Xss256m -XX:MetaspaceSize=256m -XX:+HeapDumpOnOutOfMemoryError  ./kotlin-runner-0.0.1-SNAPSHOT.jar > ./server.log 2>&1 &

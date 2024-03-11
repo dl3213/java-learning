@@ -1,6 +1,7 @@
 package code.sibyl.controller.user;
 
 import code.sibyl.common.Response;
+import code.sibyl.common.SpringUtil;
 import code.sibyl.domain.user.SysUser;
 import code.sibyl.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import code.sibyl.common.r;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -43,13 +43,13 @@ public class UserController {
     @PostMapping("/list")
     @ResponseBody
     public Mono<Response> list(ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) throws ExecutionException, InterruptedException {
-        return r.getBean(SysUserService.class).list().collectList().map(r::success);
+        return SpringUtil.getBean(SysUserService.class).list().collectList().map(Response::success);
     }
 
 
     @PostMapping("/add")
     @ResponseBody
     public Mono<Response> add(@RequestBody SysUser user, ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
-        return r.getBean(SysUserService.class).save(user).map(Response::success);
+        return SpringUtil.getBean(SysUserService.class).save(user).map(Response::success);
     }
 }

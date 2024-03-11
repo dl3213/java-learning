@@ -2,6 +2,7 @@ package code.sibyl.common;
 
 import lombok.Data;
 import lombok.ToString;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class Response extends HashMap<String, Object> {
         put(MSG_NAME, "操作成功");
         put(DATA_NAME, null);
     }
+
+
 
     public static Response success() {
         return new Response();
@@ -89,4 +92,7 @@ public class Response extends HashMap<String, Object> {
         return responseVO;
     }
 
+    public static Mono<Response> successMono() {
+        return Mono.just(success());
+    }
 }

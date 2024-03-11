@@ -1,12 +1,10 @@
 package code.sibyl.controller.database;
 
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -55,10 +53,10 @@ public class DataBaseHandler {
                 database.setDatabase(e.getDatabase());
                 database.setVersion(Objects.nonNull(database.getVersion()) ? database.getVersion() + 1 : 0);
                 databaseRepository.save(database).subscribe();
-                return r.success();
+                return Response.success();
             } catch (Exception exception) {
                 exception.printStackTrace();
-                return r.error(exception.getMessage());
+                return Response.error(exception.getMessage());
             }
         });
         return ServerResponse.ok().contentType(APPLICATION_JSON)
