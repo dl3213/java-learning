@@ -1,6 +1,14 @@
 package code.sibyl.dto
 
- data class Menu(var id: Long?, var code: String?, var name: String?, var linkUrl: String?, var children: List<MenuDTO>?) {
+import reactor.core.publisher.Flux
+
+data class Menu(
+    var id: Long?,
+    var code: String?,
+    var name: String?,
+    var linkUrl: String?,
+    var children: List<MenuDTO>?
+) {
     constructor() : this(null, null, null, null, null)
 
     fun id(id: Long?): Menu {
@@ -30,8 +38,5 @@ package code.sibyl.dto
 }
 
 fun main123() {
-    var menu = Menu().code("sys-user")
-    println(menu)
-    println(menu.id)
-    listOf(1,2,34,5,).stream()
+    Flux.just(1, 2, 3, 4).map { e -> println(e) }.doOnComplete { println("end") }.subscribe()
 }

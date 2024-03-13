@@ -57,7 +57,6 @@ public class DataBaseController {
     @PostMapping("/connect/{id}")
     @ResponseBody
     public Mono<Response> connect(@PathVariable String id) {
-        System.err.println(id);
         dataBaseService.connect(id);
         return Response.successMono();
     }

@@ -30,7 +30,9 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 @Slf4j
 @RequiredArgsConstructor
 public class DataBaseService {
+
     private final DatabaseRepository databaseRepository;
+    private final DatabaseClient databaseClient;
 
     public Flux<Database> list() {
         return databaseRepository.list();
@@ -39,6 +41,7 @@ public class DataBaseService {
     public Mono<Database> findById(Long id) {
         return databaseRepository.findById(id);
     }
+
 
     public void connect(String id) {
         databaseRepository.findById(Long.valueOf(id))
@@ -74,8 +77,7 @@ public class DataBaseService {
                     return factory;
                 })
                 .map(DatabaseClient::create)
-                .map(c -> c.sql("select now()"))
-                .map(c -> c.fetch().all().map(e -> {
+                .map(c -> c.sql("select now()").fetch().all().map(e -> {
                     System.err.println("end");
                     System.err.println(e);
                     return e;
