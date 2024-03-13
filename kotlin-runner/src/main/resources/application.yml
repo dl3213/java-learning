@@ -7,7 +7,7 @@ isDev: true
 logDetail: false
 
 server:
-  port: 80
+  port: 10001
   shutdown: graceful
   tomcat:
     connection-timeout: 3600000
