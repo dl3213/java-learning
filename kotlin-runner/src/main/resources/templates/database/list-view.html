@@ -351,7 +351,7 @@
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
-                                        <a href="#" class="btn btn-primary w-100">
+                                        <a href="#" id="add-btn" class="btn btn-primary w-100">
                                             New+
                                         </a>
                                     </div>
@@ -512,6 +512,58 @@
         }
 
         edit_btn();
+
+        function add_btn() {
+            const titles = document.getElementsByTagName('title');
+            const title = titles && titles[0] ? titles[0].innerText : "";
+            const btn = document.getElementById("add-btn");
+            btn.addEventListener('click', (e) => {
+                console.log("add onclick...")
+                //多窗口模式，层叠置顶
+                layer.open({
+                    type: 2 //此处以iframe举例
+                    , skin: 'layer-ext-yourskin' //样式类名
+                    , title: title
+                    , area: ['85%', '65%']
+                    , shade: 0
+                    , maxmin: true
+                    , scrollbar: true
+                    , content: ['/database/add-view']
+                    //,btn: ['继续弹出', '全部关闭'] //只是为了演示
+                    // ,yes: function(){
+                    //     $(that).click();
+                    // }
+                    // ,btn2: function(){
+                    //     layer.closeAll();
+                    // }
+                    , zIndex: layer.zIndex //重点1
+                    , success: function (layero, index) {
+                        layer.setTop(layero); //重点2. 保持选中窗口置顶
+                        //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
+                        layer.escIndex = layer.escIndex || [];
+                        layer.escIndex.unshift(index);
+                        //选中当前层时，将当前层索引放置在首位
+                        layero.on('mousedown', function () {
+                            var _index = layer.escIndex.indexOf(index);
+                            if (_index !== -1) {
+                                layer.escIndex.splice(_index, 1); //删除原有索引
+                            }
+                            layer.escIndex.unshift(index); //将索引插入到数组首位
+                        });
+                    }
+                    , end: function () {
+                        //更新索引
+                        if (typeof layer.escIndex === 'object') {
+                            layer.escIndex.splice(0, 1);
+                        }
+                        location.reload()
+                    }
+                });
+
+            })
+        }
+
+        add_btn();
 
         $('#layerDemo .layui-btn').on('click', function () {
             var othis = $(this), method = othis.data('method');
