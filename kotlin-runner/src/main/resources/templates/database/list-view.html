@@ -388,12 +388,12 @@
                                         <td th:text="${t?.host}"></td>
                                         <td th:text="${t?.port}"></td>
                                         <td th:text="${t?.username}"></td>
-                                        <td th:text="${t?.password}"></td>
+                                        <td>*******</td>
                                         <td th:text="${t?.database}"></td>
                                         <td th:text="${t?.desc}"></td>
                                         <td th:text="${t?.version}"></td>
-                                        <td th:text="${t?.createTime}"></td>
-                                        <td th:text="${t?.createId}"></td>
+<!--                                        <td th:text="${t?.createTime}"></td>-->
+<!--                                        <td th:text="${t?.createId}"></td>-->
                                         <td class="text-end">
                             <span class="dropdown">
                               <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
@@ -443,18 +443,48 @@
                 btn.addEventListener('click', (e) => {
                     console.log("connect onclick...")
                     const id = btn.getAttribute("key");
-                    axios
-                        .post('/database/connect/' + id)
-                        .then(response => {
-                            console.log(response)
+                    // 创建一个新的WebSocket实例
+                    var ws = new WebSocket('ws://127.0.0.1:80/database/socket/' + id);
 
-                        })
-                        .catch(error => {
-                            console.log(error)
-                        })
+                    // 当WebSocket连接打开时触发
+                    ws.onopen = function (event) {
+                        console.log('WebSocket 连接已打开');
+                        sendMessage()
+                    };
+
+                    // 当WebSocket接收到服务器发送的消息时触发
+                    ws.onmessage = function (event) {
+                        console.log('收到消息: ' + event.data);
+                    };
+
+                    // 当WebSocket连接关闭时触发
+                    ws.onclose = function (event) {
+                        console.log('WebSocket 连接已关闭');
+                    };
+
+                    // 当WebSocket通信发生错误时触发
+                    ws.onerror = function (error) {
+                        console.error('WebSocket 出现错误: ' + error);
+                    };
+
+                    // 发送消息到服务器
+                    function sendMessage() {
+                        ws.send('Hello, Server!');
+                    }
+
+                    // axios
+                    //     .post('/database/connect/' + id)
+                    //     .then(response => {
+                    //         console.log(response)
+                    //
+                    //     })
+                    //     .catch(error => {
+                    //         console.log(error)
+                    //     })
                 })
             })
         }
+
 
         connect();
 

@@ -1,6 +1,8 @@
 package code.sibyl.dto
 
 import reactor.core.publisher.Flux
+import reactor.core.scheduler.Scheduler
+import reactor.core.scheduler.Schedulers
 
 data class Menu(
     var id: Long?,
@@ -38,5 +40,5 @@ data class Menu(
 }
 
 fun main123() {
-    Flux.just(1, 2, 3, 4).map { e -> println(e) }.doOnComplete { println("end") }.subscribe()
+    Flux.just(1, 2, 3, 4).publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
 }

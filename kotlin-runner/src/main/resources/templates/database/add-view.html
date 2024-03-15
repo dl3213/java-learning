@@ -342,10 +342,10 @@ But that's the difference in our opinions.</textarea>
             const formJson = JSON.stringify(request);
             console.log(formJson)
             axios
-                .post('/database/update', request)
+                .post('/database/add', request)
                 .then(response => {
                     console.log(response)
-                    layer.msg(response.data.msg, {
+                    layer.msg(response.data && response.data.msg ? response.data.msg : '操作成功', {
                         skin: 'layer-ext-yourskin'
                         , title: title
                         , area: ['20%', '15%']

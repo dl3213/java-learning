@@ -93,7 +93,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/font/**",
                                 "/img/**",
-                                "/dist/**"
+                                "/dist/**",
+                                "/database/socket/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyExchange().authenticated()
