@@ -21,6 +21,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
@@ -28,7 +30,9 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 @Slf4j
 @RequiredArgsConstructor
 public class DataBaseService {
+
     private final DatabaseRepository databaseRepository;
+    private final DatabaseClient databaseClient;
 
     public Flux<Database> list() {
         return databaseRepository.list();
@@ -38,41 +42,54 @@ public class DataBaseService {
         return databaseRepository.findById(id);
     }
 
-    public void connect(String id) {
-        databaseRepository.findById(Long.valueOf(id)).doOnError(e -> {
-            System.err.println("findById error");
-        }).doOnSuccess(database -> {
-            System.err.println("findById succ");
-            System.err.println(database);
-            log.info("BeanService . init ");
 
-            if (StringUtils.isBlank(database.getType())) {
-                throw new RuntimeException("database type must not be null");
-            }
-            DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
-            ConnectionFactory factory = null;
-            switch (type) {
-                case h2 -> factory = ConnectionFactories.get(builder()
-                        .option(DRIVER, database.getType())
-                        .option(HOST, database.getHost())
-                        .option(PORT, Integer.valueOf(database.getPort()))
-                        .option(USER, database.getUsername())
-                        .option(PASSWORD, database.getPassword())
-                        .option(DATABASE, database.getDatabase()).build());
-                case postgresql -> factory = ConnectionFactories.get(builder()
-                        .option(DRIVER, database.getType())
-                        .option(HOST, database.getHost())
-                        .option(PORT, Integer.valueOf(database.getPort()))
-                        .option(USER, database.getUsername())
-                        .option(PASSWORD, database.getPassword())
-                        .option(DATABASE, database.getDatabase()).build());
-                case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
-                        .host(database.getHost())
-                        .port(Integer.parseInt(database.getPort()))
-                        .username(database.getUsername())
-                        .password(database.getPassword())
-                        .database(database.getDatabase()).build());
-            }
+    public void connect(String id) {
+        databaseRepository.findById(Long.valueOf(id))
+                .doOnSuccess(database -> System.err.println(database))
+                .map(database -> {
+                    if (StringUtils.isBlank(database.getType())) {
+                        throw new RuntimeException("database type must not be null");
+                    }
+                    DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
+                    ConnectionFactory factory = null;
+                    switch (type) {
+                        case h2 -> factory = ConnectionFactories.get(builder()
+                                .option(DRIVER, database.getType())
+                                .option(HOST, database.getHost())
+                                .option(PORT, Integer.valueOf(database.getPort()))
+                                .option(USER, database.getUsername())
+                                .option(PASSWORD, database.getPassword())
+                                .option(DATABASE, database.getDatabase()).build());
+                        case postgresql -> factory = ConnectionFactories.get(builder()
+                                .option(DRIVER, database.getType())
+                                .option(HOST, database.getHost())
+                                .option(PORT, Integer.valueOf(database.getPort()))
+                                .option(USER, database.getUsername())
+                                .option(PASSWORD, database.getPassword())
+                                .option(DATABASE, database.getDatabase()).build());
+                        case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
+                                .host(database.getHost())
+                                .port(Integer.parseInt(database.getPort()))
+                                .username(database.getUsername())
+                                .password(database.getPassword())
+                                .database(database.getDatabase()).build());
+                    }
+                    return factory;
+                })
+                .map(DatabaseClient::create)
+                .map(c -> c.sql("select now()").fetch().all().map(e -> {
+                    System.err.println("end");
+                    System.err.println(e);
+                    return e;
+                }).subscribe())
+                .subscribe()
+        ;
+//                .map(c -> c.fetch().all().map(m -> {
+//                    System.err.println(m);
+//                    return m;
+//                }).subscribe())
+//                .subscribe();
+
 //            ConnectionPoolConfiguration configuration=ConnectionPoolConfiguration.builder(factory)
 //                    .initialSize(10)//启动时连接池大小，默认10
 //                    .maxIdleTime(Duration.ofMillis(1000))//最长空闲时间。如果配置为负数，则连接不会因为空闲等待而被释放。默认30分钟。注意：这个配置和backgroundEvictionInterval重复用途，这个后面说明
@@ -84,18 +101,8 @@ public class DataBaseService {
 //                    //.validationQuery()//探活SQL
 //                    //.registerJmx()//是否注册JMX
 //                    .build();
-
 //            ConnectionPool pool=new ConnectionPool(configuration);
-
 //            Mono<Connection> connectionMono = pool.create();
-
-            DatabaseClient databaseClient = DatabaseClient.create(factory);
-            R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
-            System.err.println(databaseClient);//  ods_xcl_eos_org_organization
-            databaseClient.sql("select now()").fetch().all().doOnError(e -> e.printStackTrace()).map(m -> {
-                System.err.println(m);
-                return m;
-            }).subscribe();
-        }).subscribe();
+//            R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
     }
 }

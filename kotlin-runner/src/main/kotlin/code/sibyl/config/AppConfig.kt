@@ -1,35 +1,46 @@
 package code.sibyl.config
 
-import code.sibyl.KotlinApplication
-import code.sibyl.common.r
+import code.sibyl.service.DataBaseSocket
 import io.r2dbc.spi.ConnectionFactory
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
-import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
+import org.springframework.web.reactive.HandlerMapping
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
 
 
 @Configuration
 @EnableR2dbcRepositories
 class AppConfig {
 
-    private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
+    private val log = LoggerFactory.getLogger(AppConfig::class.java)
+
+    @Bean
+    fun webSocketHandlerAdapter(): WebSocketHandlerAdapter {
+        return WebSocketHandlerAdapter()
+    }
+
+    @Bean
+    fun handlerMapping(socket: DataBaseSocket): HandlerMapping {
+        log.info("socket start ==> {}", socket)
+        return SimpleUrlHandlerMapping(hashMapOf("/database/socket/{id}" to socket), -1);
+    }
 
     /**
      * db 初始化
      * @return
      */
-    @Bean
+//    @Bean
     fun initializer(@Qualifier("connectionFactory") connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
         val initializer = ConnectionFactoryInitializer()
         initializer.setConnectionFactory(connectionFactory)

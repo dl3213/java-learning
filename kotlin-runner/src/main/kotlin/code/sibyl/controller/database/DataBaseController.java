@@ -31,13 +31,19 @@ public class DataBaseController {
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        List<Database> list = dataBaseService.list().collectList().toFuture().get();
-        model.addAttribute("list", list);
-        List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).collect(Collectors.toList());
-        model.addAttribute("headerList", headerList);
-        model.addAttribute("systemName", systemName);
-        model.addAttribute("title", systemName);
-        return Mono.create(monoSink -> monoSink.success("database/list-view"));
+        return Mono.create(monoSink -> {
+            try {
+                List<Database> list = dataBaseService.list().collectList().toFuture().get();
+                model.addAttribute("list", list);
+                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+                model.addAttribute("headerList", headerList);
+                model.addAttribute("systemName", systemName);
+                model.addAttribute("title", systemName);
+                monoSink.success("database/list-view");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @GetMapping("/add-view")
@@ -57,7 +63,6 @@ public class DataBaseController {
     @PostMapping("/connect/{id}")
     @ResponseBody
     public Mono<Response> connect(@PathVariable String id) {
-        System.err.println(id);
         dataBaseService.connect(id);
         return Response.successMono();
     }
