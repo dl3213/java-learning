@@ -32,7 +32,6 @@ class AppConfig {
 
     @Bean
     fun handlerMapping(socket: DataBaseSocket): HandlerMapping {
-        log.info("socket start ==> {}", socket)
         return SimpleUrlHandlerMapping(hashMapOf("/database/socket/{id}" to socket), -1);
     }
 

@@ -175,4 +175,151 @@ public class IndexController {
         model.addAttribute("title", systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
+    @GetMapping({"/chat.html"})
+    public Mono<String> chat(final Model model) {
+        String s = "chat";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/empty.html"})
+    public Mono<String> empty(final Model model) {
+        String s = "empty";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/cookie-banner.html"})
+    public Mono<String> cookie_banner(final Model model) {
+        String s = "cookie-banner";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/activity.html"})
+    public Mono<String> activity(final Model model) {
+        String s = "activity";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/gallery.html"})
+    public Mono<String> gallery(final Model model) {
+        String s = "gallery";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/invoice.html"})
+    public Mono<String> invoice(final Model model) {
+        String s = "invoice";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/search-results.html"})
+    public Mono<String> search_results(final Model model) {
+        String s = "search-results";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/pricing.html"})
+    public Mono<String> pricing(final Model model) {
+        String s = "pricing";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/pricing-table.html"})
+    public Mono<String> pricing_table(final Model model) {
+        String s = "pricing-table";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/faq.html"})
+    public Mono<String> faq(final Model model) {
+        String s = "faq";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/users.html"})
+    public Mono<String> users(final Model model) {
+        String s = "users";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/license.html"})
+    public Mono<String> license(final Model model) {
+        String s = "license";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/logs.html"})
+    public Mono<String> logs(final Model model) {
+        String s = "logs";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/music.html"})
+    public Mono<String> music(final Model model) {
+        String s = "music";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/photogrid.html"})
+    public Mono<String> photogrid(final Model model) {
+        String s = "photogrid";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/tasks.html"})
+    public Mono<String> tasks(final Model model) {
+        String s = "tasks";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/widgets.html"})
+    public Mono<String> widgets(final Model model) {
+        String s = "widgets";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/wizard.html"})
+    public Mono<String> wizard(final Model model) {
+        String s = "wizard";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/trial-ended.html"})
+    public Mono<String> trial_ended(final Model model) {
+        String s = "trial-ended";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/job-listing.html"})
+    public Mono<String> job_listing(final Model model) {
+        String s = "job-listing";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/page-loader.html"})
+    public Mono<String> page_loader(final Model model) {
+        String s = "page-loader";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
 }

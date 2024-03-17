@@ -67,18 +67,6 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            System.err.println(m);
 //            return m;
 //        }).subscribe();
-        Mono.just(4L)
-                .flatMap(e -> {
-                    System.err.println("get");
-                    System.err.println(e);
-                    return Mono.zip(databaseRepository.findById(e), Mono.just(e));
-                })
-                .doOnSuccess(e -> {
-                    System.err.println("doOnSuccess");
-                    System.err.println(e.getT1());
-                    System.err.println(e.getT2());
-                })
-                .subscribe();
         log.info("系统初始化工作--end");
     }
 
