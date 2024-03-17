@@ -39,6 +39,8 @@ data class Menu(
     }
 }
 
-fun main123() {
-    Flux.just(1, 2, 3, 4).publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
+fun main() {
+    var just = Flux.just(1, 2, 3, 4)
+    just.publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
+    just.publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
 }

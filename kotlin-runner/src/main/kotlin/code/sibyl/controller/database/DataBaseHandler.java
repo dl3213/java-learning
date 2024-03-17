@@ -1,6 +1,7 @@
 package code.sibyl.controller.database;
 
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,25 +42,25 @@ public class DataBaseHandler {
     }
 
     public Mono<ServerResponse> update(ServerRequest serverRequest) {
-        Mono<Response> responseMono = serverRequest.bodyToMono(Database.class).map(e -> {
-            try {
-                Database database = databaseRepository.findById(e.getId()).toFuture().get();
-                database.setName(e.getName());
-                database.setType(e.getType());
-                database.setHost(e.getHost());
-                database.setPort(e.getPort());
-                database.setUsername(e.getUsername());
-                database.setPassword(e.getPassword());
-                database.setDatabase(e.getDatabase());
-                database.setVersion(Objects.nonNull(database.getVersion()) ? database.getVersion() + 1 : 0);
-                databaseRepository.save(database).subscribe();
-                return Response.success();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-                return Response.error(exception.getMessage());
-            }
-        });
-        return ServerResponse.ok().contentType(APPLICATION_JSON)
-                .body(responseMono, Response.class);
+
+
+        return serverRequest.bodyToMono(Database.class)
+                .flatMap(e -> Mono.zip(databaseRepository.findById(e.getId()), Mono.just(e)))
+                .map(zip -> {
+                    Database database = zip.getT1();
+                    Database e = zip.getT2();
+                    database.setName(e.getName());
+                    database.setType(e.getType());
+                    database.setHost(e.getHost());
+                    database.setPort(e.getPort());
+                    database.setUsername(e.getUsername());
+                    database.setPassword(e.getPassword());
+                    database.setDatabase(e.getDatabase());
+                    database.setVersion(Objects.nonNull(database.getVersion()) ? database.getVersion() + 1 : 0);
+                    return database;
+                })
+                .doOnSuccess(e -> databaseRepository.save(e).subscribe())
+                .flatMap(e -> ServerResponse.ok().contentType(APPLICATION_JSON).body(r.successMono(e), Response.class));
+
     }
 }
