@@ -18,7 +18,7 @@ class Task {
 
     private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Scheduled(cron = "0 0/1 * * * ?")
     fun runPerMin() {
         log.info("每分钟任务: {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS))
     }

@@ -60,6 +60,21 @@ public class DataBaseController {
         return Mono.create(monoSink -> monoSink.success("database/update-view"));
     }
 
+    @GetMapping("/connect-view")
+    public Mono<String> connect_view(final Model model, String id) throws ExecutionException, InterruptedException {
+
+        return Mono.just(id)
+                .map(e -> Long.valueOf(id))
+                .flatMap(e -> dataBaseService.findById(e))
+                //.map(e -> e)
+                .doOnSuccess(e -> model.addAttribute("target", e))
+                .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/connect-view")));
+//        model.addAttribute("typeList", DataBaseTypeEnum.values());
+//        Database target = dataBaseService.findById(Long.valueOf(id)).toFuture().get();
+//        model.addAttribute("target", target);
+        //return Mono.create(monoSink -> monoSink.success("database/connect-view"));
+    }
+
     @PostMapping("/connect/{id}")
     @ResponseBody
     public Mono<Response> connect(@PathVariable String id) {

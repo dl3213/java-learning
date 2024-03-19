@@ -6,8 +6,12 @@ import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+import java.util.Collection;
+
 @Repository
 public interface DatabaseRepository extends R2dbcRepository<Database, Long> {
     @Query("SELECT * from T_BASE_DATABASE ")
     Flux<Database> list();
+
+    Flux<Database> findAllByTypeIn(Collection<String> type);
 }
