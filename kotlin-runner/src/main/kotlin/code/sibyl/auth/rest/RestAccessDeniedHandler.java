@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -22,10 +23,16 @@ import java.nio.charset.StandardCharsets;
 public class RestAccessDeniedHandler implements ServerAccessDeniedHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException denied) {
-//        System.err.println("rest 认证失败");
+        System.err.println("rest 认证失败");
+        exchange.getPrincipal()
+                .doOnSuccess(e -> {
+                    System.err.println(e);
+                    System.err.println(e);
+                })
+                .subscribe();
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(HttpStatusCode.valueOf(HttpStatus.FORBIDDEN.value()));
-        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.FORBIDDEN.value(), "认证失败,无权操作")).getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase())).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }

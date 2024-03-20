@@ -39,7 +39,7 @@ class AppConfig {
      * db 初始化
      * @return
      */
-//    @Bean
+    @Bean
     fun initializer(@Qualifier("connectionFactory") connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
         val initializer = ConnectionFactoryInitializer()
         initializer.setConnectionFactory(connectionFactory)

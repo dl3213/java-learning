@@ -7,9 +7,11 @@ import code.sibyl.service.DataBaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
@@ -31,19 +33,40 @@ public class DataBaseController {
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        return Mono.create(monoSink -> {
-            try {
-                List<Database> list = dataBaseService.list().collectList().toFuture().get();
-                model.addAttribute("list", list);
-                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
-                model.addAttribute("headerList", headerList);
-                model.addAttribute("systemName", systemName);
-                model.addAttribute("title", systemName);
-                monoSink.success("database/list-view");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+
+        return dataBaseService.list()
+                .collectList()
+                .map(e -> {
+//                    Flux.deferContextual(ctx -> {
+//                        //ctx.stream().forEach(System.err::println);
+//                        return Mono.just(ctx.get(""));
+//                    }).subscribe(e -> {
+//                        e
+//                    });
+                    return e;
+                })
+                .doOnSuccess(list -> {
+                    model.addAttribute("list", list);
+                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+                    model.addAttribute("headerList", headerList);
+                    model.addAttribute("systemName", systemName);
+                    model.addAttribute("title", systemName);
+                })
+                .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
+
+//        return Mono.create(monoSink -> {
+//            try {
+//                List<Database> list = dataBaseService.list().collectList().toFuture().get();
+//                model.addAttribute("list", list);
+//                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+//                model.addAttribute("headerList", headerList);
+//                model.addAttribute("systemName", systemName);
+//                model.addAttribute("title", systemName);
+//                monoSink.success("database/list-view");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 
     @GetMapping("/add-view")
@@ -60,6 +83,7 @@ public class DataBaseController {
         return Mono.create(monoSink -> monoSink.success("database/update-view"));
     }
 
+    @PreAuthorize("hasAnyAuthority('admin:api')")
     @GetMapping("/connect-view")
     public Mono<String> connect_view(final Model model, String id) throws ExecutionException, InterruptedException {
 
