@@ -322,4 +322,98 @@ public class IndexController {
         model.addAttribute("title", systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
+    @GetMapping({"/icons.html"})
+    public Mono<String> icons(final Model model) {
+        String s = "icons";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+
+
+
+    @GetMapping({"/layout-horizontal.html"})
+    public Mono<String> layout_horizontal(final Model model) {
+        String s = "layout-horizontal";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-boxed.html"})
+    public Mono<String> layout_boxed(final Model model) {
+        String s = "layout-boxed";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-vertical-transparent.html"})
+    public Mono<String> layout_vertical_transparent(final Model model) {
+        String s = "layout-vertical-transparent";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-vertical-right.html"})
+    public Mono<String> layout_vertical_right(final Model model) {
+        String s = "layout-vertical-right";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-condensed.html"})
+    public Mono<String> layout_condensed(final Model model) {
+        String s = "layout-condensed";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-combo.html"})
+    public Mono<String> layout_combo(final Model model) {
+        String s = "layout-combo";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-navbar-dark.html"})
+    public Mono<String> layout_navbar_dark(final Model model) {
+        String s = "layout-navbar-dark";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-navbar-sticky.html"})
+    public Mono<String> layout_navbar_sticky(final Model model) {
+        String s = "layout-navbar-sticky";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-navbar-overlap.html"})
+    public Mono<String> layout_navbar_overlap(final Model model) {
+        String s = "layout-navbar-overlap";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-rtl.html"})
+    public Mono<String> layout_rtl(final Model model) {
+        String s = "layout-rtl";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-fluid.html"})
+    public Mono<String> layout_fluid(final Model model) {
+        String s = "layout-fluid";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/layout-fluid-vertical.html"})
+    public Mono<String> layout_fluid_vertical(final Model model) {
+        String s = "layout-fluid-vertical";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
 }

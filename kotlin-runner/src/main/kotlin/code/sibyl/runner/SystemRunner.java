@@ -1,10 +1,6 @@
 package code.sibyl.runner;
 
-import code.sibyl.common.r;
 import code.sibyl.repository.DatabaseRepository;
-import code.sibyl.service.DataBaseSocket;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -13,17 +9,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
-import javax.sql.DataSource;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
-import java.lang.management.RuntimeMXBean;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
 /**
  * 系统启动准备
  */

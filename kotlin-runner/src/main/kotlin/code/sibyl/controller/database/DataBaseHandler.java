@@ -1,7 +1,6 @@
 package code.sibyl.controller.database;
 
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +59,7 @@ public class DataBaseHandler {
                     return database;
                 })
                 .doOnSuccess(e -> databaseRepository.save(e).subscribe())
-                .flatMap(e -> ServerResponse.ok().contentType(APPLICATION_JSON).body(r.successMono(e), Response.class));
+                .flatMap(e -> ServerResponse.ok().contentType(APPLICATION_JSON).body(Mono.just(Response.success(e)), Response.class));
 
     }
 }

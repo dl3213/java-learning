@@ -39,7 +39,7 @@ data class Menu(
     }
 }
 
-fun main() {
+fun main12() {
     var just = Flux.just(1, 2, 3, 4)
     just.publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
     just.publishOn(Schedulers.single()).map { e -> println(e) }.doOnComplete { println("end") }.subscribeOn(Schedulers.boundedElastic())
