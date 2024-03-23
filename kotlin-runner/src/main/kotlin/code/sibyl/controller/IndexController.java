@@ -416,4 +416,109 @@ public class IndexController {
         model.addAttribute("title", systemName);
         return Mono.create(monoSink -> monoSink.success(s));
     }
+    @GetMapping({"/alerts.html"})
+    public Mono<String> alerts(final Model model) {
+        String s = "alerts";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/accordion.html"})
+    public Mono<String> accordion(final Model model) {
+        String s = "accordion";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/blank.html"})
+    public Mono<String> blank(final Model model) {
+        String s = "blank";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/badges.html"})
+    public Mono<String> badges(final Model model) {
+        String s = "badges";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/carousel.html"})
+    public Mono<String> carousel(final Model model) {
+        String s = "carousel";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/charts.html"})
+    public Mono<String> charts(final Model model) {
+        String s = "charts";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/colors.html"})
+    public Mono<String> colors(final Model model) {
+        String s = "colors";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/colorpicker.html"})
+    public Mono<String> colorpicker(final Model model) {
+        String s = "colorpicker";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/datagrid.html"})
+    public Mono<String> datagrid(final Model model) {
+        String s = "datagrid";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/datatables.html"})
+    public Mono<String> datatables(final Model model) {
+        String s = "datatables";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/dropdowns.html"})
+    public Mono<String> dropdowns(final Model model) {
+        String s = "dropdowns";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/dropzone.html"})
+    public Mono<String> dropzone(final Model model) {
+        String s = "dropzone";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/flags.html"})
+    public Mono<String> flags(final Model model) {
+        String s = "flags";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/inline-player.html"})
+    public Mono<String> inline_player(final Model model) {
+        String s = "inline-player";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/maps.html"})
+    public Mono<String> maps(final Model model) {
+        String s = "maps";
+        model.addAttribute("systemName", systemName);
+        model.addAttribute("title", systemName);
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
 }
