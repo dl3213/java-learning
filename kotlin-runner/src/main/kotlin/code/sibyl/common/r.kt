@@ -40,6 +40,10 @@ object r {
         return Mono.just(success());
     }
     @JvmStatic
+    fun successMono(e : Any): Mono<Response> {
+        return Mono.just(success(e));
+    }
+    @JvmStatic
     fun error(msg : String): Response {
         return Response.error(msg)
     }

@@ -32,7 +32,6 @@ class AppConfig {
 
     @Bean
     fun handlerMapping(socket: DataBaseSocket): HandlerMapping {
-        log.info("socket start ==> {}", socket)
         return SimpleUrlHandlerMapping(hashMapOf("/database/socket/{id}" to socket), -1);
     }
 
@@ -40,7 +39,7 @@ class AppConfig {
      * db 初始化
      * @return
      */
-//    @Bean
+    @Bean
     fun initializer(@Qualifier("connectionFactory") connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
         val initializer = ConnectionFactoryInitializer()
         initializer.setConnectionFactory(connectionFactory)

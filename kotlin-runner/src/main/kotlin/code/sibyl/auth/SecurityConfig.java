@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -93,7 +94,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/font/**",
                                 "/img/**",
-                                "/dist/**",
+                                "/dist/**"
+                                ,
                                 "/database/socket/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
@@ -137,13 +139,16 @@ public class SecurityConfig {
                 .username("admin")
                 .password("admin")
                 .passwordEncoder(passwordEncoder()::encode)
-                .authorities("admin:api","user:api")
+//                .authorities("admin:api","user:api")
+                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
+//                .roles("admin","user")//有前缀，最好不要用
                 .build();
         UserDetails user = User.withDefaultPasswordEncoder()
                 .username("user")
                 .password("user")
                 .passwordEncoder(passwordEncoder()::encode)
-                .authorities("user:api")// 角色-菜单  权限-接口
+                .authorities(new SimpleGrantedAuthority("user:api"))// 角色-菜单  权限-接口
+//                .roles("user")// 角色-菜单  权限-接口
                 .build();
         // @formatter:on
         return new MapReactiveUserDetailsService(admin, user);
@@ -172,11 +177,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public Base64.Decoder decoder(){
+    public Base64.Decoder decoder() {
         return Base64.getDecoder();
     }
+
     @Bean
-    public Base64.Encoder encoder(){
+    public Base64.Encoder encoder() {
         return Base64.getEncoder();
     }
 }

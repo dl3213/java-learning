@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
 public class DataBaseRouter {
+
     @Bean
     public RouterFunction<ServerResponse> userRouterFunction(DataBaseHandler handler) {
         return RouterFunctions.nest(RequestPredicates.path("/database"),

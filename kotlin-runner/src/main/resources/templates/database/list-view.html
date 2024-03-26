@@ -436,41 +436,78 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         console.log("database ready...")
-
+        const titles = document.getElementsByTagName('title');
+        const title = titles && titles[0] ? titles[0].innerText : "";
         function connect() {
             const els = document.getElementsByName("connect");
             els.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     console.log("connect onclick...")
                     const id = btn.getAttribute("key");
-                    // 创建一个新的WebSocket实例
-                    var ws = new WebSocket('ws://127.0.0.1:80/database/socket/' + id);
 
-                    // 当WebSocket连接打开时触发
-                    ws.onopen = function (event) {
-                        console.log('WebSocket 连接已打开');
-                        sendMessage()
-                    };
+                    //多窗口模式，层叠置顶
+                    layer.open({
+                        type: 2 //此处以iframe举例
+                        , skin: 'layer-ext-yourskin' //样式类名
+                        , title: title
+                        , area: ['85%', '65%']
+                        , shade: 0
+                        , maxmin: true
+                        , scrollbar: true
+                        , content: ['/database/connect-view?id=' + id]
+                        , zIndex: layer.zIndex //重点1
+                        , success: function (layero, index) {
+                            layer.setTop(layero); //重点2. 保持选中窗口置顶
+                            //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
+                            layer.escIndex = layer.escIndex || [];
+                            layer.escIndex.unshift(index);
+                            //选中当前层时，将当前层索引放置在首位
+                            layero.on('mousedown', function () {
+                                var _index = layer.escIndex.indexOf(index);
+                                if (_index !== -1) {
+                                    layer.escIndex.splice(_index, 1); //删除原有索引
+                                }
+                                layer.escIndex.unshift(index); //将索引插入到数组首位
+                            });
+                        }
+                        , end: function () {
+                            //更新索引
+                            if (typeof layer.escIndex === 'object') {
+                                layer.escIndex.splice(0, 1);
+                            }
+                            location.reload()
+                        }
+                    });
 
-                    // 当WebSocket接收到服务器发送的消息时触发
-                    ws.onmessage = function (event) {
-                        console.log('收到消息: ' + event.data);
-                    };
 
-                    // 当WebSocket连接关闭时触发
-                    ws.onclose = function (event) {
-                        console.log('WebSocket 连接已关闭');
-                    };
-
-                    // 当WebSocket通信发生错误时触发
-                    ws.onerror = function (error) {
-                        console.error('WebSocket 出现错误: ' + error);
-                    };
-
-                    // 发送消息到服务器
-                    function sendMessage() {
-                        ws.send('Hello, Server!');
-                    }
+                    // // 创建一个新的WebSocket实例
+                    // var ws = new WebSocket('ws://127.0.0.1:80/database/socket/' + id);
+                    //
+                    // // 当WebSocket连接打开时触发
+                    // ws.onopen = function (event) {
+                    //     console.log('WebSocket 连接已打开');
+                    //     sendMessage()
+                    // };
+                    //
+                    // // 当WebSocket接收到服务器发送的消息时触发
+                    // ws.onmessage = function (event) {
+                    //     console.log('收到消息: ' + event.data);
+                    // };
+                    //
+                    // // 当WebSocket连接关闭时触发
+                    // ws.onclose = function (event) {
+                    //     console.log('WebSocket 连接已关闭');
+                    // };
+                    //
+                    // // 当WebSocket通信发生错误时触发
+                    // ws.onerror = function (error) {
+                    //     console.error('WebSocket 出现错误: ' + error);
+                    // };
+                    //
+                    // // 发送消息到服务器
+                    // function sendMessage() {
+                    //     ws.send('Hello, Server!');
+                    // }
 
                     // axios
                     //     .post('/database/connect/' + id)
@@ -489,8 +526,6 @@
         connect();
 
         function edit_btn() {
-            const titles = document.getElementsByTagName('title');
-            const title = titles && titles[0] ? titles[0].innerText : "";
             const edits = document.getElementsByName("edit");
             edits.forEach(edit => {
                 edit.addEventListener('click', (e) => {
