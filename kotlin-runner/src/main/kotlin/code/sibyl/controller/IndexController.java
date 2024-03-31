@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -94,7 +95,13 @@ public class IndexController {
     }
 
     @GetMapping({"sign-in.html"})
-    public Mono<String> sign_in(final Model model) {
+    public Mono<String> sign_in(final Model model, ServerWebExchange exchange) {
+        System.err.println("sign-in");
+        System.err.println(exchange);
+        System.err.println(exchange.getRequest().getPath());
+        System.err.println(exchange.getRequest().getQueryParams());
+        System.err.println(exchange.getFormData());
+        System.err.println(exchange.getMultipartData());
         String s = "sign-in";
         model.addAttribute("systemName", systemName);
         model.addAttribute("title", systemName);
