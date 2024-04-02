@@ -11,6 +11,9 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
+import org.springframework.scheduling.TaskScheduler
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
@@ -21,9 +24,17 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 
 @Configuration
 @EnableR2dbcRepositories
+@EnableAsync
 class AppConfig {
 
     private val log = LoggerFactory.getLogger(AppConfig::class.java)
+
+    @Bean
+    fun taskScheduler(): TaskScheduler {
+        val taskScheduler = ThreadPoolTaskScheduler()
+        taskScheduler.poolSize = 64
+        return taskScheduler
+    }
 
     @Bean
     fun webSocketHandlerAdapter(): WebSocketHandlerAdapter {
@@ -39,7 +50,7 @@ class AppConfig {
      * db 初始化
      * @return
      */
-    @Bean
+//    @Bean
     fun initializer(@Qualifier("connectionFactory") connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
         val initializer = ConnectionFactoryInitializer()
         initializer.setConnectionFactory(connectionFactory)

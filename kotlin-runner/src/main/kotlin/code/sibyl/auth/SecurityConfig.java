@@ -94,10 +94,11 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/font/**",
                                 "/img/**",
-                                "/dist/**"
-                                ,
-                                "/database/socket/**"
-                        ).permitAll()
+                                "/dist/**",
+                                "/database/socket/**",
+                                "/noAuth/**"
+                        )
+                        .permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyExchange().authenticated()
                 );

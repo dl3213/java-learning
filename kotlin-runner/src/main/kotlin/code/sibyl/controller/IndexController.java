@@ -3,6 +3,7 @@ package code.sibyl.controller;
 import code.sibyl.dto.MenuDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -94,7 +96,14 @@ public class IndexController {
     }
 
     @GetMapping({"sign-in.html"})
-    public Mono<String> sign_in(final Model model) {
+    public Mono<String> sign_in(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
+        System.err.println("sign-in");
+        System.err.println(exchange);
+        System.err.println(exchange.getRequest().getPath());
+        System.err.println(exchange.getRequest().getQueryParams());
+        System.err.println(exchange.getFormData());
+        System.err.println(exchange.getMultipartData());
+        System.err.println(request);
         String s = "sign-in";
         model.addAttribute("systemName", systemName);
         model.addAttribute("title", systemName);

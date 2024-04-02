@@ -29,7 +29,7 @@ spring:
     cache: false
   devtools:
     livereload:
-      enabled: true
+      enabled: false
     restart:
       exclude: logs/**
   r2dbc:
