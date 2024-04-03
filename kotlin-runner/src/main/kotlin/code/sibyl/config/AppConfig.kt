@@ -51,17 +51,17 @@ class AppConfig {
      * db 初始化
      * @return
      */
-//    @Bean
-//    fun initializer(connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
-//        val initializer = ConnectionFactoryInitializer()
-//        initializer.setConnectionFactory(connectionFactory)
-//        val populator = CompositeDatabasePopulator()
-//        val resource = ClassPathResource("/db/schema.sql")
-//        populator.addPopulators(ResourceDatabasePopulator(resource))
-//        initializer.setDatabasePopulator(populator)
-//        log.info("db-initializer = {} {}", connectionFactory.metadata.name, resource.path);
-//        return initializer
-//    }
+    @Bean
+    fun initializer(connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
+        val initializer = ConnectionFactoryInitializer()
+        initializer.setConnectionFactory(connectionFactory)
+        val populator = CompositeDatabasePopulator()
+        val resource = ClassPathResource("/db/schema.sql")
+        populator.addPopulators(ResourceDatabasePopulator(resource))
+        initializer.setDatabasePopulator(populator)
+        log.info("db-initializer = {} {}", connectionFactory.metadata.name, resource.path);
+        return initializer
+    }
 
     /**
      * 全局跨域配置
