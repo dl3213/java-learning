@@ -3,6 +3,7 @@ package code.sibyl.common
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.core.env.Environment
 import reactor.core.publisher.Mono
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -26,6 +27,11 @@ object r {
 
     const val yyyy: String = "yyyy" //常用时间格式
     const val MM: String = "MM" //常用时间格式
+
+    @JvmStatic
+    fun systemName(): String? {
+        return getBean(Environment::class.java).getProperty("spring.application.name");
+    }
 
     @JvmStatic
     fun success(data: Any?): Response {

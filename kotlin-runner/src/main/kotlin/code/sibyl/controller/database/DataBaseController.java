@@ -3,6 +3,7 @@ package code.sibyl.controller.database;
 import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.service.DataBaseService;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +52,8 @@ public class DataBaseController {
                     model.addAttribute("list", list);
                     List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
                     model.addAttribute("headerList", headerList);
-                    model.addAttribute("systemName", systemName);
-                    model.addAttribute("title", systemName);
+                    model.addAttribute("systemName", r.systemName());
+                    model.addAttribute("title", r.systemName());
                 })
                 .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
 
@@ -62,8 +63,8 @@ public class DataBaseController {
 //                model.addAttribute("list", list);
 //                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
 //                model.addAttribute("headerList", headerList);
-//                model.addAttribute("systemName", systemName);
-//                model.addAttribute("title", systemName);
+//                model.addAttribute("systemName", r.systemName());
+//                model.addAttribute("title", r.systemName());
 //                monoSink.success("database/list-view");
 //            } catch (Exception e) {
 //                e.printStackTrace();
