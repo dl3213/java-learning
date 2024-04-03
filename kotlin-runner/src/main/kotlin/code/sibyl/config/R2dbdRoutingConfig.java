@@ -40,31 +40,14 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
     private final static String defaultConnectionFactoryKey = "default";
     @Autowired
     private Base64.Decoder decoder;
-    private final Map<String, ConnectionFactory> map = new ConcurrentHashMap<>();
 
     public static <T> Mono<T> putR2dbcSource(Mono<T> mono, String group) {
-        return mono.contextWrite(ctx -> {
-            System.err.println("Mono putR2dbcSource");
-            System.err.println(DB_KEY);
-            System.err.println(group);
-            return ctx.put(DB_KEY, group);
-        });
+        return mono.contextWrite(ctx -> ctx.put(DB_KEY, group));
     }
 
     public static <T> Flux<T> putR2dbcSource(Flux<T> flux, String group) {
-        return flux.contextWrite(ctx -> {
-            System.err.println("Flux putR2dbcSource");
-            System.err.println(DB_KEY);
-            System.err.println(group);
-            System.err.println(map().get(group));
-            return ctx.put(DB_KEY, group);
-        });
+        return flux.contextWrite(ctx -> ctx.put(DB_KEY, group));
     }
-
-    public static Map map() {
-        return r.getBean(R2dbdRoutingConfig.class).map;
-    }
-
 
     @Override // 或者initialize
     public void afterPropertiesSet() {
@@ -81,9 +64,7 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
 //                .collectList()
 //                .block();
         R2dbcEntityTemplate r2dbcEntityTemplate = new R2dbcEntityTemplate(connectionFactory);
-        System.err.println(r2dbcEntityTemplate);
         Map<String, ConnectionFactory> connectionFactoryMap = r2dbcEntityTemplate.select(Database.class).all().flatMap(database -> {
-                    System.err.println(database);
                     if (StringUtils.isBlank(database.getType())) {
                         throw new RuntimeException("database type must not be null");
                     }
@@ -115,25 +96,10 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
                 })
                 .collect(Collectors.toMap(e -> e.getT1(), e -> e.getT2()))
                 .block();
-        map.putAll(connectionFactoryMap);
         this.setDefaultTargetConnectionFactory(connectionFactory);
         this.setTargetConnectionFactories(connectionFactoryMap);
         super.afterPropertiesSet();
     }
-
-//    @Override
-//    protected Mono<Object> determineCurrentLookupKey() {
-//        return Mono.deferContextual(Mono::just).map(ctx -> {
-//            System.err.println("determineCurrentLookupKey");
-//            System.err.println(DB_KEY);
-//            if (ctx.hasKey(DB_KEY)) {
-//                log.info("determine datasource: " + ctx.get(DB_KEY));
-//                return ctx.get(DB_KEY);
-//            } else {
-//                return this.defaultConnectionFactoryKey;
-//            }
-//        });
-//    }
 
     @Override
     protected Mono<Object> determineCurrentLookupKey() {

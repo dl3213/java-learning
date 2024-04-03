@@ -11,6 +11,7 @@ import java.util.Collection;
 
 @Repository
 //@DS("default")
+//@DS("bi-1")
 public interface DatabaseRepository extends R2dbcRepository<Database, Long> {
     @Query("SELECT * from T_BASE_DATABASE ")
     Flux<Database> list();

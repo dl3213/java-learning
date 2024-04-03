@@ -31,6 +31,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+//@DS("bi-1")
 public class DataBaseService {
 
     private final DatabaseRepository databaseRepository;
