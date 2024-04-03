@@ -1,5 +1,6 @@
 package code.sibyl.service;
 
+import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
@@ -11,6 +12,7 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +36,7 @@ public class DataBaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseClient databaseClient;
 
+//    @DS("bi-1")
     public Flux<Database> list() {
         return databaseRepository.list();
     }

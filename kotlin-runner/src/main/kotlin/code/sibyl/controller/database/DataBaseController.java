@@ -1,5 +1,6 @@
 package code.sibyl.controller.database;
 
+import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
 import code.sibyl.domain.database.Database;
@@ -32,6 +33,7 @@ public class DataBaseController {
 
     @SneakyThrows
     @GetMapping("/list-view")
+//    @DS("bi-1")
     public Mono<String> list_view(final Model model) {
 
         return dataBaseService.list()

@@ -97,13 +97,13 @@ public class IndexController {
 
     @GetMapping({"sign-in.html"})
     public Mono<String> sign_in(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        System.err.println("sign-in");
-        System.err.println(exchange);
-        System.err.println(exchange.getRequest().getPath());
-        System.err.println(exchange.getRequest().getQueryParams());
-        System.err.println(exchange.getFormData());
-        System.err.println(exchange.getMultipartData());
-        System.err.println(request);
+//        System.err.println("sign-in");
+//        System.err.println(exchange);
+//        System.err.println(exchange.getRequest().getPath());
+//        System.err.println(exchange.getRequest().getQueryParams());
+//        System.err.println(exchange.getFormData());
+//        System.err.println(exchange.getMultipartData());
+//        System.err.println(request);
         String s = "sign-in";
         model.addAttribute("systemName", systemName);
         model.addAttribute("title", systemName);

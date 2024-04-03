@@ -33,9 +33,7 @@ spring:
     restart:
       exclude: logs/**
   r2dbc:
-    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY #这里因为是内部module就多加一层文件夹
-    username: sibyl
-    password: sibyl-h2-2023
+    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;USER=sibyl;PASSWORD=sibyl-h2-2023 #这里因为是内部module就多加一层文件夹
   h2:
     console:
       enable: true

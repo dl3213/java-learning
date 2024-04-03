@@ -1,9 +1,9 @@
 package code.sibyl.config
 
 import code.sibyl.service.DataBaseSocket
+import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
@@ -20,6 +20,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.HandlerMapping
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
+import reactor.core.publisher.Mono
 
 
 @Configuration
@@ -51,16 +52,16 @@ class AppConfig {
      * @return
      */
 //    @Bean
-    fun initializer(@Qualifier("connectionFactory") connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
-        val initializer = ConnectionFactoryInitializer()
-        initializer.setConnectionFactory(connectionFactory)
-        val populator = CompositeDatabasePopulator()
-        val resource = ClassPathResource("/db/schema.sql")
-        populator.addPopulators(ResourceDatabasePopulator(resource))
-        initializer.setDatabasePopulator(populator)
-        log.info("db-initializer = {}", resource.path);
-        return initializer
-    }
+//    fun initializer(connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
+//        val initializer = ConnectionFactoryInitializer()
+//        initializer.setConnectionFactory(connectionFactory)
+//        val populator = CompositeDatabasePopulator()
+//        val resource = ClassPathResource("/db/schema.sql")
+//        populator.addPopulators(ResourceDatabasePopulator(resource))
+//        initializer.setDatabasePopulator(populator)
+//        log.info("db-initializer = {} {}", connectionFactory.metadata.name, resource.path);
+//        return initializer
+//    }
 
     /**
      * 全局跨域配置
