@@ -20,6 +20,8 @@ public class DatabaseBeforeSaveCallback implements org.springframework.data.r2db
 
     @Override
     public Publisher<Database> onBeforeSave(Database entity, OutboundRow row, SqlIdentifier table) {
+        row.put("host", Parameter.from(encoder.encode(entity.getHost().getBytes(StandardCharsets.UTF_8))));
+        row.put("port", Parameter.from(encoder.encode(entity.getPort().getBytes(StandardCharsets.UTF_8))));
         row.put("username", Parameter.from(encoder.encode(entity.getUsername().getBytes(StandardCharsets.UTF_8))));
         row.put("password", Parameter.from(encoder.encode(entity.getPassword().getBytes(StandardCharsets.UTF_8))));
         return Mono.just(entity);

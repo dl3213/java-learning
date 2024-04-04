@@ -18,6 +18,8 @@ public class DatabaseAfterConverterCallback implements org.springframework.data.
 
     @Override
     public Publisher<Database> onAfterConvert(Database entity, SqlIdentifier table) {
+        entity.setHost(new String(decoder.decode(entity.getHost().getBytes(StandardCharsets.UTF_8))));
+        entity.setPort(new String(decoder.decode(entity.getPort().getBytes(StandardCharsets.UTF_8))));
         entity.setUsername(new String(decoder.decode(entity.getUsername().getBytes(StandardCharsets.UTF_8))));
         entity.setPassword(new String(decoder.decode(entity.getPassword().getBytes(StandardCharsets.UTF_8))));
         return Mono.just(entity);
