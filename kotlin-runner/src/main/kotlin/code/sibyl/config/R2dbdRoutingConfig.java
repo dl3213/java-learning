@@ -1,6 +1,7 @@
 package code.sibyl.config;
 
 import code.sibyl.common.DataBaseTypeEnum;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import dev.miku.r2dbc.mysql.MySqlConnectionConfiguration;
 import dev.miku.r2dbc.mysql.MySqlConnectionFactory;
@@ -36,8 +37,6 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
 
     private final static String DB_KEY = "my_r2dbc_content_key";
     private final static String defaultConnectionFactoryKey = "default";
-    @Autowired
-    private Base64.Decoder decoder;
 
     public static <T> Mono<T> putR2dbcSource(Mono<T> mono, String group) {
         return mono.contextWrite(ctx -> ctx.put(DB_KEY, group));
@@ -79,10 +78,10 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
         }
         DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
         ConnectionFactory factory = null;
-        String host = new String(decoder.decode(database.getHost().getBytes(StandardCharsets.UTF_8)));
-        String port = new String(decoder.decode(database.getPort().getBytes(StandardCharsets.UTF_8)));
-        String username = new String(decoder.decode(database.getUsername().getBytes(StandardCharsets.UTF_8)));
-        String password = new String(decoder.decode(database.getPassword().getBytes(StandardCharsets.UTF_8)));
+        String host = new String(r.base64Decoder().decode(database.getHost().getBytes(StandardCharsets.UTF_8)));
+        String port = new String(r.base64Decoder().decode(database.getPort().getBytes(StandardCharsets.UTF_8)));
+        String username = new String(r.base64Decoder().decode(database.getUsername().getBytes(StandardCharsets.UTF_8)));
+        String password = new String(r.base64Decoder().decode(database.getPassword().getBytes(StandardCharsets.UTF_8)));
         switch (type) {
             case h2 -> factory = ConnectionFactories.get(builder()
                     .option(DRIVER, database.getType())

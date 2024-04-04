@@ -176,14 +176,4 @@ public class SecurityConfig {
 //        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
     }
-
-    @Bean
-    public Base64.Decoder decoder() {
-        return Base64.getDecoder();
-    }
-
-    @Bean
-    public Base64.Encoder encoder() {
-        return Base64.getEncoder();
-    }
 }
