@@ -1,5 +1,7 @@
 package me.sibyl.test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Observable;
 
 /**
@@ -11,6 +13,15 @@ import java.util.Observable;
 
 public class Test {
     public static void main1(String[] args) {
+
+         List<String> nonPattern = Arrays.asList(
+                ".jsp",".png",".js",".css",
+                "getDictByType","query","select","getDictData","get","getStoreByCode",
+                "getMenuData"
+        );
+
+        System.err.println("/default/skins/default/org.gocom.components.coframe.auth.LoginManager.getMenuData.biz.ext");
+
 //当前:同步非阻塞
         MyObserverable observerable = new MyObserverable();
         System.err.println("observerable add=>");

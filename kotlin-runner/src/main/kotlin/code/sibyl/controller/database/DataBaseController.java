@@ -1,11 +1,11 @@
 package code.sibyl.controller.database;
 
-import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.service.DataBaseService;
+import code.sibyl.service.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
@@ -29,14 +28,16 @@ import java.util.stream.Collectors;
 public class DataBaseController {
 
     private final DataBaseService dataBaseService;
+    private final TestService testService;
 
     private final static String systemName = "未命名";
 
     @SneakyThrows
     @GetMapping("/list-view")
-//    @DS("bi-1")
     public Mono<String> list_view(final Model model) {
-
+//        testService.test().subscribe(e ->{
+//            System.err.println(e);
+//        });
         return dataBaseService.list()
                 .collectList()
                 .map(e -> {
