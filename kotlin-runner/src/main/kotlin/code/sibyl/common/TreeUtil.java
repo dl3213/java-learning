@@ -1,4 +1,4 @@
-package code.sibyl.util;
+package code.sibyl.common;
 
 import lombok.Data;
 import java.util.Arrays;

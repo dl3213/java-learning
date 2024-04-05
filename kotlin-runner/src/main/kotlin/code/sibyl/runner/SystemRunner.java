@@ -4,7 +4,6 @@ import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ftpserver.FtpServer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -29,13 +28,11 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final DatabaseRepository databaseRepository;
-    private final FtpServer ftpServer;
     private final FileStorageService fileStorageService;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-        ftpServer.start();
         fileStorageService.init();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
@@ -63,7 +60,6 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void destroy() throws Exception {
         log.info("com.tanghe.runner.SystemRunner.destroy");
-        ftpServer.stop();
     }
 
 }

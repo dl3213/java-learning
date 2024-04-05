@@ -29,7 +29,7 @@ public class R2DBCSourceAOP {
         MethodSignature signature = (MethodSignature) pjp.getSignature();
         Method method = signature.getMethod();
         DS r2DBCSource = method.getAnnotation(DS.class);
-        if(r2DBCSource == null){
+        if (r2DBCSource == null) {
             r2DBCSource = method.getDeclaringClass().getAnnotation(DS.class);
         }
         String value = r2DBCSource.value();
@@ -38,7 +38,8 @@ public class R2DBCSourceAOP {
         } else if (method.getReturnType() == Flux.class) {
             return R2dbdRoutingConfig.putR2dbcSource((Flux<?>) pjp.proceed(), value);
         } else {
-            throw new RuntimeException("不支持别的发布类型");
+            //throw new RuntimeException("不支持别的发布类型");
+            return pjp.proceed();
         }
         //return pjp.proceed();
     }

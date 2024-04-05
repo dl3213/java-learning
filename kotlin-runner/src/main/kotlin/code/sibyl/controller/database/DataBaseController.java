@@ -30,14 +30,13 @@ public class DataBaseController {
     private final DataBaseService dataBaseService;
     private final TestService testService;
 
-    private final static String systemName = "未命名";
 
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-//        testService.test().subscribe(e ->{
-//            System.err.println(e);
-//        });
+        testService.test().subscribe(e ->{
+            System.err.println(e);
+        });
         return dataBaseService.list()
                 .collectList()
                 .map(e -> {
