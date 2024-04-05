@@ -1,7 +1,7 @@
 package code.sibyl.controller;
 
 import code.sibyl.common.r;
-import code.sibyl.dto.MenuDTO;
+import code.sibyl.model.MenuDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;

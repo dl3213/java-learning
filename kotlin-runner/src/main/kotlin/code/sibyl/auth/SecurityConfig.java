@@ -95,6 +95,7 @@ public class SecurityConfig {
                                 "/font/**",
                                 "/img/**",
                                 "/dist/**",
+                                "/ftp/**",
                                 "/database/socket/**",
                                 "/noAuth/**"
                         )
