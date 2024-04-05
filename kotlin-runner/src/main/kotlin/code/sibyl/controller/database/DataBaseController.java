@@ -35,9 +35,9 @@ public class DataBaseController {
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-//        testService.test().subscribe(e ->{
-//            System.err.println(e);
-//        });
+        testService.test().subscribe(e ->{
+            System.err.println(e);
+        });
         return dataBaseService.list()
                 .collectList()
                 .map(e -> {

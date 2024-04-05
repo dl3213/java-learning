@@ -35,7 +35,7 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
     @Value("${spring.r2dbc.url}")
     public String url;//= "r2dbc:h2:file:///./kotlin-runner/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;USER=sibyl;PASSWORD=sibyl-h2-2023";
 
-    private final static String DB_KEY = "my_r2dbc_content_key";
+    public final static String DB_KEY = "my_r2dbc_content_key";
     private final static String defaultConnectionFactoryKey = "default";
 
     public static <T> Mono<T> putR2dbcSource(Mono<T> mono, String group) {
