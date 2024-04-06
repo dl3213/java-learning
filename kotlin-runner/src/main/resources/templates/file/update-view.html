@@ -1,0 +1,728 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title th:text="${title}">Form elements - Tabler - Premium and Open Source dashboard template with responsive and
+        high quality
+        UI.</title>
+    <!-- CSS files -->
+    <link href="/dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-flags.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/demo.min.css?1692870487" rel="stylesheet"/>
+    <style>
+        /*@import url('https://rsms.me/inter/inter.css');*/
+        @import url('/css/inter.css');
+
+        :root {
+            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+        }
+
+        body {
+            font-feature-settings: "cv03", "cv04", "cv11";
+        }
+    </style>
+</head>
+<body>
+<script src="/dist/js/demo-theme.min.js?1692870487"></script>
+<div class="page">
+    <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Database
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="row row-cards">
+                    <div class="col-12">
+                        <div class="row row-cards">
+                            <div class="col-12">
+                                <form class="card" id="databaseProfile">
+                                    <input hidden="hidden" name="id" th:value="${target?.id}">
+                                    <div class="card-body">
+                                        <h3 class="card-title">Edit</h3>
+                                        <div class="row row-cards">
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Name</label>
+                                                    <input type="text" class="form-control" placeholder="Name"
+                                                           name="name" th:value="${target?.name}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Type</label>
+                                                    <select class="form-select" name="type">
+                                                        <option th:each="t:${typeList}" th:text="${t.code}"
+                                                                th:value="${t.code}"
+                                                                th:selected="${target?.type == t.code}"></option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Host</label>
+                                                    <input type="text" class="form-control" placeholder="Host"
+                                                           name="host" th:value="${target?.host}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Port</label>
+                                                    <input type="text" class="form-control" placeholder="Port"
+                                                           name="port" th:value="${target?.port}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Username</label>
+                                                    <input type="text" class="form-control" placeholder="Username"
+                                                           name="username" th:value="${target?.username}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Password</label>
+                                                    <input type="text" class="form-control" placeholder="Password"
+                                                           name="password" th:value="${target?.password}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Database</label>
+                                                    <input type="text" class="form-control" placeholder="Database"
+                                                           name="database" th:value="${target?.database}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-3 mb-0">
+                                                    <label class="form-label">Desc</label>
+                                                    <textarea rows="5" class="form-control"
+                                                              placeholder="Here can be your description"
+                                                              name="desc"
+                                                              th:value="${target?.desc}">Oh so, your weak rhyme
+You doubt I'll bother, reading into it
+I'll probably won't, left to my own devices
+But that's the difference in our opinions.</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-end">
+                                        <button type="button" class="btn btn-primary" id="update">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">HTTP Request</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row row-cards">
+                                            <div class="mb-3 col-sm-4 col-md-2">
+                                                <label class="form-label required">Method</label>
+                                                <select class="form-select">
+                                                    <option value="GET">GET</option>
+                                                    <option value="POST">POST</option>
+                                                    <option value="PUT">PUT</option>
+                                                    <option value="HEAD">HEAD</option>
+                                                    <option value="DELETE">DELETE</option>
+                                                    <option value="PATCH">PATCH</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3 col-sm-8 col-md-10">
+                                                <label class="form-label required">URL</label>
+                                                <input name="url" type="text" class="form-control"
+                                                       value="https://content.googleapis.com/discovery/v1/apis/surveys/v2/rest">
+                                            </div>
+                                        </div>
+                                        <div class="form-label">Assertions</div>
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <thead>
+                                                <tr>
+                                                    <th>Source</th>
+                                                    <th>Property</th>
+                                                    <th>Comparison</th>
+                                                    <th>Target</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="STATUS_CODE" selected="">Status code</option>
+                                                            <option value="JSON_BODY">JSON body</option>
+                                                            <option value="HEADERS">Headers</option>
+                                                            <option value="TEXT_BODY">Text body</option>
+                                                            <option value="RESPONSE_TIME">Response time</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control"></td>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="EQUALS" selected="">Equals</option>
+                                                            <option value="NOT_EQUALS">Not equals</option>
+                                                            <option value="HAS_KEY">Has key</option>
+                                                            <option value="NOT_HAS_KEY">Not has key</option>
+                                                            <option value="HAS_VALUE">Has value</option>
+                                                            <option value="NOT_HAS_VALUE">Not has value</option>
+                                                            <option value="IS_EMPTY">Is empty</option>
+                                                            <option value="NOT_EMPTY">Is not empty</option>
+                                                            <option value="GREATER_THAN">Greater than</option>
+                                                            <option value="LESS_THAN">Less than</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control" value="200">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="STATUS_CODE">Status code</option>
+                                                            <option value="JSON_BODY" selected="">JSON body</option>
+                                                            <option value="HEADERS">Headers</option>
+                                                            <option value="TEXT_BODY">Text body</option>
+                                                            <option value="RESPONSE_TIME">Response time</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control"
+                                                               value="parameters.alt.type">
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="EQUALS">Equals</option>
+                                                            <option value="NOT_EQUALS">Not equals</option>
+                                                            <option value="HAS_KEY">Has key</option>
+                                                            <option value="NOT_HAS_KEY">Not has key</option>
+                                                            <option value="HAS_VALUE" selected="">Has value</option>
+                                                            <option value="NOT_HAS_VALUE">Not has value</option>
+                                                            <option value="IS_EMPTY">Is empty</option>
+                                                            <option value="NOT_EMPTY">Is not empty</option>
+                                                            <option value="GREATER_THAN">Greater than</option>
+                                                            <option value="LESS_THAN">Less than</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control" value="string">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="STATUS_CODE">Status code</option>
+                                                            <option value="JSON_BODY">JSON body</option>
+                                                            <option value="HEADERS">Headers</option>
+                                                            <option value="TEXT_BODY">Text body</option>
+                                                            <option value="RESPONSE_TIME" selected="">Response time
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control"></td>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="EQUALS">Equals</option>
+                                                            <option value="NOT_EQUALS">Not equals</option>
+                                                            <option value="HAS_KEY">Has key</option>
+                                                            <option value="NOT_HAS_KEY">Not has key</option>
+                                                            <option value="HAS_VALUE">Has value</option>
+                                                            <option value="NOT_HAS_VALUE">Not has value</option>
+                                                            <option value="IS_EMPTY">Is empty</option>
+                                                            <option value="NOT_EMPTY">Is not empty</option>
+                                                            <option value="GREATER_THAN">Greater than</option>
+                                                            <option value="LESS_THAN" selected="">Less than</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control" value="500">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="STATUS_CODE">Status code</option>
+                                                            <option value="JSON_BODY">JSON body</option>
+                                                            <option value="HEADERS" selected="">Headers</option>
+                                                            <option value="TEXT_BODY">Text body</option>
+                                                            <option value="RESPONSE_TIME">Response time</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control" value="content-type">
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-select">
+                                                            <option value="EQUALS" selected="">Equals</option>
+                                                            <option value="NOT_EQUALS">Not equals</option>
+                                                            <option value="HAS_KEY">Has key</option>
+                                                            <option value="NOT_HAS_KEY">Not has key</option>
+                                                            <option value="HAS_VALUE">Has value</option>
+                                                            <option value="NOT_HAS_VALUE">Not has value</option>
+                                                            <option value="IS_EMPTY">Is empty</option>
+                                                            <option value="NOT_EMPTY">Is not empty</option>
+                                                            <option value="GREATER_THAN">Greater than</option>
+                                                            <option value="LESS_THAN">Less than</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control"
+                                                               value="application/json; charset=UTF-8">
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-end">
+                                        <button type="submit" class="btn btn-primary">Make request</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Libs JS -->
+<script src="/dist/libs/nouislider/dist/nouislider.min.js?1692870487" defer></script>
+<script src="/dist/libs/litepicker/dist/litepicker.js?1692870487" defer></script>
+<script src="/dist/libs/tom-select/dist/js/tom-select.base.min.js?1692870487" defer></script>
+<!-- Tabler Core -->
+<script src="/dist/js/tabler.min.js?1692870487" defer></script>
+<script src="/dist/js/demo.min.js?1692870487" defer></script>
+<script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/layer.js"></script>
+<script src="/js/common/common.js"></script>
+<script>
+    layer.config({
+        extend: 'myskin/style.css', //加载您的扩展样式
+        skin: 'layer-ext-yourskin'
+    });
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-states'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-simple'), {
+    			  start: 20,
+    			  connect: [true, false],
+    			  step: 10,
+    			  range: {
+    				  min: 0,
+    				  max: 100
+    			  }
+    	 }));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-connect'), {
+    			  start: [60, 90],
+    			  connect: [false, true, false],
+    			  step: 10,
+    			  range: {
+    				  min: 0,
+    				  max: 100
+    			  }
+    	 }));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	 window.noUiSlider && (noUiSlider.create(document.getElementById('range-color'), {
+    			  start: 40,
+    			  connect: [true, false],
+    			  step: 10,
+    			  range: {
+    				  min: 0,
+    				  max: 100
+    			  }
+    	 }));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('datepicker-default'),
+    		buttonText: {
+    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('datepicker-icon'),
+    		buttonText: {
+    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('datepicker-icon-prepend'),
+    		buttonText: {
+    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	window.Litepicker && (new Litepicker({
+    		element: document.getElementById('datepicker-inline'),
+    		buttonText: {
+    			previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>`,
+    			nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>`,
+    		},
+    		inlineMode: true,
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-tags'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-users'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-optgroups'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-people'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-labels'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries-valid'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+    	var el;
+    	window.TomSelect && (new TomSelect(el = document.getElementById('select-countries-invalid'), {
+    		copyClassesToDropdown: false,
+    		dropdownParent: 'body',
+    		controlInput: '<input>',
+    		render:{
+    			item: function(data,escape) {
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    			option: function(data,escape){
+    				if( data.customProperties ){
+    					return '<div><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + escape(data.text) + '</div>';
+    				}
+    				return '<div>' + escape(data.text) + '</div>';
+    			},
+    		},
+    	}));
+    });
+    // @formatter:on
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let sliderTriggerList = [].slice.call(document.querySelectorAll("[data-slider]"));
+        sliderTriggerList.map(function (sliderTriggerEl) {
+            let options = {};
+            if (sliderTriggerEl.getAttribute("data-slider")) {
+                options = JSON.parse(sliderTriggerEl.getAttribute("data-slider"));
+            }
+            let slider = noUiSlider.create(sliderTriggerEl, options);
+            if (options['js-name']) {
+                window[options['js-name']] = slider;
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var update = document.getElementById('update');
+        const titles = document.getElementsByTagName('title');
+        const title = titles && titles[0] ? titles[0].innerText : "";
+        update.addEventListener('click', (e) => {
+            console.log("submit onclick...")
+            const form = document.querySelector('#databaseProfile');
+            console.log(form)
+            const formData = new FormData(form);
+            console.log(formData)
+            var request = Object.fromEntries(formData.entries());
+            const formJson = JSON.stringify(request);
+            console.log(formJson)
+            axios
+                .post('/database/update', request)
+                .then(response => {
+                    console.log(response)
+                    layer.msg(response.data.msg, {
+                        skin: 'layer-ext-yourskin'
+                        , title: title
+                        , area: ['20%', '15%']
+                        , shade: 0
+                        , maxmin: true
+                        , btnAlign: 'c'
+                        , time: 0
+                        , btn: ['yes', 'no'] //只是为了演示
+                        , yes:function (index, layero){
+                            layer.close(index);
+                            var parentIndex = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(parentIndex);
+                        }
+                    });
+
+                })
+                .catch(error => {
+                    console.log(error)
+                    layer.msg(error.message);
+                })
+        })
+    });
+</script>
+</body>
+</html>

@@ -95,7 +95,7 @@ public class SecurityConfig {
                                 "/font/**",
                                 "/img/**",
                                 "/dist/**",
-                                "/ftp/**",
+                                "/file/**",
                                 "/database/socket/**",
                                 "/noAuth/**"
                         )
@@ -141,8 +141,8 @@ public class SecurityConfig {
                 .username("admin")
                 .password("admin")
                 .passwordEncoder(passwordEncoder()::encode)
-//                .authorities("admin:api","user:api")
-                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
+                .authorities("admin:api","user:api")
+//                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
 //                .roles("admin","user")//有前缀，最好不要用
                 .build();
         UserDetails user = User.withDefaultPasswordEncoder()

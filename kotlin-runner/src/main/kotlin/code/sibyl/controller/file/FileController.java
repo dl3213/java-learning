@@ -1,8 +1,12 @@
-package code.sibyl.controller.ftp;
+package code.sibyl.controller.file;
 
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
+import code.sibyl.domain.database.Database;
 import code.sibyl.model.FileInfo;
+import code.sibyl.service.DataBaseService;
 import code.sibyl.service.FileStorageService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -10,27 +14,51 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@RestController
-@RequestMapping("/ftp")
+@Controller
+@RequestMapping("/file")
 public class FileController {
 
     @Autowired
     FileStorageService storageService;
+    @Autowired
+    private DataBaseService dataBaseService;
+
+    @GetMapping("/list-view")
+    public Mono<String> list_view(final Model model) {
+        return dataBaseService.list()
+                .collectList()
+                .doOnSuccess(list -> {
+                    model.addAttribute("list", list);
+                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+                    model.addAttribute("headerList", headerList);
+                    model.addAttribute("systemName", r.systemName());
+                    model.addAttribute("title", r.systemName());
+                })
+                .flatMap(e -> Mono.create(monoSink -> monoSink.success("file/list-view")));
+    }
 
     @PostMapping("/upload")
+    @ResponseBody
     public Mono<ResponseEntity<Response>> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono) {
         return storageService.save(filePartMono).map(
                 (filename) -> ResponseEntity.ok().body(Response.success("Uploaded the file successfully: " + filename)));
     }
 
     @GetMapping("/files")
+    @ResponseBody
     public ResponseEntity<Flux<FileInfo>> getListFiles() {
         Stream<FileInfo> fileInfoStream = storageService.loadAll().map(path -> {
             String filename = path.getFileName().toString();
@@ -44,6 +72,7 @@ public class FileController {
     }
 
     @GetMapping("/files/{filename:.+}")
+    @ResponseBody
     public ResponseEntity<Flux<DataBuffer>> getFile(@PathVariable String filename) {
         Flux<DataBuffer> file = storageService.load(filename);
 
@@ -52,6 +81,7 @@ public class FileController {
     }
 
     @DeleteMapping("/files/{filename:.+}")
+    @ResponseBody
     public Mono<ResponseEntity<Response>> deleteFile(@PathVariable String filename) {
         String message = "";
 
