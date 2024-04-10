@@ -1,6 +1,7 @@
 package code.sibyl.runner;
 
 import code.sibyl.repository.DatabaseRepository;
+import code.sibyl.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -27,11 +28,12 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final DatabaseRepository databaseRepository;
-
+    private final FileStorageService fileStorageService;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+        fileStorageService.init();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
 //        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();

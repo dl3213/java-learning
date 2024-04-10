@@ -2,7 +2,6 @@ package org.sample;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.ext.web.Router;
-import org.sample.router.AppRouterBuilder;
 
 /**
  * @author dyingleaf3213
@@ -20,7 +19,7 @@ public class MainVerticle extends AbstractVerticle {
         Router router = Router.router(vertx);
 
         //
-        router = AppRouterBuilder.build(router);
+        //router = AppRouterBuilder.build(router);
 
         // Create the HTTP server
         vertx.createHttpServer()

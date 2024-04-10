@@ -15,14 +15,10 @@ private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
 fun main(args: Array<String>) {
     runApplication<KotlinApplication>(*args)
-    log.info(
-        "app running in port =" + r.getBean(Environment::class.java).getProperty("server.port")
-    )
-
+    log.info("app running in port =" + r.getBean(Environment::class.java).getProperty("server.port"))
     System.getProperties().list(System.out)
-
     val runtime = Runtime.getRuntime()
-
+    println()
     println("JVM available processors: ${runtime.availableProcessors()}")
     println("JVM free memory: ${runtime.freeMemory() / 1024 / 1024} MB")
     println("JVM total memory: ${runtime.totalMemory() / 1024 / 1024} MB")

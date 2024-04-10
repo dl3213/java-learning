@@ -2,8 +2,10 @@ package code.sibyl.controller.database;
 
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.service.DataBaseService;
+import code.sibyl.service.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
@@ -27,13 +28,13 @@ import java.util.stream.Collectors;
 public class DataBaseController {
 
     private final DataBaseService dataBaseService;
+    private final TestService testService;
 
-    private final static String systemName = "未命名";
 
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-
+        //testService.test().subscribe(e -> System.err.println(e));
         return dataBaseService.list()
                 .collectList()
                 .map(e -> {
@@ -49,8 +50,8 @@ public class DataBaseController {
                     model.addAttribute("list", list);
                     List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
                     model.addAttribute("headerList", headerList);
-                    model.addAttribute("systemName", systemName);
-                    model.addAttribute("title", systemName);
+                    model.addAttribute("systemName", r.systemName());
+                    model.addAttribute("title", r.systemName());
                 })
                 .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
 
@@ -60,8 +61,8 @@ public class DataBaseController {
 //                model.addAttribute("list", list);
 //                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
 //                model.addAttribute("headerList", headerList);
-//                model.addAttribute("systemName", systemName);
-//                model.addAttribute("title", systemName);
+//                model.addAttribute("systemName", r.systemName());
+//                model.addAttribute("title", r.systemName());
 //                monoSink.success("database/list-view");
 //            } catch (Exception e) {
 //                e.printStackTrace();
@@ -103,6 +104,13 @@ public class DataBaseController {
     @ResponseBody
     public Mono<Response> connect(@PathVariable String id) {
         dataBaseService.connect(id);
-        return Response.successMono();
+        return r.successMono();
+    }
+
+    @PostMapping("/backup/{id}")
+    @ResponseBody
+    public Mono<Response> backup(@PathVariable String id) {
+        dataBaseService.backup(id);
+        return r.successMono();
     }
 }

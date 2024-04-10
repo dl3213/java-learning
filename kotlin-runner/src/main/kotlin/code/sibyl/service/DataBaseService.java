@@ -1,5 +1,6 @@
 package code.sibyl.service;
 
+import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
@@ -11,6 +12,7 @@ import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,11 +31,13 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+//@DS("bi-1")
 public class DataBaseService {
 
     private final DatabaseRepository databaseRepository;
     private final DatabaseClient databaseClient;
 
+//    @DS("bi-1")
     public Flux<Database> list() {
         return databaseRepository.list();
     }
@@ -104,5 +108,49 @@ public class DataBaseService {
 //            ConnectionPool pool=new ConnectionPool(configuration);
 //            Mono<Connection> connectionMono = pool.create();
 //            R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
+    }
+
+    public void backup(String id) {
+        Mono.just(id)
+                .map(Long::valueOf)
+                .flatMap(e -> databaseRepository.findById(e))
+                .map(database -> {
+                    if (StringUtils.isBlank(database.getType())) {
+                        throw new RuntimeException("database type must not be null");
+                    }
+                    DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
+                    ConnectionFactory factory = null;
+                    switch (type) {
+                        case h2 -> factory = ConnectionFactories.get(builder()
+                                .option(DRIVER, database.getType())
+                                .option(HOST, database.getHost())
+                                .option(PORT, Integer.valueOf(database.getPort()))
+                                .option(USER, database.getUsername())
+                                .option(PASSWORD, database.getPassword())
+                                .option(DATABASE, database.getDatabase()).build());
+                        case postgresql -> factory = ConnectionFactories.get(builder()
+                                .option(DRIVER, database.getType())
+                                .option(HOST, database.getHost())
+                                .option(PORT, Integer.valueOf(database.getPort()))
+                                .option(USER, database.getUsername())
+                                .option(PASSWORD, database.getPassword())
+                                .option(DATABASE, database.getDatabase()).build());
+                        case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
+                                .host(database.getHost())
+                                .port(Integer.parseInt(database.getPort()))
+                                .username(database.getUsername())
+                                .password(database.getPassword())
+                                .database(database.getDatabase()).build());
+                    }
+                    return factory;
+                })
+                .map(DatabaseClient::create)
+                .map(c -> c.sql("select now()").fetch().all().map(e -> {
+                    System.err.println("end");
+                    System.err.println(e);
+                    return e;
+                }).subscribe())
+                .subscribe()
+        ;
     }
 }

@@ -1,4 +1,4 @@
-package code.sibyl.dto;
+package code.sibyl.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

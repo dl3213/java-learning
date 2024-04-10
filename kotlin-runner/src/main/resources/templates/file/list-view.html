@@ -37,26 +37,6 @@
 <body>
 <script src="/dist/js/demo-theme.min.js?1692870487"></script>
 <div class="page">
-    <!-- Navbar -->
-    <header class="navbar navbar-expand-md d-print-none" hidden="hidden">
-        <div class="container-xl">
-            <div class="navbar-nav flex-row order-md-last">
-                <div class="nav-item d-none d-md-flex me-3">
-                    <div class="btn-list">
-                        <a class="btn" target="_blank" rel="noreferrer">
-                        </a>
-                        <a class="btn" target="_blank" rel="noreferrer">
-                        </a>
-                    </div>
-                </div>
-                <div class="d-none d-md-flex">
-                </div>
-                <div class="nav-item dropdown">
-
-                </div>
-            </div>
-        </div>
-    </header>
     <div class="page-wrapper">
         <!-- Page header -->
         <div class="page-header d-print-none">
@@ -382,15 +362,7 @@
                                         <td><a href="invoice.html" class="text-reset" tabindex="-1"
                                                th:text="${t?.name}">Design Works</a></td>
                                         <td>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-database">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/>
-                                                <path d="M4 6v6a8 3 0 0 0 16 0v-6"/>
-                                                <path d="M4 12v6a8 3 0 0 0 16 0v-6"/>
-                                            </svg>
+                                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-database"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0" /><path d="M4 6v6a8 3 0 0 0 16 0v-6" /><path d="M4 12v6a8 3 0 0 0 16 0v-6" /></svg>
                                             <span th:text="${t?.type}"></span>
                                         </td>
                                         <td th:text="${t?.host}"></td>
@@ -400,16 +372,19 @@
                                         <td th:text="${t?.database}"></td>
                                         <td th:text="${t?.desc}"></td>
                                         <td th:text="${t?.version}"></td>
-                                        <!--                                        <td th:text="${t?.createTime}"></td>-->
-                                        <!--                                        <td th:text="${t?.createId}"></td>-->
+<!--                                        <td th:text="${t?.createTime}"></td>-->
+<!--                                        <td th:text="${t?.createId}"></td>-->
                                         <td class="text-end">
                             <span class="dropdown">
                               <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
                                       data-bs-toggle="dropdown">Actions</button>
                               <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" name="edit" th:key="${t?.id}">edit</a>
-                                <a class="dropdown-item" name="connect" th:key="${t?.id}">connect</a>
-                                <a class="dropdown-item" name="backup" th:key="${t?.id}">backup</a>
+                                  <a class="dropdown-item" name="edit" th:key="${t?.id}">
+                                  edit
+                                </a>
+                                <a class="dropdown-item" name="connect" th:key="${t?.id}">
+                                  connect
+                                </a>
                               </div>
                             </span>
                                         </td>
@@ -443,28 +418,6 @@
         console.log("database ready...")
         const titles = document.getElementsByTagName('title');
         const title = titles && titles[0] ? titles[0].innerText : "";
-
-        function backup() {
-            const els = document.getElementsByName("backup");
-            els.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    console.log("backup onclick...")
-                    const id = btn.getAttribute("key");
-                    axios
-                        .post('/database/backup/' + id)
-                        .then(response => {
-                            console.log(response)
-
-                        })
-                        .catch(error => {
-                            console.log(error)
-                        })
-                })
-            })
-        }
-
-        backup()
-
         function connect() {
             const els = document.getElementsByName("connect");
             els.forEach(btn => {
@@ -548,6 +501,7 @@
                 })
             })
         }
+
 
         connect();
 

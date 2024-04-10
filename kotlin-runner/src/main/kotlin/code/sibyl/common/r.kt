@@ -3,6 +3,7 @@ package code.sibyl.common
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.core.env.Environment
 import reactor.core.publisher.Mono
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -27,28 +28,51 @@ object r {
     const val yyyy: String = "yyyy" //常用时间格式
     const val MM: String = "MM" //常用时间格式
 
+    val base64Encoder: Base64.Encoder = Base64.getEncoder();
+    val base64Decoder: Base64.Decoder = Base64.getDecoder();
+
+    @JvmStatic
+    fun base64Encoder(): Base64.Encoder? {
+        return base64Encoder;
+    }
+
+    @JvmStatic
+    fun base64Decoder(): Base64.Decoder? {
+        return base64Decoder;
+    }
+
+    @JvmStatic
+    fun systemName(): String? {
+        return getBean(Environment::class.java).getProperty("spring.application.name");
+    }
+
     @JvmStatic
     fun success(data: Any?): Response {
         return Response.success(data)
     }
+
     @JvmStatic
     fun success(): Response {
         return Response.success()
     }
+
     @JvmStatic
     fun successMono(): Mono<Response> {
         return Mono.just(success());
     }
+
     @JvmStatic
-    fun successMono(e : Any): Mono<Response> {
+    fun successMono(e: Any): Mono<Response> {
         return Mono.just(success(e));
     }
+
     @JvmStatic
-    fun error(msg : String): Response {
+    fun error(msg: String): Response {
         return Response.error(msg)
     }
+
     @JvmStatic
-    fun errorMono(msg : String): Mono<Response> {
+    fun errorMono(msg: String): Mono<Response> {
         return Mono.just(Response.error(msg));
     }
 

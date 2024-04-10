@@ -95,6 +95,7 @@ public class SecurityConfig {
                                 "/font/**",
                                 "/img/**",
                                 "/dist/**",
+                                "/file/**",
                                 "/database/socket/**",
                                 "/noAuth/**"
                         )
@@ -140,8 +141,8 @@ public class SecurityConfig {
                 .username("admin")
                 .password("admin")
                 .passwordEncoder(passwordEncoder()::encode)
-//                .authorities("admin:api","user:api")
-                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
+                .authorities("admin:api","user:api")
+//                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
 //                .roles("admin","user")//有前缀，最好不要用
                 .build();
         UserDetails user = User.withDefaultPasswordEncoder()
@@ -175,15 +176,5 @@ public class SecurityConfig {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 //        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
-    }
-
-    @Bean
-    public Base64.Decoder decoder() {
-        return Base64.getDecoder();
-    }
-
-    @Bean
-    public Base64.Encoder encoder() {
-        return Base64.getEncoder();
     }
 }
