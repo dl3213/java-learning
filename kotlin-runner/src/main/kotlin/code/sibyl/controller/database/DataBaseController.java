@@ -104,6 +104,13 @@ public class DataBaseController {
     @ResponseBody
     public Mono<Response> connect(@PathVariable String id) {
         dataBaseService.connect(id);
-        return Response.successMono();
+        return r.successMono();
+    }
+
+    @PostMapping("/backup/{id}")
+    @ResponseBody
+    public Mono<Response> backup(@PathVariable String id) {
+        dataBaseService.backup(id);
+        return r.successMono();
     }
 }
