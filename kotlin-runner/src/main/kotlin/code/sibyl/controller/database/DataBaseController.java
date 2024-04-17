@@ -1,5 +1,6 @@
 package code.sibyl.controller.database;
 
+import code.sibyl.aop.Header;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,10 @@ public class DataBaseController {
                 })
                 .doOnSuccess(list -> {
                     model.addAttribute("list", list);
-                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
+                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
+                            .map(Field::getName)
+                            .collect(Collectors.toList());
                     model.addAttribute("headerList", headerList);
                     model.addAttribute("systemName", r.systemName());
                     model.addAttribute("title", r.systemName());

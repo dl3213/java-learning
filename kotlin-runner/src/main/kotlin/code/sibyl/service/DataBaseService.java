@@ -16,6 +16,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class DataBaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseClient databaseClient;
 
-//    @DS("bi-1")
+    //    @DS("bi-1")
     public Flux<Database> list() {
         return databaseRepository.list();
     }
@@ -50,36 +51,7 @@ public class DataBaseService {
     public void connect(String id) {
         databaseRepository.findById(Long.valueOf(id))
                 .doOnSuccess(database -> System.err.println(database))
-                .map(database -> {
-                    if (StringUtils.isBlank(database.getType())) {
-                        throw new RuntimeException("database type must not be null");
-                    }
-                    DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
-                    ConnectionFactory factory = null;
-                    switch (type) {
-                        case h2 -> factory = ConnectionFactories.get(builder()
-                                .option(DRIVER, database.getType())
-                                .option(HOST, database.getHost())
-                                .option(PORT, Integer.valueOf(database.getPort()))
-                                .option(USER, database.getUsername())
-                                .option(PASSWORD, database.getPassword())
-                                .option(DATABASE, database.getDatabase()).build());
-                        case postgresql -> factory = ConnectionFactories.get(builder()
-                                .option(DRIVER, database.getType())
-                                .option(HOST, database.getHost())
-                                .option(PORT, Integer.valueOf(database.getPort()))
-                                .option(USER, database.getUsername())
-                                .option(PASSWORD, database.getPassword())
-                                .option(DATABASE, database.getDatabase()).build());
-                        case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
-                                .host(database.getHost())
-                                .port(Integer.parseInt(database.getPort()))
-                                .username(database.getUsername())
-                                .password(database.getPassword())
-                                .database(database.getDatabase()).build());
-                    }
-                    return factory;
-                })
+                .map(database -> getConnectionFactoryByDatabaseEntity(database))
                 .map(DatabaseClient::create)
                 .map(c -> c.sql("select now()").fetch().all().map(e -> {
                     System.err.println("end");
@@ -110,47 +82,102 @@ public class DataBaseService {
 //            R2dbcEntityTemplate template = new R2dbcEntityTemplate(databaseClient.getConnectionFactory());
     }
 
+
     public void backup(String id) {
         Mono.just(id)
                 .map(Long::valueOf)
                 .flatMap(e -> databaseRepository.findById(e))
-                .map(database -> {
-                    if (StringUtils.isBlank(database.getType())) {
-                        throw new RuntimeException("database type must not be null");
-                    }
-                    DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
-                    ConnectionFactory factory = null;
-                    switch (type) {
-                        case h2 -> factory = ConnectionFactories.get(builder()
-                                .option(DRIVER, database.getType())
-                                .option(HOST, database.getHost())
-                                .option(PORT, Integer.valueOf(database.getPort()))
-                                .option(USER, database.getUsername())
-                                .option(PASSWORD, database.getPassword())
-                                .option(DATABASE, database.getDatabase()).build());
-                        case postgresql -> factory = ConnectionFactories.get(builder()
-                                .option(DRIVER, database.getType())
-                                .option(HOST, database.getHost())
-                                .option(PORT, Integer.valueOf(database.getPort()))
-                                .option(USER, database.getUsername())
-                                .option(PASSWORD, database.getPassword())
-                                .option(DATABASE, database.getDatabase()).build());
-                        case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
-                                .host(database.getHost())
-                                .port(Integer.parseInt(database.getPort()))
-                                .username(database.getUsername())
-                                .password(database.getPassword())
-                                .database(database.getDatabase()).build());
-                    }
-                    return factory;
-                })
-                .map(DatabaseClient::create)
-                .map(c -> c.sql("select now()").fetch().all().map(e -> {
-                    System.err.println("end");
+                .map(database -> getConnectionFactoryWith(database))
+                .map(e -> e.setDatabaseClient(DatabaseClient.create(e.getConnectionFactory())))
+                .flatMapMany(e -> getAllTables(e.getDatabaseClient()).fetch().all())
+                .subscribe(e -> {
                     System.err.println(e);
-                    return e;
-                }).subscribe())
-                .subscribe()
+                    System.err.println();
+                })
+//                .map(c -> c.sql("select now()").fetch().all().map(e -> {
+//                    System.err.println("end");
+//                    System.err.println(e);
+//                    return e;
+//                }).subscribe())
+//                .subscribe()
         ;
+    }
+
+    private DatabaseClient.GenericExecuteSpec getAllTables(DatabaseClient client) {
+        String name = client.getConnectionFactory().getMetadata().getName();
+        System.err.println(name);
+        String sql = null;
+        switch (name) {
+            case "H2" -> sql = "SELECT * FROM pg_tables WHERE schemaname = 'public';";
+            case "MYSQL" -> sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'thlease_eos';";
+        }
+        return client.sql(sql);
+    }
+
+    @Nullable
+    private static Database getConnectionFactoryWith(Database database) {
+        if (StringUtils.isBlank(database.getType())) {
+            throw new RuntimeException("database type must not be null");
+        }
+        DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
+        ConnectionFactory factory = null;
+        switch (type) {
+            case h2 -> factory = ConnectionFactories.get(builder()
+                    .option(DRIVER, database.getType())
+                    .option(HOST, database.getHost())
+                    .option(PORT, Integer.valueOf(database.getPort()))
+                    .option(USER, database.getUsername())
+                    .option(PASSWORD, database.getPassword())
+                    .option(DATABASE, database.getDatabase()).build());
+            case postgresql -> factory = ConnectionFactories.get(builder()
+                    .option(DRIVER, database.getType())
+                    .option(HOST, database.getHost())
+                    .option(PORT, Integer.valueOf(database.getPort()))
+                    .option(USER, database.getUsername())
+                    .option(PASSWORD, database.getPassword())
+                    .option(DATABASE, database.getDatabase()).build());
+            case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
+                    .host(database.getHost())
+                    .port(Integer.parseInt(database.getPort()))
+                    .username(database.getUsername())
+                    .password(database.getPassword())
+                    .database(database.getDatabase()).build());
+            default -> throw new RuntimeException("");
+        }
+        database.setConnectionFactory(factory);
+        return database;
+    }
+
+    @Nullable
+    private static ConnectionFactory getConnectionFactoryByDatabaseEntity(Database database) {
+        if (StringUtils.isBlank(database.getType())) {
+            throw new RuntimeException("database type must not be null");
+        }
+        DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
+        ConnectionFactory factory = null;
+        switch (type) {
+            case h2 -> factory = ConnectionFactories.get(builder()
+                    .option(DRIVER, database.getType())
+                    .option(HOST, database.getHost())
+                    .option(PORT, Integer.valueOf(database.getPort()))
+                    .option(USER, database.getUsername())
+                    .option(PASSWORD, database.getPassword())
+                    .option(DATABASE, database.getDatabase()).build());
+            case postgresql -> factory = ConnectionFactories.get(builder()
+                    .option(DRIVER, database.getType())
+                    .option(HOST, database.getHost())
+                    .option(PORT, Integer.valueOf(database.getPort()))
+                    .option(USER, database.getUsername())
+                    .option(PASSWORD, database.getPassword())
+                    .option(DATABASE, database.getDatabase()).build());
+            case mysql -> factory = MySqlConnectionFactory.from(MySqlConnectionConfiguration.builder()
+                    .host(database.getHost())
+                    .port(Integer.parseInt(database.getPort()))
+                    .username(database.getUsername())
+                    .password(database.getPassword())
+                    .database(database.getDatabase()).build());
+            default -> throw new RuntimeException("");
+        }
+        return factory;
     }
 }
