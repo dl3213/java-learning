@@ -12,7 +12,7 @@ ftp:
   passivePorts: 50021-60021
 
 server:
-  port: 10001
+  port: 80
   shutdown: graceful
   tomcat:
     connection-timeout: 3600000

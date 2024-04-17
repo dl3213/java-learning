@@ -10,6 +10,8 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -26,9 +28,9 @@ public class Main {
 //        System.err.println(get);
 //        System.err.println(get.getString("code"));
 
-        Map<String, String> request = new HashMap<>();
-        request.put("test","1");
-        JSONObject post = post("http://localhost:80/noAuth/post", request);
+        JSONObject request = new JSONObject();
+        request.put("test", "1");
+        JSONObject post = post("http://localhost:10001/noAuth/post", request);
         System.err.println(post);
         System.err.println(post.getString("code"));
     }
@@ -52,14 +54,14 @@ public class Main {
         return ret;
     }
 
-    public static JSONObject post(String url, Map<String, String> request) {
+    public static JSONObject post(String url, JSONObject request) {
         JSONObject ret = new JSONObject();
         HttpClient client = new HttpClient();
         PostMethod post = new PostMethod(url);
         try {
-            for (Map.Entry<String, String> entry : request.entrySet()) {
-               post.addParameter(entry.getKey(), entry.getValue());
-            }
+            post.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+            RequestEntity requestEntity = new StringRequestEntity(request.toJSONString(), "application/json;charset=UTF-8", "UTF-8");
+            post.setRequestEntity(requestEntity);
             int statusCode = client.executeMethod(post);
             InputStream in = post.getResponseBodyAsStream();
             String jsonString = convertStreamToString(in);
