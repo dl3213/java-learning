@@ -38,18 +38,8 @@ public class DataBaseController {
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        //testService.test().subscribe(e -> System.err.println(e));
         return dataBaseService.list()
                 .collectList()
-                .map(e -> {
-//                    Flux.deferContextual(ctx -> {
-//                        //ctx.stream().forEach(System.err::println);
-//                        return Mono.just(ctx.get(""));
-//                    }).subscribe(e -> {
-//                        e
-//                    });
-                    return e;
-                })
                 .doOnSuccess(list -> {
                     model.addAttribute("list", list);
                     List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
@@ -61,20 +51,6 @@ public class DataBaseController {
                     model.addAttribute("title", r.systemName());
                 })
                 .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
-
-//        return Mono.create(monoSink -> {
-//            try {
-//                List<Database> list = dataBaseService.list().collectList().toFuture().get();
-//                model.addAttribute("list", list);
-//                List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
-//                model.addAttribute("headerList", headerList);
-//                model.addAttribute("systemName", r.systemName());
-//                model.addAttribute("title", r.systemName());
-//                monoSink.success("database/list-view");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 
     @GetMapping("/add-view")

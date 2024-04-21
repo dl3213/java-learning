@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 public class Main {
 
 
-    public static void main(String[] args) {
+    public static void main123(String[] args) {
 //        JSONObject get = get("http://localhost:80/noAuth/get?a=1");
 //        System.err.println(get);
 //        System.err.println(get.getString("code"));
@@ -106,7 +106,7 @@ public class Main {
      * 6.动态规划
      */
 
-    public static void main123(String[] args) {
+    public static void main(String[] args) {
         File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
