@@ -1,5 +1,6 @@
 package code.sibyl.service;
 
+import code.sibyl.common.r;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -22,9 +23,9 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FileStorageService {
+public class FileService {
 
-    private final Path root = Paths.get("D:/4code/4java/workspace/java-learning/kotlin-runner/file");
+    private final Path root = Paths.get(r.baseDir);
 
     public void init() {
         try {
@@ -61,6 +62,26 @@ public class FileStorageService {
         try {
             return Files.walk(this.root, 1)
                     .filter(path -> !path.equals(this.root))
+                    .map(this.root::relativize);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load the files!");
+        }
+    }
+
+    public Stream<Path> loadDir() {
+        try {
+            return Files.walk(this.root, 1)
+                    .filter(path -> !path.equals(this.root) && Files.isDirectory(path))
+                    .map(this.root::relativize);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load the files!");
+        }
+    }
+
+    public Stream<Path> loadDir(Path root) {
+        try {
+            return Files.walk(this.root, 1)
+                    .filter(path -> !path.equals(this.root) && Files.isDirectory(path))
                     .map(this.root::relativize);
         } catch (IOException e) {
             throw new RuntimeException("Could not load the files!");

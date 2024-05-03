@@ -1,12 +1,13 @@
 package code.sibyl.controller.file;
 
+import code.sibyl.aop.Header;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.model.FileInfo;
 import code.sibyl.service.DataBaseService;
-import code.sibyl.service.FileStorageService;
-import lombok.SneakyThrows;
+import code.sibyl.service.FileService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +22,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,7 +35,7 @@ import java.util.stream.Stream;
 public class FileController {
 
     @Autowired
-    FileStorageService storageService;
+    FileService storageService;
     @Autowired
     private DataBaseService dataBaseService;
 
@@ -42,7 +45,10 @@ public class FileController {
                 .collectList()
                 .doOnSuccess(list -> {
                     model.addAttribute("list", list);
-                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields()).map(Field::getName).filter(e -> !e.contains("create")).collect(Collectors.toList());
+                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
+                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
+                            .map(Field::getName)
+                            .collect(Collectors.toList());
                     model.addAttribute("headerList", headerList);
                     model.addAttribute("systemName", r.systemName());
                     model.addAttribute("title", r.systemName());
@@ -57,13 +63,14 @@ public class FileController {
                 (filename) -> ResponseEntity.ok().body(Response.success("Uploaded the file successfully: " + filename)));
     }
 
-    @GetMapping("/files")
+    @RequestMapping(value = "/list", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public ResponseEntity<Flux<FileInfo>> getListFiles() {
         Stream<FileInfo> fileInfoStream = storageService.loadAll().map(path -> {
             String filename = path.getFileName().toString();
             String url = UriComponentsBuilder.newInstance().path("/files/{filename}").buildAndExpand(filename).toUriString();
-            return new FileInfo(filename, url);
+            File file = new File(r.baseDir + File.separator + path.getFileName());
+            return new FileInfo(filename, url, 0l, file.isDirectory(), file.isFile());
         });
 
         Flux<FileInfo> fileInfosFlux = Flux.fromStream(fileInfoStream);

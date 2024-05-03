@@ -18,6 +18,8 @@ import java.util.function.Function
  * 通用快捷函数
  */
 object r {
+
+    const val baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名 " //常用时间格式
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式

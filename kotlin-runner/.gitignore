@@ -3,6 +3,7 @@ h2/
 logs/
 target/
 .file/
+file/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

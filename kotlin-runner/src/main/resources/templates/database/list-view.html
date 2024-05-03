@@ -21,6 +21,7 @@
     <link href="/dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/demo.min.css?1692870487" rel="stylesheet"/>
     <link href="/js/theme/default/layer.css" rel="stylesheet"/>
+    <link href="/css/layui.css" rel="stylesheet">
     <style>
         /*@import url('https://rsms.me/inter/inter.css');*/
         @import url('/css/inter.css');
@@ -365,7 +366,7 @@
                                 </div>
                             </div>
                             <div class="table-responsive">
-                                <table class="table card-table table-vcenter text-nowrap datatable">
+                                <table id="table" class="table card-table table-vcenter text-nowrap datatable">
                                     <thead>
                                     <tr>
                                         <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox"
@@ -430,13 +431,8 @@
 <script src="/dist/js/demo.min.js?1692870487" defer></script>
 <script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/layui.js"></script>
 <script src="/js/layer.js"></script>
-<script>
-    layer.config({
-        extend: 'myskin/style.css', //加载您的扩展样式
-        // skin: 'layer-ext-yourskin'
-    });
-</script>
 <script src="/js/common/common.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -472,10 +468,8 @@
                     console.log("connect onclick...")
                     const id = btn.getAttribute("key");
 
-                    //多窗口模式，层叠置顶
                     layer.open({
                         type: 2 //此处以iframe举例
-                        , skin: 'layer-ext-yourskin' //样式类名
                         , title: title
                         , area: ['85%', '65%']
                         , shade: 0
@@ -552,6 +546,7 @@
         connect();
 
         function edit_btn() {
+
             const edits = document.getElementsByName("edit");
             edits.forEach(edit => {
                 edit.addEventListener('click', (e) => {
@@ -613,14 +608,13 @@
                 //多窗口模式，层叠置顶
                 layer.open({
                     type: 2 //此处以iframe举例
-                    , skin: 'layer-ext-yourskin' //样式类名
+                    //, skin: 'layer-ext-yourskin' //样式类名
                     , title: title
                     , area: ['85%', '65%']
                     , shade: 0
                     , maxmin: true
                     , scrollbar: true
                     , content: ['/database/add-view']
-                    //,btn: ['继续弹出', '全部关闭'] //只是为了演示
                     // ,yes: function(){
                     //     $(that).click();
                     // }
@@ -656,6 +650,11 @@
 
         add_btn();
 
+        function table_load() {
+            var table = document.getElementById('table');
+        }
+        table_load();
+
         $('#layerDemo .layui-btn').on('click', function () {
             var othis = $(this), method = othis.data('method');
             active[method] ? active[method].call(this, othis) : '';
@@ -665,6 +664,7 @@
                 layer.close(layer.escIndex ? layer.escIndex[0] : 0);
             }
         });
+
     });
 </script>
 </body>
