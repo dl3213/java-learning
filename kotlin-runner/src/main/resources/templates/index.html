@@ -494,7 +494,7 @@
                       Extra
                     </span>
                             </a>
-                            <div class="dropdown-menu">
+                            <div class="dropdown-menu" id="extra_menu">
                                 <div class="dropdown-menu-columns">
                                     <div class="dropdown-menu-column">
                                         <a class="dropdown-item" href="empty.html">
@@ -578,6 +578,10 @@
                                             Page loader
                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                         </a>
+                                        <a class="dropdown-item" target-link="model.html" href="#">
+                                            model
+                                            <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -648,7 +652,7 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="icons.html">
+                            <a class="nav-link" target-link="/icons.html" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/ghost -->
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -710,7 +714,7 @@
                             </a>
                         </li>
                         <li class="nav-item" th:if="${#lists.contains(authorities, 'admin:api')}">
-                            <a class="nav-link" target-link="/file/list-view" href="#">
+                            <a class="nav-link" target-link="/photo/list-view" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -730,7 +734,7 @@
                             </a>
                         </li>
                         <li class="nav-item" th:if="${#lists.contains(authorities, 'admin:api')}">
-                            <a class="nav-link" target-link="/file/list-view" href="#">
+                            <a class="nav-link" target-link="/gallery/list-view" href="#">
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -1520,6 +1524,7 @@
                     triggers.forEach(o => o.classList.remove('active'));
                     t.classList.add("active");
                     document.getElementById('interface_menu').classList.remove('show')
+                    document.getElementById('extra_menu').classList.remove('show')
                 }
             }, false)
         })

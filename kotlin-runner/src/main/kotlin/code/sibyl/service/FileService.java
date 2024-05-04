@@ -58,11 +58,36 @@ public class FileService {
         }
     }
 
+    public Flux<DataBuffer> load(Path root ,String filename) {
+        try {
+            Path file = root.resolve(filename);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return DataBufferUtils.read(resource, new DefaultDataBufferFactory(), 4096);
+            } else {
+                throw new RuntimeException("Could not read the file!");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
     public Stream<Path> loadAll() {
         try {
             return Files.walk(this.root, 1)
                     .filter(path -> !path.equals(this.root))
                     .map(this.root::relativize);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not load the files!");
+        }
+    }
+
+    public Stream<Path> loadAll(Path root) {
+        try {
+            return Files.walk(root, 1)
+                    .filter(path -> !path.equals(root))
+                    .map(root::relativize);
         } catch (IOException e) {
             throw new RuntimeException("Could not load the files!");
         }

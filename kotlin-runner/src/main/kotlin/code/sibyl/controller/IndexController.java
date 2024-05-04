@@ -788,4 +788,11 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+    @GetMapping({"/model.html"})
+    public Mono<String> model(final Model model) {
+        String s = "model";
+        model.addAttribute("systemName", r.systemName());
+        model.addAttribute("title", r.systemName());
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
 }
