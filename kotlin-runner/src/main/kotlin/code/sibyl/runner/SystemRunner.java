@@ -1,5 +1,7 @@
 package code.sibyl.runner;
 
+import code.sibyl.cache.LocalCacheUtil;
+import code.sibyl.common.r;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
         fileService.init();
+        r.getBean(LocalCacheUtil.class).init();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
 //        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();

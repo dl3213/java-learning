@@ -42,7 +42,7 @@ public class DirController {
         Stream<FileInfo> fileInfoStream = storageService.loadDir().map(path -> {
             String filename = path.getFileName().toString();
             String url = UriComponentsBuilder.newInstance().path("/files/{filename}").buildAndExpand(filename).toUriString();
-            File file = new File(r.baseDir + File.separator + path.getFileName());
+            File file = new File(r.baseDir() + File.separator + path.getFileName());
             return new FileInfo(filename, url, 0L, file.isDirectory(), file.isFile());
         });
 

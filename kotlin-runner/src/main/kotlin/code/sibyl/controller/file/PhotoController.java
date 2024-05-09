@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 @RequestMapping("/photo")
 public class PhotoController {
 
-    private final static String dir = r.baseDir + File.separator + "photo";
+    private final static String dir = r.baseDir() + File.separator + "photo";
 
     @Autowired
     FileService fileService;

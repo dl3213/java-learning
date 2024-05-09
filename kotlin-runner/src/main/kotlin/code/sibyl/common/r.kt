@@ -19,7 +19,7 @@ import java.util.function.Function
  */
 object r {
 
-    const val baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
+    open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名 " //常用时间格式
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
@@ -41,6 +41,12 @@ object r {
     @JvmStatic
     fun base64Decoder(): Base64.Decoder? {
         return base64Decoder;
+    }
+
+
+    @JvmStatic
+    fun baseDir(): String? {
+        return this.baseDir;
     }
 
     @JvmStatic

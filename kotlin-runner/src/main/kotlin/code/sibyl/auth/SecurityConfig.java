@@ -133,28 +133,28 @@ public class SecurityConfig {
      *
      * @return
      */
-    @Bean
-    public MapReactiveUserDetailsService userDetailsService() {
-        // @formatter:off
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .passwordEncoder(passwordEncoder()::encode)
-                .authorities("admin:api","user:api")
-//                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
-//                .roles("admin","user")//有前缀，最好不要用
-                .build();
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("user")
-                .passwordEncoder(passwordEncoder()::encode)
-                .authorities(new SimpleGrantedAuthority("user:api"))// 角色-菜单  权限-接口
-//                .roles("user")// 角色-菜单  权限-接口
-                .build();
-        // @formatter:on
-        return new MapReactiveUserDetailsService(admin, user);
-    }
+//    @Bean
+//    public MapReactiveUserDetailsService userDetailsService() {
+//        // @formatter:off
+////        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        UserDetails admin = User.withDefaultPasswordEncoder()
+//                .username("admin")
+//                .password("admin")
+//                .passwordEncoder(passwordEncoder()::encode)
+//                .authorities("admin:api","user:api")
+////                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
+////                .roles("admin","user")//有前缀，最好不要用
+//                .build();
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user")
+//                .password("user")
+//                .passwordEncoder(passwordEncoder()::encode)
+//                .authorities(new SimpleGrantedAuthority("user:api"))// 角色-菜单  权限-接口
+////                .roles("user")// 角色-菜单  权限-接口
+//                .build();
+//        // @formatter:on
+//        return new MapReactiveUserDetailsService(admin, user);
+//    }
 
     /**
      *  todo
@@ -173,8 +173,8 @@ public class SecurityConfig {
     @Bean
     @Primary
     public PasswordEncoder passwordEncoder() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        NoPasswordEncoder encoder = new NoPasswordEncoder();
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
     }
 }

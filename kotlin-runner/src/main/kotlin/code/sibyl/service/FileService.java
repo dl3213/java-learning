@@ -25,11 +25,12 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class FileService {
 
-    private final Path root = Paths.get(r.baseDir);
+    private final Path root = Paths.get(r.INSTANCE.getBaseDir());
 
     public void init() {
         try {
             Files.createDirectories(root);
+            r.INSTANCE.setBaseDir("");
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize folder for upload!");
         }
@@ -58,7 +59,7 @@ public class FileService {
         }
     }
 
-    public Flux<DataBuffer> load(Path root ,String filename) {
+    public Flux<DataBuffer> load(Path root, String filename) {
         try {
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());

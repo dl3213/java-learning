@@ -9,14 +9,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- *  系统用户 Service
+ * 系统用户 Service
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SysUserService
-//        implements ReactiveUserDetailsService
-{
+public class SysUserService {
 
     private final SysUserRepository sysUserRepository;
 

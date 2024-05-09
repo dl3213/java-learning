@@ -23,7 +23,7 @@ import java.nio.file.Path;
 @RequestMapping("/gallery")
 public class GalleryController {
 
-    private final static String dir = r.baseDir + File.separator + "gallery";
+    private final static String dir = r.baseDir() + File.separator + "gallery";
 
     @Autowired
     FileService fileService;
