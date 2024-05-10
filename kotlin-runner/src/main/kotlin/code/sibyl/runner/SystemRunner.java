@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 /**
  * 系统启动准备
@@ -36,6 +37,9 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
         fileService.init();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        System.err.println(encoder.encode("admin"));
+        System.err.println(encoder.encode("user"));
         r.getBean(LocalCacheUtil.class).init();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();

@@ -173,8 +173,8 @@ public class SecurityConfig {
     @Bean
     @Primary
     public PasswordEncoder passwordEncoder() {
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        NoPasswordEncoder encoder = new NoPasswordEncoder();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        NoPasswordEncoder encoder = new NoPasswordEncoder();
         return encoder;
     }
 }
