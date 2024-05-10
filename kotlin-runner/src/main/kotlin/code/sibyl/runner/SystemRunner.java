@@ -37,9 +37,6 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
         fileService.init();
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        System.err.println(encoder.encode("admin"));
-        System.err.println(encoder.encode("user"));
         r.getBean(LocalCacheUtil.class).init();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
