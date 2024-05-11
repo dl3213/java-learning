@@ -64,11 +64,11 @@ public class Response extends HashMap<String, Object> {
         return responseVO;
     }
 
-    public static Response success(Map<String, Object> map) {
-        Response responseVO = new Response();
-        responseVO.putAll(map);
-        return responseVO;
-    }
+//    public static Response success(Map<String, Object> map) {
+//        Response responseVO = new Response();
+//        responseVO.putAll(map);
+//        return responseVO;
+//    }
 
     public static Response success(int i, String msg, Object data) {
         Response responseVO = new Response();

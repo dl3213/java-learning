@@ -6,13 +6,9 @@ auth: false
 isDev: true
 logDetail: false
 
-ftp:
-  port: 21
-  activePort: 20
-  passivePorts: 50021-60021
 
 server:
-  port: 80
+  port: 33060
   shutdown: graceful
   tomcat:
     connection-timeout: 3600000

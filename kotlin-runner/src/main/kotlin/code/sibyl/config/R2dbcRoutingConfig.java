@@ -10,7 +10,6 @@ import io.r2dbc.spi.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.connection.lookup.AbstractRoutingConnectionFactory;
@@ -30,13 +29,14 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.DATABASE;
 
 @Component
 @Slf4j
-public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
+public class R2dbcRoutingConfig extends AbstractRoutingConnectionFactory {
 
     @Value("${spring.r2dbc.url}")
     public String url;//= "r2dbc:h2:file:///./kotlin-runner/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;USER=sibyl;PASSWORD=sibyl-h2-2023";
 
     public final static String DB_KEY = "my_r2dbc_content_key";
     private final static String defaultConnectionFactoryKey = "default";
+    private Map<String, ConnectionFactory> connectionFactoryMap;
 
     public static <T> Mono<T> putR2dbcSource(Mono<T> mono, String group) {
         return mono.contextWrite(ctx -> ctx.put(DB_KEY, group));
@@ -44,6 +44,14 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
 
     public static <T> Flux<T> putR2dbcSource(Flux<T> flux, String group) {
         return flux.contextWrite(ctx -> ctx.put(DB_KEY, group));
+    }
+
+    public Mono<Map<String, ConnectionFactory>> connectionFactoryMap() {
+        return Mono.just(this.connectionFactoryMap);
+    }
+
+    public Flux<ConnectionFactory> connectionFactories() {
+        return Flux.fromStream(this.connectionFactoryMap.entrySet().stream().map(e -> e.getValue()));
     }
 
     @Override // 或者initialize
@@ -67,6 +75,7 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
                 .collect(Collectors.toMap(e -> e.getT1(), e -> e.getT2()))
                 .block();
         this.setDefaultTargetConnectionFactory(connectionFactory);
+        this.connectionFactoryMap = connectionFactoryMap;
         this.setTargetConnectionFactories(connectionFactoryMap);
         super.afterPropertiesSet();
     }
@@ -106,6 +115,7 @@ public class R2dbdRoutingConfig extends AbstractRoutingConnectionFactory {
                     .password(password)
                     .database(database.getDatabase()).build());
         }
+        log.info("load => {}", database);
         return Mono.zip(Mono.just(database.getName()), Mono.just(factory));
     }
 

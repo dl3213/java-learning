@@ -59,8 +59,6 @@ public class NoAuthController {
      */
     @GetMapping(value = {"/tanghe/index", "/tanghe/index/"})
     public String test(ServerHttpRequest request) {
-//        System.err.println("test");
-//        request.getParameterMap().entrySet().stream().map(Map.Entry::getKey).forEach(System.err::println);
         return "redirect:https://www.tanghenmt.com";
     }
 }

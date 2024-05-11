@@ -97,7 +97,8 @@ public class SecurityConfig {
                                 "/dist/**",
                                 "/file/**",
                                 "/database/socket/**",
-                                "/noAuth/**"
+                                "/noAuth/**",
+                                "/eos/**"
                         )
                         .permitAll()
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()

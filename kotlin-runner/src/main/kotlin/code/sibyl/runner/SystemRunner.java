@@ -2,6 +2,7 @@ package code.sibyl.runner;
 
 import code.sibyl.cache.LocalCacheUtil;
 import code.sibyl.common.r;
+import code.sibyl.config.R2dbcRoutingConfig;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
 /**
  * 系统启动准备
  */
@@ -38,6 +39,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
         log.info("系统初始化工作--start");
         fileService.init();
         r.getBean(LocalCacheUtil.class).init();
+        //r.getBean(R2dbcRoutingConfig.class).connectionFactories().doOnNext(e -> System.err.println(e)).subscribe();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 //        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
 //        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();

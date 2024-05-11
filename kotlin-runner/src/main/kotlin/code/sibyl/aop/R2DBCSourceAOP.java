@@ -1,6 +1,6 @@
 package code.sibyl.aop;
 
-import code.sibyl.config.R2dbdRoutingConfig;
+import code.sibyl.config.R2dbcRoutingConfig;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -34,9 +34,9 @@ public class R2DBCSourceAOP {
         }
         String value = r2DBCSource.value();
         if (method.getReturnType() == Mono.class) {
-            return R2dbdRoutingConfig.putR2dbcSource((Mono<?>) pjp.proceed(), value);
+            return R2dbcRoutingConfig.putR2dbcSource((Mono<?>) pjp.proceed(), value);
         } else if (method.getReturnType() == Flux.class) {
-            return R2dbdRoutingConfig.putR2dbcSource((Flux<?>) pjp.proceed(), value);
+            return R2dbcRoutingConfig.putR2dbcSource((Flux<?>) pjp.proceed(), value);
         } else {
             //throw new RuntimeException("不支持别的发布类型");
             return pjp.proceed();
