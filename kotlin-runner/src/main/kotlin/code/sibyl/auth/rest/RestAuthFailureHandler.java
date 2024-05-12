@@ -63,6 +63,7 @@ public class RestAuthFailureHandler implements ServerAuthenticationFailureHandle
         } else {
             System.err.println("用户认证失败，请检查后重试");
         }
+        exception.printStackTrace();
         byte[] bytes = JSONObject.toJSONString(Response.error(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase())).getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));

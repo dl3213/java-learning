@@ -701,15 +701,14 @@ But that's the difference in our opinions.</textarea>
                 .then(response => {
                     console.log(response)
                     layer.msg(response.data.msg, {
-                        skin: 'layer-ext-yourskin'
-                        , title: title
-                        , area: ['20%', '15%']
+                        title: title
+                        , area: ['30%', '15%']
                         , shade: 0
                         , maxmin: true
                         , btnAlign: 'c'
                         , time: 0
                         , btn: ['yes', 'no'] //只是为了演示
-                        , yes:function (index, layero){
+                        , yes: function (index, layero) {
                             layer.close(index);
                             var parentIndex = parent.layer.getFrameIndex(window.name);
                             parent.layer.close(parentIndex);

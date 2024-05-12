@@ -5,7 +5,6 @@ import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
-import code.sibyl.repository.CommonRepository;
 import code.sibyl.service.DataBaseService;
 import code.sibyl.service.TestService;
 import lombok.RequiredArgsConstructor;
