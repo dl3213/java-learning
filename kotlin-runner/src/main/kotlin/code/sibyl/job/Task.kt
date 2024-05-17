@@ -18,6 +18,13 @@ class Task {
 
     private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
+//    @Async("virtualThreadTaskExecutor")
+//    @Scheduled(cron = "0/5 * * * * ?")
+    fun run() {
+        println(Thread.currentThread().isVirtual)
+        log.info("测试定时任务 s: {}, {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS), Thread.currentThread().name)
+    }
+
 //    @Async
 //    @Scheduled(cron = "0 0/1 * * * ?")
     fun runPerMin() {

@@ -98,6 +98,8 @@ public class SecurityConfig {
                                 "/file/**",
                                 "/database/socket/**",
                                 "/noAuth/**",
+                                "/api/external/**",
+                                "/api/kotlin/**",
                                 "/eos/**"
                         )
                         .permitAll()

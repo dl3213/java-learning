@@ -18,6 +18,9 @@ spring:
   profiles:
     active: dev
     include: db, quartz
+  threads:
+    virtual:
+      enabled: true
   servlet:
     multipart:
       max-file-size: 10MB
