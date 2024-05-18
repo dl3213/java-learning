@@ -173,7 +173,7 @@ gradle-app.setting
 nbproject/private/
 buildTool/
 nbbuild/
-dist/
+#dist/
 nbdist/
 .nb-gradle/
 
