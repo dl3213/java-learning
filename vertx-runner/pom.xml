@@ -55,6 +55,30 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
+      <artifactId>vertx-jdbc-client</artifactId>
+      <version>4.5.7</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.4.0</version>
+    </dependency>
+<!--    &lt;!&ndash; https://mvnrepository.com/artifact/io.agroal/agroal-api &ndash;&gt;-->
+<!--    <dependency>-->
+<!--      <groupId>io.agroal</groupId>-->
+<!--      <artifactId>agroal-api</artifactId>-->
+<!--      <version>2.3</version>-->
+<!--    </dependency>-->
+<!--    &lt;!&ndash; https://mvnrepository.com/artifact/io.agroal/agroal-pool &ndash;&gt;-->
+<!--    <dependency>-->
+<!--      <groupId>io.agroal</groupId>-->
+<!--      <artifactId>agroal-pool</artifactId>-->
+<!--      <version>2.3</version>-->
+<!--    </dependency>-->
+
+    <dependency>
+      <groupId>io.vertx</groupId>
       <artifactId>vertx-lang-kotlin-coroutines</artifactId>
     </dependency>
     <dependency>
@@ -148,7 +172,7 @@
                 </transformer>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
-              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar
+              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-app.jar
               </outputFile>
             </configuration>
           </execution>

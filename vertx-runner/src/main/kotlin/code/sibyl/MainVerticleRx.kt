@@ -1,12 +1,12 @@
 package code.sibyl
 
 import code.sibyl.database.EosRepository
-import io.vertx.core.AbstractVerticle
 import io.vertx.core.Launcher
-import io.vertx.ext.web.Router
+import io.vertx.rxjava3.core.AbstractVerticle
+import io.vertx.rxjava3.ext.web.Router
 
 
-class MainVerticle : AbstractVerticle() {
+class MainVerticleRx : AbstractVerticle() {
 
 
     override fun start() {
@@ -24,5 +24,5 @@ class MainVerticle : AbstractVerticle() {
 }
 
 fun main() {
-    Launcher.executeCommand("run", MainVerticle::class.java.getName())
+    Launcher.executeCommand("run", MainVerticleRx::class.java.getName())
 }
