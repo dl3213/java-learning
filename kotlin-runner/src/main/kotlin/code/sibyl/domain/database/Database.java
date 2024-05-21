@@ -13,6 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.r2dbc.core.DatabaseClient;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -26,7 +27,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Database {
+public class Database implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -81,8 +82,10 @@ public class Database {
     private Long createId;
 
     @org.springframework.data.annotation.Transient
+    @Transient
     private ConnectionFactory connectionFactory;
 
     @org.springframework.data.annotation.Transient
+    @Transient
     private DatabaseClient databaseClient;
 }

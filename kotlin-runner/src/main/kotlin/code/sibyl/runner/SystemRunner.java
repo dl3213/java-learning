@@ -4,6 +4,7 @@ import code.sibyl.cache.LocalCacheUtil;
 import code.sibyl.common.r;
 import code.sibyl.config.R2dbcRoutingConfig;
 import code.sibyl.repository.DatabaseRepository;
+import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final DatabaseRepository databaseRepository;
     private final FileService fileService;
+    private final EosRepository eosRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -60,6 +62,29 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            System.err.println(m);
 //            return m;
 //        }).subscribe();
+
+        long start = System.currentTimeMillis();
+//        r.getBean(R2dbcRoutingConfig.class)
+//                .connectionFactoryMap()
+//                .map(e -> DatabaseClient.create(e.get("thlease_db")))
+//                .doOnSuccess(client -> {
+//
+//                    client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'")
+//                            .fetch().all()
+//                            .concatWith(client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'").fetch().all())
+//                            .doFinally(e -> {
+//                                System.err.println("cost => " + (System.currentTimeMillis() - start));
+//                            })
+//                            .subscribe(item -> {
+//                                System.err.println(item);
+//                            });
+//
+//                }).subscribe();
+        eosRepository.test()
+                .concatWith(eosRepository.test())
+                .doFinally(e -> System.err.println("cost => " + (System.currentTimeMillis() - start)))
+                .subscribe(json -> System.err.println(json));
+
         log.info("系统初始化工作--end");
     }
 

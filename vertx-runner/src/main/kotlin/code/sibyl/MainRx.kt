@@ -6,8 +6,7 @@ import io.vertx.rxjava3.core.AbstractVerticle
 import io.vertx.rxjava3.ext.web.Router
 
 
-class MainVerticleRx : AbstractVerticle() {
-
+class MainRx : AbstractVerticle() {
 
     override fun start() {
         val router: Router = Router.router(vertx)
@@ -15,14 +14,13 @@ class MainVerticleRx : AbstractVerticle() {
         router.route()
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
         EosRepository().builder(vertx)
-        vertx.createHttpServer().requestHandler(router).listen(8888);
+        vertx.createHttpServer().requestHandler(router).listen(8889);
     }
 
     override fun stop() {
         super.stop()
     }
 }
-
 fun main() {
-    Launcher.executeCommand("run", MainVerticleRx::class.java.getName())
+    Launcher.executeCommand("run", MainRx::class.java.getName())
 }

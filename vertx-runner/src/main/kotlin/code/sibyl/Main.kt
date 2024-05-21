@@ -6,8 +6,7 @@ import io.vertx.core.Launcher
 import io.vertx.ext.web.Router
 
 
-class MainVerticle : AbstractVerticle() {
-
+class Main : AbstractVerticle() {
 
     override fun start() {
         val router: Router = Router.router(vertx)
@@ -24,5 +23,5 @@ class MainVerticle : AbstractVerticle() {
 }
 
 fun main() {
-    Launcher.executeCommand("run", MainVerticle::class.java.getName())
+    Launcher.executeCommand("run", Main::class.java.getName())
 }

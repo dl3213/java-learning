@@ -20,7 +20,7 @@
     <vertx.version>4.5.7</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
 
-    <main.verticle>code.sibyl.MainVerticle</main.verticle>
+    <main.verticle>code.sibyl.Main</main.verticle>
     <launcher.class>io.vertx.core.Launcher</launcher.class>
   </properties>
 
@@ -64,19 +64,6 @@
       <artifactId>mysql-connector-j</artifactId>
       <version>8.4.0</version>
     </dependency>
-<!--    &lt;!&ndash; https://mvnrepository.com/artifact/io.agroal/agroal-api &ndash;&gt;-->
-<!--    <dependency>-->
-<!--      <groupId>io.agroal</groupId>-->
-<!--      <artifactId>agroal-api</artifactId>-->
-<!--      <version>2.3</version>-->
-<!--    </dependency>-->
-<!--    &lt;!&ndash; https://mvnrepository.com/artifact/io.agroal/agroal-pool &ndash;&gt;-->
-<!--    <dependency>-->
-<!--      <groupId>io.agroal</groupId>-->
-<!--      <artifactId>agroal-pool</artifactId>-->
-<!--      <version>2.3</version>-->
-<!--    </dependency>-->
-
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-lang-kotlin-coroutines</artifactId>
@@ -124,6 +111,12 @@
       <version>${junit-jupiter.version}</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+          <version>RELEASE</version>
+          <scope>provided</scope>
+      </dependency>
   </dependencies>
 
   <build>
