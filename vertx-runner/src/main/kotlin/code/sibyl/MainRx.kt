@@ -1,6 +1,6 @@
 package code.sibyl
 
-import code.sibyl.database.EosRepository
+import code.sibyl.database.Repository
 import io.vertx.core.Launcher
 import io.vertx.rxjava3.core.AbstractVerticle
 import io.vertx.rxjava3.ext.web.Router
@@ -13,7 +13,7 @@ class MainRx : AbstractVerticle() {
         //router.route().handler(StaticHandler.create());
         router.route()
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
-        EosRepository().builder(vertx)
+        Repository().builder(vertx)
         vertx.createHttpServer().requestHandler(router).listen(8889);
     }
 

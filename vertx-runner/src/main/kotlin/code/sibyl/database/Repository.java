@@ -1,7 +1,9 @@
 package code.sibyl.database;
 
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -13,57 +15,73 @@ import io.vertx.rxjava3.sqlclient.Row;
 import io.vertx.rxjava3.sqlclient.RowSet;
 import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
+import io.vertx.sqlclient.SqlConnection;
 
-public class EosRepository {
+public class Repository {
 
-    public void builder(Vertx vertx) {
+    private JsonObject config;
+    private MySQLConnectOptions connectOptions;
+    private PoolOptions poolOptions;
+    private Pool pool;
+
+    public JsonObject config(Vertx vertx) {
         FileSystem fileSystem = vertx.fileSystem();
         Buffer buffer = fileSystem.readFileBlocking("db.json");
-        JsonObject jsonObject = new JsonObject(buffer);
-        System.err.println(jsonObject);
-        MySQLConnectOptions connectOptions = new MySQLConnectOptions()
+        return new JsonObject(buffer);
+    }
+
+    public MySQLConnectOptions options(JsonObject jsonObject) {
+        return new MySQLConnectOptions()
                 .setPort(jsonObject.getInteger("port"))
                 .setHost(jsonObject.getString("ip"))
                 .setDatabase(jsonObject.getString("database"))
                 .setUser(jsonObject.getString("username"))
                 .setPassword(jsonObject.getString("password"));
-
-        // Pool options
-        PoolOptions poolOptions = new PoolOptions().setMaxSize(5);
-
-        // Create the pooled client
-        Pool pool = MySQLBuilder.pool().with(poolOptions).connectingTo(connectOptions).using(vertx).build();
-
-        //pool.query()
-        long start = System.currentTimeMillis();
-        // Get a connection from the pool
-        pool.getConnection().compose(conn -> {
-            System.out.println("Got a connection from the pool");
-            ;
-            // All operations execute on the same connection
-            return conn.query("SELECT * FROM th_crm_rent_out where is_del = '0'").execute()
-                    .compose(res -> conn.query("SELECT * FROM th_crm_rent_out where is_del = '0'").execute())
-                    .onSuccess(rows -> {
-                    })
-                    .onComplete(ar -> {
-                        // Release the connection to the pool
-                        System.err.println(ar.result().size());
-                        ar.result().forEach(row -> {
-                            System.err.println(row.toJson());
-                        });
-                        conn.close();
-                    });
-        }).onComplete(ar -> {
-            if (ar.succeeded()) {
-                System.out.println("Done");
-                System.err.println(ar.result().size());
-                System.err.println("cost => " + (System.currentTimeMillis() - start));
-            } else {
-                System.out.println("Something went wrong " + ar.cause().getMessage());
-            }
-        });
     }
 
+    public Pool pool(Vertx vertx, MySQLConnectOptions connectOptions, PoolOptions options) {
+        return MySQLBuilder.pool().with(options).connectingTo(connectOptions).using(vertx).build();
+    }
+
+    public Future<SqlConnection> getConnection() {
+        return this.pool.getConnection();
+    }
+
+    public Repository builder(Vertx vertx) {
+        JsonObject jsonObject = this.config(vertx);
+        this.config = jsonObject;
+        MySQLConnectOptions connectOptions = this.options(jsonObject);
+        this.connectOptions = connectOptions;
+        PoolOptions poolOptions = new PoolOptions().setMaxSize(32);
+        this.poolOptions = poolOptions;
+        Pool pooled = this.pool(vertx, connectOptions, poolOptions);
+        this.pool = pooled;
+        return this;
+    }
+
+    public Future<io.vertx.sqlclient.RowSet<io.vertx.sqlclient.Row>> sql(String sql) {
+        return this.pool.withConnection(con -> con.query(sql).execute());
+    }
+
+    public void test() {
+        long start = System.currentTimeMillis();
+        pool.getConnection()
+                .compose(conn -> conn.query("SELECT * FROM th_crm_rent_out where is_del = '0'").execute())
+                .onComplete(ar -> {
+                    if (ar.succeeded()) {
+                        System.out.println("Done");
+                        System.err.println(ar.result().size());
+                        System.err.println("cost => " + (System.currentTimeMillis() - start));
+                    } else {
+                        System.out.println("Something went wrong " + ar.cause().getMessage());
+                    }
+                });
+    }
+
+
+    public @NonNull Single<JsonObject> config(io.vertx.rxjava3.core.Vertx vertx) {
+        return vertx.fileSystem().rxReadFile("db.json").map(buffer -> new JsonObject(buffer.toString()));
+    }
 
     public void builder(io.vertx.rxjava3.core.Vertx vertx) {
         io.vertx.rxjava3.core.file.FileSystem filedSystem = vertx.fileSystem();
