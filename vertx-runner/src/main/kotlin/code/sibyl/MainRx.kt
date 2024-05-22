@@ -13,7 +13,7 @@ class MainRx : AbstractVerticle() {
         //router.route().handler(StaticHandler.create());
         router.route()
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
-        Repository().builder(vertx)
+        Repository.getInstance().builder(vertx)
         vertx.createHttpServer().requestHandler(router).listen(8889);
     }
 
@@ -21,6 +21,7 @@ class MainRx : AbstractVerticle() {
         super.stop()
     }
 }
+
 fun main() {
     Launcher.executeCommand("run", MainRx::class.java.getName())
 }

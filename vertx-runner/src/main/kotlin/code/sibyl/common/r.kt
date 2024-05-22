@@ -1,5 +1,6 @@
 package code.sibyl.common
 
+import org.apache.commons.lang3.time.DateFormatUtils
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -44,6 +45,10 @@ object r {
         return this.baseDir;
     }
 
+    @JvmStatic
+    fun format(time: LocalDateTime, formatter: String?): String? {
+        return DateTimeFormatter.ofPattern(formatter).format(time);
+    }
 
     @JvmStatic
     fun success(data: Any?): Response {
@@ -80,6 +85,7 @@ object r {
     fun bigDecimal(obj: BigDecimal): BigDecimal {
         return if (Objects.nonNull(obj)) obj else BigDecimal.ZERO
     }
+
     fun bigDecimal(obj: Int): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal.valueOf(obj.toLong()) else BigDecimal.ZERO
     }

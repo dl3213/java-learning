@@ -3,18 +3,15 @@ package code.sibyl
 import code.sibyl.common.Response
 import code.sibyl.database.Repository
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.Future
 import io.vertx.core.Launcher
-import io.vertx.core.json.JsonArray
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 
 
 class Main : AbstractVerticle() {
 
     override fun start() {
-        var builder = Repository().builder(vertx)
-        println(builder)
+        Repository.getInstance().builder(vertx)
+        println(Repository.getInstance())
         val router: Router = Router.router(vertx)
         //router.route().handler(StaticHandler.create());
 //        router.get("/")
@@ -32,8 +29,10 @@ class Main : AbstractVerticle() {
                 println(context.request().absoluteURI())
                 val start = System.currentTimeMillis()
                 var sql = "SELECT * from th_crm_rent_out where is_del = '0'";
+//                var sql = "SELECT now()";
                 println(start)
-                builder.sql(sql)
+                println(Repository.getInstance())
+                Repository.getInstance().sql(sql)
                     .onComplete { ar ->
                         var toList = ar.result().map { it.toJson() }.toList()
                         //toList.forEach { item -> println(item) }

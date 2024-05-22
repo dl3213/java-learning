@@ -1,5 +1,6 @@
 package code.sibyl.database;
 
+import code.sibyl.common.r;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -17,12 +18,24 @@ import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.time.LocalDateTime;
+
 public class Repository {
 
     private JsonObject config;
     private MySQLConnectOptions connectOptions;
     private PoolOptions poolOptions;
     private Pool pool;
+
+    private Repository() {
+        System.out.println("Repository init => " + r.format(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS));
+    }
+
+    private static Repository instance = new Repository();
+
+    public static Repository getInstance() {
+        return instance;
+    }
 
     public JsonObject config(Vertx vertx) {
         FileSystem fileSystem = vertx.fileSystem();
@@ -52,15 +65,18 @@ public class Repository {
         this.config = jsonObject;
         MySQLConnectOptions connectOptions = this.options(jsonObject);
         this.connectOptions = connectOptions;
-        PoolOptions poolOptions = new PoolOptions().setMaxSize(32);
+        PoolOptions poolOptions = new PoolOptions().setMaxSize(64);
         this.poolOptions = poolOptions;
-        Pool pooled = this.pool(vertx, connectOptions, poolOptions);
-        this.pool = pooled;
+        Pool pool = this.pool(vertx, connectOptions, poolOptions);
+        this.pool = pool;
         return this;
     }
 
     public Future<io.vertx.sqlclient.RowSet<io.vertx.sqlclient.Row>> sql(String sql) {
-        return this.pool.withConnection(con -> con.query(sql).execute());
+        return this.pool.withConnection(connection -> {
+            System.out.println("this connection ==> " + connection);
+            return connection.query(sql).execute();
+        });
     }
 
     public void test() {
