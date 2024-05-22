@@ -1,5 +1,6 @@
 package code.sibyl.common;
 
+import io.vertx.core.json.JsonObject;
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,7 +11,7 @@ import java.util.HashMap;
  */
 @Data
 @ToString
-public class Response extends HashMap<String, Object> {
+public class Response extends JsonObject {
 
     private static String DATA_NAME = "data";
     private static String CODE_NAME = "code";

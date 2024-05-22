@@ -5,10 +5,9 @@ import code.sibyl.database.Repository
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.Launcher
-import io.vertx.core.buffer.Buffer
+import io.vertx.core.json.JsonArray
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
-import io.vertx.mysqlclient.impl.util.BufferUtils
-import java.util.stream.Collectors
 
 
 class Main : AbstractVerticle() {
@@ -23,7 +22,10 @@ class Main : AbstractVerticle() {
         router.get("/index")
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
 
-        router.route("/test").respond { context ->
+        router.route("/test").failureHandler { error ->
+            println("failureHandler")
+            error.failure().printStackTrace()
+        }.respond { context ->
             println(context.request().absoluteURI())
             val start = System.currentTimeMillis()
             var sql = "SELECT * FROM th_crm_rent_out where is_del = '0'";
@@ -43,9 +45,11 @@ class Main : AbstractVerticle() {
             builder.sql(sql)
                 .onComplete { ar ->
                     var toList = ar.result().map { it.toJson() }.toList()
+                    toList.forEach { item -> println(item) }
                     println(toList.size)
-                    //Future.succeededFuture(Response.success(toList))
-                    Response.success(toList)
+//                    Future.succeededFuture(toList)
+//                    Response.success(toList)
+                    context.response().putHeader("Content-Type", "application/json").end(Response.success(toList).encode())
                 }
             //return@respond Future.succeededFuture(Response.success())
 //                .map { item -> item.toJson() }
