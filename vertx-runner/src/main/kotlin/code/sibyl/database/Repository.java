@@ -38,16 +38,6 @@ public class Repository {
     }
 
     public JDBCPool jdbcPool(Vertx vertx, JsonObject jsonObject) {
-//        return JDBCPool.pool(
-//                vertx,
-//                new JDBCConnectOptions()
-//                        .setJdbcUrl(jsonObject.getString(""))
-//                        .setUser(jsonObject.getString(""))
-//                        .setPassword(jsonObject.getString(""))
-//                        .setDatabase(jsonObject.getString("")),
-//                new PoolOptions()
-//                        .setMaxSize(32)
-//        );
         return JDBCPool.pool(vertx, jsonObject);
     }
 
@@ -70,18 +60,18 @@ public class Repository {
         Single<io.vertx.rxjava3.core.buffer.Buffer> single = filedSystem.rxReadFile("db.json");
         single.subscribe(buffer -> {
             JsonObject jsonObject = new JsonObject(buffer.toString());
-            JsonObject config = new JsonObject()
-                    .put("url", jsonObject.getString("url"))
-//                .put("driver_class", "io.vertx.mysqlclient.spi.MySQLDriver")
-                    .put("driver_class", jsonObject.getString("driver_class"))
-                    .put("user", jsonObject.getString("username"))
-                    .put("password", jsonObject.getString("password"));
+//            JsonObject config = new JsonObject()
+//                    .put("url", jsonObject.getString("url"))
+////                .put("driver_class", "io.vertx.mysqlclient.spi.MySQLDriver")
+//                    .put("driver_class", jsonObject.getString("driver_class"))
+//                    .put("user", jsonObject.getString("user"))
+//                    .put("password", jsonObject.getString("password"));
 
 
             // Pool options
             PoolOptions poolOptions = new PoolOptions().setMaxSize(32);
 //        JDBCPool pool = JDBCPool.pool(vertx, config);
-            io.vertx.rxjava3.jdbcclient.JDBCPool pool = io.vertx.rxjava3.jdbcclient.JDBCPool.pool(vertx, config);
+            io.vertx.rxjava3.jdbcclient.JDBCPool pool = io.vertx.rxjava3.jdbcclient.JDBCPool.pool(vertx, jsonObject);
             long start = System.currentTimeMillis();
             Maybe<RowSet<Row>> resa = pool.rxWithConnection(conn -> conn
                     .query("SELECT now()")
