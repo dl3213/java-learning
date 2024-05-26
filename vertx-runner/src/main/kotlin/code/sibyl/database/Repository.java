@@ -58,11 +58,8 @@ public class Repository {
                 .forQuery(Repository.getInstance().jdbcPool(), sql)
                 .mapTo(row -> row.toJson())
                 .execute(null)
-                .onFailure(error -> {
-                    System.err.println("test connet");
-                    error.printStackTrace();
-                })
-                .onSuccess(rows -> System.out.println(rows));
+                .onFailure(error -> error.printStackTrace())
+                .onSuccess(rows -> rows.forEach(System.err::println));
     }
 
     public @NonNull Single<JsonObject> config(io.vertx.rxjava3.core.Vertx vertx) {

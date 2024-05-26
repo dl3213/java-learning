@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 /**
  * 系统用户 Service
  */
-@Service
+//@Service
 @Slf4j
 @RequiredArgsConstructor
 public class LoginUserService implements ReactiveUserDetailsService {

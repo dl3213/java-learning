@@ -788,9 +788,16 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
-    @GetMapping({"/model.html"})
-    public Mono<String> model(final Model model) {
-        String s = "model";
+    @GetMapping({"/modal.html"})
+    public Mono<String> modal(final Model model) {
+        String s = "modals";
+        model.addAttribute("systemName", r.systemName());
+        model.addAttribute("title", r.systemName());
+        return Mono.create(monoSink -> monoSink.success(s));
+    }
+    @GetMapping({"/modals.html"})
+    public Mono<String> modals(final Model model) {
+        String s = "modals";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));

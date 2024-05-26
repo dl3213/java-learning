@@ -37,19 +37,31 @@ public class DataBaseController {
     @SneakyThrows
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        return dataBaseService.list()
-                .collectList()
-                .doOnSuccess(list -> {
-                    model.addAttribute("list", list);
-                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
-                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
-                            .map(Field::getName)
-                            .collect(Collectors.toList());
-                    model.addAttribute("headerList", headerList);
-                    model.addAttribute("systemName", r.systemName());
-                    model.addAttribute("title", r.systemName());
-                })
-                .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
+
+        return Mono.create(monoSink -> {
+            List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
+                    .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
+                    .map(Field::getName)
+                    .collect(Collectors.toList());
+            model.addAttribute("headerList", headerList);
+            model.addAttribute("systemName", r.systemName());
+            model.addAttribute("title", r.systemName());
+            monoSink.success("database/list-view");
+        });
+
+//        return dataBaseService.list()
+//                .collectList()
+//                .doOnSuccess(list -> {
+//                    model.addAttribute("list", list);
+//                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
+//                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
+//                            .map(Field::getName)
+//                            .collect(Collectors.toList());
+//                    model.addAttribute("headerList", headerList);
+//                    model.addAttribute("systemName", r.systemName());
+//                    model.addAttribute("title", r.systemName());
+//                })
+//                .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/list-view")));
 //        return Mono.create(monoSink -> {
 //            List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
 //                    .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))

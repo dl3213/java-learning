@@ -80,10 +80,10 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //                            });
 //
 //                }).subscribe();
-        eosRepository.test()
-                .concatWith(eosRepository.test())
-                .doFinally(e -> System.err.println("cost => " + (System.currentTimeMillis() - start)))
-                .subscribe(json -> System.err.println(json));
+//        eosRepository.test()
+//                .concatWith(eosRepository.test())
+//                .doFinally(e -> System.err.println("cost => " + (System.currentTimeMillis() - start)))
+//                .subscribe(json -> System.err.println(json));
 
         log.info("系统初始化工作--end");
     }
