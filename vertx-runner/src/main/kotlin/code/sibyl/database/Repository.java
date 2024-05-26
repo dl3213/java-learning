@@ -13,6 +13,7 @@ import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.rxjava3.sqlclient.Row;
 import io.vertx.rxjava3.sqlclient.RowSet;
 import io.vertx.sqlclient.PoolOptions;
+import io.vertx.sqlclient.templates.SqlTemplate;
 
 import java.time.LocalDateTime;
 
@@ -49,6 +50,19 @@ public class Repository {
         this.config = this.config(vertx);
         this.jdbcPool = this.jdbcPool(vertx, this.config);
         return this;
+    }
+
+    public void test() {
+        String sql = "select now();";
+        SqlTemplate
+                .forQuery(Repository.getInstance().jdbcPool(), sql)
+                .mapTo(row -> row.toJson())
+                .execute(null)
+                .onFailure(error -> {
+                    System.err.println("test connet");
+                    error.printStackTrace();
+                })
+                .onSuccess(rows -> System.out.println(rows));
     }
 
     public @NonNull Single<JsonObject> config(io.vertx.rxjava3.core.Vertx vertx) {
@@ -96,4 +110,6 @@ public class Repository {
             });
         });
     }
+
+
 }
