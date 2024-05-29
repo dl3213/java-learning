@@ -1,6 +1,7 @@
 package code.sibyl.controller;
 
 import code.sibyl.common.Response;
+import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ import java.nio.charset.Charset;
 @Slf4j
 @RequestMapping("/noAuth")
 public class NoAuthController {
+
+    private final EosRepository eosRepository;
 
     @GetMapping("/get")
     @ResponseBody
@@ -53,6 +56,11 @@ public class NoAuthController {
         return Response.success(System.currentTimeMillis());
     }
 
+    @PostMapping("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext")
+    @ResponseBody
+    public Mono<Response> test(){
+        return eosRepository.test().collectList().map(Response::success);
+    }
 
     /**
      * @return
