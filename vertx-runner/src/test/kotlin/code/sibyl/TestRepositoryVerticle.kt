@@ -12,7 +12,7 @@ class TestRepositoryVerticle {
 
   @BeforeEach
   fun deploy_verticle(vertx: Vertx, testContext: VertxTestContext) {
-    vertx.deployVerticle(Main(), testContext.succeeding<String> { _ -> testContext.completeNow() })
+    vertx.deployVerticle(Server(), testContext.succeeding<String> { _ -> testContext.completeNow() })
   }
 
   @Test
