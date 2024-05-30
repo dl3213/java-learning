@@ -1,8 +1,10 @@
 package code.sibyl.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 public class TestDTO {
 
     private String sales_contract;
@@ -23,5 +25,6 @@ public class TestDTO {
     private String unit_ton_weight;
     private String settlement_ton_weight;
     private String primary_quantity;
+    private String back_num;
     private String ret;
 }

@@ -2,10 +2,12 @@ package code.sibyl.repository.eos;
 
 import code.sibyl.aop.DS;
 import code.sibyl.domain.user.SysUser;
+import code.sibyl.dto.RentRecycleDTO;
 import code.sibyl.dto.TestDTO;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -91,4 +93,36 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
                      rent_out_mat.settlement_ton_weight
             """)
     Flux<TestDTO> test();
+
+    @Query("""
+            select main.sales_contract,mat.material_code, sum(ifnull(mat.primary_quantity,0)) as back_num
+            from th_war_rent_recycle main
+            left join th_war_rent_recycle_mat mat on mat.p_id = main.id
+            where main.is_del = '0'
+            and main.sales_contract = ?sales_contract
+            and mat.material_code = ?material_code
+            group by main.sales_contract,mat.material_code
+            """)
+    Flux<RentRecycleDTO> backNum(String sales_contract, String material_code);
+
+    @Query("""
+            select sum(ifnull(mat.primary_quantity,0)) as back_num
+            from th_war_rent_recycle main
+            left join th_war_rent_recycle_mat mat on mat.p_id = main.id
+            where main.is_del = '0'
+            and main.sales_contract = ?sales_contract
+            and mat.material_code = ?material_code
+            """)
+    Mono<BigDecimal> backNum_from(String sales_contract, String material_code);
+
+    @Query("""
+            select sum(ifnull(mat.primary_quantity,0))
+            from th_war_rent_recycle main
+            left join th_war_rent_recycle_mat mat on mat.p_id = main.id
+            where main.is_del = '0'
+            and main.sales_contract = 'SZ20240291'
+            and mat.material_code = '3302010014'
+            group by main.sales_contract,mat.material_code
+            """)
+    Mono<BigDecimal> sumTest();
 }

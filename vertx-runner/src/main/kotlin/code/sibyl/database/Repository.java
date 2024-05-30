@@ -22,7 +22,7 @@ public class Repository {
     private JDBCPool jdbcPool;
 
     private Repository() {
-        System.out.println("Repository init => " + r.format(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS));
+        //System.out.println("Repository init => " + r.format(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS));
     }
 
     private static Repository instance = new Repository();

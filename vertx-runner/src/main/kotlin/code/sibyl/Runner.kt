@@ -11,10 +11,16 @@ class Runner : AbstractVerticle() {
         vertx.deployVerticle(
             Server::class.java.getName(),
             DeploymentOptions()
-                .setThreadingModel(ThreadingModel.VIRTUAL_THREAD)
+                .setThreadingModel(ThreadingModel.WORKER)
                 .setWorkerPoolName("code-sibyl-vertx-runner")
+                .setWorkerPoolSize(32)
                 .setMaxWorkerExecuteTime(3 * 60L * 1000 * 1000000)
         )
+    }
+
+    override fun stop() {
+        super.stop()
+        println("runner stopped...")
     }
 }
 
