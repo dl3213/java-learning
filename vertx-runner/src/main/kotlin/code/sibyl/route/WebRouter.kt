@@ -3,6 +3,7 @@ package code.sibyl.route
 import code.sibyl.common.Response
 import code.sibyl.database.Repository
 import io.vertx.core.Future
+import io.vertx.core.Future.await
 import io.vertx.core.Future.future
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
@@ -46,24 +47,6 @@ class WebRouter private constructor() {
         //router.route().handler(StaticHandler.create());
         router.route().handler(BodyHandler.create());// body必须
         //router.route().handler(HSTSHandler.create());
-//        // 添加跨域支持的中间件
-//        val allowedHeaders: MutableSet<String> = HashSet()
-//        allowedHeaders.add("x-requested-with")
-//        allowedHeaders.add("Access-Control-Allow-Origin")
-//        allowedHeaders.add("origin")
-//        allowedHeaders.add("Content-Type")
-//        allowedHeaders.add("accept")
-//        allowedHeaders.add("X-PINGARUNER")
-//        allowedHeaders.add("X-PINGARUNER")
-//        allowedHeaders.add("Content-Security-Policy")
-//        val allowedMethods: MutableSet<HttpMethod> = HashSet<HttpMethod>()
-//        allowedMethods.add(HttpMethod.GET)
-//        allowedMethods.add(HttpMethod.POST)
-//        allowedMethods.add(HttpMethod.OPTIONS)
-//        router.route().handler(CorsHandler.create("*").allowedMethods(allowedMethods).allowCredentials(true).addOrigin("*"))
-
-//        router.route("/*")
-//            .handler { context -> println("request => /*"); context.next() };
 
         router.get("/")
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
@@ -71,22 +54,28 @@ class WebRouter private constructor() {
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
 
         //在租物资汇总表测试
-        router
-            .route("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext")
+        router.route("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext")
             .consumes("application/json")
             .produces("application/json")
             .handler { context ->
                 var requestJson = context.body().asJsonObject()
                 println("body => $requestJson")
                 queryRentOut(requestJson)
+                    //.compose(this::queryRentRecycle)
                     .onFailure { error -> error.printStackTrace() }
                     .onSuccess { rows ->
-                        println("first query end ==> ")
-                        //println(rows.result().size())
-                        var toList = rows.toList().map { item -> queryRentOut(item) }.toList()
-                        //toList.forEach { it -> println(it) }
-                        queryRentRecycle(null).onSuccess { println(it) }
-                        context.json(Response.success())
+                        println("first query end ==> " + rows.size())
+                        this.queryRentRecycle(rows).onSuccess {
+                            println("return end ==> " + rows.size())
+                            rows.forEach { println(it) }
+                            //println(rows.result().size())
+                            //var toList = rows.toList().map { item -> queryRentOut(item) }.toList()
+                            //toList.forEach { it -> println(it) }
+                            //queryRentRecycle(null).onSuccess { println(it) }
+
+                            context.json(Response.success(rows))
+                        }
+
                     }
             }
         this.router = router;
@@ -143,16 +132,13 @@ class WebRouter private constructor() {
                          rent_out_mat.unit_ton_weight,
                          rent_out_mat.settlement_ton_weight;
                 """.trimIndent();
-        return SqlTemplate
-            .forQuery(Repository.getInstance().jdbcPool(), sql)
-            .mapTo(Row::toJson)
+        return SqlTemplate.forQuery(Repository.getInstance().jdbcPool(), sql).mapTo(Row::toJson)
             .execute(requestJson.map);
 
     }
 
-    private fun queryRentRecycle(row: JsonObject?): Future<RowSet<JsonObject>> {
-        //println(Thread.currentThread().name)
-        //println(Thread.currentThread().threadGroup.name)
+
+    private fun queryRentRecycle(rows: RowSet<JsonObject>): Future<RowSet<JsonObject>> {
         var sql = """
                     select main.sales_contract,mat.material_code,sum(ifnull(mat.primary_quantity,0)) as back_num
                     from th_war_rent_recycle main
@@ -161,17 +147,45 @@ class WebRouter private constructor() {
                     group by main.sales_contract,mat.material_code;
                 """.trimIndent();
         sql = """
-                    select sum(ifnull(mat.primary_quantity,0))
+                    select sum(ifnull(mat.primary_quantity,0)) as back_num
                     from th_war_rent_recycle main
                     left join th_war_rent_recycle_mat mat on mat.p_id = main.id
                     where main.is_del = '0' 
-                    and main.sales_contract = 'SZ20240291'
-                    and mat.material_code = '3302010014'
+                    and main.sales_contract = #{sales_contract}
+                    and mat.material_code = #{material_code}
                 """.trimIndent();
-        return SqlTemplate
-            .forQuery(Repository.getInstance().jdbcPool(), sql)
-            .mapTo(Row::toJson)
-            .execute(row?.map);
+        println("back_num ==> ")
+        return Future.succeededFuture(rows.onEach { row ->
+            //println(it)
+            SqlTemplate
+                .forQuery(Repository.getInstance().jdbcPool(), sql)
+                .mapTo { r -> r.toJson().first() }
+                .execute(row.map)
+                .compose {
+                    println("get_back -> " + it.first().value)
+                    row.put("back_num", it.first().value)
+                    return@compose Future.succeededFuture(row);
+                }
+        });
+
+//        return rows.flatMap { it ->
+//            println(it)
+//            SqlTemplate
+//                .forQuery(Repository.getInstance().jdbcPool(), sql)
+//                .mapTo(Row::toJson)
+//                .execute(it.map)
+//        }
+
+//        rows.toList().stream().peek { it -> SqlTemplate
+//            .forQuery(Repository.getInstance().jdbcPool(), sql)
+//            .mapTo(Row::toJson)
+//            .execute(it.map) }.co
+//
+//
+//        return SqlTemplate
+//            .forQuery(Repository.getInstance().jdbcPool(), sql)
+//            .mapTo(Row::toJson)
+//            .execute(row?.map);
 
     }
 
