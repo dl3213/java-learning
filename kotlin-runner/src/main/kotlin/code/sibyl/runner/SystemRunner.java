@@ -3,6 +3,7 @@ package code.sibyl.runner;
 import code.sibyl.cache.LocalCacheUtil;
 import code.sibyl.common.r;
 import code.sibyl.config.R2dbcRoutingConfig;
+import code.sibyl.dto.TestDTO;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
@@ -14,6 +15,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 系统启动准备
@@ -62,29 +69,28 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            System.err.println(m);
 //            return m;
 //        }).subscribe();
-
+        HashMap<String, Object> map = new HashMap<>();
+//        map.put("sales_contract","SZ20240291");
+        map.put("sales_contract_list",Arrays.asList("SZ20240291"));
         long start = System.currentTimeMillis();
-//        r.getBean(R2dbcRoutingConfig.class)
-//                .connectionFactoryMap()
-//                .map(e -> DatabaseClient.create(e.get("thlease_db")))
-//                .doOnSuccess(client -> {
-//
-//                    client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'")
-//                            .fetch().all()
-//                            .concatWith(client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'").fetch().all())
-//                            .doFinally(e -> {
-//                                System.err.println("cost => " + (System.currentTimeMillis() - start));
-//                            })
-//                            .subscribe(item -> {
-//                                System.err.println(item);
-//                            });
-//
-//                }).subscribe();
-//        eosRepository.test()
-//                .concatWith(eosRepository.test())
-//                .doFinally(e -> System.err.println("cost => " + (System.currentTimeMillis() - start)))
-//                .subscribe(json -> System.err.println(json));
+        r.getBean(R2dbcRoutingConfig.class)
+                .connectionFactoryMap()
+                .map(e -> DatabaseClient.create(e.get("thlease_db")))
+                .doOnSuccess(client -> {
+                    client.sql("SELECT * FROM th_crm_rent_out where is_del = '0' and sales_contract in (:{sales_contract_list})")
+                            //.bind("sales_contract", Arrays.asList("SZ20240291"))
+                            .bindValues(map)
+                            .fetch()
+                            .all()
+                            //.concatWith(client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'").fetch().all())
+                            .doFinally(e -> {
+                                System.err.println("cost => " + (System.currentTimeMillis() - start));
+                            })
+                            .subscribe(item -> {
+                                System.err.println(item);
+                            });
 
+                }).subscribe();
         log.info("系统初始化工作--end");
     }
 

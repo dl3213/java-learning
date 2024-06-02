@@ -4,8 +4,6 @@ import io.vertx.core.json.JsonObject;
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.HashMap;
-
 /**
  *  通用返回格式
  */

@@ -60,46 +60,6 @@ public class NoAuthController {
         return Response.success(System.currentTimeMillis());
     }
 
-    @PostMapping("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext")
-    @ResponseBody
-    public Mono<Response> test() {
-        System.err.println("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext");
-
-//        return eosRepository.sumTest().map(item -> {
-//            System.err.println("return ->");
-//            System.err.println(item);
-//            return Response.success(item);
-//        });
-//        return eosRepository.backNum("SZ20240291", "3302010001").map(item -> {
-//            System.err.println(item);
-//            return item;
-//        }).collectList().map(item -> {
-//            System.err.println("return ->");
-//            System.err.println(item);
-//            return Response.success(item);
-//        }).doOnError(t -> {
-//            System.err.println("doOnError");
-//            t.printStackTrace();
-//        }).doOnSuccess(r -> {
-//            System.err.println("doOnSuccess");
-//            System.err.println(r);
-//        }).doOnTerminate(() -> {
-//            System.err.println("doOnTerminate");
-//        });
-
-        return eosRepository.test()
-                .publishOn(Schedulers.parallel())
-                .flatMap(item -> {
-                    System.err.println("flatMap ");
-                    System.err.println(Thread.currentThread().getName());
-                    System.err.println(Thread.currentThread().getThreadGroup().getName());
-                    return Mono.zip(Mono.just(item), eosRepository.backNum_from(item.getSales_contract(), item.getMaterial_code()));
-                })
-                .map(item -> item.getT1().setBack_num(item.getT2().toString()))
-                .collectList()
-                .map(Response::success);
-    }
-
     /**
      * @return
      */

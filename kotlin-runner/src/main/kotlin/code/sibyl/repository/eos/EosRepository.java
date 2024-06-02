@@ -4,7 +4,6 @@ import code.sibyl.aop.DS;
 import code.sibyl.domain.user.SysUser;
 import code.sibyl.dto.RentRecycleDTO;
 import code.sibyl.dto.TestDTO;
-import com.alibaba.fastjson2.JSONObject;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +12,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
 @Repository
 @DS("thlease_db")
@@ -75,7 +74,7 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
                                on rent_out.sales_contract = contract.contract_code and rent_out.is_del = '0'
                      left join th_crm_rent_out_mat rent_out_mat on rent_out_mat.p_id = rent_out.id
                      left join th_material_info mat on mat.material_code = rent_out_mat.material_code
-            where contract.is_del = '0'
+            where contract.is_del = '0' and contract.contract_code = ?contractCode
             group by contract.contract_code,
                      contract.project_name,
                      contract.org_code,
@@ -92,7 +91,7 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
                      rent_out_mat.unit_ton_weight,
                      rent_out_mat.settlement_ton_weight
             """)
-    Flux<TestDTO> test();
+    Flux<TestDTO> test(String contractCode); // SZ20240291 + 3302010014
 
     @Query("""
             select main.sales_contract,mat.material_code, sum(ifnull(mat.primary_quantity,0)) as back_num
@@ -114,6 +113,16 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
             and mat.material_code = ?material_code
             """)
     Mono<BigDecimal> backNum_from(String sales_contract, String material_code);
+
+    @Query("""
+            select main.sales_contract, mat.material_code, sum(ifnull(mat.primary_quantity,0)) as back_num
+            from th_war_rent_recycle main
+            left join th_war_rent_recycle_mat mat on mat.p_id = main.id
+            where main.is_del = '0'
+            and main.sales_contract in (:{sales_contract_list})
+            group by main.sales_contract, mat.material_code
+            """)
+    Flux<RentRecycleDTO> backNum_from_list(List<String> sales_contract_list);
 
     @Query("""
             select sum(ifnull(mat.primary_quantity,0))

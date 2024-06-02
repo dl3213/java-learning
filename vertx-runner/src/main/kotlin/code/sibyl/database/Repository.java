@@ -58,7 +58,7 @@ public class Repository {
                 .mapTo(row -> row.toJson())
                 .execute(null)
                 .onFailure(error -> error.printStackTrace())
-                .onSuccess(rows -> rows.forEach(System.err::println));
+                .onSuccess(rows -> System.err.println("数据库连接成功 => " + rows.iterator().next()));
     }
 
     public @NonNull Single<JsonObject> config(io.vertx.rxjava3.core.Vertx vertx) {

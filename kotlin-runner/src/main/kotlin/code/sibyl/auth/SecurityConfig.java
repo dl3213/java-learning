@@ -98,6 +98,7 @@ public class SecurityConfig {
                                 "/file/**",
                                 "/database/socket/**",
                                 "/noAuth/**",
+                                "/default/**",
                                 "/api/external/**",
                                 "/api/kotlin/**",
                                 "/eos/**"

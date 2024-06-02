@@ -3,29 +3,16 @@ package code.sibyl.route
 import code.sibyl.common.Response
 import code.sibyl.database.Repository
 import io.vertx.core.Future
-import io.vertx.core.Future.await
-import io.vertx.core.Future.future
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.Route
-import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
-import io.vertx.kotlin.coroutines.coAwait
-import io.vertx.kotlin.coroutines.dispatcher
-import io.vertx.kotlin.sqlclient.templates.executeAwait
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.templates.SqlTemplate
-import kotlinx.coroutines.GlobalScope
-import java.math.BigDecimal
-import java.util.*
-import java.util.stream.Collectors
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class WebRouter private constructor() {
 
-    lateinit var router: io.vertx.ext.web.Router;
+    private lateinit var router: io.vertx.ext.web.Router;
 
     companion object {
         private var instance: WebRouter? = null
@@ -59,23 +46,23 @@ class WebRouter private constructor() {
             .produces("application/json")
             .handler { context ->
                 var requestJson = context.body().asJsonObject()
-                println("body => $requestJson")
+                //println("body => $requestJson")
                 queryRentOut(requestJson)
                     //.compose(this::queryRentRecycle)
                     .onFailure { error -> error.printStackTrace() }
                     .onSuccess { rows ->
-                        println("first query end ==> " + rows.size())
+                        //println("first query end ==> " + rows.size())
                         this.queryRentRecycle(rows).onSuccess {
-                            println("return end ==> " + rows.size())
-                            rows.forEach { println(it) }
+                           // println("return end ==> " + rows.size())
+                            //rows.forEach { println(it) }
                             //println(rows.result().size())
                             //var toList = rows.toList().map { item -> queryRentOut(item) }.toList()
                             //toList.forEach { it -> println(it) }
                             //queryRentRecycle(null).onSuccess { println(it) }
 
-                            context.json(Response.success(rows))
+                            //context.json(Response.success(rows))
                         }
-
+                        context.json(Response.success(rows))
                     }
             }
         this.router = router;
@@ -115,7 +102,7 @@ class WebRouter private constructor() {
                                    on rent_out.sales_contract = contract.contract_code and rent_out.is_del = '0'
                          left join th_crm_rent_out_mat rent_out_mat on rent_out_mat.p_id = rent_out.id
                          left join th_material_info mat on mat.material_code = rent_out_mat.material_code
-                where contract.is_del = '0' and contract.contract_code = 'SZ20240291'
+                where contract.is_del = '0' 
                 group by contract.contract_code,
                          contract.project_name,
                          contract.org_code,
@@ -132,7 +119,9 @@ class WebRouter private constructor() {
                          rent_out_mat.unit_ton_weight,
                          rent_out_mat.settlement_ton_weight;
                 """.trimIndent();
-        return SqlTemplate.forQuery(Repository.getInstance().jdbcPool(), sql).mapTo(Row::toJson)
+        return SqlTemplate
+            .forQuery(Repository.getInstance().jdbcPool(), sql)
+            .mapTo(Row::toJson)
             .execute(requestJson.map);
 
     }
@@ -162,7 +151,7 @@ class WebRouter private constructor() {
                 .mapTo { r -> r.toJson().first() }
                 .execute(row.map)
                 .compose {
-                    println("get_back -> " + it.first().value)
+                    //println("get_back -> " + it.first().value)
                     row.put("back_num", it.first().value)
                     return@compose Future.succeededFuture(row);
                 }
