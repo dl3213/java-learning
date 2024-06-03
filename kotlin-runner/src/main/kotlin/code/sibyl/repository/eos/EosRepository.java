@@ -2,6 +2,8 @@ package code.sibyl.repository.eos;
 
 import code.sibyl.aop.DS;
 import code.sibyl.domain.user.SysUser;
+import code.sibyl.dto.QueryDTO;
+import code.sibyl.dto.QueryMap;
 import code.sibyl.dto.RentRecycleDTO;
 import code.sibyl.dto.TestDTO;
 import org.springframework.data.r2dbc.repository.Query;
@@ -14,34 +16,35 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Repository
-@DS("thlease_db")
+@DS("thlease_db" )
 public interface EosRepository extends R2dbcRepository<SysUser, Long> {
 
 
     @Query("SELECT sum(a.weighing_weight) as rentAogWeight " +
             "FROM th_war_rent_aog a " +
             "where is_del = '0' " +
-            "  and TO_DAYS(document_date) = TO_DAYS(now())")
+            "  and TO_DAYS(document_date) = TO_DAYS(now())" )
     Mono<BigDecimal> 今日退货吨重();
 
     @Query("SELECT sum(a.weighing_weight) as rentAogWeight " +
             "FROM th_war_rent_aog a " +
             "where is_del = '0' " +
-            "  and TO_DAYS(document_date) = TO_DAYS(now())")
+            "  and TO_DAYS(document_date) = TO_DAYS(now())" )
     Mono<BigDecimal> 今日发货吨重();
 
     @Query("SELECT sum(a.weighing_weight) as rentAogWeight " +
             "FROM th_war_rent_aog a " +
             "where is_del = '0' " +
-            "  and TO_DAYS(document_date) = TO_DAYS(now())")
+            "  and TO_DAYS(document_date) = TO_DAYS(now())" )
     Mono<BigDecimal> 自有资产();
 
     @Query("SELECT sum(a.weighing_weight) as rentAogWeight " +
             "FROM th_war_rent_aog a " +
             "where is_del = '0' " +
-            "  and TO_DAYS(document_date) = TO_DAYS(now())")
+            "  and TO_DAYS(document_date) = TO_DAYS(now())" )
     Mono<BigDecimal> 转租库存();
 
     @Query("""
@@ -74,7 +77,7 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
                                on rent_out.sales_contract = contract.contract_code and rent_out.is_del = '0'
                      left join th_crm_rent_out_mat rent_out_mat on rent_out_mat.p_id = rent_out.id
                      left join th_material_info mat on mat.material_code = rent_out_mat.material_code
-            where contract.is_del = '0' and contract.contract_code = ?contractCode
+            where contract.is_del = '0' and contract.contract_code = 'SZ20240291'
             group by contract.contract_code,
                      contract.project_name,
                      contract.org_code,
@@ -91,7 +94,7 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
                      rent_out_mat.unit_ton_weight,
                      rent_out_mat.settlement_ton_weight
             """)
-    Flux<TestDTO> test(String contractCode); // SZ20240291 + 3302010014
+    Flux<TestDTO> test(); // SZ20240291 + 3302010014
 
     @Query("""
             select main.sales_contract,mat.material_code, sum(ifnull(mat.primary_quantity,0)) as back_num
@@ -119,10 +122,11 @@ public interface EosRepository extends R2dbcRepository<SysUser, Long> {
             from th_war_rent_recycle main
             left join th_war_rent_recycle_mat mat on mat.p_id = main.id
             where main.is_del = '0'
-            and main.sales_contract in (:{sales_contract_list})
+            and main.sales_contract in ('SZ20240291')
             group by main.sales_contract, mat.material_code
             """)
-    Flux<RentRecycleDTO> backNum_from_list(List<String> sales_contract_list);
+//    Flux<RentRecycleDTO> backNum_from_list();
+    Flux<RentRecycleDTO> findByCustomParams(@Param("map" ) Map<String, Object> map);
 
     @Query("""
             select sum(ifnull(mat.primary_quantity,0))
