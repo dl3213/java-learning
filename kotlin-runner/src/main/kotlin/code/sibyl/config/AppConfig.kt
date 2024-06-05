@@ -3,30 +3,25 @@ package code.sibyl.config
 import code.sibyl.service.DataBaseSocket
 import io.r2dbc.spi.ConnectionFactory
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import org.springframework.core.task.AsyncTaskExecutor
-import org.springframework.core.task.support.TaskExecutorAdapter
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
-import org.springframework.scheduling.TaskScheduler
-import org.springframework.scheduling.annotation.EnableAsync
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.HandlerMapping
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
-import java.util.concurrent.Executors
 
 
 @Configuration
-@EnableR2dbcRepositories
+@EnableR2dbcRepositories("code.sibyl.repository")
+//@ComponentScan("code.sibyl.*")
+//@EntityScan("code.sibyl.domain.*")
 class AppConfig {
 
     private val log = LoggerFactory.getLogger(AppConfig::class.java)
