@@ -2,6 +2,7 @@ package code.sibyl
 
 import code.sibyl.database.Repository
 import code.sibyl.route.WebRouter
+import code.sibyl.service.EosQueryService
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
@@ -16,7 +17,6 @@ class Server : AbstractVerticle() {
     override fun start() {
         Repository.getInstance().builder(vertx)
         Repository.getInstance().test()
-        println(Repository.getInstance())
         var webRouter = WebRouter.getInstance().build(vertx)
         var port = 33060;
         vertx

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.connection.lookup.AbstractRoutingConnectionFactory;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.DATABASE;
 
 
 @Component
+//@DependsOn("initializer")//先运行一遍创建表
 @Slf4j
 public class R2dbcRoutingConfig extends AbstractRoutingConnectionFactory {
 

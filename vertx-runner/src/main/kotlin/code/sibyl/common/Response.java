@@ -1,8 +1,11 @@
 package code.sibyl.common;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.RowSet;
 import lombok.Data;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *  通用返回格式
@@ -89,4 +92,8 @@ public class Response extends JsonObject {
         return responseVO;
     }
 
+    @Nullable
+    public static Object success(@NotNull String string, @Nullable RowSet<?> get) {
+        return null;
+    }
 }

@@ -2,6 +2,8 @@ package code.sibyl.route
 
 import code.sibyl.common.Response
 import code.sibyl.database.Repository
+import code.sibyl.dto.ContractDTO
+import code.sibyl.service.EosQueryService
 import io.vertx.core.Future
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
@@ -46,24 +48,31 @@ class WebRouter private constructor() {
             .produces("application/json")
             .handler { context ->
                 var requestJson = context.body().asJsonObject()
-                //println("body => $requestJson")
-                queryRentOut(requestJson)
-                    //.compose(this::queryRentRecycle)
-                    .onFailure { error -> error.printStackTrace() }
-                    .onSuccess { rows ->
-                        //println("first query end ==> " + rows.size())
-                        this.queryRentRecycle(rows).onSuccess {
-                           // println("return end ==> " + rows.size())
-                            //rows.forEach { println(it) }
-                            //println(rows.result().size())
-                            //var toList = rows.toList().map { item -> queryRentOut(item) }.toList()
-                            //toList.forEach { it -> println(it) }
-                            //queryRentRecycle(null).onSuccess { println(it) }
+                //获取合同数
+                EosQueryService.getInstance()
+                    .queryContractList(requestJson)
+                    .compose { r -> EosQueryService.getInstance().test(r) }
+                    .onSuccess { ret -> context.json(Response.success(ret)) }
+                //同时获取 出租单和归还单数据
 
-                            //context.json(Response.success(rows))
-                        }
-                        context.json(Response.success(rows))
-                    }
+                //println("body => $requestJson")
+//                queryRentOut(requestJson)
+//                    //.compose(this::queryRentRecycle)
+//                    .onFailure { error -> error.printStackTrace() }
+//                    .onSuccess { rows ->
+//                        //println("first query end ==> " + rows.size())
+//                        this.queryRentRecycle(rows).onSuccess {
+//                           // println("return end ==> " + rows.size())
+//                            //rows.forEach { println(it) }
+//                            //println(rows.result().size())
+//                            //var toList = rows.toList().map { item -> queryRentOut(item) }.toList()
+//                            //toList.forEach { it -> println(it) }
+//                            //queryRentRecycle(null).onSuccess { println(it) }
+//
+//                            //context.json(Response.success(rows))
+//                        }
+//                        context.json(Response.success(rows))
+//                    }
             }
         this.router = router;
         return router;
