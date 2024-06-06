@@ -1,12 +1,14 @@
 package code.sibyl.runner;
 
 import code.sibyl.cache.LocalCacheUtil;
+import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.config.R2dbcRoutingConfig;
 import code.sibyl.dto.TestDTO;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -15,11 +17,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -103,7 +103,29 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-        log.info("com.tanghe.runner.SystemRunner.destroy" );
+        log.info("code.sibyl.runner.SystemRunner.destroy" );
+    }
+
+    public static void main(String[] args) {
+        JSONObject data = new JSONObject();
+        //data.put("test", "1");
+        System.err.println(data.isEmpty());
+
+        String key = "text2024006";
+        Mono
+                .justOrEmpty(data)
+                //.transformDeferred(e -> Mono.just(new JSONObject()))
+                .zipWhen(e -> Objects.isNull(e) || e.isEmpty() ? Mono.just(Response.error(404, "404")) : Mono.just(Response.success(200, "200")))
+                //.contextWrite(context -> context.put(key,"231"))
+                .transformDeferredContextual((e, contextView) -> {
+                    System.err.println(Optional.of(contextView.get(key)));
+                    return e;
+                })
+                .contextWrite(context -> context.put(key, "111"))
+                .subscribe(e -> {
+                    System.err.println("subscribe");
+                    System.err.println(e.getT2().get("code").toString());
+                });
     }
 
 }
