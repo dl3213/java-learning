@@ -12,8 +12,8 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 import java.nio.charset.StandardCharsets
 
-@Configuration
-@Order(-1)
+//@Configuration
+//@Order(-1)
 class EosWebFilter : WebFilter {
 
     private var key: String = "eos-token-key";

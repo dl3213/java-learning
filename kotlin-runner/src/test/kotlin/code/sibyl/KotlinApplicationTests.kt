@@ -15,6 +15,7 @@ class KotlinApplicationTests {
 
     @Test
     open fun contextLoads() {
+        println("test")
         var bean = r.getBean(DataBaseService::class.java)
         var list = bean.list()
     }

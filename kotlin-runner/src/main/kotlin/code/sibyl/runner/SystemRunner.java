@@ -4,6 +4,7 @@ import code.sibyl.cache.LocalCacheUtil;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.config.R2dbcRoutingConfig;
+import code.sibyl.domain.database.Database;
 import code.sibyl.dto.TestDTO;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -34,9 +36,9 @@ import java.util.stream.Collectors;
 public class SystemRunner implements CommandLineRunner, DisposableBean {
 
 
-    @Value("${runnerEnabled}" )
+    @Value("${runnerEnabled}")
     private boolean runnerEnabled;
-    @Value("${isDev}" )
+    @Value("${isDev}")
     private boolean isDev;
     private final DatabaseClient databaseClient;
 
@@ -47,15 +49,15 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("系统初始化工作--start" );
-        fileService.init();
-        r.getBean(LocalCacheUtil.class).init();
+        log.info("系统初始化工作--start");
+//        fileService.init();
+//        r.getBean(LocalCacheUtil.class).init();
 
-        databaseRepository.list_test(Arrays.asList("mysql","postgresql" ))
-                .doOnError(e -> e.printStackTrace())
-                .subscribe(item -> {
-                    System.err.println(item);
-                });
+//        databaseRepository.list_test(Arrays.asList("mysql","postgresql" ))
+//                .doOnError(e -> e.printStackTrace())
+//                .subscribe(item -> {
+//                    System.err.println(item);
+//                });
 
         //r.getBean(R2dbcRoutingConfig.class).connectionFactories().doOnNext(e -> System.err.println(e)).subscribe();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -101,17 +103,24 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //
 //                }).subscribe();
 
-//        eosRepository.findBy(Example.of(new Contract()), x -> x.page(PageRequest.of(0, 1))).subscribe(e -> {
+//        databaseRepository.findBy(Example.of(new Database()), x -> x.page(PageRequest.of(0, 1))).subscribe(e -> {
+//            System.err.println(e.getTotalPages());
+//            Class<? extends Page> aClass = e.getClass();
+//            e.get().forEach(System.err::println);
+//        });
+
+//        databaseRepository.list(PageRequest.of(0, 1)).subscribe(e -> {
+//            System.err.println(e);
 //            System.err.println(e.getTotalPages());
 //            e.get().forEach(System.err::println);
 //        });
 
-        log.info("系统初始化工作--end" );
+        log.info("系统初始化工作--end");
     }
 
     @Override
     public void destroy() throws Exception {
-        log.info("code.sibyl.runner.SystemRunner.destroy" );
+        log.info("code.sibyl.runner.SystemRunner.destroy");
     }
 
     public static void main(String[] args) {

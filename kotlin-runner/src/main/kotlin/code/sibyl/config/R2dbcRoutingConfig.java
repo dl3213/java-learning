@@ -28,7 +28,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 import static io.r2dbc.spi.ConnectionFactoryOptions.DATABASE;
 
 
-@Component
+//@Component
 //@DependsOn("initializer")//先运行一遍创建表
 @Slf4j
 public class R2dbcRoutingConfig extends AbstractRoutingConnectionFactory {

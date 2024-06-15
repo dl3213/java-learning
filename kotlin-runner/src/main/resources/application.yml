@@ -8,7 +8,7 @@ logDetail: false
 
 
 server:
-  port: 8099
+  port: 80
   shutdown: graceful
   tomcat:
     connection-timeout: 3600000
@@ -36,6 +36,7 @@ spring:
       enabled: false
     restart:
       exclude: logs/**
+      enabled: false
   r2dbc:
     url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023 #这里因为是内部module就多加一层文件夹
   h2:
@@ -47,6 +48,10 @@ spring:
   info:
     env:
       enabled: true
+
+
+file:
+  path: ./${spring.application.name}/file
 
 debug: false
 logging:
