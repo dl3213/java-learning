@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
@@ -98,6 +100,12 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //                            });
 //
 //                }).subscribe();
+
+//        eosRepository.findBy(Example.of(new Contract()), x -> x.page(PageRequest.of(0, 1))).subscribe(e -> {
+//            System.err.println(e.getTotalPages());
+//            e.get().forEach(System.err::println);
+//        });
+
         log.info("系统初始化工作--end" );
     }
 
