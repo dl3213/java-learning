@@ -4,6 +4,9 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class Test {
     public static void main(String[] args) {
 
@@ -13,5 +16,6 @@ public class Test {
 
         Future<String> mapResult = f.map(a -> a);
 
+        String collect = Arrays.asList("1", "2", 3).stream().map(String::valueOf).collect(Collectors.joining(","));
     }
 }

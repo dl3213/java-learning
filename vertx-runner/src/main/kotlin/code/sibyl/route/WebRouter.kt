@@ -51,7 +51,8 @@ class WebRouter private constructor() {
                 //获取合同数
                 EosQueryService.getInstance()
                     .queryContractList(requestJson)
-                    .compose { r -> EosQueryService.getInstance().test(r) }
+                    .compose { r -> EosQueryService.getInstance().queryRentOutList(r) }
+                    .onFailure { err -> err.printStackTrace() }
                     .onSuccess { ret -> context.json(Response.success(ret)) }
                 //同时获取 出租单和归还单数据
 
