@@ -2,6 +2,8 @@ package code.sibyl.auth;
 
 import code.sibyl.auth.rest.*;
 import code.sibyl.auth.sys.SysAuthEntryPoint;
+import code.sibyl.auth.sys.SysAuthFailureHandler;
+import code.sibyl.auth.sys.SysLogoutSuccessHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 import java.util.Base64;
@@ -121,14 +124,13 @@ public class SecurityConfig {
                         .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/login"))
 //                                .authenticationManager(new SysAuthenticationManager()) //  todo
 //                        .authenticationSuccessHandler(new RestAuthSuccessHandler()) // 前后端不分离需要跳转到首页
-                        .authenticationFailureHandler(new RestAuthFailureHandler()) // 前后端不分离需要跳转到登录页并加提示 todo
+                        .authenticationFailureHandler(new SysAuthFailureHandler(loginView, "登录失败~~~")) // 前后端不分离需要跳转到登录页并加提示 todo
                 );
 //        http.addFilterAt(new LoginFilter, ); // 自定义登录操作 ??? 邮箱手机登录可以在ReactiveUserDetailsService中完成
-        http.logout(logout->logout.logoutUrl("/logout"));
+        http.logout(logout->logout.logoutUrl("/logout").logoutSuccessHandler(new SysLogoutSuccessHandler(loginView, "用户已退出")));
         //http.securityContextRepository(customServerSecurityContextRepository());
         // @formatter:on
         http.securityContextRepository(new SessionConfig());
-//        http.se
         return http.build();
     }
 

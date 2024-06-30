@@ -107,10 +107,17 @@ public class IndexController {
 //        System.err.println(exchange.getFormData());
 //        System.err.println(exchange.getMultipartData());
 //        System.err.println(request);
+//        String s = "sign-in";
+//        model.addAttribute("systemName", r.systemName());
+//        model.addAttribute("title", r.systemName());
+//        return Mono.create(monoSink -> monoSink.success(s));
         String s = "sign-in";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
+        return exchange.getSession().flatMap(webSession -> {
+            model.addAttribute("systemName", r.systemName());
+            model.addAttribute("title", r.systemName());
+            model.addAttribute("msg", webSession.getAttributes().get("redirect-msg"));
+            return Mono.just(s);
+        });
     }
     @GetMapping({"sign-up.html"})
     public Mono<String> sign_up(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {

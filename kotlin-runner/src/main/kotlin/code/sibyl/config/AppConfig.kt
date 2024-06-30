@@ -20,8 +20,6 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 
 @Configuration
 @EnableR2dbcRepositories("code.sibyl.repository")
-//@ComponentScan("code.sibyl.*")
-//@EntityScan("code.sibyl.domain.*")
 class AppConfig {
 
     private val log = LoggerFactory.getLogger(AppConfig::class.java)
