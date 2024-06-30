@@ -6,6 +6,7 @@ import code.sibyl.common.r;
 import code.sibyl.config.R2dbcRoutingConfig;
 import code.sibyl.domain.database.Database;
 import code.sibyl.dto.TestDTO;
+import code.sibyl.event.SibylEvent;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
@@ -15,12 +16,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -46,6 +51,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     private final DatabaseRepository databaseRepository;
     private final FileService fileService;
     private final EosRepository eosRepository;
+    private final ApplicationContext applicationContext;
 
     @Override
     public void run(String... args) throws Exception {
@@ -115,7 +121,17 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            e.get().forEach(System.err::println);
 //        });
 
+        Query query = Query.query(Criteria.where("name").like("%lease%"));
+        r2dbcEntityTemplate.select(query, Database.class).subscribe(e ->{
+            System.err.println(e);
+        });
+
+//        databaseRepository.findByNameContaining("lease", PageRequest.of(0,2)).subscribe(e -> {
+//            System.err.println(e.getTotalPages());
+//            e.get().forEach(System.err::println);
+//        });
         log.info("系统初始化工作--end");
+        applicationContext.publishEvent(new SibylEvent(this,"runner-end"));
     }
 
     @Override
