@@ -1,5 +1,7 @@
 package code.sibyl.controller;
 
+import code.sibyl.aop.ActionLog;
+import code.sibyl.aop.ActionType;
 import code.sibyl.common.r;
 import code.sibyl.model.MenuDTO;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +69,7 @@ public class IndexController {
     }
 
     @GetMapping({"home",})
+    @ActionLog(topic = "home首页", type = ActionType.OTHER)
     public Mono<String> home() {
         String welcome = "home";
         return Mono.create(monoSink -> monoSink.success(welcome));
@@ -119,6 +122,7 @@ public class IndexController {
             return Mono.just(s);
         });
     }
+
     @GetMapping({"sign-up.html"})
     public Mono<String> sign_up(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
         String s = "sign-up";
@@ -126,6 +130,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"sign-in-link.html"})
     public Mono<String> sign_in_link(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
         String s = "sign-in-link";
@@ -133,6 +138,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"sign-in-illustration.html"})
     public Mono<String> sign_in_illustration(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
         String s = "sign-in-illustration";
@@ -140,6 +146,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"sign-in-cover.html"})
     public Mono<String> sign_in_cover(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
         String s = "sign-in-cover";
@@ -147,6 +154,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"forgot-password.html"})
     public Mono<String> forgot_password(final Model model) {
         String s = "forgot-password";
@@ -154,6 +162,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"auth-lock.html"})
     public Mono<String> auth_lock(final Model model) {
         String s = "auth-lock";
@@ -161,6 +170,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"terms-of-service.html"})
     public Mono<String> terms_of_service(final Model model) {
         String s = "terms-of-service";
@@ -168,6 +178,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"2-step-verification.html"})
     public Mono<String> _2_step_verification(final Model model) {
         String s = "2-step-verification";
@@ -175,6 +186,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"2-step-verification-code.html"})
     public Mono<String> _2_step_verification_code(final Model model) {
         String s = "2-step-verification-code";
@@ -182,6 +194,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"settings.html"})
     public Mono<String> settings(final Model model) {
         String s = "settings";
@@ -253,6 +266,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/cards.html"})
     public Mono<String> cards(final Model model) {
         String s = "cards";
@@ -260,6 +274,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/card-actions.html"})
     public Mono<String> card_aactions(final Model model) {
         String s = "card-actions";
@@ -267,6 +282,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/cards-masonry.html"})
     public Mono<String> cards_masonry(final Model model) {
         String s = "cards-masonry";
@@ -651,6 +667,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/error-404.html"})
     public Mono<String> error_404(final Model model) {
         String s = "error-404";
@@ -658,6 +675,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/error-500.html"})
     public Mono<String> error_500(final Model model) {
         String s = "error-500";
@@ -665,6 +683,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/error-maintenance.html"})
     public Mono<String> error_maintenance(final Model model) {
         String s = "error-maintenance";
@@ -696,6 +715,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/map-fullsize.html"})
     public Mono<String> map_fullsize(final Model model) {
         String s = "map-fullsize";
@@ -703,6 +723,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/maps-vector.html"})
     public Mono<String> maps_vector(final Model model) {
         String s = "maps-vector";
@@ -718,6 +739,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/markdown.html"})
     public Mono<String> markdown(final Model model) {
         String s = "markdown";
@@ -725,6 +747,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/navigation.html"})
     public Mono<String> navigation(final Model model) {
         String s = "navigation";
@@ -732,6 +755,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/offcanvas.html"})
     public Mono<String> offcanvas(final Model model) {
         String s = "offcanvas";
@@ -739,6 +763,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/pagination.html"})
     public Mono<String> pagination(final Model model) {
         String s = "pagination";
@@ -746,6 +771,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/placeholder.html"})
     public Mono<String> placeholder(final Model model) {
         String s = "placeholder";
@@ -753,6 +779,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/steps.html"})
     public Mono<String> steps(final Model model) {
         String s = "steps";
@@ -760,6 +787,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/stars-rating.html"})
     public Mono<String> stars_rating(final Model model) {
         String s = "stars-rating";
@@ -767,6 +795,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/tabs.html"})
     public Mono<String> tabs(final Model model) {
         String s = "tabs";
@@ -774,6 +803,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/tags.html"})
     public Mono<String> tags(final Model model) {
         String s = "tags";
@@ -781,6 +811,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/typography.html"})
     public Mono<String> typography(final Model model) {
         String s = "typography";
@@ -788,6 +819,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/tinymce.html"})
     public Mono<String> tinymce(final Model model) {
         String s = "tinymce";
@@ -795,6 +827,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/modal.html"})
     public Mono<String> modal(final Model model) {
         String s = "modals";
@@ -802,6 +835,7 @@ public class IndexController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
+
     @GetMapping({"/modals.html"})
     public Mono<String> modals(final Model model) {
         String s = "modals";

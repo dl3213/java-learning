@@ -18,15 +18,15 @@ spring:
   profiles:
     active: dev
     include: db, quartz
-  threads:
-    virtual:
-      enabled: true
+#  threads:
+#    virtual:
+#      enabled: true
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  security:
-    strategy: MODE_INHERITABLETHREADLOCAL
+#  security:
+#    strategy: MODE_INHERITABLETHREADLOCAL
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

@@ -1,6 +1,6 @@
 package code.sibyl.service;
 
-import code.sibyl.cache.LocalCacheUtil;
+import code.sibyl.cache.LocalCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WechatService {
 
-    private final LocalCacheUtil localCacheUtil;
+    private final LocalCache localCache;
 
     public String authorize() {
-        String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + localCacheUtil.get("work-weixin-id") + "&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_privateinfo&state=STATE&agentid=" + localCacheUtil.get("work-weixin-agent-id") + "#wechat_redirect";
+        String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + localCache.get("work-weixin-id") + "&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_privateinfo&state=STATE&agentid=" + localCache.get("work-weixin-agent-id") + "#wechat_redirect";
         return null;
     }
 

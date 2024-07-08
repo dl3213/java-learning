@@ -4,6 +4,7 @@ import code.sibyl.auth.rest.*;
 import code.sibyl.auth.sys.SysAuthEntryPoint;
 import code.sibyl.auth.sys.SysAuthFailureHandler;
 import code.sibyl.auth.sys.SysLogoutSuccessHandler;
+import code.sibyl.filter.ReactiveRequestContextFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
@@ -21,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
+import org.springframework.security.web.server.context.ReactorContextWebFilter;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 import java.util.Base64;
@@ -31,7 +34,7 @@ import java.util.Base64;
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
+@EnableReactiveMethodSecurity(useAuthorizationManager=true)
 @Slf4j
 public class SecurityConfig {
 
@@ -69,8 +72,9 @@ public class SecurityConfig {
                         .authenticationSuccessHandler(new RestAuthSuccessHandler())
                         .authenticationFailureHandler(new RestAuthFailureHandler())
                 );
-        http.logout(logout->logout.logoutUrl("/api/rest/logout"));
+        http.logout(logout->logout.logoutUrl("/api/rest/logout")); // ReactorContextWebFilter
         // @formatter:on
+//        http.securityContextRepository()
         return http.build();
     }
 
@@ -130,9 +134,18 @@ public class SecurityConfig {
         http.logout(logout->logout.logoutUrl("/logout").logoutSuccessHandler(new SysLogoutSuccessHandler(loginView, "用户已退出")));
         //http.securityContextRepository(customServerSecurityContextRepository());
         // @formatter:on
-        http.securityContextRepository(new SessionConfig());
+//        SessionConfig securityContextRepository = new SessionConfig();
+//        securityContextRepository.setCacheSecurityContext(true);
+//        http.securityContextRepository(securityContextRepository);
+//        http.addFilterAfter(new ReactorContextWebFilter(securityContextRepository), SecurityWebFiltersOrder.AUTHENTICATION); // ReactorContextWebFilter;
+//        http.addFilterAfter(new ReactiveRequestContextFilter(), SecurityWebFiltersOrder.FIRST); // ReactorContextWebFilter;
         return http.build();
     }
+
+//    @Bean
+//    public ReactorContextWebFilter reactorContextWebFilter(){
+//        return new ReactorContextWebFilter();
+//    }
 
     /**
      * 临时

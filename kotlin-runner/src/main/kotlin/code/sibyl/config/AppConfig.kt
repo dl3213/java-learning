@@ -1,5 +1,6 @@
 package code.sibyl.config
 
+import code.sibyl.cache.LocalCache
 import code.sibyl.service.DataBaseSocket
 import io.r2dbc.spi.ConnectionFactory
 import org.slf4j.LoggerFactory
@@ -23,6 +24,11 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 class AppConfig {
 
     private val log = LoggerFactory.getLogger(AppConfig::class.java)
+
+    @Bean
+    fun localCache(): LocalCache {
+        return LocalCache.getInstance();
+    }
 
     @Bean
     fun webSocketHandlerAdapter(): WebSocketHandlerAdapter {
