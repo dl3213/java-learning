@@ -27,6 +27,6 @@ public class TestController {
             System.err.println(Thread.currentThread().isVirtual());
         }).join();
 
-        return Response.success(Thread.currentThread().toString());
+        return Response.success("https://xn--0704-1yjs01cc-1o1uh94bqa577wbi6h.yjs11.cfd/?m=play&u=xnxx&k=187md9ba&p=");
     }
 }
