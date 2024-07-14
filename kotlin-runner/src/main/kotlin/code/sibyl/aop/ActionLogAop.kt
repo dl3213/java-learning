@@ -1,18 +1,19 @@
 package code.sibyl.aop
 
+import code.sibyl.repository.ActionLogRepository
 import lombok.extern.slf4j.Slf4j
-import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.ProceedingJoinPoint
-import org.aspectj.lang.annotation.AfterReturning
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
-import org.springframework.security.core.context.SecurityContext
 import org.springframework.stereotype.Component
+import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
+import reactor.util.context.Context
+import reactor.util.context.ContextView
 
 
 @Aspect
@@ -21,6 +22,9 @@ import reactor.kotlin.core.publisher.toMono
 class ActionLogAop {
 
     private val log = LoggerFactory.getLogger(ActionLogAop::class.java)
+
+    @Autowired
+    private lateinit var actionLogRepository : ActionLogRepository;
 
     @Pointcut("@annotation(actionLog)")
     fun pointCut(actionLog: ActionLog?) {
@@ -35,14 +39,26 @@ class ActionLogAop {
             Mono.just(joinPoint),
             Mono.just(actionLog),
 //            ReactiveSecurityContextHolder.getContext().switchIfEmpty(Mono.error(RuntimeException("无用户信息")))
-            ReactiveSecurityContextHolder.getContext()
+            ReactiveSecurityContextHolder.getContext(),
+            Mono.deferContextual { data: ContextView? ->
+                Mono.just(
+                    data as ContextView
+                )
+            }.cast(
+                Context::class.java
+            ).filter { context: Context? ->
+                context?.hasKey(ServerWebExchange::class.java) == true
+            }.map { context: Context? ->
+               context?.get(ServerWebExchange::class.java)
+            }
         ).map { t ->
             println(t.t2.target?.javaClass?.name)
             println(t.t2.signature?.name)
             println("ActionLog -> Around -> " + t.t3?.topic)
             println(t.t4.authentication)
+            println(t.t5?.request?.uri  )
 //            return@map joinPoint.proceed() as Object?
-             return@map t.t1
+            return@map t.t1
         }
             .doOnError { err ->
                 println("doOnError")
