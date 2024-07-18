@@ -47,6 +47,12 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+        databaseRepository.findAll()
+                .map(database -> {
+                    System.err.println(database);
+                    return database;
+                })
+                .subscribe();
 //        fileService.init();
 //        r.getBean(LocalCacheUtil.class).init();
 
@@ -113,7 +119,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //        });
 
         Query query = Query.query(Criteria.where("name").like("%lease%"));
-        r2dbcEntityTemplate.select(query, Database.class).subscribe(e ->{
+        r2dbcEntityTemplate.select(query, Database.class).subscribe(e -> {
             System.err.println(e);
         });
 
@@ -122,7 +128,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            e.get().forEach(System.err::println);
 //        });
         log.info("系统初始化工作--end");
-        applicationContext.publishEvent(new SibylEvent(this,"runner-end"));
+        applicationContext.publishEvent(new SibylEvent(this, "runner-end"));
     }
 
     @Override

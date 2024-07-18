@@ -1,6 +1,7 @@
 package code.sibyl.domain.database;
 
 import code.sibyl.aop.Header;
+import com.alibaba.excel.annotation.ExcelProperty;
 import io.r2dbc.spi.ConnectionFactory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,34 +34,42 @@ public class Database implements Serializable {
     @Column(name = "id", nullable = false)
     @org.springframework.data.annotation.Id
     @Header
+    @ExcelProperty("id")
     private Long id;
 
     @Column(name = "name")
     @Header
+    @ExcelProperty("name")
     private String name;
 
     @Column(name = "type")
     @Header
+    @ExcelProperty("type")
     private String type;
 
     @Column(name = "host")
     @Header
+    @ExcelProperty("host")
     private String host;
 
     @Column(name = "port")
     @Header
+    @ExcelProperty("port")
     private String port;
 
     @Column(name = "username")
     @Header
+    @ExcelProperty("username")
     private String username;
 
     @Column(name = "password")
     @Header
+    @ExcelProperty("password")
     private String password;
 
     @Column(name = "database")
     @Header
+    @ExcelProperty("database")
     private String database;
 
 
@@ -72,13 +81,16 @@ public class Database implements Serializable {
     @Version
     @Column(name = "version")
     @Header
+    @ExcelProperty("version")
     private Integer version;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "create_time")
+    @ExcelProperty("createTime")
     private LocalDateTime createTime;
 
     @Column(name = "create_id")
+    @ExcelProperty("createId")
     private Long createId;
 
     @org.springframework.data.annotation.Transient

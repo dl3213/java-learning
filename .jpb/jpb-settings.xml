@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ReverseEngineeringSettings">
+    <database-infos>
+      <database-info dbms-id="h2">
+        <mapping-types>
+          <mapping-type sql-type="JSON" java-class="java.lang.String" />
+        </mapping-types>
+      </database-info>
+    </database-infos>
+  </component>
+</project>
