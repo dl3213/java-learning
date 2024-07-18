@@ -1,7 +1,5 @@
 package code.sibyl.controller;
 
-import cn.hutool.poi.excel.ExcelUtil;
-import cn.hutool.poi.excel.ExcelWriter;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
@@ -9,27 +7,23 @@ import code.sibyl.dto.request.EosIndexRequest;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.excel.EasyExcel;
-import io.netty.buffer.PooledByteBufAllocator;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.springframework.core.io.buffer.*;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ZeroCopyHttpOutputMessage;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -102,7 +96,7 @@ public class EosController {
             byte[] bytes = outputStream.toByteArray();
 
             response.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
-                    "filename=demo.xlsx");
+                    "filename=demo_export.xlsx");
             response.getHeaders().add("Accept-Ranges", "bytes");
             DataBuffer buffer = response.bufferFactory().wrap(bytes);
             return response.writeWith(Mono.just(buffer));
@@ -111,30 +105,20 @@ public class EosController {
 
     }
 
-    @PostMapping("/download")
-    public Mono<Void> download(ServerHttpResponse serverResponse) {
+    @PostMapping("/download/test")
+    public Mono<Void> download(ServerHttpResponse response, @RequestBody EosIndexRequest indexRequest) throws IOException {
 
-        return databaseRepository.findAll().collectList().flatMap(list -> {
+        HttpClient client = new HttpClient();
+        PostMethod post = new PostMethod("http://localhost:80/eos/export");
+        RequestEntity requestEntity = new StringRequestEntity(JSONObject.toJSONString(indexRequest),"application/json;charset=UTF-8","UTF-8");
+        post.setRequestEntity(requestEntity);
+        int statusCode = client.executeMethod(post);
+        byte[] bytes = post.getResponseBody();
 
-
-            serverResponse.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
-                    "filename=demo.xlsx");
-            serverResponse.getHeaders().add("Accept-Ranges", "bytes");
-            DefaultDataBuffer dataBuffer = new DefaultDataBufferFactory().allocateBuffer();
-            OutputStream outputStream = dataBuffer.asOutputStream();
-
-            ExcelWriter writer = ExcelUtil.getWriter();
-            writer.writeRow(list);
-            writer.flush(outputStream);
-
-            Flux<DataBuffer> dataBufferFlux = Flux.create((FluxSink<DataBuffer> emitter) -> {
-                emitter.next(dataBuffer);
-                emitter.complete();
-            });
-            return serverResponse.writeWith(dataBufferFlux);
-
-        });
-
-
+        response.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
+                "filename=demo_download.xlsx");
+        response.getHeaders().add("Accept-Ranges", "bytes");
+        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+        return response.writeWith(Mono.just(buffer));
     }
 }
