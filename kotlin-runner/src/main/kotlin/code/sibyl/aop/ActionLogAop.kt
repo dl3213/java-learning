@@ -53,7 +53,7 @@ class EosActionLogAop {
             if (proceed is Flux<*>) {
                 println("proceed is Flux<*>")
                 proceed.count().subscribe { e -> println("flux size => $e") }
-                var flux = (proceed as Flux<out Any>); // todo 只适用与有限流
+                var flux = (proceed as Flux<out Any>); // todo 无限流测试
 
                 return flux.transformDeferredContextual { e, c ->
                     println("transformDeferredContextual")
