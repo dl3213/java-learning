@@ -10,6 +10,7 @@ import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Controller;
@@ -32,9 +33,11 @@ public class DefaultController {
 
     private final EosRepository eosRepository;
 
-    @GetMapping("/sse")
+    @ActionLog(topic = "test", type = ActionType.OTHER)
+    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
     public Flux<Long> sse(ServerWebExchange exchange) {
+        System.err.println("exchange");
         return Flux.interval(Duration.ofSeconds(1))
                 .map(index -> System.currentTimeMillis());
     }
@@ -63,14 +66,15 @@ public class DefaultController {
 //                .subscribe();
         return Flux.fromIterable(Arrays.asList(1, 23, 45, 6, 61))
                 .map(index -> System.currentTimeMillis())
-                .transformDeferredContextual((e, c) -> {
-                    System.err.println("transformDeferredContextual");
-                    System.err.println(Optional.of(c.get("test20240804")).get());
-                    ;
-                    System.err.println(e);
-                    return e;
-                })
-                .contextWrite(context -> context.put("test20240804", "1"));
+//                .transformDeferredContextual((e, c) -> {
+//                    System.err.println("transformDeferredContextual");
+//                    System.err.println(Optional.of(c.get("test20240804")).get());
+//                    ;
+//                    System.err.println(e);
+//                    return e;
+//                })
+//                .contextWrite(context -> context.put("test20240804", "1"))
+                ;
     }
 
     @GetMapping("/get")

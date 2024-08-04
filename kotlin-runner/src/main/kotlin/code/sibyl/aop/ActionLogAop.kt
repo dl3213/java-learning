@@ -7,13 +7,14 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.aspectj.lang.reflect.MethodSignature
+import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.util.context.Context
-import reactor.util.context.ContextView
+import reactor.util.function.Tuple2
+import reactor.util.function.Tuples
 
 
 @Aspect
@@ -42,24 +43,49 @@ class EosActionLogAop {
             if (proceed is Mono<*>) {
                 println("proceed is Mono<*>")
                 var mono = proceed as Mono<out Any>;
-                return Mono.zip(mono, r.getWebExchange())
-                    .flatMap { t ->
-                        println("Mono.zip")
-                        println(t.t1)
-                        println(t.t2.request?.uri?.toString())
-                        return@flatMap Mono.just(t.t1)
-                    }
+                return Mono.zip(mono, r.getWebExchange()).flatMap { t ->
+                    println("Mono.zip")
+                    println(t.t1)
+                    println(t.t2.request?.uri?.toString())
+                    return@flatMap Mono.just(t.t1)
+                }
             }
             if (proceed is Flux<*>) {
-                var flux = (proceed as Flux<out Any>); // todo flux无法获取ServerWebExchange
+                println("proceed is Flux<*>")
+                proceed.count().subscribe { e -> println("flux size => $e") }
+                var flux = (proceed as Flux<out Any>); // todo 只适用与有限流
 
-                return Mono.zip(flux.collectList(), r.getWebExchange())
-                    .flatMapMany { t ->
-                        println("Mono.zip flux ")
-                        println(t.t1)
-                        println(t.t2.request?.uri?.toString())
-                        return@flatMapMany Flux.fromIterable(t.t1)
+                return flux.transformDeferredContextual { e, c ->
+                    println("transformDeferredContextual")
+                    println(c.get(ServerWebExchange::class.java))
+//                    (e, c.get(ServerWebExchange::class.java))
+                    e
+//                    return@transformDeferredContextual Flux.zip(
+//                        Flux.just(e),
+//                        Flux.just(c.get(ServerWebExchange::class.java))
+//                    )
+                }
+                    .map { t ->
+                        println("Flux.zip ")
+//                        println(t.t1)
+//                        println(t.t2.request?.uri?.toString())
+                        t
+                        //(t.t1 as MutableIterable<Any>?)
                     }
+                    .doFinally { e ->
+                        println("doFinally")
+                        println(e.name)
+                        println(e.javaClass)
+                        println(e.ordinal)
+                    }
+
+//                return Mono.zip(flux.collectList(), r.getWebExchange())  // todo 只适用与有限流
+//                    .flatMapMany { t ->
+//                        println("Mono.zip flux ")
+//                        println(t.t1)
+//                        println(t.t2.request?.uri?.toString())
+//                        return@flatMapMany Flux.fromIterable(t.t1)
+//                    }
 
 //                Flux.from(flux).contextCapture().map { e ->
 //                    println("contextCapture().map")
@@ -73,27 +99,26 @@ class EosActionLogAop {
 //                    println(t.t2)
 //                }.subscribe()
 
-                Flux.from(flux).contextCapture().transformDeferredContextual { e, context ->
-                    println("transformDeferredContextual")
-                    println(context.hasKey(ServerWebExchange::class.java))
-//                println(context.get(ServerWebExchange::class.java).request.uri.toString())
-                    return@transformDeferredContextual e;
-                }.flatMap { t ->
-                    println("just flatMap")
-                    println(t)
-                    Mono.zip(
-                        Mono.just(t),
-                        Mono.just(joinPoint),
-                        Mono.just(actionLog),
-//                    r.getWebExchange()
-                    )
-                }.map { t ->
-                    println("just map")
-                    println(t.t1)
-                    println(t.t2)
-                    t
-                }
-                    .subscribe()
+//                Flux.from(flux).contextCapture().transformDeferredContextual { e, context ->
+//                    println("transformDeferredContextual")
+//                    println(context.hasKey(ServerWebExchange::class.java))
+////                println(context.get(ServerWebExchange::class.java).request.uri.toString())
+//                    return@transformDeferredContextual e;
+//                }.flatMap { t ->
+//                    println("just flatMap")
+//                    println(t)
+//                    Mono.zip(
+//                        Mono.just(t),
+//                        Mono.just(joinPoint),
+//                        Mono.just(actionLog),
+////                    r.getWebExchange()
+//                    )
+//                }.map { t ->
+//                    println("just map")
+//                    println(t.t1)
+//                    println(t.t2)
+//                    t
+//                }.subscribe()
 
 
             }
