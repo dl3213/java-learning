@@ -12,13 +12,9 @@ import java.util.function.Consumer;
 
 public class Main {
 
+
+
     public static void main(String[] args) {
-        HttpClient client = new HttpClient();
-        PostMethod post = new PostMethod("");
-    }
-
-
-    public static void main123(String[] args) {
         File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

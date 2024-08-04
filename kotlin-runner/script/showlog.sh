@@ -1,1 +1,1 @@
-tail -500f ./server.log
+tail -100f ./server.log

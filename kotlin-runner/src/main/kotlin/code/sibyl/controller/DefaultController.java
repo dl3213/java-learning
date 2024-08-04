@@ -1,5 +1,7 @@
 package code.sibyl.controller;
 
+import code.sibyl.aop.ActionLog;
+import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
 import code.sibyl.dto.QueryDTO;
 import code.sibyl.dto.QueryMap;
@@ -15,13 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.nio.charset.Charset;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,6 +37,40 @@ public class DefaultController {
     public Flux<Long> sse(ServerWebExchange exchange) {
         return Flux.interval(Duration.ofSeconds(1))
                 .map(index -> System.currentTimeMillis());
+    }
+
+    @ActionLog(topic = "test", type = ActionType.OTHER)
+    @GetMapping("/mono/get")
+    @ResponseBody
+    public Mono<Response> mono_get() {
+        return Mono.just(Response.success(System.currentTimeMillis())).contextWrite(context -> context.put("test20240804", "1"));
+    }
+
+    @ActionLog(topic = "test", type = ActionType.OTHER)
+    @GetMapping("/flux/get")
+    @ResponseBody
+    public Flux<Long> flux_get(ServerWebExchange exchange) {
+//        System.err.println(exchange.getRequest().getURI().toString());
+//        return Flux.deferContextual(contextView -> Flux.just(contextView))
+//                .cast(Context.class)
+//                .filter(e -> e.hasKey(ServerWebExchange.class) == true)
+//                .map(e -> e.get(ServerWebExchange.class))
+//                .map(e -> {
+//                    System.err.println(e.getRequest().getURI().toString());
+//                    return System.currentTimeMillis();
+//                })
+//                ;
+//                .subscribe();
+        return Flux.fromIterable(Arrays.asList(1, 23, 45, 6, 61))
+                .map(index -> System.currentTimeMillis())
+                .transformDeferredContextual((e, c) -> {
+                    System.err.println("transformDeferredContextual");
+                    System.err.println(Optional.of(c.get("test20240804")).get());
+                    ;
+                    System.err.println(e);
+                    return e;
+                })
+                .contextWrite(context -> context.put("test20240804", "1"));
     }
 
     @GetMapping("/get")

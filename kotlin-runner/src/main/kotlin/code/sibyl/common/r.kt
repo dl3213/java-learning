@@ -4,7 +4,12 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.core.env.Environment
+import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.util.context.Context
+import reactor.util.context.ContextView
+import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,6 +48,84 @@ object r {
         return base64Decoder;
     }
 
+    // 辅助方法，用于判断方法是否返回Mono或Flux
+    @JvmStatic
+    private fun isReactiveReturnType(method: Method): Boolean {
+        return (Mono::class.java.isAssignableFrom(method.returnType)
+                || Flux::class.java.isAssignableFrom(method.returnType))
+    }
+
+    // 辅助方法，用于判断方法的参数是否是响应式的
+    @JvmStatic
+    private fun hasReactiveArguments(method: Method): Boolean {
+        return Arrays.stream(method.parameters)
+            .anyMatch { param ->
+                (Mono::class.java.isAssignableFrom(param.getType())
+                        || Flux::class.java.isAssignableFrom(param.getType()))
+            }
+    }
+
+    // 根据方法判断是否响应式
+    @JvmStatic
+    fun isReactive(method: Method): Boolean {
+        return isReactiveReturnType(method) || hasReactiveArguments(method)
+    }
+
+    @JvmStatic
+    fun getWebExchange(): Mono<ServerWebExchange> {
+        return r.getMonoContext(ServerWebExchange::class.java);
+        ;
+    }
+    @JvmStatic
+    fun getWebExchange_flux(): Flux<ServerWebExchange> {
+        return r.getFluxContext(ServerWebExchange::class.java);
+        ;
+    }
+
+    @JvmStatic
+    fun <T> getMonoContext(key: Class<T>): Mono<T> {
+        return Mono.deferContextual { data: ContextView? ->
+            Mono.just(
+                data as ContextView
+            )
+        }.cast(
+            Context::class.java
+        ).filter { context: Context? ->
+            context?.hasKey(key) == true
+        }.map { context: Context? ->
+            context?.get(key)
+        }
+    }
+
+    @JvmStatic
+    fun <T> getFluxContext(key: Class<T>): Flux<T> {
+        return Flux.deferContextual { data: ContextView? ->
+            Flux.just(
+                data as ContextView
+            )
+        }.cast(
+            Context::class.java
+        ).filter { context: Context? ->
+            context?.hasKey(key) == true
+        }.map { context: Context? ->
+            context?.get(key)
+        }
+    }
+
+//    @JvmStatic
+//    fun <T> getFluxContext(key: Class<T>): Mono<T> {
+//        return Flux.deferContextual { data: ContextView? ->
+//            Mono.just(
+//                data as ContextView
+//            )
+//        }.cast(
+//            Context::class.java
+//        ).filter { context: Context? ->
+//            context?.hasKey(key) == true
+//        }.map { context: Context? ->
+//            context?.get(key)
+//        }
+//    }
 
     @JvmStatic
     fun baseDir(): String? {
