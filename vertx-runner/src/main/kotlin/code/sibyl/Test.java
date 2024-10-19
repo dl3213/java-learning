@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 public class Test {
     public static void main(String[] args) {
-
-        Future<String> f = Future.succeededFuture("a");
-
-        Future<String> composeResult = f.compose(a -> Future.succeededFuture(a));
-
-        Future<String> mapResult = f.map(a -> a);
-
-        String collect = Arrays.asList("1", "2", 3).stream().map(String::valueOf).collect(Collectors.joining(","));
+        System.out.println(System.getProperty("java.version"));
+//        Future<String> f = Future.succeededFuture("a");
+//
+//        Future<String> composeResult = f.compose(a -> Future.succeededFuture(a));
+//
+//        Future<String> mapResult = f.map(a -> a);
+//
+//        String collect = Arrays.asList("1", "2", 3).stream().map(String::valueOf).collect(Collectors.joining(","));
     }
 }

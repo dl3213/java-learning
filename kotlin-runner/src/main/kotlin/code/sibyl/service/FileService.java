@@ -67,10 +67,12 @@ public class FileService {
             if (resource.exists() || resource.isReadable()) {
                 return DataBufferUtils.read(resource, new DefaultDataBufferFactory(), 4096);
             } else {
-                throw new RuntimeException("Could not read the file!");
+                //throw new RuntimeException("Could not read the file!");
+                return null;
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            //throw new RuntimeException("Error: " + e.getMessage());
+            return null;
         }
     }
 

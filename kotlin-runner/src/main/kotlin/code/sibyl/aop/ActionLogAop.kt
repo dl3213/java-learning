@@ -7,23 +7,22 @@ import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.aspectj.lang.reflect.MethodSignature
-import org.reactivestreams.Publisher
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.util.function.Tuple2
-import reactor.util.function.Tuples
+import reactor.util.context.Context
+import reactor.util.context.ContextView
 
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 @Slf4j
 class EosActionLogAop {
 
     private val log = LoggerFactory.getLogger(EosActionLogAop::class.java)
-
 
     @Pointcut("@annotation(actionLog)")
     fun pointCut(actionLog: ActionLog?) {
@@ -43,42 +42,60 @@ class EosActionLogAop {
             if (proceed is Mono<*>) {
                 println("proceed is Mono<*>")
                 var mono = proceed as Mono<out Any>;
-                return Mono.zip(mono, r.getWebExchange()).flatMap { t ->
-                    println("Mono.zip")
-                    println(t.t1)
-                    println(t.t2.request?.uri?.toString())
-                    return@flatMap Mono.just(t.t1)
-                }
+
+                return mono
+                    .doFirst {
+
+                        println("mono doFirst")
+                        Context.of(ServerWebExchange::class.java, r.getWebExchange())
+                    }
+                    .doFinally { e ->
+                        println("mono doFinally")
+
+                        println(this)
+                    }
+
+//                return Mono.zip(mono, r.getWebExchange()).flatMap { t ->
+//                    println("Mono.zip")
+//                    println(t.t1)
+//                    println(t.t2.request?.uri?.toString())
+//                    return@flatMap Mono.just(t.t1)
+//                }
             }
             if (proceed is Flux<*>) {
                 println("proceed is Flux<*>")
                 proceed.count().subscribe { e -> println("flux size => $e") }
                 var flux = (proceed as Flux<out Any>); // todo 无限流测试
 
-                return flux.transformDeferredContextual { e, c ->
-                    println("transformDeferredContextual")
-                    println(c.get(ServerWebExchange::class.java))
-//                    (e, c.get(ServerWebExchange::class.java))
-                    e
-//                    return@transformDeferredContextual Flux.zip(
-//                        Flux.just(e),
-//                        Flux.just(c.get(ServerWebExchange::class.java))
-//                    )
+                return flux.doFinally { e ->
+                    println("flux doFinally")
+                    println(this)
+                    println(e)
                 }
-                    .map { t ->
-                        println("Flux.zip ")
-//                        println(t.t1)
-//                        println(t.t2.request?.uri?.toString())
-                        t
-                        //(t.t1 as MutableIterable<Any>?)
-                    }
-                    .doFinally { e ->
-                        println("doFinally")
-                        println(e.name)
-                        println(e.javaClass)
-                        println(e.ordinal)
-                    }
 
+//                return flux.transformDeferredContextual { e, c ->
+//                    println("transformDeferredContextual")
+//                    println(c.get(ServerWebExchange::class.java))
+////                    (e, c.get(ServerWebExchange::class.java))
+//                    e
+////                    return@transformDeferredContextual Flux.zip(
+////                        Flux.just(e),
+////                        Flux.just(c.get(ServerWebExchange::class.java))
+////                    )
+//                }
+//                    .map { t ->
+//                        println("Flux.zip ")
+////                        println(t.t1)
+////                        println(t.t2.request?.uri?.toString())
+//                        t
+//                        //(t.t1 as MutableIterable<Any>?)
+//                    }
+//                    .subscribe { e ->
+//                        println("doFinally")
+//                    }
+
+
+                //2
 //                return Mono.zip(flux.collectList(), r.getWebExchange())  // todo 只适用与有限流
 //                    .flatMapMany { t ->
 //                        println("Mono.zip flux ")
@@ -122,6 +139,8 @@ class EosActionLogAop {
 
 
             }
+
+
             //if (ret == null) throw RuntimeException(class_ + "." + method + "该方法无法推断响应式返回类型");
 
 //            Flux.deferContextual { data: ContextView? ->

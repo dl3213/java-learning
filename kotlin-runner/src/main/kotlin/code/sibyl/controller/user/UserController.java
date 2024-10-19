@@ -2,7 +2,7 @@ package code.sibyl.controller.user;
 
 import code.sibyl.common.Response;
 import code.sibyl.common.SpringUtil;
-import code.sibyl.domain.user.SysUser;
+import code.sibyl.domain.sys.User;
 import code.sibyl.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -49,7 +49,7 @@ public class UserController {
 
     @PostMapping("/add")
     @ResponseBody
-    public Mono<Response> add(@RequestBody SysUser user, ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+    public Mono<Response> add(@RequestBody User user, ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
         return SpringUtil.getBean(SysUserService.class).save(user).map(Response::success);
     }
 }

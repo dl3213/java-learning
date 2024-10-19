@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SysConfig {
+public class Config {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

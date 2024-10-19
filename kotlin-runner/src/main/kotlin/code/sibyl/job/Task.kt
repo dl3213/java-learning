@@ -8,6 +8,11 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.Duration
 import java.time.LocalDateTime
 
 
@@ -18,14 +23,18 @@ class Task {
 
     private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
-//    @Async("virtualThreadTaskExecutor")
-//    @Scheduled(cron = "0/5 * * * * ?")
+    //    @Async("virtualThreadTaskExecutor")
+//    @Scheduled(cron = "0/10 * * * * ?")
     fun run() {
         println(Thread.currentThread().isVirtual)
-        log.info("测试定时任务 s: {}, {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS), Thread.currentThread().name)
+        log.info(
+            "测试定时任务 s: {}, {}",
+            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS),
+            Thread.currentThread().name
+        )
     }
 
-//    @Async
+    //    @Async
 //    @Scheduled(cron = "0 0/1 * * * ?")
     fun runPerMin() {
         log.info("每分钟任务-start: {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS))
@@ -33,9 +42,10 @@ class Task {
         log.info("每分钟任务-end: {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS))
     }
 
-//    @Async
+    @Async
     @Scheduled(cron = "0 0 0/1 * * ?")
     fun runPerHour() {
         log.info("每小时任务 s: {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS))
+
     }
 }

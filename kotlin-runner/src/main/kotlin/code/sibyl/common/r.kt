@@ -9,6 +9,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.util.context.Context
 import reactor.util.context.ContextView
+import java.io.File
+import java.io.FileInputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -26,6 +28,7 @@ object r {
 
     open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名 " //常用时间格式
+    const val pixivBaseDir: String = "E:/4me/pixez/" //常用时间格式
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
@@ -34,6 +37,17 @@ object r {
 
     const val yyyy: String = "yyyy" //常用时间格式
     const val MM: String = "MM" //常用时间格式
+
+    private val IMAGE_EXTENSIONS = arrayOf("jpg", "jpeg", "png", "gif", "bmp", "webp")
+
+    // 图片文件头的前几个字节
+    private val IMAGE_FILE_HEADERS = arrayOf(
+        byteArrayOf(0xFF.toByte(), 0xD8.toByte()),  // JPEG (jpg)
+        byteArrayOf(0x89.toByte(), 0x50.toByte()),  // PNG (png)
+        byteArrayOf(0x47.toByte(), 0x49.toByte(), 0x46.toByte()),  // GIF (gif)
+        byteArrayOf(0x42.toByte(), 0x4D.toByte()),  // BMP (bmp)
+        byteArrayOf(0x52.toByte(), 0x49.toByte(), 0x46.toByte(), 0x46.toByte()),  // WebP (webp)
+    )
 
     val base64Encoder: Base64.Encoder = Base64.getEncoder();
     val base64Decoder: Base64.Decoder = Base64.getDecoder();
@@ -48,20 +62,70 @@ object r {
         return base64Decoder;
     }
 
+
+    @JvmStatic
+    fun isImage(file: File): Boolean {
+        if(file == null || !file.exists()) return false
+
+        // 先检查文件扩展名
+        val extension: String = getFileExtension(file.name)?.toLowerCase(Locale.ENGLISH).toString()
+        for (imgExtension in IMAGE_EXTENSIONS) {
+            if (StringUtils.equals(extension, imgExtension)) {
+                return true
+            }
+        }
+
+
+        // 文件扩展名不匹配，再检查文件头
+        val fis: FileInputStream = FileInputStream(file)
+        val fileHeader = ByteArray(IMAGE_FILE_HEADERS[0].size)
+        fis.read(fileHeader, 0, fileHeader.size)
+        fis.close()
+        for (header in IMAGE_FILE_HEADERS) {
+            if (equals(fileHeader, header)) {
+                return true
+            }
+        }
+
+        return false
+
+        return true;
+    }
+
+    private fun equals(a1: ByteArray, a2: ByteArray): Boolean {
+        if (a1.size != a2.size) {
+            return false
+        }
+        for (i in a1.indices) {
+            if (a1[i] != a2[i]) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun getFileExtension(filename: String?): String? {
+        if (filename == null) {
+            return null
+        }
+        val index = filename.lastIndexOf('.')
+        if (index == -1) {
+            return null
+        }
+        return filename.substring(index + 1)
+    }
+
     // 辅助方法，用于判断方法是否返回Mono或Flux
     @JvmStatic
     private fun isReactiveReturnType(method: Method): Boolean {
-        return (Mono::class.java.isAssignableFrom(method.returnType)
-                || Flux::class.java.isAssignableFrom(method.returnType))
+        return (Mono::class.java.isAssignableFrom(method.returnType) || Flux::class.java.isAssignableFrom(method.returnType))
     }
 
     // 辅助方法，用于判断方法的参数是否是响应式的
     @JvmStatic
     private fun hasReactiveArguments(method: Method): Boolean {
-        return Arrays.stream(method.parameters)
-            .anyMatch { param ->
-                (Mono::class.java.isAssignableFrom(param.getType())
-                        || Flux::class.java.isAssignableFrom(param.getType()))
+        return Arrays.stream(method.parameters).anyMatch { param ->
+                (Mono::class.java.isAssignableFrom(param.getType()) || Flux::class.java.isAssignableFrom(param.getType()))
             }
     }
 
@@ -74,12 +138,11 @@ object r {
     @JvmStatic
     fun getWebExchange(): Mono<ServerWebExchange> {
         return r.getMonoContext(ServerWebExchange::class.java);
-        ;
     }
+
     @JvmStatic
     fun getWebExchange_flux(): Flux<ServerWebExchange> {
         return r.getFluxContext(ServerWebExchange::class.java);
-        ;
     }
 
     @JvmStatic
@@ -222,9 +285,7 @@ object r {
      */
     fun divide(a: BigDecimal, b: BigDecimal): BigDecimal {
         return if (Objects.isNull(b) || b.compareTo(BigDecimal.ZERO) == 0 || Objects.isNull(a) || a.compareTo(BigDecimal.ZERO) == 0) BigDecimal.ZERO else a.divide(
-            b,
-            4,
-            BigDecimal.ROUND_UP
+            b, 4, BigDecimal.ROUND_UP
         )
     }
 
@@ -238,6 +299,7 @@ object r {
     /**
      * 线程等待
      */
+    @JvmStatic
     fun sleep(millis: Long) {
         try {
             Thread.sleep(millis)
@@ -360,4 +422,5 @@ object r {
 
     fun main123(args: Array<String?>?) {
     }
+
 }

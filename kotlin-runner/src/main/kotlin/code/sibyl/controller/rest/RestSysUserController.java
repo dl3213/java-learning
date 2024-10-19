@@ -1,7 +1,7 @@
 package code.sibyl.controller.rest;
 
 import code.sibyl.common.SpringUtil;
-import code.sibyl.domain.user.SysUser;
+import code.sibyl.domain.sys.User;
 import code.sibyl.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -22,7 +22,7 @@ public class RestSysUserController {
 
     @PostMapping("/list")
     @ResponseBody
-    public Flux<SysUser> list(ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+    public Flux<User> list(ServerHttpRequest request, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
         return SpringUtil.getBean(SysUserService.class).list();
     }
 }

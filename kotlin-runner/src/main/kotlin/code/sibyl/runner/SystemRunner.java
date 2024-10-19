@@ -1,7 +1,8 @@
 package code.sibyl.runner;
 
 import code.sibyl.common.Response;
-import code.sibyl.domain.database.Database;
+import code.sibyl.common.r;
+import code.sibyl.domain.base.BaseFile;
 import code.sibyl.event.SibylEvent;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
@@ -9,6 +10,7 @@ import code.sibyl.service.FileService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -18,9 +20,17 @@ import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * 系统启动准备
@@ -47,7 +57,77 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+        Path root = Path.of(r.pixivBaseDir);
 
+//        Criteria criteria = Criteria.where("IS_DELETED").is("1");
+//        r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
+//                .map(e -> {
+//                    System.err.println(e);
+//                    File file = new File(e.getAbsolutePath());
+//                    try {
+//                        file.delete();
+//                    } catch (Exception exception) {
+//                        exception.printStackTrace();
+//                    }
+//                    return e;
+//                })
+//                .count()
+//                .map(e -> {
+//                    System.err.println(STR."count = \{e}");
+//                    return e;
+//                }).subscribe();
+
+        Flux.create((sink) -> {
+                    try (Stream<Path> files = Files.list(root)) {
+                        files.forEach(e -> sink.next(e));
+                        sink.complete();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        sink.error(exception);
+                    }
+                })
+                .flatMap(item -> {
+                    try {
+                        Tika tika = new Tika();
+                        Path path = (Path) item;
+                        String fileName = path.getFileName().toString();
+                        BaseFile file = new BaseFile();
+                        file.setFileName(fileName);
+                        file.setType(tika.detect(path.toFile()));
+                        file.setAbsolutePath(path.toAbsolutePath().toString());
+                        file.setSize(String.valueOf(path.toFile().length()));
+                        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+                        //file.setExtension(suffix);
+                        file.setSuffix(suffix);
+                        file.setCode("pixiv");
+                        file.setDeleted("0");
+                        file.setCreateId(1L);
+                        file.setCreateTime(LocalDateTime.now());
+
+                        BufferedImage image = ImageIO.read(path.toFile());
+                        if(file.getType().contains("image") && r.isImage(path.toFile()) && Objects.nonNull(image)){
+                            int width = image.getWidth();
+                            int height = image.getHeight();
+                            file.setWidth(String.valueOf(width));
+                            file.setHeight(String.valueOf(height));
+                        }
+
+
+                        return r2dbcEntityTemplate.insert(file);
+                    }catch (Exception exception){
+                        exception.printStackTrace();
+                        return Mono.empty();
+                    }
+                })
+                .count()
+                .map(e -> {
+                    System.err.println(e);
+                    return e;
+                })
+                .subscribe();
+
+
+        //LocalCache.getBean().test();//测试oom
 //        databaseRepository.findAll()
 //                .map(database -> {
 //                    System.err.println(database);
@@ -143,17 +223,14 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
         System.err.println(data.isEmpty());
 
         String key = "text2024006";
-        Mono
-                .justOrEmpty(data)
+        Mono.justOrEmpty(data)
                 //.transformDeferred(e -> Mono.just(new JSONObject()))
                 .zipWhen(e -> Objects.isNull(e) || e.isEmpty() ? Mono.just(Response.error(404, "404")) : Mono.just(Response.success(200, "200")))
                 //.contextWrite(context -> context.put(key,"231"))
                 .transformDeferredContextual((e, contextView) -> {
                     System.err.println(Optional.of(contextView.get(key)));
                     return e;
-                })
-                .contextWrite(context -> context.put(key, "111"))
-                .subscribe(e -> {
+                }).contextWrite(context -> context.put(key, "111")).subscribe(e -> {
                     System.err.println("subscribe");
                     System.err.println(e.getT2().get("code").toString());
                 });

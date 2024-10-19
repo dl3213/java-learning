@@ -1,6 +1,6 @@
 package code.sibyl.service;
 
-import code.sibyl.domain.user.SysUser;
+import code.sibyl.domain.sys.User;
 import code.sibyl.repository.SysUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +18,11 @@ public class SysUserService {
 
     private final SysUserRepository sysUserRepository;
 
-    public Mono<SysUser> save(SysUser sysUser) {
-        return sysUserRepository.save(sysUser);
+    public Mono<User> save(User user) {
+        return sysUserRepository.save(user);
     }
 
-    public Flux<SysUser> list() {
+    public Flux<User> list() {
         return sysUserRepository.list();
     }
 

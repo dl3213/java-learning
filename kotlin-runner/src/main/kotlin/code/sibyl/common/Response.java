@@ -64,6 +64,15 @@ public class Response extends HashMap<String, Object> {
         return responseVO;
     }
 
+    public static Response successPage(long total, Object data) {
+        Response responseVO = new Response();
+        responseVO.put(CODE_NAME, 200);
+        responseVO.put(MSG_NAME, "操作成功");
+        responseVO.put(DATA_NAME, data);
+        responseVO.put("total", total);
+        return responseVO;
+    }
+
 //    public static Response success(Map<String, Object> map) {
 //        Response responseVO = new Response();
 //        responseVO.putAll(map);

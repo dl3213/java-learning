@@ -1,33 +1,62 @@
 package code.sibyl.controller.file;
 
+import cn.hutool.core.lang.Tuple;
+import cn.hutool.core.stream.StreamUtil;
+import code.sibyl.common.Response;
 import code.sibyl.common.r;
+import code.sibyl.domain.base.BaseFile;
+import code.sibyl.dto.PhotoDTO;
 import code.sibyl.service.FileService;
+import code.sibyl.service.QueryService;
+import com.alibaba.fastjson2.JSONObject;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/photo")
 public class PhotoController {
 
-    private final static String dir = r.baseDir() + File.separator + "photo";
+    private final static String dir = "E:\\4me\\pixez\\";
 
     @Autowired
     FileService fileService;
+    @Autowired
+    R2dbcEntityTemplate r2dbcEntityTemplate;
 
     @GetMapping({"/list-view"})
     public Mono<String> model(final Model model) {
@@ -37,18 +66,156 @@ public class PhotoController {
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
-    @GetMapping("/load/{filename:.+}")
+
+//    @GetMapping("/load/{filename:.+}")
+//    @ResponseBody
+//    public ResponseEntity<Flux<DataBuffer>> load(@PathVariable String filename) {
+//        Flux<DataBuffer> file = fileService.load(Path.of(dir), filename);
+//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"").contentType(MediaType.APPLICATION_OCTET_STREAM).body(file);
+//    }
+
+    @GetMapping(value = "/load/list", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public ResponseEntity<Flux<DataBuffer>> load(@PathVariable String filename) {
-        Flux<DataBuffer> file = fileService.load(Path.of(dir), filename);
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"").contentType(MediaType.APPLICATION_OCTET_STREAM).body(file);
+    public Flux<ServerSentEvent<PhotoDTO>> loadList() {
+        System.err.println(dir);
+        Path root = Path.of(dir);
+
+        return Flux.create((sink) -> {
+                    try (Stream<Path> files = Files.list(root)) {
+                        files.forEach(e -> sink.next(e));
+                        sink.complete();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        sink.error(exception);
+                    }
+                })
+                //.delayElements(Duration.ofSeconds(1))
+                .take(5).map(item -> {
+                    try {
+                        Path path = (Path) item;
+//                        BufferedImage image = ImageIO.read(path.toFile());
+//                        int width = image.getWidth();
+//                        int height = image.getHeight();
+                        String fileName = path.getFileName().toString();
+                        PhotoDTO dto = new PhotoDTO().setFileName(fileName)
+//                                .setWidth(String.valueOf(width))
+//                                .setHeight(String.valueOf(height))
+//                                .setScale(String.valueOf(width / height))
+                                ;
+                        return ServerSentEvent.<PhotoDTO>builder().data(dto).build();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    } finally {
+
+                    }
+                });
     }
 
-    @GetMapping("/load/list")
+
+    @PostMapping(value = "/pixiv/page")
     @ResponseBody
-    public ResponseEntity<Flux<DataBuffer>> loadList() {
-        Stream<Path> pathStream = fileService.loadAll(Path.of(dir));
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"").contentType(MediaType.APPLICATION_OCTET_STREAM).body(file);
-        return null;
+    public Mono<Response> pixiv_page(@RequestBody JSONObject jsonObject) {
+        Criteria criteria = Criteria.where("IS_DELETED").is("0");
+        Query query = Query.query(criteria).with(PageRequest.of(jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize"))) // 1开始
+                .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName));
+        return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList()).map(t -> Response.successPage(t.getT1(), t.getT2()));
+    }
+
+    @DeleteMapping(value = "/pixiv/delete/{id}")
+    @ResponseBody
+    public Mono<Response> pixiv_delete(@PathVariable String id) {
+        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).flatMap(e -> {
+            System.err.println(e);
+            e.setDeleted("1");
+//                    File file = new File(e.getAbsolutePath());
+//                    if (Objects.nonNull(file) && file.exists()) {
+//                        file.delete();
+//                    }
+            return r2dbcEntityTemplate.update(e);
+        }).map(e -> Response.success(e));
+    }
+
+    @PostMapping("/pixiv/upload")
+    @ResponseBody
+    public Mono<Response> th_finance_collection_book_upload(@RequestPart("file") Mono<FilePart> filePartMono) {
+
+        return filePartMono
+                .flatMap(e -> Mono.zip(Mono.just(e.filename()), DataBufferUtils.join(e.content())))
+                .map(t -> {
+                    DataBuffer dataBuffer = t.getT2();
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+                    System.err.println(bytes.length);
+                    return new Tuple(t.getT1(), bytes);
+                })
+                .flatMap(t -> {
+                    String fileName = t.get(0);
+                    byte[] bytes = t.get(1);
+                    String detect = r.getBean(Tika.class).detect(bytes);
+                    return Mono.zip(Mono.just(fileName), Mono.just(bytes), Mono.just(detect), ReactiveSecurityContextHolder.getContext(), QueryService.getBean().fileList(fileName, detect).collectList());
+                })
+                .flatMap(t -> {
+                    String fileName = t.getT1();
+                    System.err.println(fileName);
+                    byte[] bytes = t.getT2();
+                    System.err.println(bytes.length);
+                    String fileType = t.getT3();
+                    System.err.println(fileType);
+                    User user = (User) t.getT4().getAuthentication().getPrincipal();
+                    System.err.println(user);
+                    List<BaseFile> baseFileList = t.getT5();
+                    System.err.println(baseFileList);
+
+                    if (!fileType.contains("image")) {
+                        return Mono.error(new RuntimeException("上传失败：非图像文件"));
+                    }
+                    if (CollectionUtils.isNotEmpty(baseFileList)) {
+                        return Mono.error(new RuntimeException("上传失败：同名图像文件已存在"));
+                    }
+
+                    BaseFile file = new BaseFile();
+                    file.setFileName(fileName);
+                    file.setType(fileType);
+                    file.setAbsolutePath(r.pixivBaseDir + fileName);
+
+                    File realFile = new File(file.getAbsolutePath());
+
+                    try {
+                        try (OutputStream outputStream = new FileOutputStream(realFile)) {
+                            IOUtils.write(bytes, outputStream);
+                        }
+                    } catch (IOException e) {
+                        return Mono.error(new RuntimeException(e));
+                    } finally {
+
+                    }
+
+                    file.setSize(String.valueOf(realFile.length()));
+                    String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+                    file.setSuffix(suffix);
+                    file.setCode("pixiv");
+                    file.setDeleted("0");
+                    file.setCreateId(1L);
+                    file.setCreateTime(LocalDateTime.now());
+
+                    BufferedImage image = null;
+                    try {
+                        image = ImageIO.read(realFile);
+                    } catch (IOException e) {
+                        return Mono.error(new RuntimeException(e));
+                    }
+                    if (file.getType().contains("image") && r.isImage(realFile) && Objects.nonNull(image)) {
+                        int width = image.getWidth();
+                        int height = image.getHeight();
+                        file.setWidth(String.valueOf(width));
+                        file.setHeight(String.valueOf(height));
+                    }
+
+                    return r2dbcEntityTemplate.insert(file);
+                })
+                .map(e -> Response.success(e))
+                ;
     }
 }

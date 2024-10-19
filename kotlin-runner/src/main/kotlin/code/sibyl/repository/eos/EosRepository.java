@@ -1,9 +1,7 @@
 package code.sibyl.repository.eos;
 
 import code.sibyl.aop.DS;
-import code.sibyl.domain.user.SysUser;
-import code.sibyl.dto.QueryDTO;
-import code.sibyl.dto.QueryMap;
+import code.sibyl.domain.sys.User;
 import code.sibyl.dto.RentRecycleDTO;
 import code.sibyl.dto.TestDTO;
 import org.springframework.data.r2dbc.repository.Query;
@@ -14,13 +12,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Repository
 @DS("thlease_db" )
-public interface EosRepository extends R2dbcRepository<SysUser, Long> {
+public interface EosRepository extends R2dbcRepository<User, Long> {
 
 
     @Query("SELECT sum(a.weighing_weight) as rentAogWeight " +

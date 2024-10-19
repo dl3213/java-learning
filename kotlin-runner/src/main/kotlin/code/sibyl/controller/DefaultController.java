@@ -3,22 +3,22 @@ package code.sibyl.controller;
 import code.sibyl.aop.ActionLog;
 import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
+import code.sibyl.domain.sys.User;
 import code.sibyl.dto.QueryDTO;
-import code.sibyl.dto.QueryMap;
 import code.sibyl.dto.TestDTO;
 import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.context.Context;
 
 import java.nio.charset.Charset;
 import java.time.Duration;
@@ -32,6 +32,23 @@ import java.util.stream.Collectors;
 public class DefaultController {
 
     private final EosRepository eosRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
+
+    @GetMapping("/json")
+    @ResponseBody
+    public Mono<Response> json(String url) {
+        return r2dbcEntityTemplate.select(User.class)
+                .all()
+                .collectList()
+                .map(e -> r.success(e));
+    }
+
+    @GetMapping(value = "/getUrl")
+    @ResponseBody
+    public Mono<Response> get(String url) {
+        System.err.println("url => " + url);
+        return r.successMono();
+    }
 
     @ActionLog(topic = "test", type = ActionType.OTHER)
     @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
