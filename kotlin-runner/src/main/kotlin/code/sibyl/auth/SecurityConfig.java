@@ -159,7 +159,7 @@ public class SecurityConfig {
 //        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         UserDetails admin = User.withDefaultPasswordEncoder()
                 .username("admin")
-                .password("admin")
+                .password("admin-sibyl-202410")
                 .passwordEncoder(passwordEncoder()::encode)
                 .authorities("admin:api","user:api")
 //                .authorities(new SimpleGrantedAuthority("admin:api"),new SimpleGrantedAuthority("user:api"))
@@ -167,7 +167,7 @@ public class SecurityConfig {
                 .build();
         UserDetails user = User.withDefaultPasswordEncoder()
                 .username("user")
-                .password("user")
+                .password("user-sibyl-202410")
                 .passwordEncoder(passwordEncoder()::encode)
                 .authorities(new SimpleGrantedAuthority("user:api"))// 角色-菜单  权限-接口
 //                .roles("user")// 角色-菜单  权限-接口

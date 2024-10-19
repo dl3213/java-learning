@@ -57,7 +57,7 @@ debug: false
 logging:
   level:
     root: info
-    org.springframework.r2dbc: info
+    org.springframework.r2dbc: debug
     io.asyncer.r2dbc.mysql.client.ReactorNettyClient: warn
   file:
     name: ./${spring.application.name}/logs/log.log #这里因为是内部module就多加一层文件夹

@@ -23,7 +23,10 @@ open class BaseFile {
     open var absolutePath: String? = null
 
     @Column(name = "SIZE", length = 64)
-    open var size: String? = null
+    open var size: Long? = null
+
+    @Column(name = "SHA256")
+    open var sha256: String? = null
 
     @Column(name = "SUFFIX", length = 64)
     open var suffix: String? = null
@@ -33,8 +36,8 @@ open class BaseFile {
 
     @Column(name = "CODE", length = 64)
     open var code: String? = null
-    open var width: String? = null
-    open var height: String? = null
+    open var width: Int? = null
+    open var height: Int? = null
 
     @Column(name = "IS_DELETED", nullable = false, length = 2)
     open var isDeleted: String? = null

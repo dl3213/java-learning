@@ -13,6 +13,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -62,6 +64,39 @@ object r {
         return base64Decoder;
     }
 
+    @JvmStatic
+    fun yyyy_MM_dd(): String {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern(r.yyyy_MM_dd));
+    }
+
+    @JvmStatic
+    fun computeFileSHA256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        FileInputStream(file).use { fis ->
+            val buffer = ByteArray(1024)
+            var numRead = 0
+            while (fis.read(buffer).also { numRead = it } > 0) {
+                digest.update(buffer, 0, numRead)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    @JvmStatic
+    fun file2byte(file: File): ByteArray? {
+        return file.readBytes();
+    }
+
+    @JvmStatic
+    fun hashBytes(bytes: ByteArray): String? {
+        return try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            digest.update(bytes)
+            digest.digest().joinToString("") { "%02x".format(it) }
+        } catch (e: NoSuchAlgorithmException) {
+            null
+        }
+    }
 
     @JvmStatic
     fun isImage(file: File): Boolean {

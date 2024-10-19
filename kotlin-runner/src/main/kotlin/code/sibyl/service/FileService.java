@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Deprecated
 public class FileService {
 
     private final Path root = Paths.get(r.INSTANCE.getBaseDir());

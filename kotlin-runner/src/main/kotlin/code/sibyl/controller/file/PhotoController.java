@@ -1,16 +1,13 @@
 package code.sibyl.controller.file;
 
 import cn.hutool.core.lang.Tuple;
-import cn.hutool.core.stream.StreamUtil;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
-import code.sibyl.dto.PhotoDTO;
 import code.sibyl.service.FileService;
 import code.sibyl.service.QueryService;
 import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,31 +18,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
-import org.springframework.http.MediaType;
-import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/photo")
@@ -65,53 +51,6 @@ public class PhotoController {
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
     }
-
-
-//    @GetMapping("/load/{filename:.+}")
-//    @ResponseBody
-//    public ResponseEntity<Flux<DataBuffer>> load(@PathVariable String filename) {
-//        Flux<DataBuffer> file = fileService.load(Path.of(dir), filename);
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"").contentType(MediaType.APPLICATION_OCTET_STREAM).body(file);
-//    }
-
-    @GetMapping(value = "/load/list", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @ResponseBody
-    public Flux<ServerSentEvent<PhotoDTO>> loadList() {
-        System.err.println(dir);
-        Path root = Path.of(dir);
-
-        return Flux.create((sink) -> {
-                    try (Stream<Path> files = Files.list(root)) {
-                        files.forEach(e -> sink.next(e));
-                        sink.complete();
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                        sink.error(exception);
-                    }
-                })
-                //.delayElements(Duration.ofSeconds(1))
-                .take(5).map(item -> {
-                    try {
-                        Path path = (Path) item;
-//                        BufferedImage image = ImageIO.read(path.toFile());
-//                        int width = image.getWidth();
-//                        int height = image.getHeight();
-                        String fileName = path.getFileName().toString();
-                        PhotoDTO dto = new PhotoDTO().setFileName(fileName)
-//                                .setWidth(String.valueOf(width))
-//                                .setHeight(String.valueOf(height))
-//                                .setScale(String.valueOf(width / height))
-                                ;
-                        return ServerSentEvent.<PhotoDTO>builder().data(dto).build();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    } finally {
-
-                    }
-                });
-    }
-
 
     @PostMapping(value = "/pixiv/page")
     @ResponseBody
@@ -178,8 +117,9 @@ public class PhotoController {
                     BaseFile file = new BaseFile();
                     file.setFileName(fileName);
                     file.setType(fileType);
-                    file.setAbsolutePath(r.pixivBaseDir + fileName);
-
+                    file.setAbsolutePath(r.pixivBaseDir + File.separator + r.yyyy_MM_dd() + File.separator + fileName);
+                    String hash = r.hashBytes(bytes);
+                    file.setSha256(hash);
                     File realFile = new File(file.getAbsolutePath());
 
                     try {
@@ -191,8 +131,7 @@ public class PhotoController {
                     } finally {
 
                     }
-
-                    file.setSize(String.valueOf(realFile.length()));
+                    file.setSize(realFile.length());
                     String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
                     file.setSuffix(suffix);
                     file.setCode("pixiv");
@@ -209,8 +148,8 @@ public class PhotoController {
                     if (file.getType().contains("image") && r.isImage(realFile) && Objects.nonNull(image)) {
                         int width = image.getWidth();
                         int height = image.getHeight();
-                        file.setWidth(String.valueOf(width));
-                        file.setHeight(String.valueOf(height));
+                        file.setWidth(width);
+                        file.setHeight(height);
                     }
 
                     return r2dbcEntityTemplate.insert(file);

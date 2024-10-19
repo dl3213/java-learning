@@ -7,6 +7,7 @@ import code.sibyl.event.SibylEvent;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
+import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,91 +58,12 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-        Path root = Path.of(r.pixivBaseDir);
 
-//        Criteria criteria = Criteria.where("IS_DELETED").is("1");
-//        r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
-//                .map(e -> {
-//                    System.err.println(e);
-//                    File file = new File(e.getAbsolutePath());
-//                    try {
-//                        file.delete();
-//                    } catch (Exception exception) {
-//                        exception.printStackTrace();
-//                    }
-//                    return e;
-//                })
-//                .count()
-//                .map(e -> {
-//                    System.err.println(STR."count = \{e}");
-//                    return e;
-//                }).subscribe();
-
-        Flux.create((sink) -> {
-                    try (Stream<Path> files = Files.list(root)) {
-                        files.forEach(e -> sink.next(e));
-                        sink.complete();
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                        sink.error(exception);
-                    }
-                })
-                .flatMap(item -> {
-                    try {
-                        Tika tika = new Tika();
-                        Path path = (Path) item;
-                        String fileName = path.getFileName().toString();
-                        BaseFile file = new BaseFile();
-                        file.setFileName(fileName);
-                        file.setType(tika.detect(path.toFile()));
-                        file.setAbsolutePath(path.toAbsolutePath().toString());
-                        file.setSize(String.valueOf(path.toFile().length()));
-                        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-                        //file.setExtension(suffix);
-                        file.setSuffix(suffix);
-                        file.setCode("pixiv");
-                        file.setDeleted("0");
-                        file.setCreateId(1L);
-                        file.setCreateTime(LocalDateTime.now());
-
-                        BufferedImage image = ImageIO.read(path.toFile());
-                        if(file.getType().contains("image") && r.isImage(path.toFile()) && Objects.nonNull(image)){
-                            int width = image.getWidth();
-                            int height = image.getHeight();
-                            file.setWidth(String.valueOf(width));
-                            file.setHeight(String.valueOf(height));
-                        }
-
-
-                        return r2dbcEntityTemplate.insert(file);
-                    }catch (Exception exception){
-                        exception.printStackTrace();
-                        return Mono.empty();
-                    }
-                })
-                .count()
-                .map(e -> {
-                    System.err.println(e);
-                    return e;
-                })
-                .subscribe();
-
+        UpdateService.getBean().pixiv_init().subscribe();
 
         //LocalCache.getBean().test();//测试oom
-//        databaseRepository.findAll()
-//                .map(database -> {
-//                    System.err.println(database);
-//                    return database;
-//                })
-//                .subscribe();
-//        fileService.init();
-//        r.getBean(LocalCacheUtil.class).init();
 
-//        databaseRepository.list_test(Arrays.asList("mysql","postgresql" ))
-//                .doOnError(e -> e.printStackTrace())
-//                .subscribe(item -> {
-//                    System.err.println(item);
-//                });
+//        r.getBean(LocalCacheUtil.class).init();
 
         //r.getBean(R2dbcRoutingConfig.class).connectionFactories().doOnNext(e -> System.err.println(e)).subscribe();
 //        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -193,21 +115,6 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //            e.get().forEach(System.err::println);
 //        });
 
-//        databaseRepository.list(PageRequest.of(0, 1)).subscribe(e -> {
-//            System.err.println(e);
-//            System.err.println(e.getTotalPages());
-//            e.get().forEach(System.err::println);
-//        });
-
-//        Query query = Query.query(Criteria.where("name").like("%lease%"));
-//        r2dbcEntityTemplate.select(query, Database.class).subscribe(e -> {
-//            System.err.println(e);
-//        });
-
-//        databaseRepository.findByNameContaining("lease", PageRequest.of(0,2)).subscribe(e -> {
-//            System.err.println(e.getTotalPages());
-//            e.get().forEach(System.err::println);
-//        });
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new SibylEvent(this, "runner-end"));
     }
