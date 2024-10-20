@@ -59,7 +59,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 
-        UpdateService.getBean().pixiv_init().subscribe();
+        //UpdateService.getBean().pixiv_init().subscribe();
 
         //LocalCache.getBean().test();//测试oom
 

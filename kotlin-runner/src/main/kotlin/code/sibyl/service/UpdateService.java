@@ -37,7 +37,7 @@ public class UpdateService {
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
         return r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
                 .flatMap(e -> {
-                    System.err.println(e);
+                    System.err.println(e.getFileName());
                     File file = new File(e.getAbsolutePath());
                     try {
                         file.delete();

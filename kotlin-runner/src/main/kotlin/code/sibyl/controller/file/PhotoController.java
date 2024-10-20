@@ -58,21 +58,23 @@ public class PhotoController {
         Criteria criteria = Criteria.where("IS_DELETED").is("0");
         Query query = Query.query(criteria).with(PageRequest.of(jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize"))) // 1开始
                 .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName));
-        return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList()).map(t -> Response.successPage(t.getT1(), t.getT2()));
+        return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList())
+                .map(t -> Response.successPage(t.getT1(), t.getT2(), jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize")));
     }
 
     @DeleteMapping(value = "/pixiv/delete/{id}")
     @ResponseBody
     public Mono<Response> pixiv_delete(@PathVariable String id) {
-        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).flatMap(e -> {
-            System.err.println(e);
-            e.setDeleted("1");
+        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .flatMap(e -> {
+                    System.err.println(e);
+                    e.setDeleted("1");
 //                    File file = new File(e.getAbsolutePath());
 //                    if (Objects.nonNull(file) && file.exists()) {
 //                        file.delete();
 //                    }
-            return r2dbcEntityTemplate.update(e);
-        }).map(e -> Response.success(e));
+                    return r2dbcEntityTemplate.update(e);
+                }).map(e -> Response.success(e));
     }
 
     @PostMapping("/pixiv/upload")
@@ -117,12 +119,23 @@ public class PhotoController {
                     BaseFile file = new BaseFile();
                     file.setFileName(fileName);
                     file.setType(fileType);
-                    file.setAbsolutePath(r.pixivBaseDir + File.separator + r.yyyy_MM_dd() + File.separator + fileName);
+                    String dir = r.pixivBaseDir + r.yyyy_MM_dd() + File.separator;
+                    file.setAbsolutePath(dir + fileName);
+                    System.err.println(dir);
+                    System.err.println(file.getAbsolutePath());
                     String hash = r.hashBytes(bytes);
                     file.setSha256(hash);
                     File realFile = new File(file.getAbsolutePath());
+                    File parentFile = new File(dir);
 
                     try {
+                        if (!parentFile.exists()) {
+                            parentFile.mkdirs();
+                        }
+                        if (!realFile.exists()) {
+                            realFile.createNewFile();
+                        }
+
                         try (OutputStream outputStream = new FileOutputStream(realFile)) {
                             IOUtils.write(bytes, outputStream);
                         }

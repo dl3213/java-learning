@@ -64,12 +64,14 @@ public class Response extends HashMap<String, Object> {
         return responseVO;
     }
 
-    public static Response successPage(long total, Object data) {
+    public static Response successPage(long total, Object data, int pageNumber, int pageSize) {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 200);
         responseVO.put(MSG_NAME, "操作成功");
         responseVO.put(DATA_NAME, data);
         responseVO.put("total", total);
+        responseVO.put("pageNumber", pageNumber);
+        responseVO.put("pageSize", pageSize);
         return responseVO;
     }
 
