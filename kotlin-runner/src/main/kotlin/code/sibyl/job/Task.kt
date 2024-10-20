@@ -2,6 +2,7 @@ package code.sibyl.job
 
 import code.sibyl.KotlinApplication
 import code.sibyl.common.r
+import code.sibyl.service.UpdateService
 import lombok.RequiredArgsConstructor
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
@@ -46,6 +47,6 @@ class Task {
     @Scheduled(cron = "0 0 0/1 * * ?")
     fun runPerHour() {
         log.info("每小时任务 s: {}", r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS))
-
+        UpdateService.getBean().文件补充hash().subscribe();
     }
 }

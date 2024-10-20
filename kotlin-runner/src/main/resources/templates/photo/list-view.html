@@ -368,7 +368,7 @@
 
         var request = {
             pageNumber: 1,
-            pageSize: 10,
+            pageSize: 50,
         }
         load_photo(request)
 
@@ -391,7 +391,7 @@
                         var a = document.createElement("a");
                         a.setAttribute("id", item.id)
                         a.setAttribute("data-fslightbox", "gallery")
-                        a.setAttribute("href", "/pixiv/" + item.fileName)
+                        a.setAttribute("href", "/r-18/" + item.relativePath.replace("\\", "/"))
                         a.addEventListener('click', function (evt) {
                             photo_left_click(this, evt)
                         })
@@ -399,7 +399,7 @@
                             photo_right_click(this, evt)
                         })
                         var div_in_a = document.createElement("div");
-                        div_in_a.setAttribute("style", "background-image: url(/pixiv/" + item.fileName + ")")
+                        div_in_a.setAttribute("style", "background-image: url(/r-18/" + item.relativePath.replace("\\", "/") + ")")
 
                         // 宽 < 高
                         if (scale < 0.4) {

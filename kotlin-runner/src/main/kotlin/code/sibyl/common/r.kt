@@ -30,7 +30,7 @@ object r {
 
     open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名 " //常用时间格式
-    const val pixivBaseDir: String = "E:/4me/pixez/" //常用时间格式
+    const val fileBaseDir: String = "E:/4me/r-18/" //常用时间格式
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
@@ -100,7 +100,7 @@ object r {
 
     @JvmStatic
     fun isImage(file: File): Boolean {
-        if(file == null || !file.exists()) return false
+        if (file == null || !file.exists()) return false
 
         // 先检查文件扩展名
         val extension: String = getFileExtension(file.name)?.toLowerCase(Locale.ENGLISH).toString()
@@ -160,8 +160,8 @@ object r {
     @JvmStatic
     private fun hasReactiveArguments(method: Method): Boolean {
         return Arrays.stream(method.parameters).anyMatch { param ->
-                (Mono::class.java.isAssignableFrom(param.getType()) || Flux::class.java.isAssignableFrom(param.getType()))
-            }
+            (Mono::class.java.isAssignableFrom(param.getType()) || Flux::class.java.isAssignableFrom(param.getType()))
+        }
     }
 
     // 根据方法判断是否响应式
@@ -456,6 +456,11 @@ object r {
     }
 
     fun main123(args: Array<String?>?) {
+    }
+
+    @JvmStatic
+    fun defaultUserId(): Long {
+        return 0L;
     }
 
 }

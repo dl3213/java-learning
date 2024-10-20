@@ -21,6 +21,7 @@ open class BaseFile {
 
     @Column(name = "ABSOLUTE_PATH", length = 1024)
     open var absolutePath: String? = null
+    open var relativePath: String? = null
 
     @Column(name = "SIZE", length = 64)
     open var size: Long? = null
@@ -53,4 +54,5 @@ open class BaseFile {
 
     @Column(name = "UPDATE_ID")
     open var updateId: Long? = null
+
 }

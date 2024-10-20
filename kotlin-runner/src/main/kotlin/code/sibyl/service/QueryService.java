@@ -24,4 +24,8 @@ public class QueryService {
     public Flux<BaseFile> fileList(String fileName, String type) {
         return r2dbcEntityTemplate.select(Query.query(Criteria.where("is_deleted").is("0").and("file_name").is(fileName).and("type").is(type)), BaseFile.class);
     }
+
+    public Flux<BaseFile> fileListByHash(String hash) {
+        return r2dbcEntityTemplate.select(Query.query(Criteria.where("is_deleted").is("0").and("SHA256").is(hash)), BaseFile.class);
+    }
 }

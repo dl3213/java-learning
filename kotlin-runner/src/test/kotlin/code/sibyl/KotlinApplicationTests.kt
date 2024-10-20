@@ -27,15 +27,9 @@ class KotlinApplicationTests {
 
     @Test
     open fun hash() {
-        val file = File("E:\\4me\\pixez\\-1fc1a621974db39c.gif")
-        val file2 = File("D:\\-1fc1a621974db39c.gif")
-        val file3 = File("E:\\4me\\pixez\\2230077_p0.jpg")
+        val file = File("E:\\4me\\r-18\\video\\miad-704-C.mp4")
         val sha256_1 = computeFileSHA256(file)
-        val sha256_2 = computeFileSHA256(file2)
-        val sha256_3 = computeFileSHA256(file3)
         println("SHA-256: $sha256_1")
-        println("SHA-256: $sha256_2")
-        println("SHA-256: $sha256_3")
 
         var file2byte = file2byte(file)
         var hashBytes = file2byte?.let { hashBytes(it) }

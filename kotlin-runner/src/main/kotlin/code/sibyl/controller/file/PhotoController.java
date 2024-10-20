@@ -6,9 +6,9 @@ import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
 import code.sibyl.service.FileService;
 import code.sibyl.service.QueryService;
+import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,18 +26,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/photo")
 public class PhotoController {
-
-    private final static String dir = "E:\\4me\\pixez\\";
 
     @Autowired
     FileService fileService;
@@ -55,9 +50,11 @@ public class PhotoController {
     @PostMapping(value = "/pixiv/page")
     @ResponseBody
     public Mono<Response> pixiv_page(@RequestBody JSONObject jsonObject) {
-        Criteria criteria = Criteria.where("IS_DELETED").is("0");
-        Query query = Query.query(criteria).with(PageRequest.of(jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize"))) // 1开始
-                .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName));
+        Criteria criteria = Criteria.where("IS_DELETED").is("0").and("type").like("image%");
+        Query query = Query.query(criteria)
+                .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName))
+                .with(PageRequest.of(jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize"))) // 1开始
+                ;
         return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList())
                 .map(t -> Response.successPage(t.getT1(), t.getT2(), jsonObject.getInteger("pageNumber"), jsonObject.getInteger("pageSize")));
     }
@@ -67,8 +64,10 @@ public class PhotoController {
     public Mono<Response> pixiv_delete(@PathVariable String id) {
         return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
-                    System.err.println(e);
+                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("1");
+                    e.setUpdateTime(LocalDateTime.now());
+                    e.setUpdateId(r.defaultUserId());
 //                    File file = new File(e.getAbsolutePath());
 //                    if (Objects.nonNull(file) && file.exists()) {
 //                        file.delete();
@@ -95,7 +94,15 @@ public class PhotoController {
                     String fileName = t.get(0);
                     byte[] bytes = t.get(1);
                     String detect = r.getBean(Tika.class).detect(bytes);
-                    return Mono.zip(Mono.just(fileName), Mono.just(bytes), Mono.just(detect), ReactiveSecurityContextHolder.getContext(), QueryService.getBean().fileList(fileName, detect).collectList());
+                    String hash = r.hashBytes(bytes);
+                    return Mono.zip(
+                            Mono.just(fileName),
+                            Mono.just(bytes),
+                            Mono.just(detect),
+                            ReactiveSecurityContextHolder.getContext(),
+                            QueryService.getBean().fileList(fileName, detect).collectList(),
+                            QueryService.getBean().fileListByHash(hash).collectList()
+                    );
                 })
                 .flatMap(t -> {
                     String fileName = t.getT1();
@@ -108,6 +115,7 @@ public class PhotoController {
                     System.err.println(user);
                     List<BaseFile> baseFileList = t.getT5();
                     System.err.println(baseFileList);
+                    List<BaseFile> hashList = t.getT6();
 
                     if (!fileType.contains("image")) {
                         return Mono.error(new RuntimeException("上传失败：非图像文件"));
@@ -115,55 +123,13 @@ public class PhotoController {
                     if (CollectionUtils.isNotEmpty(baseFileList)) {
                         return Mono.error(new RuntimeException("上传失败：同名图像文件已存在"));
                     }
-
-                    BaseFile file = new BaseFile();
-                    file.setFileName(fileName);
-                    file.setType(fileType);
-                    String dir = r.pixivBaseDir + r.yyyy_MM_dd() + File.separator;
-                    file.setAbsolutePath(dir + fileName);
-                    System.err.println(dir);
-                    System.err.println(file.getAbsolutePath());
-                    String hash = r.hashBytes(bytes);
-                    file.setSha256(hash);
-                    File realFile = new File(file.getAbsolutePath());
-                    File parentFile = new File(dir);
-
-                    try {
-                        if (!parentFile.exists()) {
-                            parentFile.mkdirs();
-                        }
-                        if (!realFile.exists()) {
-                            realFile.createNewFile();
-                        }
-
-                        try (OutputStream outputStream = new FileOutputStream(realFile)) {
-                            IOUtils.write(bytes, outputStream);
-                        }
-                    } catch (IOException e) {
-                        return Mono.error(new RuntimeException(e));
-                    } finally {
-
+                    if (CollectionUtils.isNotEmpty(hashList)) {
+                        return Mono.error(new RuntimeException("上传失败：相同hash文件已存在"));
                     }
-                    file.setSize(realFile.length());
-                    String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-                    file.setSuffix(suffix);
-                    file.setCode("pixiv");
-                    file.setDeleted("0");
-                    file.setCreateId(1L);
-                    file.setCreateTime(LocalDateTime.now());
 
-                    BufferedImage image = null;
-                    try {
-                        image = ImageIO.read(realFile);
-                    } catch (IOException e) {
-                        return Mono.error(new RuntimeException(e));
-                    }
-                    if (file.getType().contains("image") && r.isImage(realFile) && Objects.nonNull(image)) {
-                        int width = image.getWidth();
-                        int height = image.getHeight();
-                        file.setWidth(width);
-                        file.setHeight(height);
-                    }
+                    String dir = r.fileBaseDir + r.yyyy_MM_dd() + File.separator;
+                    String absolutePath = dir + fileName;
+                    BaseFile file = UpdateService.getBean().file(fileName, absolutePath, null, bytes, true);
 
                     return r2dbcEntityTemplate.insert(file);
                 })

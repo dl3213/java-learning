@@ -27,7 +27,7 @@ public class DataBaseHandler {
     }
 
     public Mono<ServerResponse> save(ServerRequest serverRequest) {
-        Mono<Database> entityStream = serverRequest.bodyToMono(Database.class).doOnNext(e -> e.setCreateTime(LocalDateTime.now()).setCreateId(0L));
+        Mono<Database> entityStream = serverRequest.bodyToMono(Database.class).doOnNext(e -> e.setCreateTime(LocalDateTime.now()).setCreateId(r.defaultUserId()));
         return ServerResponse.ok().contentType(APPLICATION_JSON)
                 .body(databaseRepository.saveAll(entityStream), Database.class);
     }

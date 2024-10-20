@@ -1491,13 +1491,13 @@
         triggers.forEach(t => {
             t.addEventListener('click', (e) => {
                 e.stopPropagation();
-                console.log('menu click')
+                //console.log('menu click')
                 var navs = t.querySelectorAll('.nav-link');
-                console.log(navs)
+                //console.log(navs)
                 var nav = navs && navs[0] ? navs[0] : null;
-                console.log(nav)
+                //console.log(nav)
                 const link = nav ? nav.getAttribute("target-link") : null;
-                console.log(link)
+                //console.log(link)
                 //console.log(link)
                 var main = document.getElementById('index-main-iframe');
                 //console.log(main)
@@ -1506,6 +1506,21 @@
                     triggers.forEach(o => o.classList.remove('active'));
                     t.classList.add("active");
                 }
+
+                //dropdown-menu
+                var menus = document.querySelectorAll('.dropdown-menu');
+                if(menus){
+                    menus.forEach(item => {
+                        //item.classList.remove("show")
+                        //console.log(item)
+                        //console.log(item.parentNode.children[0])
+                        //console.log(item.parentNode.children[0] === nav)
+                        if(item.parentNode.children[0] && (item.parentNode.children[0] != nav)){
+                            item.classList.remove("show")
+                        }
+                    })
+                }
+
             }, false)
         })
 
@@ -1513,9 +1528,9 @@
         triggers2.forEach(t => {
             t.addEventListener('click', (e) => {
                 e.stopPropagation();
-                console.log('menu2 click')
+                //console.log('menu2 click')
                 const link = e && e.target ? e.target.getAttribute("target-link") : null;
-                console.log(link)
+                //console.log(link)
                 //console.log(link)
                 var main = document.getElementById('index-main-iframe');
                 //console.log(main)

@@ -97,7 +97,6 @@ public class SecurityConfig {
                         .pathMatchers(
                                 "/favicon.ico",
                                 loginView,
-                                "/pixiv/**",
                                 "/css/**",
                                 "/js/**",
                                 "/font/**",
