@@ -1,5 +1,6 @@
 package code.sibyl.config;
 
+import code.sibyl.common.r;
 import org.apache.tika.Tika;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +17,7 @@ public class CommonConfig {
 
     @Bean
     public RouterFunction<ServerResponse> staticResources() throws MalformedURLException {
-        return RouterFunctions.resources("/pixiv/**", new FileSystemResource("E:/4me/pixez/"))
-                .and(RouterFunctions.resources("/video/**", new FileSystemResource("E:/4me/video/")))
-                .and(RouterFunctions.resources("/r-18/**", new FileSystemResource("E:/4me/r-18/")))
+        return RouterFunctions.resources("/pixiv/**", new FileSystemResource(r.fileBaseDir))
 //                .and(RouterFunctions.resources("/images/**", new FileSystemResource("file:/path/to/images/")))
 //                .and(RouterFunctions.resources("/other/**", new FileSystemResource("file:/another/path/to/resources/")))
                 ;

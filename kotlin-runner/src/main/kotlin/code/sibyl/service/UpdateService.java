@@ -58,7 +58,17 @@ public class UpdateService {
     public Mono<Long> r_18_init() {
         long start = System.currentTimeMillis();
         Path root = Path.of(r.fileBaseDir);
-        return Flux.create((sink) -> {
+        return r2dbcEntityTemplate.getDatabaseClient()
+                .sql("select count(1) as count from T_BASE_FILE where 1=1")
+                .fetch()
+                .first()
+                .flatMap(map -> {
+                    Long count = (Long) map.get("count");
+                    System.err.println(STR."当前存在文件 \{count} 个");
+                    return count == 0 ? Mono.just(count) : Mono.empty();
+                })
+                //.then()
+                .flatMapMany(_ -> Flux.create((sink) -> {
                     try (Stream<Path> files = Files.walk(root)) {
                         files.forEach(e -> sink.next(e));
                         sink.complete();
@@ -66,7 +76,7 @@ public class UpdateService {
                         exception.printStackTrace();
                         sink.error(exception);
                     }
-                })
+                }))
                 .publishOn(Schedulers.parallel())
                 .filter(item -> {
                     Path path = (Path) item;
@@ -78,8 +88,8 @@ public class UpdateService {
                     try {
                         Path path = (Path) item;
                         String fileName = path.getFileName().toString();
-                        BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "r-18", null, false);
-
+                        BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
+                        System.err.println(file.getAbsolutePath());
                         return r2dbcEntityTemplate.insert(file);
                     } catch (Exception exception) {
                         exception.printStackTrace();
@@ -95,7 +105,7 @@ public class UpdateService {
 
 
     public BaseFile file(String fileName, @NotNull String absolutePath, String code, byte[] bytes, boolean needCreateFile) {
-
+        absolutePath = absolutePath.replace("\\", "/");
         BaseFile baseFile = new BaseFile();
         baseFile.setFileName(fileName);
 
@@ -112,8 +122,10 @@ public class UpdateService {
                 e.printStackTrace();
             }
         }
-        baseFile.setAbsolutePath(absolutePath.replace("\\","/"));
-        baseFile.setRelativePath(absolutePath.replace(r.fileBaseDir, "").replace("\\","/"));
+        //System.err.println(absolutePath);
+        baseFile.setAbsolutePath(absolutePath);
+        //System.err.println(absolutePath.replace(r.fileBaseDir, ""));
+        baseFile.setRelativePath(absolutePath.replace(r.fileBaseDir, ""));
 
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         baseFile.setSuffix(suffix);
