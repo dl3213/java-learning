@@ -22,7 +22,7 @@ public class FfmpegService {
 
 
 
-        FfmpegService.copy(" ", " ", "02:25:26", "02:31:11");
+        FfmpegService.copy("", "", STR."01:36:35", STR."01:42:46");
 //        FfmpegService.showWindowSize("E:\\4me\\video\\1.mp4");
     }
 
@@ -34,7 +34,7 @@ public class FfmpegService {
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
         while ((line = errorReader.readLine()) != null) {
-            System.out.println(STR."FFmpeg error: \{line}");
+            System.out.println(STR."FFmpeg --> : \{line}");
         }
         process.waitFor();
         System.out.println("Conversion completed successfully.");
@@ -47,7 +47,7 @@ public class FfmpegService {
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = errorReader.readLine()) != null) {
-            System.out.println(STR."FFmpeg error: \{line}");
+            System.out.println(STR."FFmpeg -->: \{line}");
         }
 
         process.waitFor();

@@ -1,8 +1,6 @@
 package code.sibyl.runner;
 
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
-import code.sibyl.domain.base.BaseFile;
 import code.sibyl.event.SibylEvent;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
@@ -11,27 +9,16 @@ import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * 系统启动准备
@@ -59,8 +46,8 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 
-        UpdateService.getBean().r_18_init().subscribe();
-//        UpdateService.getBean().r_18_clear().subscribe();
+        UpdateService.getBean().pixiv_init().subscribe();
+        UpdateService.getBean().pixiv_clear().subscribe();
 
         //LocalCache.getBean().test();//测试oom
 

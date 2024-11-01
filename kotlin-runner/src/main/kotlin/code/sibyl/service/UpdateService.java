@@ -37,25 +37,26 @@ public class UpdateService {
         return r.getBean(UpdateService.class);
     }
 
-    public Mono<Long> r_18_clear() {
-        Path root = Path.of(r.fileBaseDir);
+    public Mono<Long> pixiv_clear() {
+        //Path root = Path.of(r.fileBaseDir);
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
-        return r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class).flatMap(e -> {
-            System.err.println(e.getFileName());
-            File file = new File(e.getAbsolutePath());
-            try {
-                file.delete();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            return r2dbcEntityTemplate.delete(e);
-        }).count().map(e -> {
-            System.err.println(STR."pixiv_clear count = \{e}");
-            return e;
-        });
+        return r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
+                .flatMap(e -> {
+                    System.err.println(e.getFileName());
+                    File file = new File(e.getAbsolutePath());
+                    try {
+                        file.delete();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                    return r2dbcEntityTemplate.delete(e);
+                }).count().map(e -> {
+                    System.err.println(STR."pixiv_clear count = \{e}");
+                    return e;
+                });
     }
 
-    public Mono<Long> r_18_init() {
+    public Mono<Long> pixiv_init() {
         long start = System.currentTimeMillis();
         Path root = Path.of(r.fileBaseDir);
         return r2dbcEntityTemplate.getDatabaseClient()
@@ -77,7 +78,7 @@ public class UpdateService {
                         sink.error(exception);
                     }
                 }))
-                .publishOn(Schedulers.parallel())
+                .publishOn(Schedulers.boundedElastic())
                 .filter(item -> {
                     Path path = (Path) item;
                     File realFile = path.toFile();
