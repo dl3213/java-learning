@@ -1,7 +1,10 @@
 package code.sibyl.common
 
 import org.apache.commons.lang3.time.DateFormatUtils
+import java.io.File
+import java.io.FileInputStream
 import java.math.BigDecimal
+import java.security.MessageDigest
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -20,6 +23,7 @@ object r {
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
+    const val fileBaseDir: String = "E:/4me/pixiv/pixez/"
 
     const val yyyy_MM: String = "yyyy-MM" //常用时间格式
 
@@ -43,6 +47,19 @@ object r {
     @JvmStatic
     fun baseDir(): String? {
         return this.baseDir;
+    }
+
+    @JvmStatic
+    fun computeFileSHA256(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        FileInputStream(file).use { fis ->
+            val buffer = ByteArray(1024)
+            var numRead = 0
+            while (fis.read(buffer).also { numRead = it } > 0) {
+                digest.update(buffer, 0, numRead)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     @JvmStatic

@@ -46,8 +46,8 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 
-        UpdateService.getBean().pixiv_init().subscribe();
-        UpdateService.getBean().pixiv_clear().subscribe();
+        UpdateService.getBean().pixiv_init().subscribe(); // pixiv_init_v1 -> 22554 cost = 43   pixiv_init_v2 -> 22551 cost = 55
+        UpdateService.getBean().file_clear().subscribe(); //
 
         //LocalCache.getBean().test();//测试oom
 

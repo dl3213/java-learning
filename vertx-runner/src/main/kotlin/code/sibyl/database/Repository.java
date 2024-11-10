@@ -1,28 +1,24 @@
 package code.sibyl.database;
 
+import code.sibyl.common.Bean;
 import code.sibyl.common.r;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Maybe;
+import code.sibyl.service.BeanService;
+import code.sibyl.service.SystemService;
 import io.reactivex.rxjava3.core.Single;
-import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.JsonObject;
-import io.vertx.jdbcclient.JDBCPool;
-import io.vertx.rxjava3.sqlclient.Row;
-import io.vertx.rxjava3.sqlclient.RowSet;
-import io.vertx.sqlclient.PoolOptions;
-import io.vertx.sqlclient.templates.SqlTemplate;
+import io.vertx.rxjava3.jdbcclient.JDBCPool;
+import io.vertx.rxjava3.sqlclient.templates.SqlTemplate;
+import lombok.Getter;
 
-import java.time.LocalDateTime;
+public class Repository implements Bean {
 
-public class Repository {
-
+    @Getter
     private JsonObject config;
-    private JDBCPool jdbcPool;
+    @Getter
+    private io.vertx.rxjava3.jdbcclient.JDBCPool jdbcPool;
 
     private Repository() {
-        //System.out.println("Repository init => " + r.format(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS));
+        init();
     }
 
     private static Repository instance = new Repository();
@@ -31,80 +27,27 @@ public class Repository {
         return instance;
     }
 
-    public JsonObject config(Vertx vertx) {
-        FileSystem fileSystem = vertx.fileSystem();
-        Buffer buffer = fileSystem.readFileBlocking("db.json");
-        return new JsonObject(buffer);
-    }
-
-    public JDBCPool jdbcPool(Vertx vertx, JsonObject jsonObject) {
-        return JDBCPool.pool(vertx, jsonObject);
-    }
-
-    public JDBCPool jdbcPool() {
-        return this.jdbcPool;
-    }
-
-    public Repository builder(Vertx vertx) {
-        this.config = this.config(vertx);
-        this.jdbcPool = this.jdbcPool(vertx, this.config);
-        return this;
-    }
-
-    public void test() {
-        String sql = "select now();";
-        SqlTemplate
-                .forQuery(Repository.getInstance().jdbcPool(), sql)
-                .mapTo(row -> row.toJson())
-                .execute(null)
-                .onFailure(error -> error.printStackTrace())
-                .onSuccess(rows -> System.err.println("数据库连接成功 => " + rows.iterator().next()));
-    }
-
-    public @NonNull Single<JsonObject> config(io.vertx.rxjava3.core.Vertx vertx) {
-        return vertx.fileSystem().rxReadFile("db.json").map(buffer -> new JsonObject(buffer.toString()));
-    }
-
-    public void builder(io.vertx.rxjava3.core.Vertx vertx) {
-        io.vertx.rxjava3.core.file.FileSystem filedSystem = vertx.fileSystem();
-        Single<io.vertx.rxjava3.core.buffer.Buffer> single = filedSystem.rxReadFile("db.json");
-        single.subscribe(buffer -> {
-            JsonObject jsonObject = new JsonObject(buffer.toString());
-//            JsonObject config = new JsonObject()
-//                    .put("url", jsonObject.getString("url"))
-////                .put("driver_class", "io.vertx.mysqlclient.spi.MySQLDriver")
-//                    .put("driver_class", jsonObject.getString("driver_class"))
-//                    .put("user", jsonObject.getString("user"))
-//                    .put("password", jsonObject.getString("password"));
-
-
-            // Pool options
-            PoolOptions poolOptions = new PoolOptions().setMaxSize(32);
-//        JDBCPool pool = JDBCPool.pool(vertx, config);
-            io.vertx.rxjava3.jdbcclient.JDBCPool pool = io.vertx.rxjava3.jdbcclient.JDBCPool.pool(vertx, jsonObject);
-            long start = System.currentTimeMillis();
-            Maybe<RowSet<Row>> resa = pool.rxWithConnection(conn -> conn
-                    .query("SELECT now()")
-                    .rxExecute()
-                    //.flatMap(res -> conn.query("SELECT * FROM th_crm_rent_out where is_del = '0'").rxExecute())
-//                .flatMap(res -> conn.query("SELECT * FROM test_20240520").rxExecute())
-//                .flatMap(res -> conn.query("SELECT * FROM test_20240520").rxExecute())
-                    .toMaybe());
-
-            // Connect to the database
-            resa.subscribe(rowSet -> {
-                // Subscribe to the final result
-                System.out.println("Results:");
-                rowSet.forEach(row -> {
-                    System.out.println(row.toJson());
-                });
-                System.err.println(rowSet.size());
-                System.err.println("cost => " + (System.currentTimeMillis() - start)); //
-            }, err -> {
-                System.out.println("Database problem");
-                err.printStackTrace();
-            });
-        });
+    public Single<Repository> builder(io.vertx.rxjava3.core.Vertx vertx) {
+        return vertx.fileSystem()
+                .rxReadFile("db.json")
+                .map(buffer -> {
+                    this.config = new JsonObject(buffer.toString());
+                    System.out.println("config -> " + config);
+                    JDBCPool pool = JDBCPool.pool(vertx, this.config);
+                    this.jdbcPool = pool;
+                    return this;
+                })
+                .doOnSuccess(repository -> {
+                    String sql = "select now();";
+                    System.out.println(sql);
+                    SqlTemplate
+                            .forQuery(repository.getJdbcPool(), sql)
+                            .execute(null)
+                            .doOnSuccess(rows -> System.err.println("数据库连接成功 => " + rows.iterator().next().toJson()))
+                            .subscribe()
+                    ;
+                })
+                ;
     }
 
 

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,11 +34,12 @@ public class UpdateService {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
+
     public static UpdateService getBean() {
         return r.getBean(UpdateService.class);
     }
 
-    public Mono<Long> pixiv_clear() {
+    public Mono<Long> file_clear() {
         //Path root = Path.of(r.fileBaseDir);
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
         return r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
@@ -70,19 +72,21 @@ public class UpdateService {
                 })
                 //.then()
                 .flatMapMany(_ -> Flux.create((sink) -> {
-                    try (Stream<Path> files = Files.walk(root)) {
-                        files.forEach(e -> sink.next(e));
-                        sink.complete();
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                        sink.error(exception);
-                    }
-                }))
-                .publishOn(Schedulers.boundedElastic())
+                            try (Stream<Path> files = Files.walk(root)) {
+                                files.forEach(e -> sink.next(e));
+                                sink.complete();
+                            } catch (Exception exception) {
+                                exception.printStackTrace();
+                                sink.error(exception);
+                            }
+                        })
+                        //.publishOn(Schedulers.fromExecutor(r.getBean(TaskExecutor.class, "taskExecutor")), 32)
+                )
+                //.publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskScheduler.class)), 32)
+                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskScheduler.class)))
                 .filter(item -> {
                     Path path = (Path) item;
                     File realFile = path.toFile();
-                    //System.err.println(path.getFileName() + " -> " + realFile.isFile() + " -> " + realFile.isDirectory());
                     return realFile.isFile() && !realFile.isDirectory();
                 })
                 .flatMap(item -> {
@@ -90,7 +94,7 @@ public class UpdateService {
                         Path path = (Path) item;
                         String fileName = path.getFileName().toString();
                         BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
-                        System.err.println(file.getAbsolutePath());
+                        System.err.println(STR."\{Thread.currentThread()} -> \{file.getAbsolutePath()}");
                         return r2dbcEntityTemplate.insert(file);
                     } catch (Exception exception) {
                         exception.printStackTrace();
@@ -99,10 +103,60 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    System.err.println(STR."pixiv_init -> \{count} cost = \{(System.currentTimeMillis() - start)}");
+                    System.err.println(STR."pixiv_init_v1 -> \{count} cost = \{((System.currentTimeMillis() - start) / 1000 / 60)}");
                     return count;
                 });
     }
+
+    @Deprecated // 没上面快
+    public Mono<Long> pixiv_init_parallel() {
+        long start = System.currentTimeMillis();
+        Path root = Path.of(r.fileBaseDir);
+        return r2dbcEntityTemplate.getDatabaseClient()
+                .sql("select count(1) as count from T_BASE_FILE where 1=1")
+                .fetch()
+                .first()
+                .flatMap(map -> {
+                    Long count = (Long) map.get("count");
+                    System.err.println(STR."当前存在文件 \{count} 个");
+                    return count == 0 ? Mono.just(count) : Mono.empty();
+                })
+                .flatMapMany(_ -> Flux.create((sink) -> {
+                            try (Stream<Path> files = Files.walk(root)) {
+                                files.forEach(e -> sink.next(e));
+                                sink.complete();
+                            } catch (Exception exception) {
+                                exception.printStackTrace();
+                                sink.error(exception);
+                            }
+                        })
+                )
+                .parallel(16)
+                .runOn(Schedulers.boundedElastic())
+                .filter(item -> {
+                    Path path = (Path) item;
+                    File realFile = path.toFile();
+                    return realFile.isFile() && !realFile.isDirectory();
+                })
+                .flatMap(item -> {
+                    try {
+                        Path path = (Path) item;
+                        String fileName = path.getFileName().toString();
+                        BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
+                        //System.err.println(STR."\{Thread.currentThread()} -> \{file.getAbsolutePath()}");
+                        return r2dbcEntityTemplate.insert(file).map(_ -> 1L).onErrorReturn(0L);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        return Mono.empty();
+                    }
+                })
+                .reduce((a, b) -> a + b)
+                .map(count -> {
+                    System.err.println(STR."pixiv_init_v2 -> \{count} cost = \{((System.currentTimeMillis() - start) / 1000 / 60)}");
+                    return count;
+                });
+    }
+
 
 
     public BaseFile file(String fileName, @NotNull String absolutePath, String code, byte[] bytes, boolean needCreateFile) {
@@ -150,12 +204,19 @@ public class UpdateService {
                 }
             }
             realFile = new File(absolutePath);
-            BufferedImage image = ImageIO.read(realFile);
-            if (baseFile.getType().contains("image") && r.isImage(realFile) && Objects.nonNull(image)) {
-                int width = image.getWidth();
-                int height = image.getHeight();
-                baseFile.setWidth(width);
-                baseFile.setHeight(height);
+
+            if (baseFile.getType().contains("image")) {
+                try {
+                    BufferedImage image = ImageIO.read(realFile);
+                    int width = image.getWidth();
+                    int height = image.getHeight();
+                    baseFile.setWidth(width);
+                    baseFile.setHeight(height);
+                } catch (Exception e) {
+                    System.err.println(STR."图片读取异常 ->  \{baseFile.getAbsolutePath()}");
+                    e.printStackTrace();
+                    throw e;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

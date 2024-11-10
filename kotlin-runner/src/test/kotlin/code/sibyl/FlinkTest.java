@@ -1,5 +1,6 @@
 package code.sibyl;
 
+import code.sibyl.common.r;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
@@ -8,11 +9,71 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.context.Context;
 
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class FlinkTest {
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) {
+        System.err.println(STR."cpu core -> \{Runtime.getRuntime().availableProcessors()}");
+        long start = System.currentTimeMillis();
+        Flux.range(1, 10)
+//                .publishOn(Schedulers.parallel())
+//                .subscribeOn(Schedulers.boundedElastic())
+                .parallel(8)
+                .runOn(Schedulers.parallel())
+                .map(e -> {
+                    System.err.println(STR."\{Thread.currentThread()} -> \{e}");
+                    r.sleep(1000);
+                    return 1;
+                })
+                .reduce((a, b) -> a + b)
+                .map(count -> {
+                    System.err.println(STR."end, count = \{count}  cost = \{(System.currentTimeMillis() - start)}");
+                    return count;
+                })
+//                .doFinally(_ -> System.err.println(STR."end, cost -> \{(System.currentTimeMillis() - start)}"))
+//                .doOnComplete(() -> System.err.println(STR."end, cost -> \{(System.currentTimeMillis() - start)}"))
+                //.subscribeOn(Schedulers.boundedElastic())
+//                .log()
+//                .contextWrite(context -> Context.of("total", 1))
+                .subscribe();
+
+
+//        Flux.range(1, 10)
+//                //.repeat()
+//                .parallel(8) //parallelism
+//                .runOn(Schedulers.parallel())
+//                .doOnNext(d -> System.out.println(STR."I'm on thread \{Thread.currentThread()} -> " + d))
+//                .doOnComplete()
+//                .subscribe();
+
+        r.sleep(10000);
+    }
+
+
+    public static ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(32);
+        executor.setMaxPoolSize(64);
+        executor.setQueueCapacity(32);
+        //executor.setKeepAliveSeconds(1*60*60);
+        executor.setThreadNamePrefix("kotlin-runner-taskExecutor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+
+    public static void main2(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(new Configuration().set(RestOptions.PORT, 9090));
         env.setParallelism(1);
@@ -41,24 +102,13 @@ public class FlinkTest {
         dbProps.put("sslMode", "DISABLED");
         dbProps.put("enabledTLSProtocols", "TLSv1.2");
         //通过FlinkCDC构建SourceFunction
-        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                .hostname("127.0.0.1")
-                .port(3306)
-                .username("root")
-                .password("test")
-                .databaseList("db1")    //监控的数据库
-                .tableList("db1.t_test")	//监控的数据库下的表
+        MySqlSource<String> mySqlSource = MySqlSource.<String>builder().hostname("127.0.0.1").port(3306).username("root").password("test").databaseList("db1")    //监控的数据库
+                .tableList("db1.t_test")    //监控的数据库下的表
                 .deserializer(new JsonDebeziumDeserializationSchema())//反序列化
-                .debeziumProperties(dbProps)
-                .startupOptions(StartupOptions.initial()) //
-                .jdbcProperties(dbProps)
-                .build();
+                .debeziumProperties(dbProps).startupOptions(StartupOptions.initial()) //
+                .jdbcProperties(dbProps).build();
 
-        env
-                .fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "eos-test")
-                .setParallelism(4)
-                .print()
-                .setParallelism(1);
+        env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "eos-test").setParallelism(4).print().setParallelism(1);
 
         env.execute();
     }

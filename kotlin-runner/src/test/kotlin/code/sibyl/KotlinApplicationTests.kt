@@ -18,6 +18,7 @@ import java.security.NoSuchAlgorithmException
 @SpringBootTest
 class KotlinApplicationTests {
 
+
     @Test
     open fun contextLoads() {
         println("test")

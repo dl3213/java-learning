@@ -29,8 +29,8 @@ import java.util.function.Function
 object r {
 
     open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
-    const val systemName: String = "未命名 " //常用时间格式
-    const val fileBaseDir: String = "E:/4me/pixiv/" //常用时间格式
+    const val systemName: String = "未命名"
+    const val fileBaseDir: String = "E:/4me/pixiv/pixez/"
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
@@ -98,6 +98,7 @@ object r {
         }
     }
 
+    @Deprecated(message = "")
     @JvmStatic
     fun isImage(file: File): Boolean {
         if (file == null || !file.exists()) return false
@@ -350,6 +351,11 @@ object r {
     @JvmStatic
     fun <T> getBean(clazz: Class<T>?): T {
         return SpringUtil.getBean(clazz)
+    }
+
+    @JvmStatic
+    fun <T> getBean(clazz: Class<T>?, name:String?): T {
+        return SpringUtil.getBean(name, clazz)
     }
 
     /**
