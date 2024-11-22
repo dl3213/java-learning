@@ -100,7 +100,7 @@ public class SystemService implements Bean {
                     baseFile.setFileName(fileName);
 
                     baseFile.setType(tika.detect(realFile));
-                    baseFile.setSha256(r.computeFileSHA256(realFile));
+                    //baseFile.setSha256(r.computeFileSHA256(realFile));
 
                     baseFile.setAbsolutePath(absolutePath);
                     baseFile.setRelativePath(absolutePath.replace(r.fileBaseDir, ""));
@@ -116,11 +116,11 @@ public class SystemService implements Bean {
                     try {
                         if (baseFile.getType().contains("image")) {
                             try {
-                                BufferedImage image = ImageIO.read(realFile);
-                                int width = image.getWidth();
-                                int height = image.getHeight();
-                                baseFile.setWidth(width);
-                                baseFile.setHeight(height);
+//                                BufferedImage image = ImageIO.read(realFile);
+//                                int width = image.getWidth();
+//                                int height = image.getHeight();
+//                                baseFile.setWidth(width);
+//                                baseFile.setHeight(height);
                             } catch (Exception e) {
                                 System.err.println(STR."图片读取异常 ->  \{baseFile.getAbsolutePath()}");
                                 e.printStackTrace();
@@ -171,7 +171,7 @@ public class SystemService implements Bean {
                     baseFile.setFileName(fileName);
 
                     baseFile.setType(tika.detect(realFile));
-                    baseFile.setSha256(r.computeFileSHA256(realFile));
+//                    baseFile.setSha256(r.computeFileSHA256(realFile));
 
                     //System.err.println(absolutePath);
                     baseFile.setAbsolutePath(absolutePath);
@@ -189,11 +189,11 @@ public class SystemService implements Bean {
                     try {
                         if (baseFile.getType().contains("image")) {
                             try {
-                                BufferedImage image = ImageIO.read(realFile);
-                                int width = image.getWidth();
-                                int height = image.getHeight();
-                                baseFile.setWidth(width);
-                                baseFile.setHeight(height);
+//                                BufferedImage image = ImageIO.read(realFile);
+//                                int width = image.getWidth();
+//                                int height = image.getHeight();
+//                                baseFile.setWidth(width);
+//                                baseFile.setHeight(height);
                             } catch (Exception e) {
                                 System.err.println(STR."图片读取异常 ->  \{baseFile.getAbsolutePath()}");
                                 e.printStackTrace();
@@ -204,7 +204,7 @@ public class SystemService implements Bean {
                         e.printStackTrace();
                     }
                     baseFile.setSize(realFile.length());
-                    System.err.println(STR."\{Thread.currentThread()} -> \{baseFile}");
+                    System.err.println(STR."\{Thread.currentThread()} -> \{baseFile.getAbsolutePath()}");
 
                     return SqlTemplate
                             .forUpdate(Repository.getInstance().getJdbcPool(), """
@@ -232,7 +232,7 @@ public class SystemService implements Bean {
                 })
                 .sequential()
                 .count()
-                .doOnSuccess(count -> System.err.println(STR."end -> \{Thread.currentThread()} -> \{count} , cost = \{(System.currentTimeMillis() - start) / 1000 / 60}"))
+                .doOnSuccess(count -> System.err.println(STR."doOnSuccess end -> \{Thread.currentThread()} -> \{count} , cost = \{(System.currentTimeMillis() - start) / 1000 / 60}"))
                 .subscribe()
         ;
     }

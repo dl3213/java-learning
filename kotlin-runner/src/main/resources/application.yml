@@ -18,9 +18,11 @@ spring:
   profiles:
     active: dev
     include: db, quartz
-#  threads:
-#    virtual:
-#      enabled: true
+  main:
+    keep-alive: true
+  threads:
+    virtual:
+      enabled: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -38,7 +40,13 @@ spring:
       exclude: logs/**
       enabled: false
   r2dbc:
+#    url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;TRACE_LEVEL_FILE=3;TRACE_LEVEL_SYSTEM_OUT=3;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023 #这里因为是内部module就多加一层文件夹
     url: r2dbc:h2:file:///./${spring.application.name}/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023 #这里因为是内部module就多加一层文件夹
+    pool:
+      enabled: true
+      max-size: 1024
+      min-idle: 64
+      initial-size: 64
   h2:
     console:
       enable: true

@@ -85,10 +85,10 @@ public class PhotoController {
                         select * from T_BASE_FILE 
                         where IS_DELETED = '0' 
                         and type like 'image%' 
-                        and SHA256 like '%' || :keyword || '%'
+                        -- and SHA256 like '%' || :keyword || '%'
                         order by FILE_NAME asc
                         """)
-                .bind("keyword", keyword)
+                //.bind("keyword", keyword)
                 .mapProperties(BaseFile.class)
                 .all()
                 .skip((pageNumber - 1) * pageSize)

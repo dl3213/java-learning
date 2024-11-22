@@ -1256,7 +1256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 5.0.14 - 2019-08-19
 
 ### Added
-- Added an API to reload the autocompleter menu with additional fetch metadata #MENTIONS-17
+- Added an API to reload the autocompleter menu with additional fetch h2Metadata #MENTIONS-17
 
 ### Fixed
 - Fixed missing toolbar button border styling options. #TINY-3965

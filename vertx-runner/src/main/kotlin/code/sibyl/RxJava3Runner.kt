@@ -25,6 +25,7 @@ class RxJava3Runner : AbstractVerticle() {
         println("RxJava3Runner listen in 9000...")
         //println(BeanService.getMap())
         r.sleep(5000)
+//        SystemService.getInstance().pixiv_init(vertx)
         SystemService.getInstance().pixiv_init_parallel(vertx)
     }
 

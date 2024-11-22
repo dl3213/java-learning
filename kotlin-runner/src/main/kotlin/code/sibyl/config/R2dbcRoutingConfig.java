@@ -31,6 +31,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.DATABASE;
 //@Component
 //@DependsOn("initializer")//先运行一遍创建表
 @Slf4j
+@Deprecated
 public class R2dbcRoutingConfig extends AbstractRoutingConnectionFactory {
 
     @Value("${spring.r2dbc.url}")

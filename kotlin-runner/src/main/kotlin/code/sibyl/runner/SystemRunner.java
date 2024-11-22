@@ -1,11 +1,13 @@
 package code.sibyl.runner;
 
 import code.sibyl.common.Response;
+import code.sibyl.common.r;
 import code.sibyl.event.SibylEvent;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
 import code.sibyl.service.UpdateService;
+import code.sibyl.service.backup.BackupService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +47,14 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-
-        UpdateService.getBean().pixiv_init().subscribe(); // pixiv_init_v1 -> 22554 cost = 43   pixiv_init_v2 -> 22551 cost = 55
+        BackupService.getBean()
+                .backup(r.getBean(R2dbcEntityTemplate.class))
+                .map(e -> {
+                    System.err.println(e);
+                    return e;
+                })
+                .subscribe();
+        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         UpdateService.getBean().file_clear().subscribe(); //
 
         //LocalCache.getBean().test();//测试oom
