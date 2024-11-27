@@ -10,7 +10,6 @@ import code.sibyl.service.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -88,7 +87,7 @@ public class DataBaseController {
         return Mono.create(monoSink -> monoSink.success("database/update-view"));
     }
 
-    @PreAuthorize("hasAnyAuthority('admin:api')")
+//    @PreAuthorize("hasAnyAuthority('admin:api')")
     @GetMapping("/connect-view")
     public Mono<String> connect_view(final Model model, String id) throws ExecutionException, InterruptedException {
 

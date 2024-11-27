@@ -18,16 +18,16 @@ class Task {
 
     private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
-    @Async
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Async
+//    @Scheduled(cron = "0 0/1 * * * ?")
     fun test1() {
         log.info("[test1 -- 2000] [{}] start", Thread.currentThread().name)
         sleep(2000)
         log.info("[test1 -- 2000] [{}] end", Thread.currentThread().name)
     }
 
-    @Async
-    @Scheduled(cron = "0 0/1 * * * ?")
+//    @Async
+//    @Scheduled(cron = "0 0/1 * * * ?")
     fun test2() {
         log.info("[test2 -- 5000] [{}] start", Thread.currentThread().name)
         sleep(5000)
@@ -35,7 +35,7 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0/2 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     fun 图片补充大小() {
         log.info(
             "{} - 图片补充大小 : {}",
@@ -46,7 +46,7 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0/2 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     fun 文件补充hash() {
         log.info(
             "{} - 文件补充hash : {}",

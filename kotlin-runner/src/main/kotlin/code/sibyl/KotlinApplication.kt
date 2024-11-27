@@ -16,6 +16,8 @@ private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 fun main(args: Array<String>) {
     runApplication<KotlinApplication>(*args)
     log.info("app running in port = " + r.getBean(Environment::class.java).getProperty("server.port"))
+    log.info("app running in env = " + System.getProperty("env"))
+    log.info("app running in path = " + r.absolutePath())
 //    System.getProperties().list(System.out)
 //    val runtime = Runtime.getRuntime()
 //    println()

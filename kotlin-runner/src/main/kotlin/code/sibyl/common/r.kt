@@ -3,6 +3,7 @@ package code.sibyl.common
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.springframework.boot.system.ApplicationHome
 import org.springframework.core.env.Environment
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
@@ -21,6 +22,8 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Function
+import java.util.stream.Collector
+import java.util.stream.Collectors
 
 
 /**
@@ -33,6 +36,7 @@ object r {
     const val fileBaseDir: String = "E:/4me/pixiv/"
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
+    const val yyyy_MM_dd_HH_mm_ss_with_link: String = "yyyy_MM_dd_HH_mm_ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
 
     const val yyyy_MM: String = "yyyy-MM" //常用时间格式
@@ -62,6 +66,11 @@ object r {
     @JvmStatic
     fun base64Decoder(): Base64.Decoder? {
         return base64Decoder;
+    }
+
+    @JvmStatic
+    fun absolutePath(): String {
+        return ApplicationHome().dir.absolutePath;
     }
 
     @JvmStatic
@@ -354,7 +363,7 @@ object r {
     }
 
     @JvmStatic
-    fun <T> getBean(clazz: Class<T>?, name:String?): T {
+    fun <T> getBean(clazz: Class<T>?, name: String?): T {
         return SpringUtil.getBean(name, clazz)
     }
 
@@ -467,6 +476,19 @@ object r {
     @JvmStatic
     fun defaultUserId(): Long {
         return 0L;
+    }
+
+    @JvmStatic
+    fun dataToInsertSql(tableName: String, data: MutableMap<String, Any>): String {
+        var sql: String = "INSERT INTO $tableName ("
+        sql += data.entries.stream().map { it.key }.collect(Collectors.joining(","))
+        sql += ")"
+        sql += "VALUES ("
+        sql += data.entries.stream()
+            .map { if (Objects.isNull(it.value)) "null" else "'" + it.value.toString() + "'" }
+            .collect(Collectors.joining(","))
+        sql += ");\n"
+        return sql;
     }
 
 }

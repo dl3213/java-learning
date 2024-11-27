@@ -30,7 +30,8 @@ class KotlinApplicationTests {
 
     @Test
     open fun backup() {
-        BackupService.getBean().backup(r.getBean(R2dbcEntityTemplate::class.java)).map { it -> println(it) }.block();
+        BackupService.getBean().backup("sibyl", r.getBean(R2dbcEntityTemplate::class.java)).map { it -> println(it) }
+            .block();
     }
 
     @Test

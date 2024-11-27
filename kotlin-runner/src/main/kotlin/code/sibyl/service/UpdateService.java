@@ -240,7 +240,7 @@ public class UpdateService {
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(5)
+                .take(50)
                 .flatMap(item -> {
                     String absolutePath = item.getAbsolutePath();
                     File realFile = new File(absolutePath);
@@ -274,7 +274,7 @@ public class UpdateService {
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(10)
+                .take(500)
                 .flatMap(item -> {
                     String absolutePath = item.getAbsolutePath();
                     File realFile = new File(absolutePath);

@@ -8,11 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,15 +28,19 @@ public class IndexController {
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     @RequestMapping({"/", "index", "main"})
-    public Mono<String> index(final Model model, @AuthenticationPrincipal UserDetails userDetails, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+    public Mono<String> index(final Model model
+//            ,
+//                              @AuthenticationPrincipal UserDetails userDetails,
+//                              @CurrentSecurityContext(expression = "authentication") Authentication authentication
+    ) {
         //System.err.println("首页");
-        List<String> authorities = userDetails.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.toList());
+//        List<String> authorities = userDetails.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.toList());
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
-        model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("userDetails", userDetails);
-        model.addAttribute("authentication", authentication);
-        model.addAttribute("authorities", authorities);
+//        model.addAttribute("username", userDetails.getUsername());
+//        model.addAttribute("userDetails", userDetails);
+//        model.addAttribute("authentication", authentication);
+//        model.addAttribute("authorities", authorities);
         List<MenuDTO> menuTree = menuTree();
         model.addAttribute("menuTree", menuTree);
         return Mono.create(monoSink -> monoSink.success("index"));

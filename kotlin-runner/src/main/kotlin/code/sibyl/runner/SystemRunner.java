@@ -48,7 +48,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
         BackupService.getBean()
-                .backup(r.getBean(R2dbcEntityTemplate.class))
+                .backup("sibyl", r.getBean(R2dbcEntityTemplate.class))
                 .map(e -> {
                     System.err.println(e);
                     return e;

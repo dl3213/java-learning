@@ -20,8 +20,6 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -140,7 +138,7 @@ public class PhotoController {
                             Mono.just(fileName),
                             Mono.just(bytes),
                             Mono.just(detect),
-                            ReactiveSecurityContextHolder.getContext(),
+                            Mono.just(new Object()) , //ReactiveSecurityContextHolder.getContext(),
                             QueryService.getBean().fileList(fileName, detect).collectList(),
                             QueryService.getBean().fileListByHash(hash).collectList()
                     );
@@ -152,7 +150,7 @@ public class PhotoController {
                     System.err.println(bytes.length);
                     String fileType = t.getT3();
                     System.err.println(fileType);
-                    User user = (User) t.getT4().getAuthentication().getPrincipal();
+                    Object user = (Object) t.getT4() ;//.getAuthentication().getPrincipal();
                     System.err.println(user);
                     List<BaseFile> baseFileList = t.getT5();
                     System.err.println(baseFileList);
