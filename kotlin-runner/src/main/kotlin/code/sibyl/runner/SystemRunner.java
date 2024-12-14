@@ -1,5 +1,6 @@
 package code.sibyl.runner;
 
+import code.sibyl.cache.LocalCache;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.event.SibylEvent;
@@ -47,17 +48,11 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-        BackupService.getBean()
-                .backup("sibyl", r.getBean(R2dbcEntityTemplate.class))
-                .map(e -> {
-                    System.err.println(e);
-                    return e;
-                })
-                .subscribe();
-        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
-        UpdateService.getBean().file_clear().subscribe(); //
 
-        //LocalCache.getBean().test();//测试oom
+//        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
+//        UpdateService.getBean().file_clear().subscribe(); //
+
+//        LocalCache.getBean().test();//测试oom
 
 //        r.getBean(LocalCacheUtil.class).init();
 

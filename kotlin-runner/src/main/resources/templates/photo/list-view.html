@@ -14,6 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Photogrid - Tabler - Premium and Open Source dashboard template with responsive and high quality UI.</title>
     <!-- CSS files -->
+    <link href="/dist/libs/dropzone/dist/dropzone.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler-flags.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
@@ -45,29 +46,58 @@
                         </h2>
                     </div>
                 </div>
-                <div class="col-xl-4">
-                    <div class="row">
-                        <div class="col-md-6 col-xl-12">
-                            <div class="mb-3">
-                                <div class="form-label">upload</div>
-                                <input id="upload" type="file" class="form-control">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">keyword</label>
-                                <input type="text" class="form-control" name="keyword" id="keyword"
-                                       placeholder="Input keyword">
-                                <div class="col-6 col-sm-4 col-md-2 col-xl py-3">
-                                    <a class="btn btn-primary w-100" id="search-btn">
-                                        search
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div hidden="hidden">
                     <input id="success-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-success">
                     <input id="danger-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-danger">
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="row row-cards">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">Basic Usage</h3>
+                                <form class="dropzone" id="dropzone-default" action="/file/upload" method="post"
+                                      autocomplete="off" novalidate>
+                                    <div class="fallback">
+                                        <input name="file" type="file"/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">Multiple File Upload</h3>
+                                <form class="dropzone" id="dropzone-multiple" action="/file/upload" autocomplete="off"
+                                      novalidate>
+                                    <div class="fallback">
+                                        <input name="file" type="file" multiple/>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">Custom Dropzone</h3>
+                                <form class="dropzone" id="dropzone-custom" action="/file/upload" autocomplete="off"
+                                      novalidate>
+                                    <div class="fallback">
+                                        <input name="file" type="file"/>
+                                    </div>
+                                    <div class="dz-message">
+                                        <h3 class="dropzone-msg-title">Your text here</h3>
+                                        <span class="dropzone-msg-desc">Your custom description here</span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -307,6 +337,7 @@
     </div>
 </div>
 <!-- Libs JS -->
+<script src="/dist/libs/dropzone/dist/dropzone-min.js?1692870487" defer></script>
 <script src="/dist/libs/fslightbox/index.js?1692870487" defer></script>
 <!-- Tabler Core -->
 <script src="/dist/js/tabler.min.js?1692870487" defer></script>
@@ -319,26 +350,14 @@
     document.addEventListener("DOMContentLoaded", function () {
         console.log("DOMContentLoaded...")
 
-        const upload = document.getElementById('upload');
-        upload.addEventListener('change', function () {
-            const file = this.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-            axios.post('/photo/pixiv/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-                .then(response => {
-                    console.log('File uploaded successfully');
-                    // 处理响应数据
-                    alert(response.data.msg)
-                })
-                .catch(error => {
-                    console.error('Error uploading file');
-                    // 处理错误情况
-                });
-        });
+        var config = {
+            maxFilesize: 102400
+        }
+
+        new Dropzone("#dropzone-default", config)
+        new Dropzone("#dropzone-multiple", config)
+        new Dropzone("#dropzone-custom", config)
+
 
         var elList = document.querySelectorAll('[data-fslightbox="gallery"]');
         console.log(elList)
@@ -349,13 +368,21 @@
             item.addEventListener('contextmenu', function (evt) {
                 photo_right_click(this, evt)
             })
+
+            // 为元素添加事件监听
+            item.addEventListener('dblclick', function(event) {
+                event.preventDefault();
+                alert("dblclick")
+            });
+
         })
+
+
 
         function photo_right_click(_this, evt) {
             // evt.stopPropagation();
             // evt.stopImmediatePropagation()
-            // evt.preventDefault()
-            evt.preventDefault();
+            evt.preventDefault()
             console.log(_this.getAttribute('href'))
             var menu = document.getElementById('custom-menu');
             console.log(`${document.documentElement.scrollTop + evt.clientY}px` + `${evt.clientX}px`)
@@ -368,6 +395,9 @@
 
         function photo_left_click(_this, evt) {
             console.log(_this.getAttribute('href'))
+            // evt.stopPropagation();
+            // evt.stopImmediatePropagation()
+            // evt.preventDefault()
         }
 
         document.addEventListener('click', function () {
@@ -426,7 +456,7 @@
         }
         load_photo(request)
 
-        document.getElementById('search-btn').addEventListener('click', function (event) {
+        document.getElementById('search-btn')?.addEventListener('click', function (event) {
             document.getElementById('photo_div').innerHTML = '';
             request = {
                 pageNumber: 1,
@@ -455,7 +485,7 @@
                         var a = document.createElement("a");
                         a.setAttribute("id", item.id)
                         a.setAttribute("data-fslightbox", "gallery")
-                        a.setAttribute("href", "/pixiv/" + item.relativePath)
+                        a.setAttribute("href", "/static-file/" + item.relativePath)
                         a.addEventListener('click', function (evt) {
                             photo_left_click(this, evt)
                         })
@@ -463,7 +493,7 @@
                             photo_right_click(this, evt)
                         })
                         var div_in_a = document.createElement("div");
-                        div_in_a.setAttribute("style", "background-image: url(/pixiv/" + item.relativePath + ")")
+                        div_in_a.setAttribute("style", "background-image: url(/static-file/" + item.relativePath + ")")
 
                         // 宽 < 高
                         if (scale < 0.4) {

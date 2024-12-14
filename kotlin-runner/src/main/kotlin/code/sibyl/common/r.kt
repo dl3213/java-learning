@@ -14,10 +14,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.BiPredicate
@@ -33,8 +35,10 @@ object r {
 
     open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名"
-    const val fileBaseDir: String = "E:/4me/pixiv/"
+    const val fileBaseDir: String = "E:/sibyl-system/file/"
+    const val staticFileBasePath: String = "/static-file/**"
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
+    const val HH_mm_ss: String = "HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_with_link: String = "yyyy_MM_dd_HH_mm_ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
@@ -274,15 +278,20 @@ object r {
     fun errorMono(msg: String): Mono<Response> {
         return Mono.just(Response.error(msg));
     }
-
+    @JvmStatic
     fun formatDate(date: Date?, formatter: String?): String {
         return DateFormatUtils.format(date, formatter)
     }
-
+    @JvmStatic
+    fun formatDate(date: LocalTime?, formatter: String?): String {
+        return DateTimeFormatter.ofPattern(formatter).format(date)
+    }
+    @JvmStatic
     fun formatDate(date: LocalDate?, formatter: String?): String {
         return DateTimeFormatter.ofPattern(formatter).format(date)
     }
 
+    @JvmStatic
     fun formatDate(date: LocalDateTime?, formatter: String?): String {
         return DateTimeFormatter.ofPattern(formatter).format(date)
     }
@@ -291,10 +300,11 @@ object r {
     /**
      * 字符串处理
      */
+    @JvmStatic
     fun string(obj: String?): String {
         return StringUtils.trim(obj)
     }
-
+    @JvmStatic
     fun eqZero(vararg value: BigDecimal): Boolean {
         return Arrays.stream(value).allMatch { e: BigDecimal -> e.compareTo(BigDecimal.ZERO) == 0 }
     }
@@ -302,18 +312,19 @@ object r {
     /**
      * bigDecimal 空处理
      */
+    @JvmStatic
     fun bigDecimal(obj: BigDecimal): BigDecimal {
         return if (Objects.nonNull(obj)) obj else BigDecimal.ZERO
     }
-
+    @JvmStatic
     fun bigDecimal(obj: Any): BigDecimal {
-        return if (Objects.nonNull(obj)) BigDecimal(if (StringUtils.isNumeric(obj.toString())) obj.toString() else "0") else BigDecimal.ZERO
+        return if (Objects.nonNull(obj)) BigDecimal(obj.toString()) else BigDecimal.ZERO
     }
-
+    @JvmStatic
     fun bigDecimal(obj: Int): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal.valueOf(obj.toLong()) else BigDecimal.ZERO
     }
-
+    @JvmStatic
     fun bigDecimal(obj: Long): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal.valueOf(obj) else BigDecimal.ZERO
     }
@@ -321,6 +332,7 @@ object r {
     /**
      * bigDecimal 空处理
      */
+    @JvmStatic
     fun bigDecimal(): BigDecimal {
         return BigDecimal.ZERO
     }
@@ -328,6 +340,7 @@ object r {
     /**
      * bigDecimal 除法处理
      */
+    @JvmStatic
     fun divide(a: BigDecimal, b: BigDecimal): BigDecimal {
         return if (Objects.isNull(b) || b.compareTo(BigDecimal.ZERO) == 0 || Objects.isNull(a) || a.compareTo(BigDecimal.ZERO) == 0) BigDecimal.ZERO else a.divide(
             b, 4, BigDecimal.ROUND_UP
@@ -337,6 +350,7 @@ object r {
     /**
      * integer 空处理
      */
+    @JvmStatic
     fun integer(obj: Int): Int {
         return if (Objects.nonNull(obj)) obj else 0
     }
@@ -483,12 +497,22 @@ object r {
         var sql: String = "INSERT INTO $tableName ("
         sql += data.entries.stream().map { it.key }.collect(Collectors.joining(","))
         sql += ")"
-        sql += "VALUES ("
+        sql += " VALUES ("
         sql += data.entries.stream()
-            .map { if (Objects.isNull(it.value)) "null" else "'" + it.value.toString() + "'" }
+            .map { if (Objects.isNull(it.value)) "null" else "'" + it.value.toString().replace("'", "") + "'" }
             .collect(Collectors.joining(","))
         sql += ");\n"
         return sql;
+    }
+
+    @JvmStatic
+    fun env(): Any? {
+        return System.getProperty("env") ?: "dev"
+    }
+
+    @JvmStatic
+    fun percent(num: Any): String {
+        return (r.bigDecimal(num).multiply(BigDecimal(100))).setScale(4, RoundingMode.UP).toString()+"%"
     }
 
 }

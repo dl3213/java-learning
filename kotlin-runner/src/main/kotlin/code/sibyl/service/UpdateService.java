@@ -1,35 +1,33 @@
 package code.sibyl.service;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+import org.bytedeco.opencv.global.opencv_core;
+import org.bytedeco.opencv.opencv_core.IplImage;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -136,11 +134,13 @@ public class UpdateService {
                 .sql("select count(1) as count from T_BASE_FILE where 1=1")
                 .fetch()
                 .first()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
                 .flatMap(map -> {
                     Long count = (Long) map.get("count");
                     System.err.println(STR."当前存在文件 \{count} 个");
                     return count == 0 ? Mono.just(count) : Mono.empty();
                 })
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
                 //.subscribeOn(scheduler)
                 .flatMapMany(_ -> Flux.create((sink) -> {
                             try (Stream<Path> files = Files.walk(root)) {
@@ -167,7 +167,7 @@ public class UpdateService {
                         String fileName = path.getFileName().toString();
                         BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
                         //System.err.println(STR."PoolSize=\{scheduler.getPoolSize()}, activeCount=\{executor.getActiveCount()}, queueSize=\{executor.getQueueSize()}, thread=\{Thread.currentThread()}, file=\{file.getAbsolutePath()}");
-                        System.err.println(STR."thread=\{Thread.currentThread()}, file=\{file.getAbsolutePath()}");
+                        //System.err.println(STR."thread=\{Thread.currentThread()}, file=\{file.getAbsolutePath()}");
                         return r2dbcEntityTemplate.insert(file).map(_ -> 1L).onErrorReturn(0L);
                     } catch (Exception exception) {
                         exception.printStackTrace();
@@ -183,10 +183,10 @@ public class UpdateService {
 
     public BaseFile file(String fileName, @NotNull String absolutePath, String code, byte[] bytes, boolean needCreateFile) {
         absolutePath = absolutePath.replace("\\", "/");
-        BaseFile baseFile = new BaseFile();
-        baseFile.setFileName(fileName);
-
         File realFile = new File(absolutePath);
+        BaseFile baseFile = new BaseFile();
+        baseFile.setFileName(realFile.getName());
+        baseFile.setRealName(fileName);
         if (Objects.nonNull(bytes) && needCreateFile) {
             //String hash = r.hashBytes(bytes); // 导致线程越来越慢
             baseFile.setType(r.getBean(Tika.class).detect(bytes));
@@ -240,7 +240,7 @@ public class UpdateService {
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(50)
+                .take(100)
                 .flatMap(item -> {
                     String absolutePath = item.getAbsolutePath();
                     File realFile = new File(absolutePath);
@@ -292,7 +292,7 @@ public class UpdateService {
                     }
                     int width = image.getWidth();
                     int height = image.getHeight();
-                    log.info("[图片补充大小] [{}] {} --> width = {}, height = {}" , Thread.currentThread().getName(), absolutePath , width, height);
+                    log.info("[图片补充大小] [{}] {} --> width = {}, height = {}", Thread.currentThread().getName(), absolutePath, width, height);
                     return client.sql("update T_BASE_FILE set height=:height, width=:width where id=:id")
                             .bind("id", item.getId())
                             .bind("height", height)
@@ -306,5 +306,89 @@ public class UpdateService {
                     return count;
                 })
                 ;
+    }
+
+    @NotNull
+    public Mono<Long> 视频文件补充thumbnail() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where type like 'video%' and (thumbnail is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+//                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .take(500)
+                .flatMap(item -> {
+                    String absolutePath = item.getAbsolutePath();
+                    System.err.println(absolutePath);
+                    File targetVideo = new File(absolutePath);
+                    String thumbnailPath = null;
+                    try {
+                        FFmpegFrameGrabber ff = FFmpegFrameGrabber.createDefault(absolutePath);
+                        ff.start();
+                        String rotate = ff.getVideoMetadata("rotate");
+                        Frame f;
+                        int i = 0;
+                        while (i < 1) {
+                            f = ff.grabImage();
+                            IplImage src;
+                            if (null != rotate && rotate.length() > 1) {
+                                OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
+                                src = converter.convert(f);
+                                f = converter.convert(rotate(src, Integer.parseInt(rotate)));
+                            }
+                            thumbnailPath = doExecuteFrame(f, targetVideo.getParentFile().getAbsolutePath(), item.getFileName());
+                            System.err.println(thumbnailPath);
+                            i++;
+                        }
+                        ff.stop();
+
+                    } catch (FFmpegFrameGrabber.Exception e) {
+                        return Flux.error(new RuntimeException(e));
+                    }
+                    System.err.println();
+
+                    log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} " , Thread.currentThread().getName(), absolutePath , thumbnailPath );
+                    return client.sql("update T_BASE_FILE set thumbnail=:thumbnailPath where id=:id")
+                            .bind("id", item.getId())
+                            .bind("thumbnailPath", thumbnailPath)
+                            .fetch()
+                            .rowsUpdated();
+//                    return Mono.just(1);
+                })
+                .count()
+                .map(count -> {
+                    log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    return count;
+                })
+                ;
+    }
+
+    /**
+     * 进行旋转角度操作（为了保证截取到的第一帧图片与视频中的角度方向保持一致）
+     */
+    public IplImage rotate(IplImage src, int angle) {
+        IplImage img = IplImage.create(src.height(), src.width(), src.depth(), src.nChannels());
+        opencv_core opencv_core = new opencv_core();
+        opencv_core.cvTranspose(src, img);
+        opencv_core.cvFlip(img, img, angle);
+        return img;
+    }
+
+    public static String doExecuteFrame(Frame f, String targetFilePath, String targetFileName) {
+        if (null == f || null == f.image) {
+            return null;
+        }
+        Java2DFrameConverter converter = new Java2DFrameConverter();
+        String imageMat = "jpg";
+        String fileName = targetFilePath + File.separator + targetFileName + "." + imageMat;
+        BufferedImage bi = converter.getBufferedImage(f);
+        File output = new File(fileName);
+        try {
+            ImageIO.write(bi, imageMat, output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fileName;
     }
 }

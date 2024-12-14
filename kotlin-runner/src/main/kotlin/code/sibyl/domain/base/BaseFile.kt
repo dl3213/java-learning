@@ -1,6 +1,9 @@
 package code.sibyl.domain.base
 
+import code.sibyl.common.r
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
+import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 
 @Entity
@@ -15,6 +18,7 @@ open class BaseFile {
 
     @Column(name = "FILE_NAME")
     open var fileName: String? = null
+    open var realName: String? = null
 
     @Column(name = "TYPE", length = 64)
     open var type: String? = null
@@ -39,16 +43,21 @@ open class BaseFile {
     open var code: String? = null
     open var width: Int? = null
     open var height: Int? = null
+    open var thumbnail: String? = null
 
     @Column(name = "IS_DELETED", nullable = false, length = 2)
     open var isDeleted: String? = null
 
+    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
+    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
     @Column(name = "CREATE_TIME")
     open var createTime: LocalDateTime? = null
 
     @Column(name = "CREATE_ID")
     open var createId: Long? = null
 
+    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
+    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
     @Column(name = "UPDATE_TIME")
     open var updateTime: LocalDateTime? = null
 

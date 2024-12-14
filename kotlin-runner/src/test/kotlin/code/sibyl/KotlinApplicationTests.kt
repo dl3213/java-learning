@@ -23,9 +23,7 @@ class KotlinApplicationTests {
 
     @Test
     open fun contextLoads() {
-        println("test")
-        var bean = r.getBean(DataBaseService::class.java)
-        var list = bean.list()
+        UpdateService.getBean().视频文件补充thumbnail().block();
     }
 
     @Test

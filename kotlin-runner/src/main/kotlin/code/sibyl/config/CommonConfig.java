@@ -1,6 +1,12 @@
 package code.sibyl.config;
 
+import cn.hutool.core.lang.Snowflake;
+import cn.hutool.core.util.IdUtil;
 import code.sibyl.common.r;
+import code.sibyl.config.adapter.LocalDateTimeTypeAdapter;
+import code.sibyl.config.adapter.LocalDateTypeAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.tika.Tika;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,15 +15,27 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.resource.PathResourceResolver;
+import org.springframework.web.reactive.resource.ResourceWebHandler;
 
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -26,7 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableScheduling
 public class CommonConfig {
 
-//    @Primary
+    //    @Primary
     @Bean("virtualExecutor")
     public AsyncTaskExecutor virtualExecutor() {
         TaskExecutorAdapter adapter = new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("sibyl-virtual-taskExecutor-").factory()));
@@ -34,7 +52,7 @@ public class CommonConfig {
     }
 
 
-//    @Primary
+    //    @Primary
     @Bean("taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() { // 作用于@Async + @Scheduled
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -63,14 +81,35 @@ public class CommonConfig {
 
     @Bean
     public RouterFunction<ServerResponse> staticResources() throws MalformedURLException {
-        return RouterFunctions.resources("/pixiv/**", new FileSystemResource(r.fileBaseDir))
+        return RouterFunctions.resources(r.staticFileBasePath, new FileSystemResource(r.fileBaseDir), ((resource, httpHeaders) -> {
+            httpHeaders.set("sibyl", "test");
+            httpHeaders.setAcceptCharset(Arrays.asList(
+                    Charset.forName("UTF-8"),
+                    Charset.forName("GBK"),
+                    Charset.forName("ISO-8859-1")
+            ));
+        }))
 //                .and(RouterFunctions.resources("/images/**", new FileSystemResource("file:/path/to/images/")))
 //                .and(RouterFunctions.resources("/other/**", new FileSystemResource("file:/another/path/to/resources/")))
                 ;
     }
 
+
+    @Bean
+    public Snowflake snowflake() {
+        return IdUtil.createSnowflake(1, 1);
+    }
+
     @Bean
     public Tika tika() {
         return new Tika();
+    }
+
+    @Bean
+    public Gson gson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
+        gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter());
+        return gsonBuilder.setPrettyPrinting().create();
     }
 }

@@ -44,6 +44,7 @@ public class PhotoController {
         String s = "/photo/list-view";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
+        model.addAttribute("staticFileBasePath", r.staticFileBasePath);
         return Mono.create(monoSink -> monoSink.success(s));
     }
 

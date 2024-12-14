@@ -16,10 +16,6 @@ import java.util.Map;
 @Component
 public class LocalCache {
 
-    private LocalCache() {
-        this.cacheMap = new HashMap<>();
-    }
-
     private static LocalCache instance = new LocalCache();
 
     public static LocalCache getInstance() {
@@ -40,6 +36,7 @@ public class LocalCache {
      *      2)或者jmap -heap [pid]  or jmap.exe -dump:live,file=./ [pid]
      * 2.启动 visualvm，拖进./hprof文件
      */
+    @Async
     public void test() {
         // 创建一个列表来存储对象引用
         List<LargeObject> objects = new ArrayList<>();
@@ -49,9 +46,9 @@ public class LocalCache {
                 // 创建新的 LargeObject 实例并添加到列表中
                 objects.add(new LargeObject());
                 // 打印当前对象数量
-                System.out.println("Number of objects: " + objects.size());
+                //System.out.println("Number of objects: " + objects.size());
                 // 可以添加一些延迟来控制内存消耗速度
-                 r.sleep(100); // 注释掉，或根据需要调整
+                 r.sleep(300); // 注释掉，或根据需要调整
             }
         } catch (OutOfMemoryError e) {
             System.err.println("OutOfMemoryError caught: " + e.getMessage());
@@ -60,7 +57,7 @@ public class LocalCache {
     }
 
     @Getter
-    private Map<String, Object> cacheMap;
+    private Map<String, Object> cacheMap = new HashMap<>();
 
     public Object get(String key) {
         return cacheMap.get(key);

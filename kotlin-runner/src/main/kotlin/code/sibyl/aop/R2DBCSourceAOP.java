@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 @Component
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@Deprecated
 public class R2DBCSourceAOP {
 
     @Pointcut(value = "(@annotation(code.sibyl.aop.DS) || @within(code.sibyl.aop.DS))")

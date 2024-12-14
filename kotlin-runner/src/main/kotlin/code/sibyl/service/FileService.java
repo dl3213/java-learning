@@ -1,18 +1,23 @@
 package code.sibyl.service;
 
+import cn.hutool.core.lang.Snowflake;
 import code.sibyl.common.r;
+import code.sibyl.domain.base.BaseFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -26,7 +31,9 @@ import java.util.stream.Stream;
 @Deprecated
 public class FileService {
 
-    private final Path root = Paths.get(r.INSTANCE.getBaseDir());
+    private final Path root = Paths.get(r.fileBaseDir);
+
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     public void init() {
 //        try {
@@ -37,12 +44,31 @@ public class FileService {
 //        }
     }
 
-    public Mono<String> save(Mono<FilePart> filePartMono) {
+    public Mono<BaseFile> save(Mono<FilePart> filePartMono) {
 
-        return filePartMono.doOnNext(fp -> System.out.println("Receiving File:" + fp.filename())).flatMap(filePart -> {
-            String filename = filePart.filename();
-            return filePart.transferTo(root.resolve(filename)).then(Mono.just(filename));
-        });
+        return filePartMono
+                .flatMap(filePart -> {
+                    log.info("[fileUpload] {} ", STR."Receiving File:\{filePart.filename()}");
+                    String filename = filePart.filename();
+                    String[] split = filename.split("\\.");
+                    String fileUniqueId = String.valueOf(r.getBean(Snowflake.class).nextId());
+                    String tempFileName = fileUniqueId + (split != null && split.length > 0 ? "." + split[split.length - 1] : "");
+                    log.info("[fileUpload] tempFileName = {}", tempFileName);
+                    String absoluteDir = r.fileBaseDir + r.yyyy_MM_dd() + File.separator;
+                    log.info("[fileUpload] absoluteDir = {}", absoluteDir);
+                    String absolutePath = absoluteDir + tempFileName;
+                    log.info("[fileUpload] absolutePath = {}", absolutePath);
+                    try {
+                        FileUtils.createParentDirectories(new File(absolutePath));
+                    } catch (IOException e) {
+                        return Mono.error(new RuntimeException(e));
+                    }
+                    return filePart.transferTo(root.resolve(absolutePath)).then(Mono.zip(Mono.just(filename), Mono.just(absolutePath)));
+                })
+                .flatMap(item -> {
+                    BaseFile file = UpdateService.getBean().file(item.getT1(), item.getT2(), null, null, false);
+                    return r2dbcEntityTemplate.insert(file);
+                });
     }
 
     public Flux<DataBuffer> load(String filename) {

@@ -61,7 +61,7 @@ public class BackupService {
                 .flatMapMany(item -> item.tableNameList().flatMap(tableName -> Mono.zip(Mono.just(item), Mono.just(tableName))))
                 .flatMap(tuple2 -> {
                     String tableName = tuple2.getT2();
-                    System.err.println(tableName);
+//                    System.err.println(tableName);
                     final String backupTableFile = STR."\{backupPath}\{tableName}-\{formatted}.sql";
                     File tableSqlFile = new File(backupTableFile);
 
@@ -84,7 +84,7 @@ public class BackupService {
                     String tableName = item.getT1();
                     File tabelSqlFile = item.getT2();
                     Map<String, Object> data = item.getT3();
-                    System.err.println(STR."\{tableName} -> \{tabelSqlFile.getAbsolutePath()} -> \{data}");
+//                    System.err.println(STR."\{tableName} -> \{tabelSqlFile.getAbsolutePath()} -> \{data}");
 
                     try {
                         try (FileWriter writer = new FileWriter(tabelSqlFile, true)) {
@@ -94,6 +94,11 @@ public class BackupService {
                         throw new RuntimeException(e);
                     }
                     return item;
+                })
+                .count()
+                .map(count ->{
+                    System.err.println(STR."backup end: count -> \{count}");
+                    return count;
                 })
                 .then()
                 .thenReturn(1L);
