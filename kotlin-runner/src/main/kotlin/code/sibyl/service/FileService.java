@@ -13,9 +13,11 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class FileService {
     public Mono<BaseFile> save(Mono<FilePart> filePartMono) {
 
         return filePartMono
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
                 .flatMap(filePart -> {
                     log.info("[fileUpload] {} ", STR."Receiving File:\{filePart.filename()}");
                     String filename = filePart.filename();

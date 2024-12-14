@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -34,18 +32,21 @@ public class IndexController {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
+    private Map<String, String> indexCache = new HashMap<>();
+
     @RequestMapping({"/", "index", "main"})
     public Mono<String> index(final Model model, ServerWebExchange exchange, @RequestParam(defaultValue = "index") String index
 //            ,
 //                              @AuthenticationPrincipal UserDetails userDetails,
 //                              @CurrentSecurityContext(expression = "authentication") Authentication authentication
     ) {
-        index = StringUtils.isBlank(index) ? "index" : index;
+
         System.err.println("首页访问 --->" + index);
         System.err.println(exchange.getRequest().getURI().toString());
         System.err.println("client from = " + exchange.getRequest().getRemoteAddress());
         System.err.println("to server = " + exchange.getRequest().getLocalAddress());
         System.err.println(exchange.getRequest().getSslInfo());
+        System.err.println(Thread.currentThread().getName());
         exchange.getRequest().getHeaders().entrySet().forEach(System.err::println);
 
 //        List<MenuDTO> menuTree = menuTree();
