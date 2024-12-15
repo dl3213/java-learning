@@ -195,6 +195,7 @@ public class FileController {
     public Mono<Response> delete(@PathVariable String id) {
         return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
+                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("1");
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
