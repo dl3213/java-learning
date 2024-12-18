@@ -406,7 +406,7 @@
                            <div class="col-xs-2 col-md-2 col-lg-2"><span class="avatar me-3 rounded" style="background-image: url(/static/avatars/000m.jpg)"></span></div>
                             <div class="col-xs-12 col-md-6 col-lg-6"> <div>` + (item.realName.length > 12 ? item.realName.substring(0, 12) + "..." : item.realName) + `</div>
                                         <div class="text-secondary">` + item.createTime + `</div></div>
-                            <div class="col-xs-4 col-md-2 col-lg-2">`+(item.size / 1024.0 / 1024.0).toFixed(1)+`MB</div>
+                            <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary  ms-auto">Go Detail</a></div>
                             <div class="col-xs-4 col-md-2 col-lg-2"><a target-id="` + item.id + `" class="btn btn-link delete-btn">delete</a>
                            </div>
                         </div>

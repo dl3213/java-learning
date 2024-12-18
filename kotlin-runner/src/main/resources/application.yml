@@ -52,6 +52,13 @@ spring:
       path: /h2-console
       settings:
         web-allow-others: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      repositories:
+        enabled: false
   info:
     env:
       enabled: true

@@ -8,7 +8,6 @@ import org.springframework.boot.runApplication
 import org.springframework.core.env.Environment
 
 @SpringBootApplication
-@Slf4j
 class KotlinApplication
 
 private val log = LoggerFactory.getLogger(KotlinApplication::class.java)

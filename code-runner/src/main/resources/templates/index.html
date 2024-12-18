@@ -199,7 +199,7 @@
                         <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">New...</a></li>
                         <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Profile</a></li>
                         <li><a href="#" class="link-dark d-inline-flex text-decoration-none rounded">Settings</a></li>
-                        <form id="_form" method="post" th:action="@{/logout}">
+                        <form id="_form" method="post" th:action="@{/auth/logout}">
                             <input type="hidden" name="name" value="value" />
                             <li><a onclick="document.getElementById('_form').submit();" class="link-dark d-inline-flex text-decoration-none rounded">注销</a></li>
                         </form>

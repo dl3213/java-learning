@@ -4,11 +4,9 @@ enum class ActionType {
 
     INSERT,
     UPDATE,
+    DELETE,
+    TEST,
     OTHER,
     ;
 
-}
-
-fun main(){
-    println(ActionType.UPDATE)
 }

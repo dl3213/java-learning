@@ -45,7 +45,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-6">
-                <a href=".">
+                <a href="/">
                     <img th:src="${sys_icon}" width="110" height="32" th:alt="${alt}" class="navbar-brand-image">
                 </a>
             </h1>
@@ -53,7 +53,7 @@
                 <div class="nav-item d-none d-md-flex me-3">
                     <div class="btn-list">
                         <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
-                            <form action="./" method="get" autocomplete="off" novalidate>
+                            <form action="/" method="get" autocomplete="off" novalidate>
                                 <div class="input-icon">
                     <span class="input-icon-addon">
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
@@ -217,8 +217,8 @@
                         <span class="avatar avatar-sm"
                               th:style="'background-image: url(/static/avatars/000m.jpg)'"></span>
                         <div class="d-none d-xl-block ps-2">
-                            <div th:text="${user.nickname}">Paweł Kuna</div>
-                            <div th:text="${user.username}" class="mt-1 small text-secondary">UI Designer</div>
+                            <div th:text="${user?.nickname}">Paweł Kuna</div>
+                            <div th:text="${user?.username}" class="mt-1 small text-secondary">UI Designer</div>
                         </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" id="user-profile-picture">
@@ -253,7 +253,7 @@
                         </a>
                         <div class="dropdown-divider"></div>
                         <a target-link="settings.html" class="dropdown-item">Settings</a>
-                        <form id="_form" method="post" th:action="@{/logout}">
+                        <form id="_form" method="post" th:action="@{/auth/logout}">
                             <a onclick="console.log('logout click');document.getElementById('_form').submit();"
                                class="dropdown-item" id="logoutBtn">Logout</a>
                         </form>

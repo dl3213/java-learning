@@ -940,14 +940,6 @@ public class IndexController {
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
-    @GetMapping({"/login-view"})
-    public Mono<String> login_view(final Model model) {
-        String s = "login-view";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
     @GetMapping("welcome")
     public Mono<String> toWelcome() {
         String welcome = "default/welcome";
@@ -956,17 +948,7 @@ public class IndexController {
 
     @GetMapping({"sign-in.html"})
     public Mono<String> sign_in(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-//        System.err.println("sign-in");
-//        System.err.println(exchange);
-//        System.err.println(exchange.getRequest().getPath());
-//        System.err.println(exchange.getRequest().getQueryParams());
-//        System.err.println(exchange.getFormData());
-//        System.err.println(exchange.getMultipartData());
-//        System.err.println(request);
-//        String s = "sign-in";
-//        model.addAttribute("systemName", r.systemName());
-//        model.addAttribute("title", r.systemName());
-//        return Mono.create(monoSink -> monoSink.success(s));
+
         String s = "sign-in";
         return exchange.getSession().flatMap(webSession -> {
             model.addAttribute("systemName", r.systemName());

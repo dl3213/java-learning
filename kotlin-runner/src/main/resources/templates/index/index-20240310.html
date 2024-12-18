@@ -231,7 +231,7 @@
                         <a href="#" class="dropdown-item">Feedback</a>
                         <div class="dropdown-divider"></div>
                         <a href="settings.html" class="dropdown-item">Settings</a>
-                        <form id="_form" method="post" th:action="@{/logout}">
+                        <form id="_form" method="post" th:action="@{/auth/logout}">
                             <a onclick="console.log('logout click');document.getElementById('_form').submit();" class="dropdown-item" id="logoutBtn">Logout</a>
                         </form>
 
