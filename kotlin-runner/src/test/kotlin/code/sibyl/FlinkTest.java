@@ -1,14 +1,28 @@
 package code.sibyl;
 
 import code.sibyl.common.r;
-import com.ververica.cdc.connectors.mysql.source.MySqlSource;
-import com.ververica.cdc.connectors.mysql.table.StartupOptions;
-import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
+import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
+import org.apache.flink.runtime.minicluster.MiniCluster;
+import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
+import org.apache.flink.shaded.zookeeper3.org.apache.zookeeper.Transaction;
 import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.table.api.TableResult;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.table.catalog.CatalogDescriptor;
+import org.apache.flink.types.Row;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import reactor.core.publisher.Flux;
@@ -21,9 +35,11 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static org.apache.flink.table.api.Expressions.$;
+
 public class FlinkTest {
 
-    public static void main(String[] args) {
+    public static void main123(String[] args) {
         System.err.println(STR."cpu core -> \{Runtime.getRuntime().availableProcessors()}");
         long start = System.currentTimeMillis();
         Flux.range(1, 10)
@@ -73,43 +89,119 @@ public class FlinkTest {
         return executor;
     }
 
-    public static void main2(String[] args) throws Exception {
-
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(new Configuration().set(RestOptions.PORT, 9090));
-        env.setParallelism(1);
-        //1.1Checkpoint相关
-        /*读取的是binlog中的数据，如果集群挂掉，尽量能实现断点续传功能。如果从最新的读取（丢数据）。如果从最开始读（重复数据）。理想状态：读取binlog中的数据读一行，保存一次读取到的（读取到的行）位置信息。而flink中读取行位置信息保存在Checkpoint中。使用Checkpoint可以把flink中读取（按行）的位置信息保存在Checkpoint中*/
-        env.enableCheckpointing(10000L);//s执行一次Checkpoint
-        env.getCheckpointConfig().setCheckpointTimeout(30000L);
-        //env.getCheckpointConfig().setCheckpointStorage();
-        env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
-        env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
-
-        //设置Checkpoint的模式：精准一次
-        //env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
-        //任务挂掉的时候是否清理checkpoint。使任务正常退出时不删除CK内容，有助于任务恢复。默认的是取消的时候清空checkpoint中的数据。RETAIN_ON_CANCELLATION表示取消任务的时候，保存最后一次的checkpoint。便于任务的重启和恢复，正常情况下都使用RETAIN
-        //env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-        //设置一个重启策略：默认的固定延时重启次数，重启的次数是Integer的最大值，重启的间隔是1s
-        //env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, 2000L));
-        //设置一个状态后端 jobManager。如果使用的yarn集群模式，jobManager随着任务的生成而生成，任务挂了jobManager就没了。因此需要启动一个状态后端。只要设置checkpoint，尽量就设置一个状态后端。保存在各个节点都能读取的位置：hdfs中
-        //env.setStateBackend(new FsStateBackend("hdfs://hadoop102:8020/flink/ck/"));
-        //指定用户
-        //System.setProperty("HADOOP_USER_NAME", "sibyl");
-
-        Properties dbProps = new Properties();
-        dbProps.put("jdbc.properties.useSSL", false);
-        dbProps.put("useSSL", false);
-        dbProps.put("sslMode", "DISABLED");
-        dbProps.put("enabledTLSProtocols", "TLSv1.2");
-        //通过FlinkCDC构建SourceFunction
-        MySqlSource<String> mySqlSource = MySqlSource.<String>builder().hostname("127.0.0.1").port(3306).username("root").password("test").databaseList("db1")    //监控的数据库
-                .tableList("db1.t_test")    //监控的数据库下的表
-                .deserializer(new JsonDebeziumDeserializationSchema())//反序列化
-                .debeziumProperties(dbProps).startupOptions(StartupOptions.initial()) //
-                .jdbcProperties(dbProps).build();
-
-        env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "eos-test").setParallelism(4).print().setParallelism(1);
-
-        env.execute();
+    public static void main(String[] args) throws Exception {
+        MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder()
+                .setConfiguration(new Configuration().set(RestOptions.PORT, 9090))
+                .build();
+        MiniCluster miniCluster = new MiniCluster(configuration);
+        miniCluster.start();
     }
+
+    //https://nightlies.apache.org/flink/flink-docs-release-1.20/docs/dev/datastream/sources/#use-the-source
+    //flink DataStream API Table API
+    public static void main12311(String[] args) throws Exception {
+
+        //LocalStreamEnvironment localEnvironment = LocalStreamEnvironment.createLocalEnvironment();
+
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(new Configuration());
+
+        StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
+
+        String sourceTable = """
+                CREATE TABLE mysql_source (
+                                id INT,
+                                store_code STRING,
+                                store_name STRING
+                                ) WITH (
+                                'connector' = 'jdbc',
+                                'driver' = 'com.mysql.cj.jdbc.Driver',
+                                'url' = 'jdbc:mysql://101.132.156.239:3306/thlease_db?useSSL=false&characterEncoding=utf-8&autoReconnect=true',
+                                'username' = 'root',
+                                'password' = 'jhwl@20220216',
+                                'table-name' = 'th_mater_store_info'    
+                                );
+                """;
+        tEnv.executeSql(sourceTable);
+        //tEnv.executeSql("select * from mysql_source").print();
+        String sinkTable = """
+                CREATE TABLE mysql_sink (
+                                id INT,
+                                store_code STRING,
+                                store_name STRING
+                                ) WITH (
+                                'connector' = 'jdbc',
+                                'driver' = 'com.mysql.cj.jdbc.Driver',
+                                'url' = 'jdbc:mysql://101.132.156.239:3306/thlease_db?useSSL=false&characterEncoding=utf-8&autoReconnect=true',
+                                'username' = 'root',
+                                'password' = 'jhwl@20220216',
+                                'table-name' = 'th_mater_store_info_test1'
+                                );
+                """;
+
+        // jdbc 所支持的参数配置：
+        //chunk-key.even-distribution.factor.lower-bound：块键（Chunk Key）的均匀分布因子下限。
+        //chunk-key.even-distribution.factor.upper-bound：块键的均匀分布因子上限。
+        //chunk-meta.group.size：块元数据的分组大小。
+        //connect.max-retries：连接重试的最大次数。
+        //connect.timeout：连接的超时时间。
+        //connection.pool.size：连接池的大小。
+        //connector：使用的连接器的名称。
+        //database-name：数据库的名称。
+        //heartbeat.interval：心跳间隔时间。
+        //hostname：主机名或 IP 地址。
+        //password：连接到数据库或其他系统所需的密码。
+        //port：连接的端口号。
+        //property-version：属性版本。
+        //scan.incremental.snapshot.chunk.key-column：增量快照的块键列。
+        //scan.incremental.snapshot.chunk.size：增量快照的块大小。
+        //scan.incremental.snapshot.enabled：是否启用增量快照。
+        //scan.newly-added-table.enabled：是否启用新加入表的扫描。
+        //scan.snapshot.fetch.size：从状态快照中获取的每次批量记录数。
+        //scan.startup.mode：扫描启动模式。
+        //scan.startup.specific-offset.file：指定启动位置的文件名。
+        //scan.startup.specific-offset.gtid-set：指定启动位置的 GTID 集合。
+        //scan.startup.specific-offset.pos：指定启动位置的二进制日志位置。
+        //scan.startup.specific-offset.skip-events：跳过的事件数量。
+        //scan.startup.specific-offset.skip-rows：跳过的行数。
+        //scan.startup.timestamp-millis：指定启动时间戳（毫秒）。
+        //server-id：服务器 ID。
+        //server-time-zone：服务器时区。
+        //split-key.even-distribution.factor.lower-bound：切分键（Split Key）的均匀分布因子下限。
+        //split-key.even-distribution.factor.upper-bound：切分键的均匀分布因子上限。
+        //table-name：表名。
+        //username：连接到数据库或其他系统所需的用户名。
+        //Sink目标表with下的属性：
+        //connection.max-retry-timeout：连接重试的最大超时时间。
+        //connector：使用的连接器的名称。
+        //driver：JDBC 连接器中使用的数据库驱动程序的类名。
+        //lookup.cache：查找表的缓存配置。
+        //lookup.cache.caching-missing-key：是否缓存查找表中的缺失键。
+        //lookup.cache.max-rows：查找表缓存中允许的最大行数。
+        //lookup.cache.ttl：查找表缓存中行的生存时间。
+        //lookup.max-retries：查找操作的最大重试次数。
+        //lookup.partial-cache.cache-missing-key：是否缓存查找表部分缺失的键。
+        //lookup.partial-cache.expire-after-access：查找表部分缓存中行的访问到期时间。
+        //lookup.partial-cache.expire-after-write：查找表部分缓存中行的写入到期时间。
+        //lookup.partial-cache.max-rows：查找表部分缓存中允许的最大行数。
+        //password：连接到数据库或其他系统所需的密码。
+        //property-version：属性版本。
+        //scan.auto-commit：是否自动提交扫描操作。
+        //scan.fetch-size：每次批量获取记录的大小。
+        //scan.partition.column：用于分区的列名。
+        //scan.partition.lower-bound：分区的下限值。
+        //scan.partition.num：要扫描的分区数量。
+        //scan.partition.upper-bound：分区的上限值。
+        //sink.buffer-flush.interval：将缓冲区的数据刷新到目标系统的时间间隔。
+        //sink.buffer-flush.max-rows：缓冲区中的最大行数，达到此值时将刷新数据。
+        //sink.max-retries：写入操作的最大重试次数。
+        //sink.parallelism：写入任务的并行度。
+        //table-name：表名。
+        //url：连接到数据库或其他系统的 URL。
+        //username：连接到数据库或其他系统所需的用户名。
+        tEnv.executeSql(sinkTable);
+        tEnv.executeSql("insert into mysql_sink select id,store_code,store_name from mysql_source");
+        System.out.println("MySQL to MySQL ");
+
+    }
+
 }

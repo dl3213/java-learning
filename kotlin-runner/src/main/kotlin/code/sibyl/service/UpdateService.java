@@ -259,7 +259,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    //log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -302,7 +302,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    //log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -358,7 +358,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    //log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;

@@ -83,3 +83,19 @@ logging:
 
 
 
+data-source:
+  sibyl-mysql:
+    driver: mysql
+    host: 127.0.0.1
+    port: 3306
+    database: sibyl
+    user: root
+    password: 123456
+  sibyl-postgresql:
+    driver: postgresql
+    host: 127.0.0.1
+    port: 3306
+    database: postgres
+    user: postgres
+    password: 123456
+

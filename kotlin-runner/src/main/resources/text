@@ -1,0 +1,78 @@
+
+节点分配	master	slave1	slave2
+HDFS	DataNode NameNode	DataNode	Datanode SecondaryNamenode
+YARN	NodeManager	NodeManager ResourceManager	NodeManager
+IP	172.18.0.101	172.18.0.102	172.18.0.103
+
+1. docker run --privileged -it centos:7 /usr/sbin/init
+2. docker exec -it 0fe38296e4dc /bin/bash
+   centos安装yum
+   yum -y install which
+   yum -y install openssh-server
+   yum -y install openssh-clients
+   passwd 123456
+3. docker commit -a "dl3213" -m "ssh" 7562aa9139ac088a820e9f5eb6956fc9b2518121116e1f8ace67806ffdedde9c centos-ssh  #创建镜像
+4. 根据上步的镜像创建容器
+#创建上面拉取镜像的容器，设置名称为master，加入自定义网络，指定ip，指定映射端口，添加/etc/hosts内容,先创建master节点容器
+
+#master节点开放 10070、9000端口
+docker run -itd --name master -d -h master \
+--network hadoop --ip 172.18.0.2 -p 10070:10070 -p 8080:8080 -p 8081:8081 -p 8082:8082 -p 4040:4040 -p 19888:19888 -p 18080:18080 \
+--privileged=true --add-host=master:172.18.0.2 --add-host=slave1:172.18.0.3 --add-host=slave2:172.18.0.4 \
+centos-ssh
+
+#slave1容器开放8088端口
+docker run -itd --name slave1 -d -h slave1 \
+--network hadoop --ip 172.18.0.3 -p 8088:8088 \
+--privileged=true --add-host=master:172.18.0.2 --add-host=slave1:172.18.0.3 --add-host=slave2:172.18.0.4 \
+centos-ssh
+
+#slave2容器开放 10090端口
+docker run -itd --name slave2 -d -h slave2 \
+--network hadoop --ip 172.18.0.4 -p 10090:10090 \
+--privileged=true --add-host=master:172.18.0.2 --add-host=slave1:172.18.0.3 --add-host=slave2:172.18.0.4 \
+centos-ssh
+
+5. 上传hadoop安装包
+docker cp D:/z/hadoop-3.4.1.tar.gz 0d5e6731d1671480000c87b03801cf7d9f59326edd29d47be01a1053dbed5c7e:/opt
+
+docker cp D:/z/jdk-8u431-linux-x64.tar.gz 0d5e6731d1671480000c87b03801cf7d9f59326edd29d47be01a1053dbed5c7e:/opt
+
+6. 安装jdk+hadoop
+
+scp -r ./module slave1:/opt
+
+##JAVA_HOME
+export JAVA_HOME=/opt/module/jdk1.8.0_391
+export PATH=$PATH:$JAVA_HOME/bin
+##HADOOP_HOME
+export HADOOP_HOME=/opt/module/hadoop-3.4.1
+export PATH=$PATH:$HADOOP_HOME/bin
+export PATH=$PATH:$HADOOP_HOME/sbin
+
+
+docker cp D:/z/hadoop-3.4.1.tar.gz 39e01a4355295b96e0d76e1770fd5ab0e64a80de53d898362a3c65c584df5058:/opt
+
+docker cp D:/z/jdk-8u431-linux-x64.tar.gz 9b5f8332029c500547456fa14d4f6f0aedf641c69ed01f924e637623ca34af25:/opt
+
+
+#master节点
+docker run -tid --name=master --privileged=true -p 22:22 centos:7 /usr/sbin/init
+
+
+docker run -d -p 3306:3306 \
+--name mysql --privileged=true \
+--restart=always  \
+-v C:/Users/dl3213/mysql:/var/lib/mysql \
+-e MYSQL_ROOT_PASSWORD=123456 \
+mysql:8.0.32
+
+
+
+docker run -d -p 5432:5432 \
+--restart=always \
+ -v C:/Users/dl3213/postgres:/var/lib/postgresql \
+-e POSTGRES_PASSWORD=123456 \
+--name postgres postgres
+
+

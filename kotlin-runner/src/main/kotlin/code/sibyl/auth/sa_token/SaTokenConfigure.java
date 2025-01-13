@@ -57,7 +57,7 @@ public class SaTokenConfigure {
                 .setError(e -> {
                     ServerWebExchange serverWebExchange = SaReactorSyncHolder.getContext();
                     System.err.println(serverWebExchange.getRequest().getURI().toString() + "    ->     sa全局异常 ");
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     ServerHttpResponse response = serverWebExchange.getResponse();
                     return new SaResponseForReactor(response).addHeader("msg", "认证失败").redirect("/sign-in.html");
 

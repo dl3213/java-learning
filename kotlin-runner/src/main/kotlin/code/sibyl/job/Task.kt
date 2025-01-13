@@ -37,8 +37,8 @@ class Task {
         log.info("[test2 -- 5000] [{}] end", Thread.currentThread().name)
     }
 
-    @Async
-    @Scheduled(cron = "0 0 0 * * ?")
+//    @Async
+//    @Scheduled(cron = "0 0 0 * * ?")
     fun backup(){
         BackupService.getBean()
             .backup("sibyl", getBean(R2dbcEntityTemplate::class.java))
@@ -52,33 +52,33 @@ class Task {
     @Async
     @Scheduled(cron = "0 0/1 * * * ?")
     fun 图片补充大小() {
-        log.info(
-            "{} - 图片补充大小 : {}",
-            Thread.currentThread().name,
-            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
-        )
+//        log.info(
+//            "{} - 图片补充大小 : {}",
+//            Thread.currentThread().name,
+//            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
+//        )
         UpdateService.getBean().图片补充大小().subscribe()
     }
 
     @Async
     @Scheduled(cron = "0 0/5 * * * ?")
     fun 文件补充hash() {
-        log.info(
-            "{} - 文件补充hash : {}",
-            Thread.currentThread().name,
-            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
-        )
+//        log.info(
+//            "{} - 文件补充hash : {}",
+//            Thread.currentThread().name,
+//            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
+//        )
         UpdateService.getBean().文件补充hash().subscribe();
     }
 
     @Async
     @Scheduled(cron = "0 0/5 * * * ?")
     fun 视频文件补充thumbnail() {
-        log.info(
-            "{} - 视频文件补充thumbnail : {}",
-            Thread.currentThread().name,
-            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
-        )
+//        log.info(
+//            "{} - 视频文件补充thumbnail : {}",
+//            Thread.currentThread().name,
+//            r.formatDate(LocalDateTime.now(), r.yyyy_MM_dd_HH_mm_ss_SSS)
+//        )
         UpdateService.getBean().视频文件补充thumbnail().subscribe();
     }
 }

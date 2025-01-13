@@ -9,6 +9,7 @@ import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
 import code.sibyl.service.UpdateService;
 import code.sibyl.service.backup.BackupService;
+import code.sibyl.service.sql.SibylMysqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,6 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
 //        UpdateService.getBean().file_clear().subscribe(); //
 
