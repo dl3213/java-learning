@@ -1,4 +1,4 @@
-package code.sibyl.config;
+package code.sibyl.flink;
 
 
 import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
@@ -29,6 +29,7 @@ import java.util.Properties;
 @RequiredArgsConstructor
 @Slf4j
 public class FlinkConfig {
+
 
     @Bean
     public MiniCluster miniCluster() throws Exception {
@@ -87,6 +88,7 @@ public class FlinkConfig {
         Properties dbProps = new Properties();
         dbProps.put("jdbc.properties.useSSL", false);
         dbProps.put("useSSL", false);
+        dbProps.put("allowPublicKeyRetrieval", true);
         dbProps.put("sslMode", "DISABLED");
         dbProps.put("enabledTLSProtocols", "TLSv1.2");
 
@@ -135,11 +137,12 @@ public class FlinkConfig {
 
         env.fromSource(local_mysql, WatermarkStrategy.noWatermarks(), "local_mysql")
                 .setParallelism(1)
-                .print();
+                //.print()
+                .addSink(new FluxSink());
 
         env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres")
                 .setParallelism(1)
-                .print();
+                .addSink(new FluxSink());
 
         env.executeAsync();
 

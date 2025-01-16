@@ -203,6 +203,19 @@ public class FileController {
                 })
                 .map(e -> Response.success(e));
     }
+    @PostMapping(value = "/restore/{id}")
+    @ResponseBody
+    public Mono<Response> restore(@PathVariable String id) {
+        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .flatMap(e -> {
+                    System.err.println(e.getAbsolutePath());
+                    e.setDeleted("0");
+                    e.setUpdateTime(LocalDateTime.now());
+                    e.setUpdateId(r.defaultUserId());
+                    return r2dbcEntityTemplate.update(e);
+                })
+                .map(e -> Response.success(e));
+    }
 
     @RequestMapping(value = "/list", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody

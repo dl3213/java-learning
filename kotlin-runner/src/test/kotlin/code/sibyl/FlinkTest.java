@@ -89,7 +89,7 @@ public class FlinkTest {
         return executor;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main123222(String[] args) throws Exception {
         MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder()
                 .setConfiguration(new Configuration().set(RestOptions.PORT, 9090))
                 .build();
@@ -99,7 +99,7 @@ public class FlinkTest {
 
     //https://nightlies.apache.org/flink/flink-docs-release-1.20/docs/dev/datastream/sources/#use-the-source
     //flink DataStream API Table API
-    public static void main12311(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         //LocalStreamEnvironment localEnvironment = LocalStreamEnvironment.createLocalEnvironment();
 
@@ -109,32 +109,32 @@ public class FlinkTest {
 
         String sourceTable = """
                 CREATE TABLE mysql_source (
-                                id INT,
-                                store_code STRING,
-                                store_name STRING
+                                id BIGINT,
+                                name STRING,
+                                type STRING
                                 ) WITH (
                                 'connector' = 'jdbc',
                                 'driver' = 'com.mysql.cj.jdbc.Driver',
-                                'url' = 'jdbc:mysql://101.132.156.239:3306/thlease_db?useSSL=false&characterEncoding=utf-8&autoReconnect=true',
+                                'url' = 'jdbc:mysql://127.0.0.1:3306/sibyl?useSSL=false&characterEncoding=utf-8&autoReconnect=true',
                                 'username' = 'root',
-                                'password' = 'jhwl@20220216',
-                                'table-name' = 'th_mater_store_info'    
+                                'password' = '123456',
+                                'table-name' = 't_biz_book'    
                                 );
                 """;
         tEnv.executeSql(sourceTable);
         //tEnv.executeSql("select * from mysql_source").print();
         String sinkTable = """
                 CREATE TABLE mysql_sink (
-                                id INT,
-                                store_code STRING,
-                                store_name STRING
+                                id BIGINT,
+                                name STRING,
+                                type STRING
                                 ) WITH (
                                 'connector' = 'jdbc',
-                                'driver' = 'com.mysql.cj.jdbc.Driver',
-                                'url' = 'jdbc:mysql://101.132.156.239:3306/thlease_db?useSSL=false&characterEncoding=utf-8&autoReconnect=true',
-                                'username' = 'root',
-                                'password' = 'jhwl@20220216',
-                                'table-name' = 'th_mater_store_info_test1'
+                                'driver' = 'org.postgresql.Driver',
+                                'url' = 'jdbc:postgresql://127.0.0.1:5432/postgres',
+                                'username' = 'postgres',
+                                'password' = '123456',
+                                'table-name' = 't_biz_book'
                                 );
                 """;
 
@@ -199,7 +199,7 @@ public class FlinkTest {
         //url：连接到数据库或其他系统的 URL。
         //username：连接到数据库或其他系统所需的用户名。
         tEnv.executeSql(sinkTable);
-        tEnv.executeSql("insert into mysql_sink select id,store_code,store_name from mysql_source");
+        tEnv.executeSql("insert into mysql_sink select id,name,type from mysql_source");
         System.out.println("MySQL to MySQL ");
 
     }

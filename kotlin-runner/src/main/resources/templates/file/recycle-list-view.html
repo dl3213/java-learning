@@ -250,31 +250,7 @@
                 </div>
             </div>
         </div>
-        <!-- Page body -->
-        <div class="page-body">
-            <div class="container-xl">
-                <div class="row row-cards">
 
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">Custom Dropzone</h3>
-                                <form class="dropzone" id="dropzone-custom" action="/file/upload" autocomplete="off"
-                                      novalidate>
-                                    <div class="fallback">
-                                        <input name="file" type="file"/>
-                                    </div>
-                                    <div class="dz-message">
-                                        <h3 class="dropzone-msg-title">Your text here</h3>
-                                        <span class="dropzone-msg-desc">Your custom description here</span>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="page-body">
             <div class="container-xl">
                 <div class="row row-cards" id="gallery-context">
@@ -381,8 +357,8 @@
                                     </div>
                                     <div class="col-xs-4 col-md-2 col-lg-2">`+(item.size / 1024.0 / 1024.0).toFixed(1)+`MB</div>
                                     <div class="col-xs-4 col-md-2 col-lg-2">
-                                        <a target-id="` + item.id + `" class="btn btn-link delete-btn">
-                                            delete
+                                        <a target-id="` + item.id + `" class="btn btn-link restore-btn">
+                                            restore
                                         </a>
                                     </div>
                                 </div>
@@ -407,7 +383,7 @@
                             <div class="col-xs-12 col-md-6 col-lg-6"> <div>` + (item.realName.length > 12 ? item.realName.substring(0, 12) + "..." : item.realName) + `</div>
                                         <div class="text-secondary">` + item.createTime + `</div></div>
                             <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary  ms-auto">Go Detail</a></div>
-                            <div class="col-xs-4 col-md-2 col-lg-2"><a target-id="` + item.id + `" class="btn btn-link delete-btn">delete</a>
+                            <div class="col-xs-4 col-md-2 col-lg-2"><a target-id="` + item.id + `" class="btn btn-link restore-btn">restore</a>
                            </div>
                         </div>
                       </div>
@@ -504,7 +480,7 @@
                         // }];
 
 
-                        var delete_btn_list = document.getElementsByClassName("delete-btn");
+                        var delete_btn_list = document.getElementsByClassName("restore-btn");
                         for (let el of delete_btn_list) {
                             el.addEventListener('click', function (evt) {
                                 console.log(el.getAttribute("target-id"))
@@ -522,7 +498,7 @@
                                     </span>
                                     `
                                     axios
-                                        .delete('/file/delete/' + id)
+                                        .post('/file/restore/' + id)
                                         .then(response => {
                                             console.log(response)
                                             //alert(response.data.msg)

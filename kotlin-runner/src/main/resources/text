@@ -76,3 +76,7 @@ docker run -d -p 5432:5432 \
 --name postgres postgres
 
 
+D:\4code\4dev\apache-maven-3.9.6\bin\mvn dependency:resolve -Dclassifier=sources
+
+
+git config --global http.sslVerify false

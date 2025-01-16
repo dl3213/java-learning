@@ -94,7 +94,7 @@ data-source:
   sibyl-postgresql:
     driver: postgresql
     host: 127.0.0.1
-    port: 3306
+    port: 5432
     database: postgres
     user: postgres
     password: 123456

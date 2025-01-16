@@ -341,7 +341,9 @@
         console.log("DOMContentLoaded...")
 
         var config = {
-            maxFilesize: 102400
+            maxFilesize: 10240000,
+            uploadMultiple: true,
+            parallelUploads: 1,
         }
 
         new Dropzone("#dropzone-custom", config)
