@@ -75,7 +75,7 @@ public class UpdateService {
     // 20241122 pixiv_init_v1 -> 22816 cost = 21618
     public Mono<Long> pixiv_init() {
         long start = System.currentTimeMillis();
-        Path root = Path.of(r.fileBaseDir);
+        Path root = Path.of(r.fileBaseDir());
         return r2dbcEntityTemplate.getDatabaseClient()
                 .sql("select count(1) as count from T_BASE_FILE where 1=1")
                 .fetch()
@@ -128,7 +128,7 @@ public class UpdateService {
     // 20241122 pixiv_init_parallel -> 22816 cost = 9093
     public Mono<Long> pixiv_init_parallel() {
         long start = System.currentTimeMillis();
-        Path root = Path.of(r.fileBaseDir);
+        Path root = Path.of(r.fileBaseDir());
         Scheduler scheduler = Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class));
         return r2dbcEntityTemplate.getDatabaseClient()
                 .sql("select count(1) as count from T_BASE_FILE where 1=1")
@@ -200,7 +200,7 @@ public class UpdateService {
             }
         }
         baseFile.setAbsolutePath(absolutePath);
-        baseFile.setRelativePath(absolutePath.replace(r.fileBaseDir, ""));
+        baseFile.setRelativePath(absolutePath.replace(r.fileBaseDir(), ""));
 
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         baseFile.setSuffix(suffix);
@@ -235,7 +235,7 @@ public class UpdateService {
     public Mono<Long> 文件补充hash() {
         long start = System.currentTimeMillis();
         DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where SHA256 IS NULL ")
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and SHA256 IS NULL ")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
@@ -312,7 +312,7 @@ public class UpdateService {
     public Mono<Long> 视频文件补充thumbnail() {
         long start = System.currentTimeMillis();
         DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where type like 'video%' and (thumbnail is null)")
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (thumbnail is null)")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))

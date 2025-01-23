@@ -1,0 +1,15 @@
+
+env: dev
+
+file:
+  path: E:/sibyl-system/file/
+
+spring:
+  r2dbc:
+    url: r2dbc:h2:file:///E:/sibyl-system/database/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
+    pool:
+      enabled: true
+      max-size: 1024
+      min-idle: 64
+      initial-size: 64
+

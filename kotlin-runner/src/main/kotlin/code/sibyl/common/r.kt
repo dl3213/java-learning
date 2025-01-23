@@ -33,9 +33,7 @@ import java.util.stream.Collectors
  */
 object r {
 
-    open var baseDir: String = "D:/4code/4java/workspace/java-learning/kotlin-runner/file";
     const val systemName: String = "未命名"
-    const val fileBaseDir: String = "E:/sibyl-system/file/"
     const val staticFileBasePath: String = "/static-file/**"
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val HH_mm_ss: String = "HH:mm:ss" //常用时间格式
@@ -240,8 +238,13 @@ object r {
 //    }
 
     @JvmStatic
-    fun baseDir(): String? {
-        return this.baseDir;
+    fun fileBaseDir(): String? {
+        if ("prod".equals(r.env())) {
+            return r.absolutePath() + File.separator + "file/"
+        } else {
+            return r.getBean(Environment::class.java).getProperty("file.path");
+        }
+
     }
 
     @JvmStatic
@@ -278,14 +281,17 @@ object r {
     fun errorMono(msg: String): Mono<Response> {
         return Mono.just(Response.error(msg));
     }
+
     @JvmStatic
     fun formatDate(date: Date?, formatter: String?): String {
         return DateFormatUtils.format(date, formatter)
     }
+
     @JvmStatic
     fun formatDate(date: LocalTime?, formatter: String?): String {
         return DateTimeFormatter.ofPattern(formatter).format(date)
     }
+
     @JvmStatic
     fun formatDate(date: LocalDate?, formatter: String?): String {
         return DateTimeFormatter.ofPattern(formatter).format(date)
@@ -304,6 +310,7 @@ object r {
     fun string(obj: String?): String {
         return StringUtils.trim(obj)
     }
+
     @JvmStatic
     fun eqZero(vararg value: BigDecimal): Boolean {
         return Arrays.stream(value).allMatch { e: BigDecimal -> e.compareTo(BigDecimal.ZERO) == 0 }
@@ -316,14 +323,17 @@ object r {
     fun bigDecimal(obj: BigDecimal): BigDecimal {
         return if (Objects.nonNull(obj)) obj else BigDecimal.ZERO
     }
+
     @JvmStatic
     fun bigDecimal(obj: Any): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal(obj.toString()) else BigDecimal.ZERO
     }
+
     @JvmStatic
     fun bigDecimal(obj: Int): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal.valueOf(obj.toLong()) else BigDecimal.ZERO
     }
+
     @JvmStatic
     fun bigDecimal(obj: Long): BigDecimal {
         return if (Objects.nonNull(obj)) BigDecimal.valueOf(obj) else BigDecimal.ZERO
@@ -512,7 +522,7 @@ object r {
 
     @JvmStatic
     fun percent(num: Any): String {
-        return (r.bigDecimal(num).multiply(BigDecimal(100))).setScale(4, RoundingMode.UP).toString()+"%"
+        return (r.bigDecimal(num).multiply(BigDecimal(100))).setScale(4, RoundingMode.UP).toString() + "%"
     }
 
 }

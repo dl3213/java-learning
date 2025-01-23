@@ -1,5 +1,6 @@
 package code.sibyl.config;
 
+import code.sibyl.config.property.EosTestConnectionProperty;
 import code.sibyl.config.property.SibylMysqlConnectionProperty;
 import code.sibyl.config.property.SibylPostgresqlConnectionProperty;
 import io.r2dbc.pool.ConnectionPool;
@@ -32,6 +33,24 @@ public class DataSourceConfig {
     @Primary
     public R2dbcEntityTemplate r2dbcEntityTemplate(R2dbcConverter r2dbcConverter) {
         return new R2dbcEntityTemplate(this.databaseClient, DialectResolver.getDialect(this.databaseClient.getConnectionFactory()), r2dbcConverter);
+    }
+
+//    @Bean("eos-test")
+    public R2dbcEntityTemplate eosTest(EosTestConnectionProperty property) {
+        ConnectionFactory connectionFactory = ConnectionFactories.get(
+                builder()
+                        .option(DRIVER, property.getDriver())
+                        .option(HOST, property.getHost())
+                        .option(PORT, property.getPort())
+                        .option(DATABASE, property.getDatabase())
+                        .option(USER, property.getUser())
+                        .option(SSL, false)
+                        .option(PASSWORD, CharBuffer.wrap(property.getPassword()))
+                        .build()
+        );
+        ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory);//
+//        return new R2dbcEntityTemplate(connectionFactory); // 每次sql都是新的连接
+        return new R2dbcEntityTemplate(new ConnectionPool(builder.build()));
     }
 
 //    @ConditionalOnProperty(name = "data-source", havingValue = "sibyl-mysql", matchIfMissing = false)

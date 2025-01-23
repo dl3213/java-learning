@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 import oshi.hardware.GlobalMemory;
 import oshi.util.GlobalConfig;
 import reactor.core.publisher.Flux;
@@ -31,9 +32,12 @@ public class SystemInfoController {
         GlobalConfig.set(GlobalConfig.OSHI_OS_WINDOWS_CPU_UTILITY, true);
     }
 
+    private final int interval = 5;
+
     @GetMapping(value = "/cpu", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Response> cpu() {
-        return Flux.interval(Duration.ofSeconds(2))
+    public Flux<Response> cpu(ServerWebExchange serverWebExchange) {
+//        System.err.println(serverWebExchange.getRequest().getCookies());
+        return Flux.interval(Duration.ofSeconds(interval))
                 .map(index -> {
                     JSONObject jsonObject = new JSONObject();
                     CpuInfo cpuInfo = OshiUtil.getCpuInfo(); // hutool封装的oshi
@@ -48,7 +52,7 @@ public class SystemInfoController {
 
     @GetMapping(value = "/memory", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Response> memory() {
-        return Flux.interval(Duration.ofSeconds(2))
+        return Flux.interval(Duration.ofSeconds(interval))
                 .map(index -> {
                     JSONObject jsonObject = new JSONObject();
                     GlobalMemory info = OshiUtil.getMemory(); // hutool封装的oshi
@@ -64,7 +68,7 @@ public class SystemInfoController {
 
     @GetMapping(value = "/jvm", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Response> jvm() {
-        return Flux.interval(Duration.ofSeconds(2))
+        return Flux.interval(Duration.ofSeconds(interval))
                 .map(index -> {
                     JSONObject jsonObject = new JSONObject();
                     val runtime = Runtime.getRuntime();
@@ -88,7 +92,7 @@ public class SystemInfoController {
 
     @GetMapping(value = "/db", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Response> db() {
-        return Flux.interval(Duration.ofSeconds(2))
+        return Flux.interval(Duration.ofSeconds(interval))
                 .map(index -> {
                     JSONObject jsonObject = new JSONObject();
                     R2dbcEntityTemplate r2dbcEntityTemplate = r.getBean(R2dbcEntityTemplate.class);

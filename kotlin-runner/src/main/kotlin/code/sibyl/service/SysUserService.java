@@ -34,7 +34,7 @@ public class SysUserService {
     public Mono<User> me() {
         Long id = 1L;
         return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), User.class)
-                .switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .switchIfEmpty(Mono.just(new User(1L, "admin", "admin")))
                 ;
     }
 

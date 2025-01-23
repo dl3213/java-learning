@@ -31,7 +31,7 @@ import java.util.Properties;
 public class FlinkConfig {
 
 
-    @Bean
+//    @Bean
     public MiniCluster miniCluster() throws Exception {
         MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder()
                 .setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090))
@@ -44,7 +44,7 @@ public class FlinkConfig {
     }
 
 
-    @Bean
+//    @Bean
     public StreamExecutionEnvironment cdc() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9091));
         env.setParallelism(1);
@@ -138,11 +138,13 @@ public class FlinkConfig {
         env.fromSource(local_mysql, WatermarkStrategy.noWatermarks(), "local_mysql")
                 .setParallelism(1)
                 //.print()
-                .addSink(new FluxSink());
+                .addSink(new PrintRichSink())
+//                .sinkTo(new FluxSink())
+        ;
 
         env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres")
                 .setParallelism(1)
-                .addSink(new FluxSink());
+                .addSink(new PrintRichSink());
 
         env.executeAsync();
 

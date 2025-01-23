@@ -59,24 +59,45 @@ docker cp D:/z/jdk-8u431-linux-x64.tar.gz 9b5f8332029c500547456fa14d4f6f0aedf641
 #master节点
 docker run -tid --name=master --privileged=true -p 22:22 centos:7 /usr/sbin/init
 
+sudo docker run --name redis --restart=always -d -p 6379:6379 redis
 
-docker run -d -p 3306:3306 \
+sudo docker run --name nginx --restart=always -p 80:80 -d nginx
+
+sudo docker run -d -p 3306:3306 \
 --name mysql --privileged=true \
 --restart=always  \
--v C:/Users/dl3213/mysql:/var/lib/mysql \
+-v /data/db/mysql:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=123456 \
 mysql:8.0.32
 
 
 
-docker run -d -p 5432:5432 \
+sudo docker run -d -p 5432:5432 \
 --restart=always \
- -v C:/Users/dl3213/postgres:/var/lib/postgresql \
+ -v /data/db/postgres:/var/lib/postgresql \
 -e POSTGRES_PASSWORD=123456 \
 --name postgres postgres
 
 
 D:\4code\4dev\apache-maven-3.9.6\bin\mvn dependency:resolve -Dclassifier=sources
 
+-- 有时上传文件失败是因为账号没有文件的写入权限
+sudo chown ubuntu /data/
+sudo chmod 750 /data/
+
 
 git config --global http.sslVerify false
+
+sibyl-test
+
+ssh -i D:/z/sibyl-test.pem ubuntu@127.0.0.1
+
+scp -i D:/z/sibyl-test.pem -v -C -vvv D:/4code/4java/workspace/java-learning/kotlin-runner/target/kotlin-runner/kotlin-runner-0.0.1-SNAPSHOT.jar root@127.0.0.1:/data/workspace/kotlin-runner
+
+scp D:/z/sibyl-test.pem D:/4code/4java/workspace/java-learning/kotlin-runner/target/kotlin-runner/kotlin-runner-0.0.1-SNAPSHOT.jar ubuntu@127.0.0.1:/data/workspace/kotlin-runner
+
+
+scp -i D:/z/sibyl-test.pem D:/4code/4java/workspace/java-learning/kotlin-runner/target/kotlin-runner/kotlin-runner-0.0.1-SNAPSHOT.jar -C -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o ConnectTimeout=60 -vvv root@127.0.0.1:/data/workspace/kotlin-runner
+scp -i  sibyl-test.pem D:/4code/4java/workspace/java-learning/kotlin-runner/target/kotlin-runner/kotlin-runner-0.0.1-SNAPSHOT.jar root@127.0.0.1:/data/workspace/kotlin-runner
+
+scp -i "your-key.pem" -r /path/to/local/folder ec2-user@your-public-ip:/path/to/remote/directory

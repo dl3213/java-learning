@@ -167,7 +167,7 @@ public class PhotoController {
                         return Mono.error(new RuntimeException("上传失败：相同hash文件已存在"));
                     }
 
-                    String dir = r.fileBaseDir + r.yyyy_MM_dd() + File.separator;
+                    String dir = r.fileBaseDir() + r.yyyy_MM_dd() + File.separator;
                     String absolutePath = dir + fileName;
                     BaseFile file = UpdateService.getBean().file(fileName, absolutePath, null, bytes, true);
 

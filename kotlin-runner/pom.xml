@@ -427,6 +427,8 @@
                 <targetPath>${project.build.directory}/${project.artifactId}/config</targetPath>
                 <includes>
                     <include>application.yml</include>
+                    <include>application-dev.yml</include>
+                    <include>application-prod.yml</include>
                     <include>application-db.yml</include>
                     <include>application-db-dev.yml</include>
                     <include>application-db-prod.yml</include>
@@ -456,9 +458,12 @@
                     <!-- 排除不需要打进jar包的文件，也就是上面config目录中的文件 -->
                     <excludes>
                         <include>application.yml</include>
+                        <include>application-dev.yml</include>
+                        <include>application-prod.yml</include>
                         <include>application-db.yml</include>
                         <include>application-db-dev.yml</include>
                         <include>application-db-prod.yml</include>
+                        <include>/kettle/kettle.properties</include>
                     </excludes>
                     <archive>
                         <!-- 程序入口，即main函数 -->

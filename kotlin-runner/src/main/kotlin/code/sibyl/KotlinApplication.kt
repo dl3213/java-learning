@@ -17,6 +17,7 @@ fun main(args: Array<String>) {
     log.info("app running in port = " + r.getBean(Environment::class.java).getProperty("server.port"))
     log.info("app running in env = " + r.env())
     log.info("app running in path = " + r.absolutePath())
+    log.info("app running in fileBaseDir = " + r.fileBaseDir())
 //    System.getProperties().list(System.out)
     val runtime = Runtime.getRuntime()
     println("JVM available processors: ${runtime.availableProcessors()}")

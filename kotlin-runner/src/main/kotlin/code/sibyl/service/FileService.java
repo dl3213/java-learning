@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @Deprecated
 public class FileService {
 
-    private final Path root = Paths.get(r.fileBaseDir);
+    private final Path root = Paths.get(r.fileBaseDir());
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
@@ -57,7 +57,7 @@ public class FileService {
                     String fileUniqueId = String.valueOf(r.getBean(Snowflake.class).nextId());
                     String tempFileName = fileUniqueId + (split != null && split.length > 0 ? "." + split[split.length - 1] : "");
                     log.info("[fileUpload] tempFileName = {}", tempFileName);
-                    String absoluteDir = r.fileBaseDir + r.yyyy_MM_dd() + File.separator;
+                    String absoluteDir = r.fileBaseDir() + r.yyyy_MM_dd() + File.separator;
                     log.info("[fileUpload] absoluteDir = {}", absoluteDir);
                     String absolutePath = absoluteDir + tempFileName;
                     log.info("[fileUpload] absolutePath = {}", absolutePath);

@@ -2569,6 +2569,20 @@
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
+
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("home ready...")
+
         let cpuInfoList = [];
         let cpuEventSource = getCpuInfo();
 
@@ -2635,24 +2649,6 @@
             }
             return source;
         }
-
-        // document.addEventListener('visibilitychange', (event) => {
-        //     if (document.hidden) {
-        //         console.log('home 不显示');
-        //         cpuEventSource?.close();
-        //         memEventSource?.close();
-        //         jvmEventSource?.close();
-        //     } else {
-        //         console.log('home 显示');
-        //         cpuEventSource = getCpuInfo();
-        //         memEventSource = getOSMemInfo();
-        //         jvmEventSource = getJvmInfo();
-        //     }
-        // });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
 
         let osMemArr = []
         let timeArr = []
@@ -2768,12 +2764,6 @@
             return source;
         }
         let memEventSource = getOSMemInfo()
-
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        console.log("home ready...")
 
         let jvmMemArr = []
         let jvmHeapArr = []
@@ -2898,6 +2888,20 @@
             return source;
         }
         let jvmEventSource = getJvmInfo()
+
+        document.addEventListener('visibilitychange', (event) => {
+            if (document.hidden) {
+                console.log('home 不显示');
+                cpuEventSource?.close();
+                memEventSource?.close();
+                jvmEventSource?.close();
+            } else {
+                console.log('home 显示');
+                cpuEventSource = getCpuInfo();
+                memEventSource = getOSMemInfo();
+                jvmEventSource = getJvmInfo();
+            }
+        });
     });
 </script>
 </body>

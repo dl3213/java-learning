@@ -42,21 +42,21 @@ public class IndexController {
     ) {
 
         System.err.println("首页访问 --->" + index);
-        System.err.println(exchange.getRequest().getURI().toString());
+//        System.err.println(exchange.getRequest().getURI().toString());
         System.err.println("client from = " + exchange.getRequest().getRemoteAddress());
         System.err.println("to server = " + exchange.getRequest().getLocalAddress());
-        System.err.println(exchange.getRequest().getSslInfo());
+//        System.err.println(exchange.getRequest().getSslInfo());
         System.err.println(Thread.currentThread().getName());
-        exchange.getRequest().getHeaders().entrySet().forEach(System.err::println);
+//        exchange.getRequest().getHeaders().entrySet().forEach(System.err::println);
 
 //        List<MenuDTO> menuTree = menuTree();
 //        model.addAttribute("menuTree", menuTree);
 
-        final String finalIndex = "/index/" + index;
+        final String finalIndex = "index/" + index;
         return Mono.zip(Mono.just(1), SysUserService.getBean().me())
                 .map(tuple -> {
                     model.addAttribute("user", tuple.getT2());
-                    model.addAttribute("sys_icon", "/static/sibyl.svg");
+                    model.addAttribute("sys_icon", "static/sibyl.svg");
                     model.addAttribute("alt", "SIBYL");
                     model.addAttribute("systemName", r.systemName());
                     model.addAttribute("title", r.systemName());
@@ -923,7 +923,7 @@ public class IndexController {
     @GetMapping({"home",})
     @ActionLog(topic = "home首页", type = ActionType.OTHER)
     public Mono<String> home(final Model model) {
-        String welcome = "/index/home";
+        String welcome = "index/home";
         model.addAttribute("app-pid", ProcessHandle.current().pid());
         return Mono.create(monoSink -> monoSink.success(welcome));
     }
@@ -1056,7 +1056,7 @@ public class IndexController {
 
     @GetMapping({"/layout-vertical.html"})
     public Mono<String> layout_vertical(final Model model) {
-        String s = "/index/layout-vertical";
+        String s = "index/layout-vertical";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1328,7 +1328,7 @@ public class IndexController {
 
     @GetMapping({"/layout-horizontal.html"})
     public Mono<String> layout_horizontal(final Model model) {
-        String s = "/index/layout-horizontal";
+        String s = "index/layout-horizontal";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1336,7 +1336,7 @@ public class IndexController {
 
     @GetMapping({"/layout-boxed.html"})
     public Mono<String> layout_boxed(final Model model) {
-        String s = "/index/layout-boxed";
+        String s = "index/layout-boxed";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1344,7 +1344,7 @@ public class IndexController {
 
     @GetMapping({"/layout-vertical-transparent.html"})
     public Mono<String> layout_vertical_transparent(final Model model) {
-        String s = "/index/layout-vertical-transparent";
+        String s = "index/layout-vertical-transparent";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1352,7 +1352,7 @@ public class IndexController {
 
     @GetMapping({"/layout-vertical-right.html"})
     public Mono<String> layout_vertical_right(final Model model) {
-        String s = "/index/layout-vertical-right";
+        String s = "index/layout-vertical-right";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1360,7 +1360,7 @@ public class IndexController {
 
     @GetMapping({"/layout-condensed.html"})
     public Mono<String> layout_condensed(final Model model) {
-        String s = "/index/layout-condensed";
+        String s = "index/layout-condensed";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1368,7 +1368,7 @@ public class IndexController {
 
     @GetMapping({"/layout-combo.html"})
     public Mono<String> layout_combo(final Model model) {
-        String s = "/index/layout-combo";
+        String s = "index/layout-combo";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1376,7 +1376,7 @@ public class IndexController {
 
     @GetMapping({"/layout-navbar-dark.html"})
     public Mono<String> layout_navbar_dark(final Model model) {
-        String s = "/index/layout-navbar-dark";
+        String s = "index/layout-navbar-dark";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1384,7 +1384,7 @@ public class IndexController {
 
     @GetMapping({"/layout-navbar-sticky.html"})
     public Mono<String> layout_navbar_sticky(final Model model) {
-        String s = "/index/layout-navbar-sticky";
+        String s = "index/layout-navbar-sticky";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1392,7 +1392,7 @@ public class IndexController {
 
     @GetMapping({"/layout-navbar-overlap.html"})
     public Mono<String> layout_navbar_overlap(final Model model) {
-        String s = "/index/layout-navbar-overlap";
+        String s = "index/layout-navbar-overlap";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1400,7 +1400,7 @@ public class IndexController {
 
     @GetMapping({"/layout-rtl.html"})
     public Mono<String> layout_rtl(final Model model) {
-        String s = "/index/layout-rtl";
+        String s = "index/layout-rtl";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1408,7 +1408,7 @@ public class IndexController {
 
     @GetMapping({"/layout-fluid.html"})
     public Mono<String> layout_fluid(final Model model) {
-        String s = "/index/layout-fluid";
+        String s = "index/layout-fluid";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));
@@ -1416,7 +1416,7 @@ public class IndexController {
 
     @GetMapping({"/layout-fluid-vertical.html"})
     public Mono<String> layout_fluid_vertical(final Model model) {
-        String s = "/index/layout-fluid-vertical";
+        String s = "index/layout-fluid-vertical";
         model.addAttribute("systemName", r.systemName());
         model.addAttribute("title", r.systemName());
         return Mono.create(monoSink -> monoSink.success(s));

@@ -88,7 +88,7 @@ public class CommonConfig {
 
     @Bean
     public RouterFunction<ServerResponse> staticResources() throws MalformedURLException {
-        return RouterFunctions.resources(r.staticFileBasePath, new FileSystemResource(r.fileBaseDir), ((resource, httpHeaders) -> {
+        return RouterFunctions.resources(r.staticFileBasePath, new FileSystemResource(r.fileBaseDir()), ((resource, httpHeaders) -> {
             httpHeaders.set("sibyl", "test");
             httpHeaders.setAcceptCharset(Arrays.asList(
                     Charset.forName("UTF-8"),

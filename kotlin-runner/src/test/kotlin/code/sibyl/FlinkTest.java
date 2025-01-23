@@ -199,7 +199,9 @@ public class FlinkTest {
         //url：连接到数据库或其他系统的 URL。
         //username：连接到数据库或其他系统所需的用户名。
         tEnv.executeSql(sinkTable);
-        tEnv.executeSql("insert into mysql_sink select id,name,type from mysql_source");
+        tEnv.executeSql("insert into mysql_sink select id,name,type from mysql_source")
+
+        ;
         System.out.println("MySQL to MySQL ");
 
     }

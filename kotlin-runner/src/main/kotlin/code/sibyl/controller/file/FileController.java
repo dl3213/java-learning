@@ -224,7 +224,7 @@ public class FileController {
                 .map(path -> {
                     String filename = path.getFileName().toString();
                     String url = UriComponentsBuilder.newInstance().path("/files/{filename}").buildAndExpand(filename).toUriString();
-                    File file = new File(r.baseDir() + File.separator + path.getFileName());
+                    File file = new File(r.fileBaseDir() + File.separator + path.getFileName());
                     return new FileInfo(filename, url, 0l, file.isDirectory(), file.isFile());
                 });
 
