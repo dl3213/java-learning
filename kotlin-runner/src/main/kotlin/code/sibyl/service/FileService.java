@@ -6,6 +6,8 @@ import code.sibyl.domain.base.BaseFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -35,7 +37,10 @@ public class FileService {
 
     private final Path root = Paths.get(r.fileBaseDir());
 
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
+
+    @Autowired
+    @Qualifier("sibyl-postgresql")
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
 
     public void init() {
 //        try {

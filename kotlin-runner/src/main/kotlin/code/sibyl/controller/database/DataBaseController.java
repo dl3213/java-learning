@@ -49,6 +49,7 @@ public class DataBaseController {
             model.addAttribute("headerList", headerList);
             model.addAttribute("systemName", r.systemName());
             model.addAttribute("title", r.systemName());
+            model.addAttribute("typeList", DataBaseTypeEnum.values());
             monoSink.success("database/list-view");
         });
 

@@ -166,11 +166,11 @@ public class DataBaseService {
         return database;
     }
 
-    public  ConnectionFactory getConnectionFactoryByDatabaseEntity(Database database) {
+    public ConnectionFactory getConnectionFactoryByDatabaseEntity(Database database) {
         if (StringUtils.isBlank(database.getType())) {
             throw new RuntimeException("database type must not be null");
         }
-        if (database.getId() == 0L){
+        if (database.getId() == 0L) {
             return databaseClient.getConnectionFactory();
         }
         DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());

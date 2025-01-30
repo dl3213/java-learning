@@ -55,7 +55,12 @@ class DataBaseSocket : WebSocketHandler {
                     clientMap += session to DatabaseClient.create(DataBaseService.getBean().getConnectionFactoryByDatabaseEntity(tuple.t2))
                 }
                 .flatMap { tuple ->
-                    return@flatMap clientMap[session]?.sql(tuple.t1)?.fetch()?.all()?.collectList()?.onErrorResume { throwable -> Mono.just(Arrays.asList(hashMapOf("throwable" to throwable.message))) }
+                    return@flatMap clientMap[session]?.sql(tuple.t1)
+                        ?.fetch()?.all()?.collectList()
+                        ?.onErrorResume { throwable ->
+                            throwable.printStackTrace()
+                            Mono.just(Arrays.asList(hashMapOf("throwable" to throwable.message)))
+                        }
                 }
                 .map { tuple ->
                     println(clientMap)

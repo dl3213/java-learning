@@ -13,6 +13,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,6 +51,7 @@ public class FileController {
     @Autowired
     private DataBaseService dataBaseService;
     @Autowired
+    @Qualifier("sibyl-postgresql")
     R2dbcEntityTemplate r2dbcEntityTemplate;
 
     @GetMapping("/list-view")
