@@ -49,7 +49,7 @@ class DataBaseSocket : WebSocketHandler {
         return session.send(
             session.receive()
                 .map { m -> m.payloadAsText }
-                .flatMap { text -> Mono.zip( Mono.just(text), DataBaseService.getBean().findById(id)) }
+                .flatMap { text -> Mono.zip( Mono.just(text), DataBaseService.getBean().findById(id)) } // todo
                 .doOnNext { tuple ->
                     log.info("from client: ${tuple.t1}")
                     clientMap += session to DatabaseClient.create(DataBaseService.getBean().getConnectionFactoryByDatabaseEntity(tuple.t2))
