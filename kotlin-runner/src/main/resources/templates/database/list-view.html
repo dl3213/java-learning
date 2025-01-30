@@ -677,6 +677,7 @@ But that's the difference in our opinions.</textarea>
                             db.addEventListener("click", function (event) {
                                 //console.log(event.currentTarget)
                                 //console.log(event.currentTarget.getAttribute("db-id"))
+ 
                                 var db_id = event.currentTarget.getAttribute("db-id");
                                 socket?.close()
                                 socket = new WebSocket('ws://127.0.0.1:8080/database/socket/'+db_id);
@@ -730,7 +731,7 @@ But that's the difference in our opinions.</textarea>
                                     }
 
                                     document.getElementById("chat-context").innerHTML += `
-                                        <div class="chat-item"  >
+                                        <div class="chat-item server-context"  >
                                             <div class="row align-items-end" >
                                                 <div class="col-auto"><span class="avatar" style="background-image: url(/static/avatars/000f.jpg)"></span> </div>
                                                 <div class="col col-lg-11">
@@ -752,6 +753,14 @@ But that's the difference in our opinions.</textarea>
                                     
                                     var div = document.getElementById('scrollable');
                                     div.scrollTop = div.scrollHeight;
+
+                                    [...document.getElementsByClassName('server-context')].forEach(item => {
+                                        item.addEventListener('click', (event) => { 
+                                            console.log(event.currentTarget)
+                                            
+                                        })
+                                    })
+
                                 };
                                 
                                 // 错误事件
