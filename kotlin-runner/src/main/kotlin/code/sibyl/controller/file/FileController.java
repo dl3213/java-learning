@@ -54,7 +54,7 @@ public class FileController {
 
     @GetMapping("/list-view")
     public Mono<String> list_view(final Model model) {
-        return dataBaseService.list()
+        return dataBaseService.list(null)
                 .collectList()
                 .doOnSuccess(list -> {
                     model.addAttribute("list", list);

@@ -253,6 +253,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.11.1</version>
+        </dependency>
+
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
@@ -352,19 +359,23 @@
 
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>default</id>
-            <url>https://repo.maven.apache.org/maven</url>
-        </repository>
-        <repository>
-            <id>4thline-repo</id>
-            <url>http://4thline.org/m2</url>
-            <snapshots>
-                <enabled>false</enabled> <!-- Or true, if you like to use unreleased code -->
-            </snapshots>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>default</id>-->
+<!--            <url>https://repo.maven.apache.org/maven</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>aliyun</id>-->
+<!--            <url>https://maven.aliyun.com/repository/public</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>4thline-repo</id>-->
+<!--            <url>http://4thline.org/m2</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled> &lt;!&ndash; Or true, if you like to use unreleased code &ndash;&gt;-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--    </repositories>-->
 
     <!--    <build>-->
     <!--        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>-->

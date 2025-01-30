@@ -35,7 +35,7 @@ public class DataSourceConfig {
         return new R2dbcEntityTemplate(this.databaseClient, DialectResolver.getDialect(this.databaseClient.getConnectionFactory()), r2dbcConverter);
     }
 
-//    @Bean("eos-test")
+    //    @Bean("eos-test")
     public R2dbcEntityTemplate eosTest(EosTestConnectionProperty property) {
         ConnectionFactory connectionFactory = ConnectionFactories.get(
                 builder()
@@ -53,7 +53,7 @@ public class DataSourceConfig {
         return new R2dbcEntityTemplate(new ConnectionPool(builder.build()));
     }
 
-//    @ConditionalOnProperty(name = "data-source", havingValue = "sibyl-mysql", matchIfMissing = false)
+    @ConditionalOnProperty(name = "data-source.sibyl-mysql.enable", havingValue = "true", matchIfMissing = false)
     @Bean("sibyl-mysql")
     public R2dbcEntityTemplate sibylMysql(SibylMysqlConnectionProperty property) {
         ConnectionFactory connectionFactory = ConnectionFactories.get(
@@ -68,10 +68,11 @@ public class DataSourceConfig {
         );
         ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory);//
 //        return new R2dbcEntityTemplate(connectionFactory); // 每次sql都是新的连接
+        log.info("sibyl-mysql init...");
         return new R2dbcEntityTemplate(new ConnectionPool(builder.build()));
     }
 
-//    @ConditionalOnProperty(name = "data-source", havingValue = "sibyl-postgresql", matchIfMissing = false)
+    @ConditionalOnProperty(name = "data-source.sibyl-postgresql.enable", havingValue = "true", matchIfMissing = false)
     @Bean("sibyl-postgresql")
     public R2dbcEntityTemplate sibylPostgresql(SibylPostgresqlConnectionProperty property) {
         ConnectionFactory connectionFactory = ConnectionFactories.get(
@@ -86,6 +87,7 @@ public class DataSourceConfig {
         );
         ConnectionPoolConfiguration.Builder builder = ConnectionPoolConfiguration.builder(connectionFactory);//
 //        return new R2dbcEntityTemplate(connectionFactory); // 每次sql都是新的连接
+        log.info("sibyl-postgresql init...");
         return new R2dbcEntityTemplate(new ConnectionPool(builder.build()));
     }
 }

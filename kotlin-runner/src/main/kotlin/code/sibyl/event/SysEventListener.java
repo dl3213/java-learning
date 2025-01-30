@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class SysEventListener {
 
     @Async
-    @EventListener(classes = SibylEvent.class)
-    public void doOnEvent(SibylEvent event) {
+    @EventListener(classes = Event.class)
+    public void doOnEvent(Event event) {
         log.info("[SibylEvent-{}]-------------------------------------", event.getEvent());
     }
 }

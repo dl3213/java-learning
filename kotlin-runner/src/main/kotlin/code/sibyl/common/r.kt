@@ -240,7 +240,7 @@ object r {
     @JvmStatic
     fun fileBaseDir(): String? {
         if ("prod".equals(r.env())) {
-            return r.absolutePath() + File.separator + "file/"
+            return r.absolutePath() + File.separator + "file" + File.separator
         } else {
             return r.getBean(Environment::class.java).getProperty("file.path");
         }

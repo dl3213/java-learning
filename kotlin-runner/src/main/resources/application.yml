@@ -6,6 +6,12 @@ auth: false
 isDev: true
 logDetail: false
 
+flink:
+  enabled: false
+
+file:
+  model: ftp
+  path: c:/sibyl-system/file/ # 必须/结尾
 
 server:
   port: 8080
@@ -28,8 +34,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-#  security:
-#    strategy: MODE_INHERITABLETHREADLOCAL
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
@@ -40,19 +44,19 @@ spring:
     restart:
       exclude: logs/**
       enabled: false
+  r2dbc:
+    url: r2dbc:h2:file:///./h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
+    pool:
+      enabled: true
+      max-size: 1024
+      min-idle: 64
+      initial-size: 64
   h2:
     console:
       enable: true
       path: /h2-console
       settings:
         web-allow-others: true
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
-      database: 0
-      repositories:
-        enabled: false
   info:
     env:
       enabled: true
@@ -68,25 +72,10 @@ logging:
     org.apache.flink: warn
     sun.rmi: warn
   file:
-    name: ./${spring.application.name}/logs/log.log #这里因为是内部module就多加一层文件夹
+    name: ./logs/sibyl-runner-log.log #这里因为是内部module就多加一层文件夹
   logback:
     rollingpolicy:
       max-file-size: 100MB
       max-history: 360
 
-data-source:
-  sibyl-mysql:
-    driver: mysql
-    host: 127.0.0.1
-    port: 3306
-    database: sibyl
-    user: root
-    password: 123456
-  sibyl-postgresql:
-    driver: postgresql
-    host: 127.0.0.1
-    port: 5432
-    database: postgres
-    user: postgres
-    password: 123456
 

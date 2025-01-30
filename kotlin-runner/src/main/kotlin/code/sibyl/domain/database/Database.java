@@ -1,6 +1,7 @@
 package code.sibyl.domain.database;
 
 import code.sibyl.aop.Header;
+import code.sibyl.common.DataBaseTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.r2dbc.spi.ConnectionFactory;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
  */
 
 @Entity
-@Table("T_BASE_DATABASE")
+@Table("T_SYS_DATABASE")
 @Data
 @Builder
 @Accessors(chain = true)
@@ -100,4 +101,8 @@ public class Database implements Serializable {
     @org.springframework.data.annotation.Transient
     @Transient
     private DatabaseClient databaseClient;
+
+    public static Database _default() {
+        return new Database().setId(0L).setName("H2").setType(DataBaseTypeEnum.h2.getCode()).setDesc("default");
+    }
 }

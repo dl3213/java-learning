@@ -1,6 +1,6 @@
 package code.sibyl.flink;
 
-
+import code.sibyl.common.r;
 import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
@@ -18,6 +18,7 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.catalog.ObjectPath;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,13 +26,13 @@ import java.io.File;
 import java.time.Duration;
 import java.util.Properties;
 
+@ConditionalOnProperty(name = "flink.enabled", havingValue = "true", matchIfMissing = false)
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
 public class FlinkConfig {
 
-
-//    @Bean
+    @Bean
     public MiniCluster miniCluster() throws Exception {
         MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder()
                 .setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090))
@@ -40,11 +41,12 @@ public class FlinkConfig {
         miniCluster.start();
         //miniCluster.close();
         //miniCluster.isRunning();
+        log.info("flink MiniCluster start");
         return miniCluster;
     }
 
 
-//    @Bean
+    @Bean
     public StreamExecutionEnvironment cdc() throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9091));
         env.setParallelism(1);
@@ -57,7 +59,7 @@ public class FlinkConfig {
         checkpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE); //配置检查点模式：EXACTLY_ONCE：精确一次,AT_LEAST_ONCE:至少一次
         checkpointConfig.setMaxConcurrentCheckpoints(1);
         checkpointConfig.enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-        env.getCheckpointConfig().setCheckpointStorage(new FileSystemCheckpointStorage(Path.fromLocalFile(new File("E:\\flink-checkpoint"))));
+        env.getCheckpointConfig().setCheckpointStorage(new FileSystemCheckpointStorage(Path.fromLocalFile(new File(r.absolutePath() + File.separator + "flink-checkpoint"))));
         //env.getCheckpointConfig().setCheckpointStorage(new JobManagerCheckpointStorage());
 //// 检查点配置超时时间
 //        env.getCheckpointConfig().setAlignmentTimeout(Duration.ofMillis(1000L));
@@ -98,7 +100,7 @@ public class FlinkConfig {
                 .hostname("127.0.0.1")
                 .port(3306)
                 .username("root")
-                .password("123456")
+                .password("sibyl-mysql-0127")
                 .databaseList("sibyl")    //监控的数据库
 //                .tableList("thlease_db.th_mater_store_info, thlease_db.th_crm_rent_out,  thlease_db.th_crm_customer_info")    //监控的数据库下的表
                 .tableList("sibyl.*")    //监控的数据库下的表
@@ -125,7 +127,7 @@ public class FlinkConfig {
                 .schemaList("public")
                 .tableList("public.*")
                 .username("postgres")
-                .password("123456")
+                .password("sibyl-postgres-0127")
                 //.slotName("flink")
                 .decodingPluginName("pgoutput") // use pgoutput for PostgreSQL 10+ //   ALTER TABLE t_biz_book REPLICA IDENTITY FULL; -- 执行这个之后update 才有before
                 .deserializer(new JsonDebeziumDeserializationSchema())
@@ -147,7 +149,7 @@ public class FlinkConfig {
                 .addSink(new PrintRichSink());
 
         env.executeAsync();
-
+        log.info("flink-cdc start");
         return env;
     }
 }

@@ -7,6 +7,7 @@ import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.service.DataBaseService;
 import code.sibyl.service.TestService;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,12 @@ import java.util.stream.Collectors;
 public class DataBaseController {
 
     private final DataBaseService dataBaseService;
-    private final TestService testService;
-//    private final CommonRepository commonRepository;
 
+    @PostMapping("/list")
+    @ResponseBody
+    public Mono<Response> list(@RequestBody JSONObject jsonObject) {
+        return dataBaseService.list(jsonObject).collectList().map(e -> r.success(e));
+    }
 
     @SneakyThrows
     @GetMapping("/list-view")

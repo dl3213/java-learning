@@ -12,24 +12,19 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title th:text="${title}">Tabler - Premium and Open Source dashboard template with responsive and high quality
-        UI.</title>
+    <title th:text="${title}">Playground - Tabler - Premium and Open Source dashboard template with responsive and high
+        quality UI.</title>
     <!-- CSS files -->
     <link href="/dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler-flags.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
     <link href="/dist/css/demo.min.css?1692870487" rel="stylesheet"/>
-    <link href="/js/theme/default/layer.css" rel="stylesheet"/>
-    <link href="/css/layui.css" rel="stylesheet">
     <style>
-        /*@import url('https://rsms.me/inter/inter.css');*/
         @import url('/css/inter.css');
-
         :root {
             --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
         }
-
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
         }
@@ -38,759 +33,490 @@
 <body>
 <script src="/dist/js/demo-theme.min.js?1692870487"></script>
 <div class="page">
-    <!-- Navbar -->
-    <header class="navbar navbar-expand-md d-print-none" hidden="hidden">
-        <div class="container-xl">
-            <div class="navbar-nav flex-row order-md-last">
-                <div class="nav-item d-none d-md-flex me-3">
-                    <div class="btn-list">
-                        <a class="btn" target="_blank" rel="noreferrer">
-                        </a>
-                        <a class="btn" target="_blank" rel="noreferrer">
-                        </a>
-                    </div>
-                </div>
-                <div class="d-none d-md-flex">
-                </div>
-                <div class="nav-item dropdown">
 
+    <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Database
+                        </h2>
+                    </div>
                 </div>
             </div>
         </div>
-    </header>
-    <div class="page-wrapper">
         <!-- Page body -->
         <div class="page-body">
             <div class="container-xl">
-                <div class="row row-cards">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Databases</h3>
-                            </div>
-                            <div class="card-body border-bottom py-3">
-                                <div class="d-flex">
-                                    <div class="text-secondary" style="margin-left: 10px">
-                                        <a href="#" id="add-btn" class="btn btn-primary w-100">
-                                            New+
-                                        </a>
-                                    </div>
-                                    <div class="text-secondary" style="margin-left: 10px"></div>
-                                    <div class="text-secondary" style="margin-left: 10px">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal_form">
-                                            Launch modal with form
-                                        </button>
-                                        <div class="modal" id="exampleModal_form" tabindex="-1">
-                                            <div class="modal-dialog modal-lg" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">New report</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Name</label>
-                                                            <input type="text" class="form-control"
-                                                                   name="example-text-input"
-                                                                   placeholder="Your report name"/>
-                                                        </div>
-                                                        <label class="form-label">Report type</label>
-                                                        <div class="form-selectgroup-boxes row mb-3">
-                                                            <div class="col-md-6">
-                                                                <label class="form-selectgroup-item">
-                                                                    <input type="radio" name="report-type" value="1"
-                                                                           class="form-selectgroup-input" checked/>
-                                                                    <span class="form-selectgroup-label d-flex align-items-center p-3">
-                <span class="me-3">
-                  <span class="form-selectgroup-check"></span>
-                </span>
-                <span class="form-selectgroup-label-content">
-                  <span class="form-selectgroup-title strong mb-1">Simple</span>
-                  <span class="d-block text-secondary">Provide only basic data needed for the report</span>
-                </span>
-              </span>
-                                                                </label>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-selectgroup-item">
-                                                                    <input type="radio" name="report-type" value="1"
-                                                                           class="form-selectgroup-input"/>
-                                                                    <span class="form-selectgroup-label d-flex align-items-center p-3">
-                <span class="me-3">
-                  <span class="form-selectgroup-check"></span>
-                </span>
-                <span class="form-selectgroup-label-content">
-                  <span class="form-selectgroup-title strong mb-1">Advanced</span>
-                  <span class="d-block text-secondary">Insert charts and additional advanced analyses to be inserted in the report</span>
-                </span>
-              </span>
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-lg-8">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Report url</label>
-                                                                    <div class="input-group input-group-flat">
-                <span class="input-group-text">
-                  https://tabler.io/reports/
-                </span>
-                                                                        <input type="text" class="form-control ps-0"
-                                                                               value="report-01" autocomplete="off"/>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-4">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Visibility</label>
-                                                                    <select class="form-select">
-                                                                        <option value="1" selected>Private</option>
-                                                                        <option value="2">Public</option>
-                                                                        <option value="3">Hidden</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-lg-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Client name</label>
-                                                                    <input type="text" class="form-control"/>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Reporting period</label>
-                                                                    <input type="date" class="form-control"/>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-12">
-                                                                <div>
-                                                                    <label class="form-label">Additional
-                                                                        information</label>
-                                                                    <textarea class="form-control" rows="3"></textarea>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a href="#" class="btn btn-link link-secondary"
-                                                           data-bs-dismiss="modal">
-                                                            Cancel
-                                                        </a>
-                                                        <a href="#" class="btn btn-primary ms-auto"
-                                                           data-bs-dismiss="modal">
-                                                            Create new report
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div class="card">
+                    <div class="row g-0">
+                        <div class="col-12 col-lg-4 col-xl-2 border-end">
+                            <div class="card-header d-none d-md-block">
+                                <div class="input-icon">
+                      <span class="input-icon-addon"> <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                             stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                             stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path
+                                d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/><path d="M21 21l-6 -6"/></svg>
+                      </span>
+                                    <input type="text" value="" class="form-control" placeholder="Search…"
+                                           aria-label="Search"/>
                                 </div>
                             </div>
-                            <div class="modal modal-blur fade" id="modal-report" tabindex="-1" role="dialog"
-                                 aria-hidden="true">
-                                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">New report</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label">Name</label>
-                                                <input type="text" class="form-control" name="example-text-input"
-                                                       placeholder="Your report name">
+                            <div class="card-body p-0 scrollable"  style="max-height: 35rem">
+                                <div class="nav flex-column nav-pills" id="list" role="tablist">
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3 active" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/000m.jpg)"></span>
                                             </div>
-                                            <label class="form-label">Report type</label>
-                                            <div class="form-selectgroup-boxes row mb-3">
-                                                <div class="col-lg-6">
-                                                    <label class="form-selectgroup-item">
-                                                        <input type="radio" name="report-type" value="1"
-                                                               class="form-selectgroup-input" checked>
-                                                        <span class="form-selectgroup-label d-flex align-items-center p-3">
-                    <span class="me-3">
-                      <span class="form-selectgroup-check"></span>
-                    </span>
-                    <span class="form-selectgroup-label-content">
-                      <span class="form-selectgroup-title strong mb-1">Simple</span>
-                      <span class="d-block text-secondary">Provide only basic data needed for the report</span>
-                    </span>
-                  </span>
-                                                    </label>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <label class="form-selectgroup-item">
-                                                        <input type="radio" name="report-type" value="1"
-                                                               class="form-selectgroup-input">
-                                                        <span class="form-selectgroup-label d-flex align-items-center p-3">
-                    <span class="me-3">
-                      <span class="form-selectgroup-check"></span>
-                    </span>
-                    <span class="form-selectgroup-label-content">
-                      <span class="form-selectgroup-title strong mb-1">Advanced</span>
-                      <span class="d-block text-secondary">Insert charts and additional advanced analyses to be inserted in the report</span>
-                    </span>
-                  </span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-8">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Report url</label>
-                                                        <div class="input-group input-group-flat">
-                    <span class="input-group-text">
-                      https://tabler.io/reports/
-                    </span>
-                                                            <input type="text" class="form-control ps-0"
-                                                                   value="report-01" autocomplete="off">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Visibility</label>
-                                                        <select class="form-select">
-                                                            <option value="1" selected>Private</option>
-                                                            <option value="2">Public</option>
-                                                            <option value="3">Hidden</option>
-                                                        </select>
-                                                    </div>
+                                            <div class="col text-body">
+                                                <div>Paweł Kuna</div>
+                                                <div class="text-secondary text-truncate w-100">Sure Paweł, let me pull
+                                                    the latest updates.
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Client name</label>
-                                                        <input type="text" class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Reporting period</label>
-                                                        <input type="date" class="form-control">
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <div>
-                                                        <label class="form-label">Additional information</label>
-                                                        <textarea class="form-control" rows="3"></textarea>
-                                                    </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar">JL</span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Jeffie Lewzey</div>
+                                                <div class="text-secondary text-truncate w-100">I'm on it too 👊</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/002m.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Mallory Hulme</div>
+                                                <div class="text-secondary text-truncate w-100">I see you've refactored
+                                                    the <code>calculateStatistics</code> function. The code is much
+                                                    cleaner now.
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-                                                Cancel
-                                            </a>
-                                            <a href="#" class="btn btn-primary ms-auto" data-bs-dismiss="modal">
-                                                <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                     height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                     stroke="currentColor" fill="none" stroke-linecap="round"
-                                                     stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                    <path d="M12 5l0 14"/>
-                                                    <path d="M5 12l14 0"/>
-                                                </svg>
-                                                Create new report
-                                            </a>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/003m.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Dunn Slane</div>
+                                                <div class="text-secondary text-truncate w-100">Yes, I thought it was
+                                                    getting a bit cluttered.
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="table-responsive">
-                                <table id="table" class="table card-table table-vcenter text-nowrap datatable">
-                                    <thead>
-                                    <tr>
-                                        <th class="w-1"><input class="form-check-input m-0 align-middle" type="checkbox"
-                                                               aria-label="Select all invoices"></th>
-                                        <th class="w-1" th:each="h:${headerList}" th:text="${h}"></th>
-                                        <th class="w-1"></th>
-                                    </tr>
-                                    </thead>
-
-                                    <tbody id="table-body">
-                                    <tr th:each="t:${list}">
-                                        <td><input class="form-check-input m-0 align-middle" type="checkbox"
-                                                   aria-label="Select invoice"></td>
-                                        <td><span class="text-secondary" th:text="${t?.id}" name="id"></span></td>
-                                        <td><a href="#" class="text-reset" tabindex="-1"
-                                               th:text="${t?.name}">Design Works</a></td>
-                                        <td>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-database">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                                <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/>
-                                                <path d="M4 6v6a8 3 0 0 0 16 0v-6"/>
-                                                <path d="M4 12v6a8 3 0 0 0 16 0v-6"/>
-                                            </svg>
-                                            <span th:text="${t?.type}"></span>
-                                        </td>
-                                        <td th:text="${t?.host}"></td>
-                                        <td th:text="${t?.port}"></td>
-                                        <td th:text="${t?.username}"></td>
-                                        <td>*******</td>
-                                        <td th:text="${t?.database}"></td>
-                                        <td th:text="${t?.desc}"></td>
-                                        <td th:text="${t?.version}"></td>
-                                        <!--                                        <td th:text="${t?.createTime}"></td>-->
-                                        <!--                                        <td th:text="${t?.createId}"></td>-->
-                                        <td class="text-end">
-                            <span class="dropdown">
-                              <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"
-                                      data-bs-toggle="dropdown">Actions</button>
-                              <div class="dropdown-menu dropdown-menu-end">
-                                <a class="dropdown-item" name="edit" th:key="${t?.id}">edit</a>
-                                <a class="dropdown-item" name="connect" th:key="${t?.id}">connect</a>
-                                <a class="dropdown-item" name="backup" th:key="${t?.id}">backup</a>
-                              </div>
-                            </span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-
-                                </table>
-                                <div class="card" id="loading-div">
-                                    <ul class="list-group list-group-flush placeholder-glow">
-                                        <li class="list-group-item">
-                                            <div class="row align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="avatar avatar-rounded placeholder"></div>
-                                                </div>
-                                                <div class="col-7">
-                                                    <div class="placeholder placeholder-xs col-9"></div>
-                                                    <div class="placeholder placeholder-xs col-7"></div>
-                                                </div>
-                                                <div class="col-2 ms-auto text-end">
-                                                    <div class="placeholder placeholder-xs col-8"></div>
-                                                    <div class="placeholder placeholder-xs col-10"></div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Emmy Levet</div>
+                                                <div class="text-secondary text-truncate w-100">The commit message is
+                                                    descriptive, too. Good job on mentioning the issue number it fixes.
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <div class="row align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="avatar avatar-rounded placeholder"></div>
-                                                </div>
-                                                <div class="col-7">
-                                                    <div class="placeholder placeholder-xs col-9"></div>
-                                                    <div class="placeholder placeholder-xs col-7"></div>
-                                                </div>
-                                                <div class="col-2 ms-auto text-end">
-                                                    <div class="placeholder placeholder-xs col-8"></div>
-                                                    <div class="placeholder placeholder-xs col-10"></div>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/001f.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Maryjo Lebarree</div>
+                                                <div class="text-secondary text-truncate w-100">I noticed you added some
+                                                    new dependencies in the <code>package.json</code>. Did you also
+                                                    update the <code>README</code> with the setup instructions?
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <div class="row align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="avatar avatar-rounded placeholder"></div>
-                                                </div>
-                                                <div class="col-7">
-                                                    <div class="placeholder placeholder-xs col-9"></div>
-                                                    <div class="placeholder placeholder-xs col-7"></div>
-                                                </div>
-                                                <div class="col-2 ms-auto text-end">
-                                                    <div class="placeholder placeholder-xs col-8"></div>
-                                                    <div class="placeholder placeholder-xs col-10"></div>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar">EP</span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Egan Poetz</div>
+                                                <div class="text-secondary text-truncate w-100">Oops, I forgot. I'll add
+                                                    that right away.
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <div class="row align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="avatar avatar-rounded placeholder"></div>
-                                                </div>
-                                                <div class="col-7">
-                                                    <div class="placeholder placeholder-xs col-9"></div>
-                                                    <div class="placeholder placeholder-xs col-7"></div>
-                                                </div>
-                                                <div class="col-2 ms-auto text-end">
-                                                    <div class="placeholder placeholder-xs col-8"></div>
-                                                    <div class="placeholder placeholder-xs col-10"></div>
+                                            <div class="col-auto">🌴</div>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/002f.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Kellie Skingley</div>
+                                                <div class="text-secondary text-truncate w-100">I see a couple of edge
+                                                    cases we might not be handling in the
+                                                    <code>calculateStatistic</code> function. Should I open an issue for
+                                                    that?
                                                 </div>
                                             </div>
-                                        </li>
-                                    </ul>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/003f.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Christabel Charlwood</div>
+                                                <div class="text-secondary text-truncate w-100">Yes, Bob. Please do. We
+                                                    should not forget to handle those.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#chat-1" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar">HS</span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>Haskel Shelper</div>
+                                                <div class="text-secondary text-truncate w-100">Alright, once the <code>README</code>
+                                                    is updated, I'll merge this commit into the main branch. Nice work,
+                                                    Paweł.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="card"></div>
-                        <div class="card">
-                            <div id="table-default" class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                    <tr>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-name">Name</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-city">City</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-type">Type</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-score">Score</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-date">Date</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-quantity">Quantity</button>
-                                        </th>
-                                        <th>
-                                            <button class="table-sort" data-sort="sort-progress">Progress</button>
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody class="table-tbody">
-                                    <tr>
-                                        <td class="sort-name">Steel Vengeance</td>
-                                        <td class="sort-city">Cedar Point, United States</td>
-                                        <td class="sort-type">RMC Hybrid</td>
-                                        <td class="sort-score">100,0%</td>
-                                        <td class="sort-date" data-date="1628071164">August 04, 2021</td>
-                                        <td class="sort-quantity">74</td>
-                                        <td class="sort-progress" data-progress="30">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">30%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 30%" role="progressbar"
-                                                             aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="30% Complete">
-                                                            <span class="visually-hidden">30% Complete</span>
+                        <div class="col-12 col-lg-8 col-xl-10 d-flex flex-column">
+                            <div class="card-body scrollable" id="scrollable" style="height: 35rem">
+                                <div class="chat">
+                                    <div id="chat-context" class="chat-bubbles">
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:32</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Hey guys, I just pushed a new commit on the
+                                                                <code>dev</code> branch. Can you have a look and tell me
+                                                                what you think?</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/002m.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Mallory Hulme</div>
+                                                                <div class="col-auto chat-bubble-date">09:34</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Sure Paweł, let me pull the latest updates.</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Fury 325</td>
-                                        <td class="sort-city">Carowinds, United States</td>
-                                        <td class="sort-type">B&M Giga, Hyper, Steel</td>
-                                        <td class="sort-score">99,3%</td>
-                                        <td class="sort-date" data-date="1546512137">January 03, 2019</td>
-                                        <td class="sort-quantity">49</td>
-                                        <td class="sort-progress" data-progress="48">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">48%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 48%" role="progressbar"
-                                                             aria-valuenow="48" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="48% Complete">
-                                                            <span class="visually-hidden">48% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/003m.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Dunn Slane</div>
+                                                                <div class="col-auto chat-bubble-date">09:34</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>I'm on it too 👊</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Wildfire</td>
-                                        <td class="sort-city">Kolmården Sweden</td>
-                                        <td class="sort-type">RMC Twister, Wooden, Terrain</td>
-                                        <td class="sort-score">99,3%</td>
-                                        <td class="sort-date" data-date="1546016360">December 28, 2018</td>
-                                        <td class="sort-quantity">8</td>
-                                        <td class="sort-progress" data-progress="9">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">9%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 9%" role="progressbar"
-                                                             aria-valuenow="9" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="9% Complete">
-                                                            <span class="visually-hidden">9% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/002m.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Mallory Hulme</div>
+                                                                <div class="col-auto chat-bubble-date">09:40</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>I see you've refactored the
+                                                                <code>calculateStatistics</code> function. The code is
+                                                                much cleaner now.</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Lightning Rod</td>
-                                        <td class="sort-city">Dollywood, United States</td>
-                                        <td class="sort-type">RMC Wooden</td>
-                                        <td class="sort-score">99,1%</td>
-                                        <td class="sort-date" data-date="1604704179">November 07, 2020</td>
-                                        <td class="sort-quantity">104</td>
-                                        <td class="sort-progress" data-progress="98">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">98%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 98%" role="progressbar"
-                                                             aria-valuenow="98" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="98% Complete">
-                                                            <span class="visually-hidden">98% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:42</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Yes, I thought it was getting a bit cluttered.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Emmy Levet</div>
+                                                                <div class="col-auto chat-bubble-date">09:43</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>The commit message is descriptive, too. Good job on
+                                                                mentioning the issue number it fixes.</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Maverick</td>
-                                        <td class="sort-city">Cedar Point, United States</td>
-                                        <td class="sort-type">Intamin Rocket, Steel</td>
-                                        <td class="sort-score">99,1%</td>
-                                        <td class="sort-date" data-date="1637669424">November 23, 2021</td>
-                                        <td class="sort-quantity">86</td>
-                                        <td class="sort-progress" data-progress="46">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">46%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 46%" role="progressbar"
-                                                             aria-valuenow="46" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="46% Complete">
-                                                            <span class="visually-hidden">46% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/003m.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Dunn Slane</div>
+                                                                <div class="col-auto chat-bubble-date">09:44</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>I noticed you added some new dependencies in the <code>package.json</code>.
+                                                                Did you also update the <code>README</code> with the
+                                                                setup instructions?</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">El Toro</td>
-                                        <td class="sort-city">Six Flags Great Adventure, United States</td>
-                                        <td class="sort-type">Intamin Twister, Wooden</td>
-                                        <td class="sort-score">99,0%</td>
-                                        <td class="sort-date" data-date="1610586921">January 14, 2021</td>
-                                        <td class="sort-quantity">130</td>
-                                        <td class="sort-progress" data-progress="29">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">29%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 29%" role="progressbar"
-                                                             aria-valuenow="29" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="29% Complete">
-                                                            <span class="visually-hidden">29% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:45</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Oops, I forgot. I'll add that right away.</p>
+                                                            <div class="mt-2">
+                                                                <img src="https://media3.giphy.com/media/VABbCpX94WCfS/giphy.gif"
+                                                                     alt="" class="rounded img-fluid"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/002m.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Mallory Hulme</div>
+                                                                <div class="col-auto chat-bubble-date">09:46</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>I see a couple of edge cases we might not be handling in
+                                                                the <code>calculateStatistic</code> function. Should I
+                                                                open an issue for that?</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Twisted Colossus</td>
-                                        <td class="sort-city">Six Flags Magic Mountain, United States</td>
-                                        <td class="sort-type">RMC Hybrid</td>
-                                        <td class="sort-score">98,9%</td>
-                                        <td class="sort-date" data-date="1569399536">September 25, 2019</td>
-                                        <td class="sort-quantity">30</td>
-                                        <td class="sort-progress" data-progress="57">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">57%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 57%" role="progressbar"
-                                                             aria-valuenow="57" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="57% Complete">
-                                                            <span class="visually-hidden">57% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:47</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Yes, Bob. Please do. We should not forget to handle
+                                                                those.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Emmy Levet</div>
+                                                                <div class="col-auto chat-bubble-date">09:50</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Alright, once the <code>README</code> is updated, I'll
+                                                                merge this commit into the main branch. Nice work,
+                                                                Paweł.</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Eejanaika new</td>
-                                        <td class="sort-city">Fuji-Q Highland, Japan</td>
-                                        <td class="sort-type">S&S Power 4th Dimension, Steel</td>
-                                        <td class="sort-score">98,6%</td>
-                                        <td class="sort-date" data-date="1610794724">January 16, 2021</td>
-                                        <td class="sort-quantity">162</td>
-                                        <td class="sort-progress" data-progress="91">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">91%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 91%" role="progressbar"
-                                                             aria-valuenow="91" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="91% Complete">
-                                                            <span class="visually-hidden">91% Complete</span>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:52</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>Thanks, <a href="#">@everyone</a>! 🙌</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                                </div>
+                                                <div class="col-auto">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-body">
+                                                            <p class="text-secondary text-italic">typing<span
+                                                                    class="animated-dots"></span></p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Wicked Cyclone</td>
-                                        <td class="sort-city">Six Flags New England, United States</td>
-                                        <td class="sort-type">RMC Hybrid</td>
-                                        <td class="sort-score">98,2%</td>
-                                        <td class="sort-date" data-date="1568819813">September 18, 2019</td>
-                                        <td class="sort-quantity">174</td>
-                                        <td class="sort-progress" data-progress="3">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">3%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 3%" role="progressbar"
-                                                             aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="3% Complete">
-                                                            <span class="visually-hidden">3% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Shambhala</td>
-                                        <td class="sort-city">Port Aventura, Spain</td>
-                                        <td class="sort-type">B&M Hyper, Steel</td>
-                                        <td class="sort-score">98,2%</td>
-                                        <td class="sort-date" data-date="1538221867">September 29, 2018</td>
-                                        <td class="sort-quantity">111</td>
-                                        <td class="sort-progress" data-progress="24">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">24%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 24%" role="progressbar"
-                                                             aria-valuenow="24" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="24% Complete">
-                                                            <span class="visually-hidden">24% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Taron</td>
-                                        <td class="sort-city">Phantasialand, Germany</td>
-                                        <td class="sort-type">Intamin Sit Down, Steel</td>
-                                        <td class="sort-score">98,2%</td>
-                                        <td class="sort-date" data-date="1592858850">June 22, 2020</td>
-                                        <td class="sort-quantity">130</td>
-                                        <td class="sort-progress" data-progress="48">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">48%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 48%" role="progressbar"
-                                                             aria-valuenow="48" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="48% Complete">
-                                                            <span class="visually-hidden">48% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Expedition Ge Force</td>
-                                        <td class="sort-city">Holiday Park, Germany</td>
-                                        <td class="sort-type">Intamin Megacoaster, Steel</td>
-                                        <td class="sort-score">98,2%</td>
-                                        <td class="sort-date" data-date="1565107347">August 06, 2019</td>
-                                        <td class="sort-quantity">157</td>
-                                        <td class="sort-progress" data-progress="57">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">57%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 57%" role="progressbar"
-                                                             aria-valuenow="57" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="57% Complete">
-                                                            <span class="visually-hidden">57% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Storm Chaser</td>
-                                        <td class="sort-city">Kentucky Kingdom, United States</td>
-                                        <td class="sort-type">RMC Steel</td>
-                                        <td class="sort-score">97,9%</td>
-                                        <td class="sort-date" data-date="1564805623">August 03, 2019</td>
-                                        <td class="sort-quantity">43</td>
-                                        <td class="sort-progress" data-progress="42">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">42%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 42%" role="progressbar"
-                                                             aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="42% Complete">
-                                                            <span class="visually-hidden">42% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Helix</td>
-                                        <td class="sort-city">Liseberg, Sweden</td>
-                                        <td class="sort-type">Mack Looper, Steel, Terrain</td>
-                                        <td class="sort-score">97,9%</td>
-                                        <td class="sort-date" data-date="1633500491">October 06, 2021</td>
-                                        <td class="sort-quantity">151</td>
-                                        <td class="sort-progress" data-progress="54">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">54%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 54%" role="progressbar"
-                                                             aria-valuenow="54" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="54% Complete">
-                                                            <span class="visually-hidden">54% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="sort-name">Outlaw Run</td>
-                                        <td class="sort-city">Silver Dollar City, United States</td>
-                                        <td class="sort-type">RMC Hybrid</td>
-                                        <td class="sort-score">96,6%</td>
-                                        <td class="sort-date" data-date="1547084027">January 10, 2019</td>
-                                        <td class="sort-quantity">131</td>
-                                        <td class="sort-progress" data-progress="64">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-lg-auto">64%</div>
-                                                <div class="col">
-                                                    <div class="progress" style="width: 5rem">
-                                                        <div class="progress-bar" style="width: 64%" role="progressbar"
-                                                             aria-valuenow="64" aria-valuemin="0" aria-valuemax="100"
-                                                             aria-label="64% Complete">
-                                                            <span class="visually-hidden">64% Complete</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="input-group input-group-flat">
+                                    <input id="sql-text" type="text" class="form-control" autocomplete="off"
+                                           placeholder="Type sql"/>
+                                    <span class="input-group-text">
+                        <a href="#" class="link-secondary" data-bs-toggle="tooltip" aria-label="Clear search"
+                           title="Clear search"> <!-- Download SVG icon from http://tabler-icons.io/i/mood-smile -->
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                               viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                               stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"
+                                                                                    fill="none"/><path
+                                  d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M9 10l.01 0"/><path
+                                  d="M15 10l.01 0"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
+                        </a>
+                        <a href="#" class="link-secondary ms-2" data-bs-toggle="tooltip" aria-label="Add notification"
+                           title="Add notification"> <!-- Download SVG icon from http://tabler-icons.io/i/paperclip -->
+                          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                               viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                               stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"
+                                                                                    fill="none"/><path
+                                  d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3l6.5 -6.5a3 3 0 0 0 -6 -6l-6.5 6.5a4.5 4.5 0 0 0 9 9l6.5 -6.5"/></svg>
+                        </a>
+                        <a href="#" id="send" class="link-secondary ms-2" data-bs-toggle="tooltip"  aria-label="send"
+                           title="send"> <!-- Download SVG icon from http://tabler-icons.io/i/paperclip -->
+                           <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-telegram"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4" /></svg>
+                        </a>
+                      </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -803,304 +529,139 @@
 <!-- Tabler Core -->
 <script src="/dist/js/tabler.min.js?1692870487" defer></script>
 <script src="/dist/js/demo.min.js?1692870487" defer></script>
-<script src="/dist/libs/list.js/dist/list.min.js?1692870487" defer></script>
-<script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/layui.js"></script>
-<script src="/js/layer.js"></script>
 <script src="/js/common/common.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        console.log("database ready...")
-        const titles = document.getElementsByTagName('title');
-        const title = titles && titles[0] ? titles[0].innerText : "";
 
-        function backup() {
-            const els = document.getElementsByName("backup");
-            els.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    console.log("backup onclick...")
-                    const id = btn.getAttribute("key");
-                    axios
-                        .post('/database/backup/' + id)
-                        .then(response => {
-                            console.log(response)
+        var socket = null;
 
-                        })
-                        .catch(error => {
-                            console.log(error)
-                        })
-                })
-            })
-        }
+        var request = {}
+        load_list()
 
-        backup()
-
-        function connect() {
-            const els = document.getElementsByName("connect");
-            els.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    console.log("connect onclick...")
-                    const id = btn.getAttribute("key");
-
-                    layer.open({
-                        type: 2 //此处以iframe举例
-                        , title: title
-                        , area: ['85%', '65%']
-                        , shade: 0
-                        , maxmin: true
-                        , scrollbar: true
-                        , content: ['/database/connect-view?id=' + id]
-                        , zIndex: layer.zIndex //重点1
-                        , success: function (layero, index) {
-                            layer.setTop(layero); //重点2. 保持选中窗口置顶
-                            //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
-                            layer.escIndex = layer.escIndex || [];
-                            layer.escIndex.unshift(index);
-                            //选中当前层时，将当前层索引放置在首位
-                            layero.on('mousedown', function () {
-                                var _index = layer.escIndex.indexOf(index);
-                                if (_index !== -1) {
-                                    layer.escIndex.splice(_index, 1); //删除原有索引
-                                }
-                                layer.escIndex.unshift(index); //将索引插入到数组首位
-                            });
-                        }
-                        , end: function () {
-                            //更新索引
-                            if (typeof layer.escIndex === 'object') {
-                                layer.escIndex.splice(0, 1);
-                            }
-                            location.reload()
-                        }
-                    });
-
-
-                    // // 创建一个新的WebSocket实例
-                    // var ws = new WebSocket('ws://127.0.0.1:80/database/socket/' + id);
-                    //
-                    // // 当WebSocket连接打开时触发
-                    // ws.onopen = function (event) {
-                    //     console.log('WebSocket 连接已打开');
-                    //     sendMessage()
-                    // };
-                    //
-                    // // 当WebSocket接收到服务器发送的消息时触发
-                    // ws.onmessage = function (event) {
-                    //     console.log('收到消息: ' + event.data);
-                    // };
-                    //
-                    // // 当WebSocket连接关闭时触发
-                    // ws.onclose = function (event) {
-                    //     console.log('WebSocket 连接已关闭');
-                    // };
-                    //
-                    // // 当WebSocket通信发生错误时触发
-                    // ws.onerror = function (error) {
-                    //     console.error('WebSocket 出现错误: ' + error);
-                    // };
-                    //
-                    // // 发送消息到服务器
-                    // function sendMessage() {
-                    //     ws.send('Hello, Server!');
-                    // }
-
-                    // axios
-                    //     .post('/database/connect/' + id)
-                    //     .then(response => {
-                    //         console.log(response)
-                    //
-                    //     })
-                    //     .catch(error => {
-                    //         console.log(error)
-                    //     })
-                })
-            })
-        }
-
-        connect();
-
-        function edit_btn() {
-
-            const edits = document.getElementsByName("edit");
-            edits.forEach(edit => {
-                edit.addEventListener('click', (e) => {
-                    console.log("edit onclick...")
-                    const id = edit.getAttribute("key");
-                    //多窗口模式，层叠置顶
-                    layer.open({
-                        type: 2 //此处以iframe举例
-                        , skin: 'layer-ext-yourskin' //样式类名
-                        , title: title
-                        , area: ['85%', '65%']
-                        , shade: 0
-                        , maxmin: true
-                        , scrollbar: true
-                        , content: ['/database/update-view?id=' + id]
-                        //,btn: ['继续弹出', '全部关闭'] //只是为了演示
-                        // ,yes: function(){
-                        //     $(that).click();
-                        // }
-                        // ,btn2: function(){
-                        //     layer.closeAll();
-                        // }
-                        , zIndex: layer.zIndex //重点1
-                        , success: function (layero, index) {
-                            layer.setTop(layero); //重点2. 保持选中窗口置顶
-                            //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
-                            layer.escIndex = layer.escIndex || [];
-                            layer.escIndex.unshift(index);
-                            //选中当前层时，将当前层索引放置在首位
-                            layero.on('mousedown', function () {
-                                var _index = layer.escIndex.indexOf(index);
-                                if (_index !== -1) {
-                                    layer.escIndex.splice(_index, 1); //删除原有索引
-                                }
-                                layer.escIndex.unshift(index); //将索引插入到数组首位
-                            });
-                        }
-                        , end: function () {
-                            //更新索引
-                            if (typeof layer.escIndex === 'object') {
-                                layer.escIndex.splice(0, 1);
-                            }
-                            location.reload()
-                        }
-                    });
-
-                })
-            })
-        }
-
-        edit_btn();
-
-        function add_btn() {
-            const titles = document.getElementsByTagName('title');
-            const title = titles && titles[0] ? titles[0].innerText : "";
-            const btn = document.getElementById("add-btn");
-            btn.addEventListener('click', (e) => {
-                console.log("add onclick...")
-                //多窗口模式，层叠置顶
-                layer.open({
-                    type: 2 //此处以iframe举例
-                    //, skin: 'layer-ext-yourskin' //样式类名
-                    , title: title
-                    , area: ['85%', '65%']
-                    , shade: 0
-                    , maxmin: true
-                    , scrollbar: true
-                    , content: ['/database/add-view']
-                    // ,yes: function(){
-                    //     $(that).click();
-                    // }
-                    // ,btn2: function(){
-                    //     layer.closeAll();
-                    // }
-                    , zIndex: layer.zIndex //重点1
-                    , success: function (layero, index) {
-                        layer.setTop(layero); //重点2. 保持选中窗口置顶
-                        //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
-                        layer.escIndex = layer.escIndex || [];
-                        layer.escIndex.unshift(index);
-                        //选中当前层时，将当前层索引放置在首位
-                        layero.on('mousedown', function () {
-                            var _index = layer.escIndex.indexOf(index);
-                            if (_index !== -1) {
-                                layer.escIndex.splice(_index, 1); //删除原有索引
-                            }
-                            layer.escIndex.unshift(index); //将索引插入到数组首位
-                        });
-                    }
-                    , end: function () {
-                        //更新索引
-                        if (typeof layer.escIndex === 'object') {
-                            layer.escIndex.splice(0, 1);
-                        }
-                        //location.reload()
-                    }
-                });
-
-            })
-        }
-
-        add_btn();
-
-        function table_load() {
-            console.log('table_load')
+        function load_list(){
 
             axios
-                .get('/database/list')
-                .then(response => {
-                    console.log(response)
-                    $('#loading-div').hide();
-                    response.data.forEach(item => {
-                        console.log(item)
-                        $('#table-body').append('<tr>\n' +
-                            '                                        <td><input class="form-check-input m-0 align-middle" type="checkbox"\n' +
-                            '                                                   aria-label="Select invoice"></td>\n' +
-                            '                                        <td><span class="text-secondary" name="id">' + item.id + '</span></td>\n' +
-                            '                                        <td><a href="#" class="text-reset" tabindex="-1"\n' +
-                            '                                        >' + item.name + '</a></td>\n' +
-                            '                                        <td>\n' +
-                            '                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"\n' +
-                            '                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"\n' +
-                            '                                                 stroke-linecap="round" stroke-linejoin="round"\n' +
-                            '                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-database">\n' +
-                            '                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>\n' +
-                            '                                                <path d="M12 6m-8 0a8 3 0 1 0 16 0a8 3 0 1 0 -16 0"/>\n' +
-                            '                                                <path d="M4 6v6a8 3 0 0 0 16 0v-6"/>\n' +
-                            '                                                <path d="M4 12v6a8 3 0 0 0 16 0v-6"/>\n' +
-                            '                                            </svg>\n' +
-                            '                                            <span>' + item.type + '</span>\n' +
-                            '                                        </td>\n' +
-                            '                                        <td>' + item.host + '</td>\n' +
-                            '                                        <td>' + item.port + '</td>\n' +
-                            '                                        <td>' + item.username + '</td>\n' +
-                            '                                        <td>*******</td>\n' +
-                            '                                        <td>' + item.database + '</td>\n' +
-                            '                                        <td>' + item.desc + '</td>\n' +
-                            '                                        <td>' + item.version + '</td>\n' +
-                            '                                        <td class="text-end">\n' +
-                            '                            <span class="dropdown">\n' +
-                            '                              <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport"\n' +
-                            '                                      data-bs-toggle="dropdown">Actions</button>\n' +
-                            '                              <div class="dropdown-menu dropdown-menu-end">\n' +
-                            '                                <a class="dropdown-item" name="edit" th:key="' + item.id + '">edit</a>\n' +
-                            '                                <a class="dropdown-item" name="connect" th:key="' + item.id + '">connect</a>\n' +
-                            '                                <a class="dropdown-item" name="backup" th:key="' + item.id + '">backup</a>\n' +
-                            '                              </div>\n' +
-                            '                            </span>\n' +
-                            '                                        </td>\n' +
-                            '                                    </tr>')
+                    .post('/database/list', request)
+                    .then(response => {
+                        //console.log(response)
+                        var list = response.data.data
+                        //document.getElementById("chat-context").innerHTML = ''
+                        document.getElementById("list").innerHTML = ''
+                        list.forEach(item => {
+                            document.getElementById("list").innerHTML += `
+                            <a href="#chat-1" db-id="`+item.id+`" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                                       data-bs-toggle="pill" role="tab" aria-selected="true">
+                                        <div class="row align-items-center flex-fill">
+                                            <div class="col-auto"><span class="avatar"
+                                                                        style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                            </div>
+                                            <div class="col text-body">
+                                                <div>`+item.name+`</div>
+                                                <div class="text-secondary text-truncate w-100">`+item.desc+`.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                            ` 
+                        })
+
+                        var dbList = document.querySelectorAll('[db-id]');
+
+                        dbList.forEach(db => {
+                            //console.log(db)
+                            db.addEventListener("click", function (event) {
+                                //console.log(event.currentTarget)
+                                //console.log(event.currentTarget.getAttribute("db-id"))
+                                var db_id = event.currentTarget.getAttribute("db-id");
+                                socket?.close()
+                                socket = new WebSocket('ws://127.0.0.1:8080/database/socket/'+db_id);
+                                // 打开事件
+                                socket.onopen = function(event) {
+                                    console.log("Connection established");
+                                    // 可以在这里发送第一条消息
+                                    socket.send("Hello Server!");
+                                };
+                                
+                                // 接收消息事件
+                                socket.onmessage = function(event) {
+                                    console.log("Message from server ", event.data);
+                                    document.getElementById("chat-context").innerHTML += `
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-8">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Emmy Levet</div>
+                                                                <div class="col-auto chat-bubble-date">09:50</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>`+event.data+`</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `
+                                    var div = document.getElementById('scrollable');
+                                    div.scrollTop = div.scrollHeight;
+                                };
+                                
+                                // 错误事件
+                                socket.onerror = function(error) {
+                                    console.error("WebSocket Error: " + error);
+                                };
+                                
+                                // 关闭事件
+                                socket.onclose = function(event) {
+                                    console.log("Connection closed");
+                                };
+                            })
+                        })
+
                     })
-                })
-                .catch(error => {
-                    console.log(error)
-                    layer.msg(error.message);
-                })
+                    .catch(error => {
+                        console.log(error)
+                    })
+
+                    
         }
-
-        table_load();
-
-        $('#layerDemo .layui-btn').on('click', function () {
-            var othis = $(this), method = othis.data('method');
-            active[method] ? active[method].call(this, othis) : '';
-        });
-        $(document).on('keyup', function (e) {
-            if (e.keyCode === 27) {
-                layer.close(layer.escIndex ? layer.escIndex[0] : 0);
+        
+        document.getElementById('send').addEventListener('click',function(event){
+            var sql = document.getElementById('sql-text').value
+            console.log('sql - ' + sql)
+            if(sql && socket){
+                socket.send(sql)
+                document.getElementById("chat-context").innerHTML += `
+                                        <div class="chat-item">
+                                            <div class="row align-items-end justify-content-end">
+                                                <div class="col col-lg-8">
+                                                    <div class="chat-bubble chat-bubble-me">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">Paweł Kuna</div>
+                                                                <div class="col-auto chat-bubble-date">09:52</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>`+sql+`</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-auto"><span class="avatar"
+                                                                            style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                `
+                var div = document.getElementById('scrollable');
+                div.scrollTop = div.scrollHeight;
             }
-        });
-
-        const list = new List('table-default', {
-            sortClass: 'table-sort',
-            listClass: 'table-tbody',
-            valueNames: ['sort-name', 'sort-type', 'sort-city', 'sort-score',
-                {attr: 'data-date', name: 'sort-date'},
-                {attr: 'data-progress', name: 'sort-progress'},
-                'sort-quantity'
-            ]
-        });
+        })
     });
 </script>
 </body>

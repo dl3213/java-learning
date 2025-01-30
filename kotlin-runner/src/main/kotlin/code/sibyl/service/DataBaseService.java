@@ -2,8 +2,10 @@ package code.sibyl.service;
 
 import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
+import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
+import com.alibaba.fastjson2.JSONObject;
 import io.asyncer.r2dbc.mysql.MySqlConnectionConfiguration;
 import io.asyncer.r2dbc.mysql.MySqlConnectionFactory;
 import io.r2dbc.pool.ConnectionPool;
@@ -38,14 +40,29 @@ public class DataBaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseClient databaseClient;
 
-    //    @DS("bi-1")
-    public Flux<Database> list() {
-        return databaseRepository.list();
-//        return null;
+    public static DataBaseService getBean() {
+        return r.getBean(DataBaseService.class);
+    }
+
+    public Flux<Database> list(JSONObject jsonObject) {
+        return Flux.just(Database._default())
+                .concatWith(databaseClient.sql("""
+                                select * from T_SYS_DATABASE where is_deleted = '0' order by create_time asc
+                                """)
+                        .mapProperties(Database.class)
+                        .all())
+                ;
+    }
+
+    public Mono<Database> findById(String id) {
+        return databaseClient.sql("select * from T_SYS_DATABASE where id=:id")
+                .bind("id", id)
+                .mapProperties(Database.class)
+                .one();
     }
 
     public Mono<Database> findById(Long id) {
-        return databaseRepository.findById(id);
+        return databaseRepository.findById(id).switchIfEmpty(Mono.just(Database._default()));
     }
 
 
@@ -149,10 +166,12 @@ public class DataBaseService {
         return database;
     }
 
-    @Nullable
-    private static ConnectionFactory getConnectionFactoryByDatabaseEntity(Database database) {
+    public  ConnectionFactory getConnectionFactoryByDatabaseEntity(Database database) {
         if (StringUtils.isBlank(database.getType())) {
             throw new RuntimeException("database type must not be null");
+        }
+        if (database.getId() == 0L){
+            return databaseClient.getConnectionFactory();
         }
         DataBaseTypeEnum type = DataBaseTypeEnum.get(database.getType());
         ConnectionFactory factory = null;

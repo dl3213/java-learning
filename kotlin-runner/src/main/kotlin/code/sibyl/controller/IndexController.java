@@ -396,7 +396,7 @@ public class IndexController {
                                                                             Cookie banner
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="chat.html">
+                                                                        <a class="dropdown-item" href="list-view.html">
                                                                             Chat
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
@@ -1142,7 +1142,7 @@ public class IndexController {
         return Mono.create(monoSink -> monoSink.success(s));
     }
 
-    @GetMapping({"/chat.html"})
+    @GetMapping({"/list-view.html"})
     public Mono<String> chat(final Model model) {
         String s = "chat";
         model.addAttribute("systemName", r.systemName());

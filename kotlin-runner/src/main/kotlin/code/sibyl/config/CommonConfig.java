@@ -15,8 +15,10 @@ import org.redisson.config.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.FileUrlResource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.http.HttpHeaders;
@@ -100,13 +102,29 @@ public class CommonConfig {
 //                .and(RouterFunctions.resources("/other/**", new FileSystemResource("file:/another/path/to/resources/")))
                 ;
     }
+    @Bean
+    public RouterFunction<ServerResponse> sibylResources() throws MalformedURLException {
+        return RouterFunctions.resources("/sibyl-file/**", new UrlResource("ftp://13.60.20.165:21"), ((resource, httpHeaders) -> {
+            httpHeaders.set("sibyl", "test");
+            httpHeaders.setAcceptCharset(Arrays.asList(
+                    Charset.forName("UTF-8"),
+                    Charset.forName("GBK"),
+                    Charset.forName("ISO-8859-1")
+            ));
+        }))
+//                .and(RouterFunctions.resources("/images/**", new FileSystemResource("file:/path/to/images/")))
+//                .and(RouterFunctions.resources("/other/**", new FileSystemResource("file:/another/path/to/resources/")))
+                ;
+    }
 
     @Bean
     public Redisson redisson() {
         Config config = new Config();
         config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379")
-                .setDatabase(4);
+                .setAddress("redis://" + r.getBean(Environment.class).getProperty("spring.data.redis.host") + ":6379")
+                .setDatabase(4)
+                .setConnectionPoolSize(32)
+        ;
         return (Redisson) Redisson.create(config);
     }
 

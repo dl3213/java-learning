@@ -1,15 +1,10 @@
 package code.sibyl.runner;
 
-import code.sibyl.cache.LocalCache;
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
-import code.sibyl.event.SibylEvent;
+import code.sibyl.event.Event;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
-import code.sibyl.service.UpdateService;
-import code.sibyl.service.backup.BackupService;
-import code.sibyl.service.sql.SibylMysqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,7 +102,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //        });
 
         log.info("系统初始化工作--end");
-        applicationContext.publishEvent(new SibylEvent(this, "runner-end"));
+        applicationContext.publishEvent(new Event(this, "runner-end"));
     }
 
     @Override

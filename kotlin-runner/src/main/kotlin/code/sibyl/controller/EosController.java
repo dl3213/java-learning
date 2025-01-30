@@ -32,7 +32,6 @@ import java.io.IOException;
 public class EosController {
 
     private final EosRepository eosRepository;
-    private final DatabaseRepository databaseRepository;
 
     /**
      * todo 考虑到租赁系统人员和四区域+安翔并没有直接的关系，目前先暂行修改为显示全部数据
@@ -85,25 +84,6 @@ public class EosController {
         //return r.successMono();
     }
 
-    @PostMapping("/export")
-    public Mono<Void> export(ServerWebExchange exchange, ServerHttpResponse response, WebSession webSession, @RequestBody EosIndexRequest indexRequest) {
-
-
-        return databaseRepository.findAll().collectList().flatMap(list -> {
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            EasyExcel.write(outputStream, Database.class).sheet().doWrite(list); // 假设getData()返回一个List<SimpleData>数据集
-            byte[] bytes = outputStream.toByteArray();
-
-            response.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
-                    "filename=demo_export.xlsx");
-            response.getHeaders().add("Accept-Ranges", "bytes");
-            DataBuffer buffer = response.bufferFactory().wrap(bytes);
-            return response.writeWith(Mono.just(buffer));
-        });
-
-
-    }
 
     @PostMapping("/download/test")
     public Mono<Void> download(ServerHttpResponse response, @RequestBody EosIndexRequest indexRequest) throws IOException {

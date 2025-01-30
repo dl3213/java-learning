@@ -1,14 +1,29 @@
 
 env: prod
 
-file:
-  path: /file/ # 必须/结尾
-
 spring:
-  r2dbc:
-    url: r2dbc:h2:file:///./h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
-    pool:
-      enabled: true
-      max-size: 1024
-      min-idle: 64
-      initial-size: 64
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      repositories:
+        enabled: false
+
+data-source:
+  sibyl-mysql:
+    enable: true
+    driver: mysql
+    host: 127.0.0.1
+    port: 3306
+    database: sibyl
+    user: root
+    password: 123456
+  sibyl-postgresql:
+    enable: true
+    driver: postgresql
+    host: 127.0.0.1
+    port: 5432
+    database: postgres
+    user: postgres
+    password: sibyl-postgres-0127
