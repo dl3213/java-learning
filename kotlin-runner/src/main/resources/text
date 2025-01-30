@@ -78,6 +78,8 @@ sudo docker run -d -p 5432:5432 \
 -e POSTGRES_PASSWORD=sibyl-postgres-0127 \
 --name postgres postgres
 
+git config --local user.name "dl3213"
+git config --local user.email 18778253517@163.com
 
 D:\4code\4dev\apache-maven-3.9.6\bin\mvn dependency:resolve -Dclassifier=sources
 
