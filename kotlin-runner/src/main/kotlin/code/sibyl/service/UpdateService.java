@@ -14,6 +14,8 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.opencv_core.IplImage;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
@@ -39,7 +41,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UpdateService {
 
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
+    @Autowired
+    @Qualifier("sibyl-postgresql")
+    private R2dbcEntityTemplate r2dbcEntityTemplate;
 
 
     public static UpdateService getBean() {
@@ -348,7 +352,7 @@ public class UpdateService {
                     }
                     System.err.println();
 
-                    log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} " , Thread.currentThread().getName(), absolutePath , thumbnailPath );
+                    log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
                     return client.sql("update T_BASE_FILE set thumbnail=:thumbnailPath where id=:id")
                             .bind("id", item.getId())
                             .bind("thumbnailPath", thumbnailPath)

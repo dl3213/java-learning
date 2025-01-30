@@ -100,11 +100,12 @@ public class FileController {
         Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
         if ("1".equals(hash)) {
             sha256Query = r2dbcEntityTemplate.getDatabaseClient()
-                    .sql("""
-                            select sha256, count(1) as count from T_BASE_FILE
-                            where is_deleted = '0'
-                            group by sha256
-                            having count >=2
+                    .sql(""" 
+                            select * from (
+                                select sha256, count(1) as count from T_BASE_FILE
+                                where is_deleted = '0'
+                                group by sha256
+                            )t where count >=2
                             """)
                     .fetch()
                     .all()
