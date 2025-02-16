@@ -315,7 +315,10 @@
                                 </svg>
                             </a>
                         </li>
-
+                        <li class="page-item">
+                            <input type="text" class="form-control"  id="page-size"
+                                   name="example-text-input" value="12">
+                        </li>
                         <li class="page-item">
                             <select name="user[day]" class="form-select" id="page-select">
                             </select>
@@ -340,6 +343,11 @@
     document.addEventListener("DOMContentLoaded", function () {
         console.log("DOMContentLoaded...")
 
+        var danger_ok_btn = document.getElementById("danger_ok");
+        var pageSizeInput = document.getElementById("page-size");
+        var keywordInput = document.getElementById("keyword");
+        var page_select = document.getElementById("page-select");
+        var totalInfoDiv = document.getElementById("totalInfo");
         var config = {
             maxFilesize: 10240000,
             uploadMultiple: false,
@@ -350,11 +358,15 @@
 
         var request = {
             pageNumber: 1,
-            pageSize: 30,
+            pageSize: pageSizeInput.value,
         }
         load_photo(request)
 
-        var danger_ok_btn = document.getElementById("danger_ok");
+        pageSizeInput.addEventListener("change", function (evt){
+            if(Number(evt.currentTarget.value) < Number(9)){
+                evt.currentTarget.value = 9
+            }
+        })
 
         document.getElementById("page-select").addEventListener("change", function (event) {
             var selectedValue = event.target.value;
@@ -371,22 +383,23 @@
         function buildGallery(item, url) {
             return `<div class="col-sm-8 col-sm-6 col-lg-4">
                         <div class="card card-sm">
-                            <a href="` + url + `" class="d-block"  data-fslightbox="gallery" ><img
+                            <a ` + (item.type.startsWith("video") ? 'href' : 'href123') + `="` + url + `" class="d-block"  data-fslightbox="gallery" ><img
                                     src="` + (item.type.startsWith("video") ? url + '.jpg' : url) + `"
-                                    class="card-img-top"></a>
+                                    class="card-img-top"  ></a>
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <div class="col-xs-2 col-md-2 col-lg-2"><span class="avatar me-3 rounded" style="background-image: url(/static/avatars/000m.jpg)"></span></div>
-                                    <div class="col-xs-12 col-md-6 col-lg-6">
-                                        <div>` + (item.realName.length > 20 ? item.realName.substring(0, 20) + "..." : item.realName) + `</div>
-                                        <div class="text-secondary">` + item.createTime + `</div>
-                                    </div>
-                                    <div class="col-xs-4 col-md-2 col-lg-2">`+(item.size / 1024.0 / 1024.0).toFixed(1)+`MB</div>
                                     <div class="col-xs-4 col-md-2 col-lg-2">
                                         <a target-id="` + item.id + `" class="btn btn-link delete-btn">
                                             delete
                                         </a>
                                     </div>
+                                    <div class="col-xs-2 col-md-2 col-lg-2"><span class="avatar me-3 rounded" style="background-image: url(/static/avatars/000m.jpg)"></span></div>
+                                    <div class="col-xs-12 col-md-6 col-lg-6">
+                                        <div>` + (item.realName.length > 20 ? item.realName.substring(0, 20) + "..." : item.realName) + `</div>
+                                        <div class="text-secondary">` + item.createTime + `</div>
+                                    </div>
+                                    <div class="col-xs-4 col-md-2 col-lg-2">` + (item.size / 1024.0 / 1024.0).toFixed(1) + `MB</div>
+
                                 </div>
                             </div>
                         </div>
@@ -405,11 +418,12 @@
                       <!-- Card footer -->
                       <div class="card-footer">
                         <div class="d-flex align-items-center">
+                            <div class="col-xs-4 col-md-2 col-lg-2"><a target-id="` + item.id + `" class="btn btn-link delete-btn">delete</a>
                            <div class="col-xs-2 col-md-2 col-lg-2"><span class="avatar me-3 rounded" style="background-image: url(/static/avatars/000m.jpg)"></span></div>
                             <div class="col-xs-12 col-md-6 col-lg-6"> <div>` + (item.realName.length > 12 ? item.realName.substring(0, 12) + "..." : item.realName) + `</div>
                                         <div class="text-secondary">` + item.createTime + `</div></div>
                             <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary  ms-auto">Go Detail</a></div>
-                            <div class="col-xs-4 col-md-2 col-lg-2"><a target-id="` + item.id + `" class="btn btn-link delete-btn">delete</a>
+
                            </div>
                         </div>
                       </div>
@@ -418,10 +432,13 @@
         }
 
         function load_photo(request) {
+
+
             axios
                 .post('/file/page', {
                     ...request,
-                    "keyword": document.getElementById("keyword")?.value,
+                    "pageSize": pageSizeInput.value,
+                    "keyword": keywordInput?.value,
                     "hash": document.getElementById("hash")?.checked ? document.getElementById("hash")?.value : "0",
                     //"type": "image",
                 })
@@ -430,7 +447,7 @@
                     console.log(data)
                     var totalInfo = "<text>total = " + data.total + "</text>";
                     console.log(totalInfo)
-                    document.getElementById("totalInfo").innerHTML = totalInfo;
+                    totalInfoDiv.innerHTML = totalInfo;
                     if (data.pageNumber == 1) {
                         document.getElementById("page-prev").classList.add("disabled")
                     } else {
@@ -438,8 +455,9 @@
                     }
 
                     var pageIndex_size = (data.total / data.pageSize)
-                    var page_select = document.getElementById("page-select");
+
                     page_select.innerHTML = ""
+                    pageIndex_size = pageIndex_size == 0 ? 1 : pageIndex_size;
                     for (let i = 1; i <= (pageIndex_size + 1); i++) {
                         if (i == data.pageNumber) {
                             page_select.innerHTML += `<option selected value="` + i + `" >` + i + `</option>`
@@ -450,12 +468,15 @@
 
                     var page_index_list = document.getElementsByClassName("page-index");
                     if (data.pageNumber > (3)) {
-                        var start = data.pageNumber == 1 && data.pageNumber <= 2 ? 1 : data.pageNumber - 2;
-                        for (let el of page_index_list) {
-                            el.innerText = start
-                            start = numberAdd(start, 1)
-                        }
+
                     }
+
+                    var start = data.pageNumber == 1 && data.pageNumber < 2 ? 1 : data.pageNumber - 2;
+                    for (let el of page_index_list) {
+                        el.innerText = start
+                        start = numberAdd(start, 1)
+                    }
+
                     for (let el of page_index_list) {
                         if (el.innerText == data.pageNumber) {
                             el.parentElement.classList.add("active")
@@ -465,7 +486,6 @@
 
                     }
 
-                    document.getElementsByName("page-link")
 
                     document.getElementById('gallery-context').innerHTML = ""
                     data.data.forEach(item => {

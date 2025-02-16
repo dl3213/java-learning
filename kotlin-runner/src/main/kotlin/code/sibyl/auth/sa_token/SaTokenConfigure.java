@@ -23,8 +23,8 @@ public class SaTokenConfigure {
     /**
      * 注册 [Sa-Token全局过滤器]
      */
-    @Bean
-    @Order(2)
+//    @Bean
+//    @Order(2)
     public SaReactorFilter systemFilter() {
         SaReactorFilter filter = new SaReactorFilter();
         return filter
@@ -47,6 +47,7 @@ public class SaTokenConfigure {
                         "/default/**",
                         "/api/external/**",
                         "/api/kotlin/**",
+                        "/api/test/**",
                         "/eos/**"
                 )
                 // 指定[认证函数]: 每次请求执行
@@ -65,8 +66,8 @@ public class SaTokenConfigure {
                 ;
     }
 
-    @Bean
-    @Order(1)
+//    @Bean
+//    @Order(1)
     public SaReactorFilter restFilter() {
         SaReactorFilter filter = new SaReactorFilter();
         return filter
@@ -74,7 +75,8 @@ public class SaTokenConfigure {
                 .addInclude("/api/rest")    /* 拦截所有path */
                 // 指定 [放行路由]
                 .addExclude(
-                        "/api/rest/auth/login"
+                        "/api/rest/auth/login",
+                        "/api/rest/v1/**"
                 )
                 // 指定[认证函数]: 每次请求执行
                 .setAuth(obj -> {

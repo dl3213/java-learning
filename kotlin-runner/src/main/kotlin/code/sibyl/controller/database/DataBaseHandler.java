@@ -6,6 +6,9 @@ import code.sibyl.domain.database.Database;
 import code.sibyl.repository.DatabaseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -22,10 +25,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class DataBaseHandler {
 
     private final DatabaseRepository databaseRepository;
+    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     public Mono<ServerResponse> list(ServerRequest serverRequest) {
         return ServerResponse.ok().contentType(APPLICATION_JSON)
-                .body(databaseRepository.findAll(), Database.class);
+                .body(r2dbcEntityTemplate.select(Query.query(Criteria.empty()), Database.class), Database.class);
     }
 
     public Mono<ServerResponse> save(ServerRequest serverRequest) {

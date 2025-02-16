@@ -414,6 +414,7 @@
                     var pageIndex_size = (data.total / data.pageSize)
                     var page_select = document.getElementById("page-select");
                     page_select.innerHTML = ""
+                    pageIndex_size = pageIndex_size == 0 ? 1 : pageIndex_size;
                     for (let i = 1; i <= (pageIndex_size + 1); i++) {
                         if (i == data.pageNumber) {
                             page_select.innerHTML += `<option selected value="` + i + `" >` + i + `</option>`

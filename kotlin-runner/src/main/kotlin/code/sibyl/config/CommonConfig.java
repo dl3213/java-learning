@@ -12,9 +12,11 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.tika.Tika;
 import org.redisson.Redisson;
 import org.redisson.config.Config;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.FileUrlResource;
@@ -28,6 +30,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -36,6 +40,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.resource.ResourceWebHandler;
+import org.springframework.web.server.i18n.AcceptHeaderLocaleContextResolver;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.netty.http.client.HttpClient;
 
 import java.lang.reflect.Array;
@@ -45,13 +51,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
+@EnableWebFlux
 @EnableAsync
 @EnableScheduling
-public class CommonConfig {
+public class CommonConfig implements WebFluxConfigurer {
 
     //    @Primary
     @Bean("virtualExecutor")
@@ -155,5 +163,22 @@ public class CommonConfig {
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
         gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter());
         return gsonBuilder.setPrettyPrinting().create();
+    }
+
+    @Bean
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasenames("i18n/message");
+//        messageSource.setDefaultEncoding("UTF-8");
+        return messageSource;
+    }
+
+
+    @Primary
+    @Bean
+    public LocaleContextResolver localeResolver() {
+        AcceptHeaderLocaleContextResolver resolver = new AcceptHeaderLocaleContextResolver();
+        resolver.setDefaultLocale(Locale.US); // 设置默认区域
+        return resolver;
     }
 }

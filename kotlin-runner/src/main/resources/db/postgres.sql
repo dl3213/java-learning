@@ -30,3 +30,21 @@ create table IF NOT EXISTS t_base_file
     UPDATE_ID     BIGINT,
     THUMBNAIL     varchar(1024)
 );
+
+create table t_biz_book
+(
+    id            bigint                                    not null
+        primary key,
+    name          varchar(255),
+    type          varchar(64),
+    absolute_path varchar(1024),
+    relative_path varchar(1024),
+    page_num      bigint,
+    serial_number varchar(255),
+    code          varchar(64),
+    is_deleted    varchar(2) default '0'::character varying not null,
+    create_time   timestamp,
+    create_id     bigint,
+    update_time   timestamp,
+    update_id     bigint
+);

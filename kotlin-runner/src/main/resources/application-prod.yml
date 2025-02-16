@@ -6,6 +6,7 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+      password: sibyl-postgres-0127
       database: 0
       repositories:
         enabled: false
@@ -18,7 +19,7 @@ data-source:
     port: 3306
     database: sibyl
     user: root
-    password: 123456
+    password: sibyl-mysql-0127
   sibyl-postgresql:
     enable: true
     driver: postgresql

@@ -680,7 +680,7 @@ But that's the difference in our opinions.</textarea>
  
                                 var db_id = event.currentTarget.getAttribute("db-id");
                                 socket?.close()
-                                socket = new WebSocket('ws://127.0.0.1:8080/database/socket/'+db_id);
+                                socket = new WebSocket('ws://127.0.0.1:8080/database/socket/'+db_id+'?a=1&b=2&db='+db_id);
                                 // 打开事件
                                 socket.onopen = function(event) {
                                     console.log("Connection established");

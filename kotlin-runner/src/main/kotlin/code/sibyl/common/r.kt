@@ -1,5 +1,6 @@
 package code.sibyl.common
 
+import net.sf.jsqlparser.parser.CCJSqlParserUtil
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
@@ -24,7 +25,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Function
-import java.util.stream.Collector
 import java.util.stream.Collectors
 
 
@@ -525,4 +525,16 @@ object r {
         return (r.bigDecimal(num).multiply(BigDecimal(100))).setScale(4, RoundingMode.UP).toString() + "%"
     }
 
+
+    @JvmStatic
+    fun isSql(obj: Any): Boolean {
+        if (obj == null || obj.toString().isBlank()) return false;
+        try {
+            return CCJSqlParserUtil.parse(obj.toString()) != null;
+        } catch (e: java.lang.Exception) {
+            //e.printStackTrace()
+            e.message?.let { error(it) }
+            return false;
+        }
+    }
 }

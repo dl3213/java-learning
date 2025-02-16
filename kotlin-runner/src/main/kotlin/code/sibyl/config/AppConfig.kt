@@ -68,13 +68,14 @@ class AppConfig {
      * 全局跨域配置
      * @return
      */
-    @Bean
+//    @Bean //CorsWebFilter 才生效
     fun corsFilter(): CorsWebFilter {
         val config = CorsConfiguration()
         config.allowCredentials = true
         config.addAllowedOriginPattern("*")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
+        ////config.addAllowedOrigin("*")
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", config)
         return CorsWebFilter(source)

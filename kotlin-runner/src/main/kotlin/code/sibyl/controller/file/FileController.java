@@ -51,7 +51,7 @@ public class FileController {
     @Autowired
     private DataBaseService dataBaseService;
     @Autowired
-    @Qualifier("sibyl-postgresql")
+//    @Qualifier("sibyl-postgresql")
     R2dbcEntityTemplate r2dbcEntityTemplate;
 
     @GetMapping("/list-view")
@@ -116,7 +116,7 @@ public class FileController {
 
         Integer pageNumber = jsonObject.getInteger("pageNumber");
         Integer pageSize = jsonObject.getInteger("pageSize");
-
+        System.err.println(jsonObject);
         return Mono.zip(Mono.just(criteria), sha256Query)
                 .flatMap(tuple -> {
                     //System.err.println(tuple.getT2());

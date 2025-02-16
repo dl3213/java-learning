@@ -11,6 +11,7 @@ import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -33,6 +34,15 @@ public class DefaultController {
 
     private final EosRepository eosRepository;
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
+    private final MessageSource messageSource;
+
+    @GetMapping("/greeting")
+    @ResponseBody
+    public Mono<String> greeting(@RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+        System.err.println(locale);
+        System.err.println(messageSource.getClass());
+        return Mono.just(messageSource.getMessage("greeting", null, locale));
+    }
 
     @GetMapping("/json")
     @ResponseBody

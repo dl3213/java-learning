@@ -42,7 +42,7 @@ import java.util.stream.Stream;
 public class UpdateService {
 
     @Autowired
-    @Qualifier("sibyl-postgresql")
+//    @Qualifier("sibyl-postgresql")
     private R2dbcEntityTemplate r2dbcEntityTemplate;
 
 

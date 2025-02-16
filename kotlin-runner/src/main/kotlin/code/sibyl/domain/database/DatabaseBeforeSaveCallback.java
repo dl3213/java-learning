@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-@Component
+//@Component
 public class DatabaseBeforeSaveCallback implements org.springframework.data.r2dbc.mapping.event.BeforeSaveCallback<Database> {
 
     @Override

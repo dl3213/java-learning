@@ -66,7 +66,7 @@ sudo docker run --name nginx --restart=always -p 80:80 -d nginx
 sudo docker run -d -p 3306:3306 \
 --name mysql --privileged=true \
 --restart=always  \
--v C:/Users/18778/4code/4dev/data/mysql:/var/lib/mysql \
+-v D:/4code/4data/mysql:/var/lib/mysql \
 -e MYSQL_ROOT_PASSWORD=sibyl-mysql-0127 -e TZ=Asia/Shanghai \
 mysql:8.0.32
 
@@ -74,7 +74,7 @@ mysql:8.0.32
 
 sudo docker run -d -p 5432:5432 \
 --restart=always \
- -v C:/Users/18778/4code/4dev/data/postgres:/var/lib/postgresql \
+ -v D:/4code/4data/postgres:/var/lib/postgresql \
 -e POSTGRES_PASSWORD=sibyl-postgres-0127 \
 --name postgres postgres
 
@@ -103,3 +103,8 @@ scp -i D:/z/sibyl-test.pem D:/4code/4java/workspace/java-learning/kotlin-runner/
 scp -i  sibyl-test.pem D:/4code/4java/workspace/java-learning/kotlin-runner/target/kotlin-runner/kotlin-runner-0.0.1-SNAPSHOT.jar root@127.0.0.1:/data/workspace/kotlin-runner
 
 scp -i "your-key.pem" -r /path/to/local/folder ec2-user@your-public-ip:/path/to/remote/directory
+
+
+
+1. bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
+2. ollama run deepseek-r1:14b

@@ -39,7 +39,7 @@ public class FileService {
 
 
     @Autowired
-    @Qualifier("sibyl-postgresql")
+//    @Qualifier("sibyl-postgresql")
     private R2dbcEntityTemplate r2dbcEntityTemplate;
 
     public void init() {

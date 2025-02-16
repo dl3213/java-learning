@@ -10,8 +10,8 @@ flink:
   enabled: false
 
 file:
-  model: ftp
-  path: c:/sibyl-system/file/ # 必须/结尾
+  mode: ftp
+  path: e:/sibyl-system/file/ # 必须/结尾
 
 server:
   port: 8080

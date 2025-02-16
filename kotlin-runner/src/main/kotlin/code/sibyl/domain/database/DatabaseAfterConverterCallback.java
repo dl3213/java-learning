@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-@Component
+//@Component
 public class DatabaseAfterConverterCallback implements org.springframework.data.r2dbc.mapping.event.AfterConvertCallback<Database> {
 
     @Override
@@ -21,5 +21,12 @@ public class DatabaseAfterConverterCallback implements org.springframework.data.
         entity.setUsername(new String(r.base64Decoder().decode(entity.getUsername().getBytes(StandardCharsets.UTF_8))));
         entity.setPassword(new String(r.base64Decoder().decode(entity.getPassword().getBytes(StandardCharsets.UTF_8))));
         return Mono.just(entity);
+    }
+
+    public static void main(String[] args) {
+        byte[] bytes = "sibyl-mysql-0127".getBytes(StandardCharsets.UTF_8);
+        byte[] decode = r.base64Decoder().decode(bytes);
+        System.err.println(new String(decode));
+        System.err.println(new String(r.base64Decoder().decode("sibyl-postgres-0127".getBytes(StandardCharsets.UTF_8))));
     }
 }

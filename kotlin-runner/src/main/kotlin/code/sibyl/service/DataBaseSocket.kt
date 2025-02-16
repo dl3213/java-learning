@@ -1,17 +1,17 @@
 package code.sibyl.service
 
+import code.sibyl.common.r
 import com.alibaba.fastjson2.JSONObject
+import org.apache.http.client.utils.URLEncodedUtils
 import org.slf4j.LoggerFactory
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketHandler
-import org.springframework.web.reactive.socket.WebSocketMessage
 import org.springframework.web.reactive.socket.WebSocketSession
-import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
-import java.util.Arrays
+import java.nio.charset.StandardCharsets
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.function.Supplier
 
 // @MessageMapping和@SendTo
 @Component
@@ -44,8 +44,12 @@ class DataBaseSocket : WebSocketHandler {
 //                session.textMessage("Echo $value")
 //            }
 
-        var id : Long =  session.handshakeInfo.uri.path.replace("/database/socket/", "").toLong()
+
+        var id : Long =  handshakeInfo.uri.path.replace("/database/socket/", "").toLong()
         log.info("socket get => id = {}", id)
+        var queryList = URLEncodedUtils.parse(handshakeInfo.uri.query, StandardCharsets.UTF_8)
+        var queryMap = queryList.associateBy { it.name to it.value }
+        log.error("socket get => map = {}", queryMap)
         return session.send(
             session.receive()
                 .map { m -> m.payloadAsText }
@@ -55,12 +59,18 @@ class DataBaseSocket : WebSocketHandler {
                     clientMap += session to DatabaseClient.create(DataBaseService.getBean().getConnectionFactoryByDatabaseEntity(tuple.t2))
                 }
                 .flatMap { tuple ->
-                    return@flatMap clientMap[session]?.sql(tuple.t1)
-                        ?.fetch()?.all()?.collectList()
-                        ?.onErrorResume { throwable ->
-                            throwable.printStackTrace()
-                            Mono.just(Arrays.asList(hashMapOf("throwable" to throwable.message)))
-                        }
+
+                    if(!r.isSql(tuple.t1)){
+                        return@flatMap Mono.just(tuple.t1);
+                    }else{
+                        return@flatMap clientMap[session]?.sql(tuple.t1)
+                            ?.fetch()?.all()?.collectList()
+                            ?.onErrorResume { throwable ->
+                                throwable.printStackTrace()
+                                Mono.just(Arrays.asList(hashMapOf("throwable" to throwable.message)))
+                            }
+                    }
+
                 }
                 .map { tuple ->
                     println(clientMap)

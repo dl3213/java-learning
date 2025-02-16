@@ -17,6 +17,8 @@
         <java.version>21</java.version>
         <kotlin.version>2.0.0</kotlin.version>
         <flink.version>1.20.0</flink.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <dependencies>
         <!-- Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc -->
@@ -355,6 +357,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
     </dependencies>

@@ -2,11 +2,16 @@ package code.sibyl.service;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -26,10 +31,12 @@ import java.util.List;
 
 public class BilibiliTool {
 
+    private static final WebClient webClient = webClient();
+
     public static void main(String[] args) {
 
         List<String> strings = Arrays.asList(
-                "BV1vfr7YQEB3"
+
         );
         System.err.println(strings.size());
         strings.stream().forEach(item -> {
@@ -42,11 +49,21 @@ public class BilibiliTool {
 
     }
 
+    public static WebClient webClient() {
+        // 创建不验证SSL的HttpClient
+        HttpClient httpClient = HttpClient.create()
+                .secure(sslContextSpec -> sslContextSpec.sslContext(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE)));
+        // 使用HttpClient创建WebClient
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
     private static String getCookie() {
 
         return """
-                buvid4=B0D8C4F1-19BA-C893-3C07-45A7F21D60B664363-023123112-o4ni5UDK5a3zSIFeUd70zQ%3D%3D; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; rpdid=|(k|J|)mkm|u0J'u~|Ru|RmJl; LIVE_BUVID=AUTO7017041119038683; buvid_fp_plain=undefined; enable_web_push=DISABLE; header_theme_version=CLOSE; CURRENT_BLACKGAP=0; FEED_LIVE_VERSION=V_WATCHLATER_PIP_WINDOW; go-back-dyn=1; fingerprint=13e2f4887100f107ecd8ac557c446668; buvid_fp=13e2f4887100f107ecd8ac557c446668; home_feed_column=5; historyviewmode=list; buvid3=B98504AD-F503-5AD6-B9B4-57D8CBF3986758338infoc; b_nut=1735560337; _uuid=310462B75-4A28-9E3F-1F102-849AFE6B148932264infoc; hit-dyn-v2=1; CURRENT_QUALITY=80; browser_resolution=2327-1228; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzcwMzIxMjgsImlhdCI6MTczNjc3Mjg2OCwicGx0IjotMX0.QMlwcMUMW8DiSvyR9aYLVxkzh61tAy3GpgVDdKZU7CI; bili_ticket_expires=1737032068; SESSDATA=36c485ee%2C1752405147%2C110db%2A12CjDYwV8R3lKbnSzo4fisi8rUnbg9t81opRogCq12_gmMkddWLbR3q9iJNNVLxt4H3hwSVjdHYVB1OFVuT1ItMHB4MHdMa3J4cjBleTFPamhZaWY0Smh2dmRTb1hxOXhtTFdxLXUwYnQzVS1qYzhFRzFwWk4yRlcyb29qcTdsX2dpLUxyQWtyOW9nIIEC; bili_jct=0371af2d563e4cf42b2376fe17d5a1b9; sid=7v2b7hi6; CURRENT_FNVAL=4048; bp_t_offset_11885873=1022284048459890688; PVID=2; b_lsid=1AC6CEA2_19464D76141
-                """.toString();
+                buvid4=B0D8C4F1-19BA-C893-3C07-45A7F21D60B664363-023123112-o4ni5UDK5a3zSIFeUd70zQ%3D%3D; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; buvid_fp_plain=undefined; enable_web_push=DISABLE; header_theme_version=CLOSE; CURRENT_BLACKGAP=0; FEED_LIVE_VERSION=V_WATCHLATER_PIP_WINDOW; go-back-dyn=1; historyviewmode=list; buvid3=B98504AD-F503-5AD6-B9B4-57D8CBF3986758338infoc; b_nut=1735560337; _uuid=310462B75-4A28-9E3F-1F102-849AFE6B148932264infoc; hit-dyn-v2=1; CURRENT_QUALITY=80; enable_feed_channel=DISABLE; home_feed_column=5; rpdid=|(k||lRJlRJu0J'u~J)YYYY~R; LIVE_BUVID=AUTO6017386770844761; browser_resolution=2327-1228; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzkzNTc0NzUsImlhdCI6MTczOTA5ODIxNSwicGx0IjotMX0.JoVNVHnrL_ELzdPZfu3uZVN3HgbXDtBlmpS1O19X0Vk; bili_ticket_expires=1739357415; CURRENT_FNVAL=4048; PVID=2; bsource=search_baidu; SESSDATA=7be150af%2C1754654392%2C43c05%2A22CjDNLuTvGjwgWhJtZGqMZ89WkWavSIBV-J1JwVQEDBPxzQ9ucv2MhHH80qGKs4TJSjESVjBBR1dUdGxIRlhUU3JnNDZjdGEyM0RWR0V0WlFhd2R2ZnhCbS16RkJ1WjdINUNVVnd1N1AxRTYxOUV1VC1GMmp3X3JkN3hObkV2VDEzdGU1VTVPcXl3IIEC; bili_jct=c0028f6886a232bd8564be627b4ffeb3; sid=pw7hvb4w; bp_t_offset_11885873=1031925988046405632; fingerprint=a1b14c043db0f76975753d85d58b71f6; buvid_fp=a1b14c043db0f76975753d85d58b71f6; b_lsid=44C17D8E_194EA9A874A
+                """.toString().trim();
     }
 
     public static void close(InputStream inputStream) {
