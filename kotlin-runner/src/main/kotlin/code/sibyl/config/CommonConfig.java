@@ -56,10 +56,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
-@EnableWebFlux
+//@EnableWebFlux
 @EnableAsync
 @EnableScheduling
-public class CommonConfig implements WebFluxConfigurer {
+public class CommonConfig  {
 
     //    @Primary
     @Bean("virtualExecutor")
