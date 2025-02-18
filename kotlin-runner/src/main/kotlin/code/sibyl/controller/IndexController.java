@@ -41,12 +41,12 @@ public class IndexController {
 //                              @CurrentSecurityContext(expression = "authentication") Authentication authentication
     ) {
 
-        System.err.println("首页访问 --->" + index);
+//        System.err.println("首页访问 --->" + index);
 //        System.err.println(exchange.getRequest().getURI().toString());
-        System.err.println("client from = " + exchange.getRequest().getRemoteAddress());
-        System.err.println("to server = " + exchange.getRequest().getLocalAddress());
+//        System.err.println("client from = " + exchange.getRequest().getRemoteAddress());
+//        System.err.println("to server = " + exchange.getRequest().getLocalAddress());
 //        System.err.println(exchange.getRequest().getSslInfo());
-        System.err.println(Thread.currentThread().getName());
+//        System.err.println(Thread.currentThread().getName());
 //        exchange.getRequest().getHeaders().entrySet().forEach(System.err::println);
 
 //        List<MenuDTO> menuTree = menuTree();

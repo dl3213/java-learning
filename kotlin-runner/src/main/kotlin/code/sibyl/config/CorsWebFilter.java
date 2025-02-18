@@ -13,7 +13,7 @@ public class CorsWebFilter implements WebFilter {
         exchange.getResponse().getHeaders().add("Access-Control-Allow-Origin", "*"); // 或者指定域名
         exchange.getResponse().getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponse().getHeaders().add("Access-Control-Max-Age", "3600");
-        exchange.getResponse().getHeaders().add("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
+        exchange.getResponse().getHeaders().add("Access-Control-Allow-Headers", "*");
         if ("OPTIONS".equals(exchange.getRequest().getMethod().name())) {
             return Mono.empty();
         }
