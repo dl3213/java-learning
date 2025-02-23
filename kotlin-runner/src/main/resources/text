@@ -107,4 +107,9 @@ scp -i "your-key.pem" -r /path/to/local/folder ec2-user@your-public-ip:/path/to/
 
 
 1. bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
+
+dl.ME3213
+
 2. ollama run deepseek-r1:14b
+
+

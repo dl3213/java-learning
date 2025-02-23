@@ -1,8 +1,5 @@
 package code.sibyl;
 
-import code.sibyl.common.r;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

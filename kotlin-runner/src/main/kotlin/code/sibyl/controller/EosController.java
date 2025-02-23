@@ -10,10 +10,6 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.springframework.core.io.buffer.*;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
@@ -85,20 +81,20 @@ public class EosController {
     }
 
 
-    @PostMapping("/download/test")
-    public Mono<Void> download(ServerHttpResponse response, @RequestBody EosIndexRequest indexRequest) throws IOException {
-
-        HttpClient client = new HttpClient();
-        PostMethod post = new PostMethod("http://localhost:80/eos/export");
-        RequestEntity requestEntity = new StringRequestEntity(JSONObject.toJSONString(indexRequest),"application/json;charset=UTF-8","UTF-8");
-        post.setRequestEntity(requestEntity);
-        int statusCode = client.executeMethod(post);
-        byte[] bytes = post.getResponseBody();
-
-        response.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
-                "filename=demo_download.xlsx");
-        response.getHeaders().add("Accept-Ranges", "bytes");
-        DataBuffer buffer = response.bufferFactory().wrap(bytes);
-        return response.writeWith(Mono.just(buffer));
-    }
+//    @PostMapping("/download/test")
+//    public Mono<Void> download(ServerHttpResponse response, @RequestBody EosIndexRequest indexRequest) throws IOException {
+//
+//        HttpClient client = new HttpClient();
+//        PostMethod post = new PostMethod("http://localhost:80/eos/export");
+//        RequestEntity requestEntity = new StringRequestEntity(JSONObject.toJSONString(indexRequest),"application/json;charset=UTF-8","UTF-8");
+//        post.setRequestEntity(requestEntity);
+//        int statusCode = client.executeMethod(post);
+//        byte[] bytes = post.getResponseBody();
+//
+//        response.getHeaders().set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; " +
+//                "filename=demo_download.xlsx");
+//        response.getHeaders().add("Accept-Ranges", "bytes");
+//        DataBuffer buffer = response.bufferFactory().wrap(bytes);
+//        return response.writeWith(Mono.just(buffer));
+//    }
 }

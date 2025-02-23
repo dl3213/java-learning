@@ -35,44 +35,36 @@ import java.time.LocalDateTime;
 public class Database implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     @org.springframework.data.annotation.Id
     @JsonSerialize(using = ToStringSerializer.class)
     @Header
     @ExcelProperty("id")
     private Long id;
 
-    @Column(name = "name")
     @Header
     @ExcelProperty("name")
     private String name;
 
-    @Column(name = "type")
     @Header
     @ExcelProperty("type")
     private String type;
 
-    @Column(name = "host")
     @Header
     @ExcelProperty("host")
     private String host;
 
-    @Column(name = "port")
     @Header
     @ExcelProperty("port")
     private String port;
 
-    @Column(name = "username")
     @Header
     @ExcelProperty("username")
     private String username;
 
-    @Column(name = "password")
     @Header
     @ExcelProperty("password")
     private String password;
 
-    @Column(name = "database")
     @Header
     @ExcelProperty("database")
     private String database;
@@ -90,11 +82,9 @@ public class Database implements Serializable {
     private Integer version;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Column(name = "create_time")
     @ExcelProperty("createTime")
     private LocalDateTime createTime;
 
-    @Column(name = "create_id")
     @ExcelProperty("createId")
     private Long createId;
 

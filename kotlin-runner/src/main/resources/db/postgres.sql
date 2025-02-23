@@ -2,11 +2,15 @@ SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public';
 
-select * from t_base_file;
+select *
+from t_base_file;
 
-alter table t_base_file add _desc varchar(1024);
+alter table t_base_file
+    add _desc varchar(1024);
 
-update t_base_file set real_name='12' where id = '1';
+update t_base_file
+set real_name='12'
+where id = '1';
 
 create table IF NOT EXISTS t_base_file
 (
@@ -33,8 +37,7 @@ create table IF NOT EXISTS t_base_file
 
 create table t_biz_book
 (
-    id            bigint                                    not null
-        primary key,
+    id            BIGINT GENERATED ALWAYS AS IDENTITY primary key,
     name          varchar(255),
     type          varchar(64),
     absolute_path varchar(1024),
@@ -42,7 +45,8 @@ create table t_biz_book
     page_num      bigint,
     serial_number varchar(255),
     code          varchar(64),
-    is_deleted    varchar(2) default '0'::character varying not null,
+    description   varchar(1024),
+    is_deleted    varchar(1) default '0'::character varying not null,
     create_time   timestamp,
     create_id     bigint,
     update_time   timestamp,

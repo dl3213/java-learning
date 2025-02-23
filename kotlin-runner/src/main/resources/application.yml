@@ -60,6 +60,11 @@ spring:
   info:
     env:
       enabled: true
+  ai:
+    ollama:
+      base-url: http://localhost:11434  # Ollama 默认端口
+      chat:
+        model: deepseek-r1:14b  # 需与本地部署的模型名称一致
 
 
 debug: false

@@ -222,7 +222,7 @@ class BookController {
     fun delete(@PathVariable id: String): Mono<Response> {
         System.err.println("delete -> $id")
         return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
-            .switchIfEmpty(Mono.error<Book>(RuntimeException("${id}不存在")))
+            .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .flatMap { e: Book ->
                 System.err.println(e.absolutePath)
                 e.isDeleted = "1"

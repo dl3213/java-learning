@@ -22,34 +22,24 @@ open class Book {
     @JsonSerialize(using = ToStringSerializer::class)
     open var id: Long? = null
 
-    @Column(name = "name")
     open var name: String? = null
 
-    @Column(name = "TYPE", length = 64)
     open var type: String? = null
 
-    @Column(name = "ABSOLUTE_PATH", length = 1024)
     open var absolutePath: String? = null
 
-    @Column(name = "relative_path", length = 1024)
     open var relativePath: String? = null
 
-    @Lob
-    @Column(name = "page_num")
     open var pageNum: Long? = null
 
-    @Column(name = "SERIAL_NUMBER")
     open var serialNumber: String? = null
 
-    @Column(name = "CODE", length = 64)
     open var code: String? = null
-
-    @Column(name = "IS_DELETED", nullable = false, length = 2)
+    open var description: String? = null
     open var isDeleted: String? = null
 
     @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
     @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
-    @Column(name = "CREATE_TIME")
     open var createTime: LocalDateTime? = null
 
     @Column(name = "CREATE_ID")
@@ -57,9 +47,7 @@ open class Book {
 
     @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
     @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
-    @Column(name = "UPDATE_TIME")
     open var updateTime: LocalDateTime? = null
 
-    @Column(name = "UPDATE_ID")
     open var updateId: Long? = null
 }

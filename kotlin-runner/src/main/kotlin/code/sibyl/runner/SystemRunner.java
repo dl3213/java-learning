@@ -9,6 +9,8 @@ import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -41,12 +43,14 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     private final FileService fileService;
     private final EosRepository eosRepository;
     private final ApplicationContext applicationContext;
+    private final ChatModel chatModel;
+    private final ChatClient chatClient;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
-        UpdateService.getBean().file_clear().subscribe(); //
+        //UpdateService.getBean().file_clear().subscribe(); //
 
 //        LocalCache.getBean().test();//测试oom
 
