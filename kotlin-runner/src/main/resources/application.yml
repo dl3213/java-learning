@@ -11,7 +11,7 @@ flink:
 
 file:
   mode: ftp
-  path: e:/sibyl-system/file/ # 必须/结尾
+  path: E:\sibyl-system\file\ # 必须/结尾
 
 server:
   port: 8080

@@ -1,7 +1,10 @@
 package code.sibyl.domain.base
 
 import code.sibyl.common.r
+import com.alibaba.fastjson2.annotation.JSONField
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import jakarta.persistence.*
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
@@ -14,6 +17,7 @@ open class BaseFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
     @org.springframework.data.annotation.Id
+    @JsonSerialize(using = ToStringSerializer::class)
     open var id: Long? = null
 
     @Column(name = "FILE_NAME")

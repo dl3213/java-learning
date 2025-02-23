@@ -1,0 +1,474 @@
+<!doctype html>
+<!--
+* Tabler - Premium and Open Source dashboard template with responsive and high quality UI.
+* @version 1.0.0-beta20
+* @link https://tabler.io
+* Copyright 2018-2023 The Tabler Authors
+* Copyright 2018-2023 codecalm.net Paweł Kuna
+* Licensed under MIT (https://github.com/tabler/tabler/blob/master/LICENSE)
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Photogrid - Tabler - Premium and Open Source dashboard template with responsive and high quality UI.</title>
+    <!-- CSS files -->
+    <link href="/dist/libs/dropzone/dist/dropzone.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-flags.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
+    <link href="/dist/css/demo.min.css?1692870487" rel="stylesheet"/>
+    <style>
+        @import url('/css/inter.css');
+
+        :root {
+            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+        }
+
+        body {
+            font-feature-settings: "cv03", "cv04", "cv11";
+        }
+    </style>
+</head>
+<body>
+<script src="/dist/js/demo-theme.min.js?1692870487"></script>
+<div class="page">
+    <div class="page-wrapper">
+        <!-- Page header -->
+        <div class="page-header d-print-none">
+            <div class="container-xl">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            Photogrid
+                        </h2>
+                    </div>
+                </div>
+                <div hidden="hidden">
+                    <input id="success-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-success">
+                    <input id="danger-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-danger">
+                </div>
+            </div>
+        </div>
+        <div class="page-body">
+            <div class="container-xl">
+                <div class="row row-cards">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">Custom Dropzone</h3>
+                                <form class="dropzone" id="dropzone-custom" action="/api/rest/v1/book/upload"
+                                      autocomplete="off"
+                                      novalidate>
+                                    <div class="fallback">
+                                        <input name="file" type="file"/>
+                                    </div>
+                                    <div class="dz-message">
+                                        <h3 class="dropzone-msg-title">Your text here</h3>
+                                        <span class="dropzone-msg-desc">Your custom description here</span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Page body -->
+        <div class="page-body">
+            <div class="container-xl">
+                <div id="custom-menu" class="dropdown-menu">
+                    <a class="dropdown-item" event="delete" href="#">
+                        delete
+                    </a>
+                    <a class="dropdown-item" event="move" href="#">
+                        move
+                    </a>
+                    <a class="dropdown-item" event="success" href="#">
+                        success
+                    </a>
+                    <a class="dropdown-item" event="danger" href="#">
+                        danger
+                    </a>
+                    <a class="dropdown-item" event="?" href="#">
+                        ?
+                    </a>
+                </div>
+                <div class="modal modal-blur fade" id="modal-success" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal-status bg-success"></div>
+                            <div class="modal-body text-center py-4">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/circle-check -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-green icon-lg" width="24"
+                                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/>
+                                    <path d="M9 12l2 2l4 -4"/>
+                                </svg>
+                                <h3>Succedeed</h3>
+                                <div class="text-secondary" id="modal-success-context">success</div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="w-100">
+                                    <div class="row">
+                                        <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                            Cancel
+                                        </a></div>
+                                        <div class="col"><a href="#" class="btn btn-success w-100"
+                                                            data-bs-dismiss="modal">
+                                            Ok
+                                        </a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal modal-blur fade" id="modal-danger" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal-status bg-danger"></div>
+                            <div class="modal-body text-center py-4">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24"
+                                     height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z"/>
+                                    <path d="M12 9v4"/>
+                                    <path d="M12 17h.01"/>
+                                </svg>
+                                <!--<h3>Are you sure?</h3>-->
+                                <div class="text-secondary" id="modal-danger-context">Do you really want to remove this
+                                    file? What you've done cannot be undone.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="w-100">
+                                    <div class="row">
+                                        <div class="col"><a href="#" class="btn w-100" data-bs-dismiss="modal">
+                                            Cancel
+                                        </a></div>
+                                        <div class="col"><a href="#" class="btn btn-danger w-100"
+                                                            data-bs-dismiss="modal">
+                                            Ok
+                                        </a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success alert-dismissible" id="alert-success" hidden="true" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <!-- Download SVG icon from http://tabler-icons.io/i/check -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24"
+                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12l5 5l10 -10"/>
+                            </svg>
+                        </div>
+                        <div id="alert-success-context">
+                            Wow! Everything worked!
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+                <div class="alert alert-warning alert-dismissible" id="alert-warning" hidden="true" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <!-- Download SVG icon from http://tabler-icons.io/i/alert-triangle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24"
+                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M10.24 3.957l-8.422 14.06a1.989 1.989 0 0 0 1.7 2.983h16.845a1.989 1.989 0 0 0 1.7 -2.983l-8.423 -14.06a1.989 1.989 0 0 0 -3.4 0z"/>
+                                <path d="M12 9v4"/>
+                                <path d="M12 17h.01"/>
+                            </svg>
+                        </div>
+                        <div id="alert-warning-context">
+                            Uh oh, something went wrong
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+                <div class="alert alert-danger alert-dismissible" id="alert-danger" hidden="true" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <!-- Download SVG icon from http://tabler-icons.io/i/alert-circle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24"
+                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                <path d="M12 8v4"/>
+                                <path d="M12 16h.01"/>
+                            </svg>
+                        </div>
+                        <div id="alert-danger-context">
+                            I'm so sorry…
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+                <div class="alert alert-info alert-dismissible" id="alert-info" hidden="true" role="alert">
+                    <div class="d-flex">
+                        <div>
+                            <!-- Download SVG icon from http://tabler-icons.io/i/info-circle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24"
+                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+                                <path d="M12 9h.01"/>
+                                <path d="M11 12h1v4h1"/>
+                            </svg>
+                        </div>
+                        <div id="alert-info-context">
+                            Did you know?
+                        </div>
+                    </div>
+                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                </div>
+
+                <div class="row g-2 g-md-3">
+                    <div class="col-lg-12">
+                        <div id="photo_div" class="row g-2 g-md-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Libs JS -->
+<script src="/dist/libs/dropzone/dist/dropzone-min.js?1692870487" defer></script>
+<script src="/dist/libs/fslightbox/index.js?1692870487" defer></script>
+<!-- Tabler Core -->
+<script src="/dist/js/tabler.min.js?1692870487" defer></script>
+<script src="/dist/js/demo.min.js?1692870487" defer></script>
+<script src="/js/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/layer.js"></script>
+<script src="/js/common/common.js"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded...")
+        /*<![CDATA[*/
+        var entityId = /*[[${entityId}]]*/ '';
+        /*]]>*/
+        console.log(entityId);
+
+
+        var config = {
+            maxFilesize: 10240000,
+            uploadMultiple: false,
+            parallelUploads: 1,
+            url: "/api/rest/v1/book/upload/" + entityId,
+        }
+        new Dropzone("#dropzone-custom", config)
+
+        var elList = document.querySelectorAll('[data-fslightbox="gallery"]');
+        console.log(elList)
+        elList.forEach(item => {
+            item.addEventListener('click', function (evt) {
+                photo_left_click(this, evt)
+            })
+            item.addEventListener('contextmenu', function (evt) {
+                photo_right_click(this, evt)
+            })
+
+            // 为元素添加事件监听
+            item.addEventListener('dblclick', function (event) {
+                event.preventDefault();
+                alert("dblclick")
+            });
+
+        })
+
+
+        function photo_right_click(_this, evt) {
+            // evt.stopPropagation();
+            // evt.stopImmediatePropagation()
+            evt.preventDefault()
+            console.log(_this.getAttribute('href'))
+            var menu = document.getElementById('custom-menu');
+            console.log(`${document.documentElement.scrollTop + evt.clientY}px` + `${evt.clientX}px`)
+            // 设置自定义菜单的位置并显示
+            menu.style.top = `${document.documentElement.scrollTop + evt.clientY}px`;
+            menu.style.left = `${evt.clientX}px`;
+            menu.style.display = 'block';
+            menu.setAttribute("item-id", _this.getAttribute('id'))
+        }
+
+        function photo_left_click(_this, evt) {
+            console.log(_this.getAttribute('href'))
+            // evt.stopPropagation();
+            // evt.stopImmediatePropagation()
+            // evt.preventDefault()
+        }
+
+        document.addEventListener('click', function () {
+            var menu = document.getElementById('custom-menu');
+            menu.style.display = 'none';
+        });
+
+
+        // 点击选项时的处理逻辑
+        document.getElementById('custom-menu').addEventListener('click', function (event) {
+            //console.log(this)
+            // event.stopPropagation();
+            // event.stopImmediatePropagation()
+            event.preventDefault()
+            var evt_selected = event.target.getAttribute('event');
+            var item_id = this.getAttribute("item-id");
+            console.log('你选择了: ' + evt_selected + ' --> ' + item_id);
+            switch (evt_selected) {
+                case "delete":
+                    axios
+                        .delete('/photo/pixiv/delete/' + item_id)
+                        .then(response => {
+                            console.log(response)
+                            //alert(response.data.msg)
+                            if (response.data.code == 200) {
+                                document.getElementById("modal-success-context").textContent = response.data.msg
+                                document.getElementById("success-btn").click();
+                            } else {
+                                document.getElementById("modal-danger-context").textContent = response.data.msg
+                                document.getElementById("danger-btn").click();
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                            document.getElementById("modal-danger-context").textContent = error.message
+                            document.getElementById("danger-btn").click();
+                        })
+                    break;
+                case "success":
+                    document.getElementById("modal-success-context").textContent = "操作成功" + new Date().getTime()
+                    document.getElementById("success-btn").click();
+                    break;
+                case "danger":
+                    document.getElementById("modal-danger-context").textContent = "操作失败" + new Date().getTime()
+                    document.getElementById("danger-btn").click();
+                    break;
+                default:
+
+                    break;
+            }
+        });
+
+        var request = {
+            pageNumber: 1,
+            pageSize: 10,
+        }
+        load_photo(request)
+
+
+        function load_photo(request) {
+
+            axios
+                .post('/api/rest/v1/book/detail/page/' + entityId, request) // /api/rest/v1/book/detail/page/ /photo/pixiv/page
+                .then(response => {
+                    var res = response.data;
+                    console.log(res)
+                    var data = res.data;
+                    if (!data) return
+                    data.forEach(item => {
+                        console.log(item)
+                        var div = document.createElement("div");
+                        var a = document.createElement("a");
+                        a.setAttribute("id", item.id)
+                        a.setAttribute("data-fslightbox", "gallery")
+                        a.setAttribute("href", "/static-file/" + item.relativePath)
+                        a.addEventListener('click', function (evt) {
+                            photo_left_click(this, evt)
+                        })
+                        a.addEventListener('contextmenu', function (evt) {
+                            photo_right_click(this, evt)
+                        })
+                        var div_in_a = document.createElement("div");
+                        div_in_a.setAttribute("style", "background-image: url(/static-file/" + item.relativePath + ")")
+
+
+                        if (true) {
+                            div.classList.add("col-6")
+                            div_in_a.classList.add("img-responsive", "img-responsive-1x2", "rounded-3", "border")
+                        }
+
+                        a.appendChild(div_in_a);
+                        div.appendChild(a);
+                        document.getElementById('photo_div').appendChild(div)
+                        refreshFsLightbox();
+                        return;
+                    })
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+
+        }
+
+
+        function getScrollTop() {
+            var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
+            if (document.body) {
+                bodyScrollTop = document.body.scrollTop;
+            }
+            if (document.documentElement) {
+                documentScrollTop = document.documentElement.scrollTop;
+            }
+            scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;
+            return scrollTop;
+        }
+
+        //文档的总高度
+        function getScrollHeight() {
+            var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
+            if (document.body) {
+                bodyScrollHeight = document.body.scrollHeight;
+            }
+            if (document.documentElement) {
+                documentScrollHeight = document.documentElement.scrollHeight;
+            }
+            scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;
+            return scrollHeight;
+        }
+
+        //浏览器视口的高度
+        function getWindowHeight() {
+            var windowHeight = 0;
+            if (document.compatMode == "CSS1Compat") {
+                windowHeight = document.documentElement.clientHeight;
+            } else {
+                windowHeight = document.body.clientHeight;
+            }
+            return windowHeight;
+        }
+
+
+        window.onscroll = function () {
+            //console.log((getScrollTop() + getWindowHeight()) + " --> " + getScrollHeight())
+            if ((getScrollHeight() - (getScrollTop() + getWindowHeight())) <= 5) {
+                // moreReconmend();
+                //console.log("getScrollTop:" + getScrollTop() + "**getWindowHeight:" + getWindowHeight() + "**getScrollHeight:" + getScrollHeight())
+                request.pageNumber += 1
+                load_photo(request)
+                //alert('页面底部')
+            }
+        };
+
+    });
+</script>
+</body>
+</html>

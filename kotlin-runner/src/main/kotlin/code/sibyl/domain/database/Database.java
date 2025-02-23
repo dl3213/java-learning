@@ -3,6 +3,9 @@ package code.sibyl.domain.database;
 import code.sibyl.aop.Header;
 import code.sibyl.common.DataBaseTypeEnum;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.r2dbc.spi.ConnectionFactory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +37,7 @@ public class Database implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     @org.springframework.data.annotation.Id
+    @JsonSerialize(using = ToStringSerializer.class)
     @Header
     @ExcelProperty("id")
     private Long id;

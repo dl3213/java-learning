@@ -5,6 +5,7 @@ import code.sibyl.event.Event;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
+import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
-//        UpdateService.getBean().file_clear().subscribe(); //
+        UpdateService.getBean().file_clear().subscribe(); //
 
 //        LocalCache.getBean().test();//测试oom
 

@@ -66,7 +66,6 @@ public class GalleryController {
 
         Integer pageNumber = jsonObject.getInteger("pageNumber");
         Integer pageSize = jsonObject.getInteger("pageSize");
-        System.err.println(jsonObject);
         return Mono.zip(Mono.just(criteria), sha256Query)
                 .flatMap(tuple -> {
                     //System.err.println(tuple.getT2());
