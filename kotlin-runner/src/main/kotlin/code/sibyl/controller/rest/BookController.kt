@@ -10,6 +10,7 @@ import code.sibyl.common.r.systemName
 import code.sibyl.common.r.yyyy_MM_dd
 import code.sibyl.domain.base.BaseFile
 import code.sibyl.domain.biz.Book
+import code.sibyl.service.BookService
 import com.alibaba.fastjson2.JSONObject
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
@@ -90,20 +91,7 @@ class BookController {
             .map { r.success() }
     }
 
-    fun getAllFiles(directory: String?): Flux<String> {
-        val startPath: Path = Paths.get(directory)
-        return Flux.using(
-            {
-                Files.walk(startPath)
-                    .filter { Files.isRegularFile(it) }
-                    .sorted(compareBy { it.fileName.toString() })
-            },
-            { stream: Stream<Path> -> Flux.fromStream(stream) },  // 转换为 Flux<Path>
-            { stream: Stream<*> -> stream.close() }// 资源清理
-        )
-            .filter(Files::isRegularFile) // 过滤出文件（排除目录）
-            .map(Path::toString);
-    }
+
 
     @GetMapping(value = ["/detail/first/{id}"], produces = [MediaType.IMAGE_JPEG_VALUE])
     @ResponseBody
@@ -111,10 +99,11 @@ class BookController {
 
         return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .flatMap { book ->
-                getAllFiles(book.absolutePath).take(1).next()
+                r.getAllFiles(book.absolutePath)
+                    .take(1).next()
             }
             .flatMapMany {
-                println(it)
+                //println(it)
                 Paths.get(it).normalize()
                 DataBufferUtils.read(FileSystemResource(it), DefaultDataBufferFactory(), 1024)
                     .subscribeOn(Schedulers.boundedElastic())
@@ -130,15 +119,16 @@ class BookController {
         return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .publishOn(Schedulers.boundedElastic())
             .flatMapMany { book ->
-                getAllFiles(book.absolutePath).flatMap { path -> Mono.zip(Mono.just(book), Mono.just(path)) }
+                r.getAllFiles(book.absolutePath).flatMap { path -> Mono.zip(Mono.just(book), Mono.just(path)) }
             }
             .skip((pageNumber - 1) * pageSize)  // 跳过前面页的数据
             .take(pageSize)             // 取当前页的数据量
             .map {
-                println("path -> $it")
+                //println("path -> $it")
                 var realFile = File(it.t2.toString())
-                println("file -> ${realFile.name}")
+                //println("file -> ${realFile.name}")
                 var file = BaseFile()
+                file.id = id.toLong()
                 file.fileName = realFile.name
                 file.realName = realFile.name
                 file.absolutePath = it.t2
@@ -188,33 +178,8 @@ class BookController {
     @PostMapping(value = ["/add"])
     @ResponseBody
     fun add(@RequestBody book: Book): Mono<Response> {
-        book.isDeleted = "0"
-        book.createTime = LocalDateTime.now()
 
-        val id = getBean(Snowflake::class.java).nextId()
-        val fileUniqueId = id.toString()
-        log.info("[book add] fileUniqueId = {}", fileUniqueId)
-        val absoluteDir = fileBaseDir() + "book" + "/" + yyyy_MM_dd() + "/"
-        val absolutePath = absoluteDir + fileUniqueId + "/"
-        log.info("[book add] absolutePath = {}", absolutePath)
-        try {
-            FileUtils.createParentDirectories(File(absolutePath))
-        } catch (e: IOException) {
-            return Mono.error(RuntimeException(e))
-        }
-        val realFile = File(absolutePath)
-        try {
-            realFile.mkdirs()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        book.id = id
-        book.absolutePath = absolutePath
-        book.relativePath = absolutePath.replace(fileBaseDir()!!, "")
-
-        book.code = null
-        book.serialNumber = null
-        return r2dbcEntityTemplate!!.insert(book).map { item: Book? -> Response.success(item) }
+        return BookService.bean.insert(book).map { item: Book? -> Response.success(item) }
     }
 
     @DeleteMapping(value = ["/delete/{id}"])
@@ -224,7 +189,7 @@ class BookController {
         return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .flatMap { e: Book ->
-                System.err.println(e.absolutePath)
+                //System.err.println(e.absolutePath)
                 e.isDeleted = "1"
                 e.updateTime = LocalDateTime.now()
                 e.updateId = defaultUserId()

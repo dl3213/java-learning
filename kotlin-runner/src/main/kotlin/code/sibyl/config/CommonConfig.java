@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.redisson.Redisson;
 import org.redisson.config.Config;
@@ -17,6 +18,7 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -65,7 +67,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 //@EnableWebFlux
 @EnableAsync
 @EnableScheduling
-public class CommonConfig  {
+@Slf4j
+public class CommonConfig {
 
     //    @Primary
     @Bean("virtualExecutor")
@@ -116,6 +119,7 @@ public class CommonConfig  {
 //                .and(RouterFunctions.resources("/other/**", new FileSystemResource("file:/another/path/to/resources/")))
                 ;
     }
+
     @Bean
     public RouterFunction<ServerResponse> sibylResources() throws MalformedURLException {
         return RouterFunctions.resources("/sibyl-file/**", new UrlResource("ftp://13.60.20.165:21"), ((resource, httpHeaders) -> {
@@ -189,8 +193,8 @@ public class CommonConfig  {
     }
 
     @Bean
-    public ChatClient chatClient(ChatModel chatModel){
-        return ChatClient.builder(chatModel)
+    public ChatClient chatClient(ChatModel chatModel) {
+        ChatClient chatClient = ChatClient.builder(chatModel)
                 // 实现 Chat Memory 的 Advisor
                 // 在使用 Chat Memory 时，需要指定对话 ID，以便 Spring AI 处理上下文。
                 .defaultAdvisors(
@@ -207,5 +211,8 @@ public class CommonConfig  {
                                 .build()
                 )
                 .build();
+        log.info("chatClient = {}", chatClient.getClass());
+        return chatClient;
     }
+
 }

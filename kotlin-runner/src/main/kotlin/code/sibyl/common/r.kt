@@ -9,6 +9,7 @@ import org.springframework.core.env.Environment
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.onErrorMap
 import reactor.util.context.Context
 import reactor.util.context.ContextView
 import java.io.File
@@ -16,6 +17,9 @@ import java.io.FileInputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.time.LocalDate
@@ -26,6 +30,7 @@ import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Function
 import java.util.stream.Collectors
+import java.util.stream.Stream
 
 
 /**
@@ -536,5 +541,37 @@ object r {
             e.message?.let { error(it) }
             return false;
         }
+    }
+
+    @JvmStatic
+    fun getAllFiles(directory: String?): Flux<String> {
+        val startPath: Path = Paths.get(directory)
+        return Flux.using(
+            {
+                Files.walk(startPath)
+                    .filter { Files.isRegularFile(it) }
+                    .sorted(compareBy { it.fileName.toString() })
+            },
+            { stream: Stream<Path> -> Flux.fromStream(stream) },  // 转换为 Flux<Path>
+            { stream: Stream<*> -> stream.close() }// 资源清理
+        )
+            .filter(Files::isRegularFile) // 过滤出文件（排除目录）
+            .map(Path::toString);
+    }
+
+    @JvmStatic
+    fun walk(directory: String?, dept: Int): Flux<Path> {
+        val startPath: Path = Paths.get(directory)
+        return Flux.using(
+            {
+                Files.walk(startPath, dept)
+            },
+            { stream: Stream<Path> -> Flux.fromStream(stream) },  // 转换为 Flux<Path>
+            { stream: Stream<*> -> stream.close() }// 资源清理
+        )
+//            .onErrorResume{
+//                println("error => "+ it.message)
+//                Mono.just(startPath)
+//            }
     }
 }

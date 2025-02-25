@@ -4,6 +4,7 @@ import code.sibyl.common.Response;
 import code.sibyl.event.Event;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
+import code.sibyl.service.BookService;
 import code.sibyl.service.FileService;
 import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
@@ -43,12 +44,13 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     private final FileService fileService;
     private final EosRepository eosRepository;
     private final ApplicationContext applicationContext;
-    private final ChatModel chatModel;
     private final ChatClient chatClient;
+    private final org.springframework.ai.ollama.OllamaChatModel ollamaChatModel;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+        BookService.getBean().move_test().subscribe();
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         //UpdateService.getBean().file_clear().subscribe(); //
 

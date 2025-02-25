@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Flux;
 public class DeepSeekController {
 
     private final ChatClient chatClient;
+    private final org.springframework.ai.ollama.OllamaChatModel ollamaChatModel;
 
     // 同步调用（非流式）
     @GetMapping("/chat")

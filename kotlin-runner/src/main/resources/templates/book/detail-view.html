@@ -30,46 +30,34 @@
         body {
             font-feature-settings: "cv03", "cv04", "cv11";
         }
+        .dropzone {
+            height: 25px;
+        }
     </style>
 </head>
 <body>
 <script src="/dist/js/demo-theme.min.js?1692870487"></script>
 <div class="page">
-    <div class="page-wrapper" style="height: 100%">
-        <!-- Page header -->
-        <div class="page-header d-print-none" style="height: 2%">
-            <div class="container-xl">
-                <div class="row g-2 align-items-center">
-                    <div class="col">
-                        <h2 class="page-title" id="title">
-                            Photogrid
-                        </h2>
-                    </div>
-                </div>
-                <div hidden="hidden">
-                    <input id="success-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-success">
-                    <input id="danger-btn" class="btn" data-bs-toggle="modal" data-bs-target="#modal-danger">
-                </div>
-            </div>
-        </div>
-        <div class="page-body" style="height: 3%">
-            <div class="container-xl">
-                <div class="row row-cards">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">Custom Dropzone</h3>
-                                <form class="dropzone" id="dropzone-custom" action="/api/rest/v1/book/upload"
-                                      autocomplete="off"
-                                      novalidate>
-                                    <div class="fallback">
-                                        <input name="file" type="file"/>
+    <div class="page-wrapper" >
+        <div class="page-body" >
+            <div class="container-xl" >
+                <div class="row row-cards" >
+                    <div class="col-md-12"  >
+                        <div class="card"  >
+                            <div class="card-body" >
+                                <div class="col-xl-12" >
+                                    <div class="row"  >
+                                        <div class="col-md-12 col-xl-12" >
+                                            <div class="mb-sm-1"  >
+                                                <form class="dropzone" id="dropzone-custom" action="/api/rest/v1/book/upload" autocomplete="off" novalidate>
+                                                    <div class="fallback">
+                                                        <input name="file" type="file"/>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="dz-message">
-                                        <h3 class="dropzone-msg-title">Your text here</h3>
-                                        <span class="dropzone-msg-desc">Your custom description here</span>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,7 +65,7 @@
             </div>
         </div>
         <!-- Page body -->
-        <div class="page-body" style="height: 95%">
+        <div class="page-body" >
             <div class="container-xl">
                 <div id="custom-menu" class="dropdown-menu">
                     <a class="dropdown-item" event="delete" href="#">
@@ -268,8 +256,6 @@
         var entityId = /*[[${entityId}]]*/ '';
         /*]]>*/
         console.log(entityId);
-
-
         var config = {
             maxFilesize: 10240000,
             uploadMultiple: false,
@@ -406,6 +392,15 @@
                             <a ` + 'href' + `="` + (url) + `" class="d-block card-img-top entity" id="` + item.id + `"  data-fslightbox="gallery" ><img
                                     src="` + (url) + `"
                                     class="card-img-top"  ></a>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="col-xs-12 col-md-6 col-lg-6">
+                                        <div>` + (item.fileName.length > 20 ? item.fileName.substring(0, 20) + "..." : item.fileName) + `</div>
+                                        <div class="text-secondary">` + (item.id.length > 20 ? item.id.substring(0, 20) + "..." : item.id) + `</div>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>`
         }
