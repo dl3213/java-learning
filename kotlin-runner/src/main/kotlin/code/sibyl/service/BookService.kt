@@ -37,6 +37,7 @@ class BookService {
     @Qualifier("sibyl-postgresql")
     private val r2dbcEntityTemplate: R2dbcEntityTemplate? = null
 
+
     fun move_test(): Mono<Long?> {
         val str = "E:\\4me\\book"
         val parent = Paths.get(str)
@@ -58,7 +59,7 @@ class BookService {
                 if (Objects.nonNull(book.id)) {
 
                     return@flatMap Mono.error(RuntimeException(path.toFile().name + " -> " + book.id + " 已存在"))
-                    return@flatMap Mono.zip(Mono.just(path), Mono.just(book));
+//                    return@flatMap Mono.zip(Mono.just(path), Mono.just(book));
                 }
                 book.name = path.toFile().name
                 Mono.zip(Mono.just(path), this.insert(book))

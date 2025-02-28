@@ -142,7 +142,8 @@ class BookController {
     @PostMapping(value = ["/page"])
     @ResponseBody
     fun page(@RequestBody jsonObject: JSONObject): Mono<Response> {
-        var criteria = Criteria.where("IS_DELETED").`is`("0") //.and("type").like("image%");
+        val isDeleted = jsonObject.getString("isDeleted")
+        var criteria = Criteria.where("IS_DELETED").`is`(isDeleted) //.and("type").like("image%");
 
         val keyword = jsonObject.getString("keyword")
         if (StringUtils.isNotBlank(keyword)) {

@@ -118,6 +118,13 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     }
 
     public static void main(String[] args) {
+
+        //
+        List<Integer> list = Arrays.asList(1, 2, 3);
+        for (Integer i : list) {
+            // loop
+        }
+
         JSONObject data = new JSONObject();
         //data.put("test", "1");
         System.err.println(data.isEmpty());

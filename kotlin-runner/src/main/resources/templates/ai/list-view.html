@@ -42,109 +42,8 @@
                     <div class="col">
                         <div class="d-flex">
                             <h2 class="page-title">
-                                Database
+                                AI
                             </h2>
-                            <div class="text-secondary" style="margin-left: 10px">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                        data-bs-target="#exampleModal_form">
-                                    New+
-                                </button>
-                                <div class="modal" id="exampleModal_form" tabindex="-1">
-                                    <div class="modal-dialog modal-lg" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">New+</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form class="card" id="databaseProfile">
-                                                    <input hidden="hidden" name="id" th:value="${target?.id}">
-                                                    <div class="card-body">
-                                                        <!-- <h3 class="card-title">Edit</h3>-->
-                                                        <div class="row row-cards">
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Name</label>
-                                                                    <input type="text" class="form-control" placeholder="Name"
-                                                                           name="name" th:value="${target?.name}?:'new database'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Type</label>
-                                                                    <select class="form-select" name="type">
-                                                                        <option th:each="t:${typeList}" th:text="${t.code}"
-                                                                                th:value="${t.code}"
-                                                                                th:selected="${target?.type == t.code}"></option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Host</label>
-                                                                    <input type="text" class="form-control" placeholder="Host"
-                                                                           name="host" th:value="${target?.host}?:'127.0.0.1'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Port</label>
-                                                                    <input type="text" class="form-control" placeholder="Port"
-                                                                           name="port" th:value="${target?.port}?:'80'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Username</label>
-                                                                    <input type="text" class="form-control" placeholder="Username"
-                                                                           name="username" th:value="${target?.username}?:'root'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-6 col-md-6">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Password</label>
-                                                                    <input type="text" class="form-control" placeholder="Password"
-                                                                           name="password" th:value="${target?.password}?:'password'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="mb-3">
-                                                                    <label class="form-label">Database</label>
-                                                                    <input type="text" class="form-control" placeholder="Database"
-                                                                           name="database" th:value="${target?.database}?:'database'">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <div class="mb-3 mb-0">
-                                                                    <label class="form-label">Desc</label>
-                                                                    <textarea rows="5" class="form-control"
-                                                                              placeholder="Here can be your description"
-                                                                              name="desc"
-                                                                              th:value="${target?.desc}">Oh so, your weak rhyme
-You doubt I'll bother, reading into it
-I'll probably won't, left to my own devices
-But that's the difference in our opinions.</textarea>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <a href="#" class="btn btn-link link-secondary"
-                                                   data-bs-dismiss="modal">
-                                                    Cancel
-                                                </a>
-                                                <a href="#" class="btn btn-primary ms-auto"
-                                                   data-bs-dismiss="modal" id="update">
-                                                    New+
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,7 +495,7 @@ But that's the difference in our opinions.</textarea>
                                 <div class="input-group input-group-flat">
 <!--                                    <input id="sql-text" type="text" class="form-control" autocomplete="off"-->
 <!--                                           placeholder="Type sql"/>-->
-                                    <textarea id="sql-text" type="text" class="form-control" autocomplete="off"     placeholder="Type sql" rows="3"></textarea>
+                                    <textarea id="text" type="text" class="form-control" autocomplete="off"     placeholder="Type sql" rows="3"></textarea>
                                     <span class="input-group-text">
                         <a href="#" class="link-secondary" data-bs-toggle="tooltip" aria-label="Clear search"
                            title="Clear search"> <!-- Download SVG icon from http://tabler-icons.io/i/mood-smile -->
@@ -639,27 +538,23 @@ But that's the difference in our opinions.</textarea>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        var socket = null;
-
         var request = {}
         load_list()
 
         function load_list(){
 
             axios
-                    .post('/database/list', request)
+                    .post('/api/rest/v1/ai/list', request)
                     .then(response => {
-                        //console.log(response)
                         var list = response.data.data
-                        //document.getElementById("chat-context").innerHTML = ''
                         document.getElementById("list").innerHTML = ''
                         list.forEach(item => {
                             document.getElementById("list").innerHTML += `
-                            <a href="#chat-1" db-id="`+item.id+`" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
+                            <a href="#chat-1" entity-code="`+item.code+`" class="nav-link text-start mw-100 p-3" id="chat-1-tab"
                                        data-bs-toggle="pill" role="tab" aria-selected="true">
                                         <div class="row align-items-center flex-fill">
                                             <div class="col-auto"><span class="avatar"
-                                                                        style="background-image: url(/static/avatars/000m.jpg)"></span>
+                                                                        style="background-image: url(/static/deepseek.webp)"></span>
                                             </div>
                                             <div class="col text-body">
                                                 <div>`+item.name+`</div>
@@ -670,108 +565,14 @@ But that's the difference in our opinions.</textarea>
                             ` 
                         })
 
-                        var dbList = document.querySelectorAll('[db-id]');
+                        var entityList = document.querySelectorAll('[entity-code]');
 
-                        dbList.forEach(db => {
-                            //console.log(db)
+                        entityList.forEach(db => {
                             db.addEventListener("click", function (event) {
                                 //console.log(event.currentTarget)
                                 //console.log(event.currentTarget.getAttribute("db-id"))
- 
-                                var db_id = event.currentTarget.getAttribute("db-id");
-                                socket?.close()
-                                socket = new WebSocket('ws://127.0.0.1:8080/database/socket/'+db_id+'?a=1&b=2&db='+db_id);
-                                // 打开事件
-                                socket.onopen = function(event) {
-                                    console.log("Connection established");
-                                    // 可以在这里发送第一条消息
-                                    socket.send("Hello Server!");
-                                };
-                                
-                                // 接收消息事件
-                                socket.onmessage = function(event) {
-                                    console.log("Message from server ", event.data);
-                                    var json = JSON.parse(event.data)
-                                    var context = event.data
-                                    if(Array.isArray(json)){  
-                                        context =  `
-                                        <table class="table">
-                                            <thead>
-                                            <tr> 
-                                        `
-                                        const allKeys = [...new Set(json.map(obj => Object.keys(obj)).flat())];
-                                        allKeys.forEach(item => {
-                                            var td = `<th><button class="table-sort" data-sort="sort-name">`+item+`</button></th>`
-                                            context += td
-                                        })
-                                        context += `
-                                            </tr>
-                                            </thead>
-                                        <tbody class="table-tbody">
-                                        `
-                                        json.forEach(item => {
-                                            var tr = `<tr>` 
-                                            console.log(Object.keys(item))
-                                            for(var key of allKeys){
-                                                console.log(key)
-                                                console.log(item[key])
-                                                tr += `<td class="sort-name">`+item[key]+`</td>`
-                                            }  
-                                            tr += `</tr>`
-                                            context += tr
-                                        })
-
-                                        context += `
-                                        </tbody>
-                                        </table>
-                                        `
-
-                                    }else{
-                                        context = event.data
-                                    }
-
-                                    document.getElementById("chat-context").innerHTML += `
-                                        <div class="chat-item server-context"  >
-                                            <div class="row align-items-end" >
-                                                <div class="col-auto"><span class="avatar" style="background-image: url(/static/avatars/000f.jpg)"></span> </div>
-                                                <div class="col col-lg-11">
-                                                    <div class="chat-bubble">
-                                                        <div class="chat-bubble-title">
-                                                            <div class="row">
-                                                                <div class="col chat-bubble-author">server</div>
-                                                                <div class="col-auto chat-bubble-date">`+moment().format('YYYY-MM-DD HH:mm:ss')+`</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="chat-bubble-body" style="white-space: nowrap;overflow-x: auto;">
-                                                            <p>`+context+`</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `
-                                    
-                                    var div = document.getElementById('scrollable');
-                                    div.scrollTop = div.scrollHeight;
-
-                                    [...document.getElementsByClassName('server-context')].forEach(item => {
-                                        item.addEventListener('click', (event) => { 
-                                            console.log(event.currentTarget)
-                                            
-                                        })
-                                    })
-
-                                };
-                                
-                                // 错误事件
-                                socket.onerror = function(error) {
-                                    console.error("WebSocket Error: " + error);
-                                };
-                                
-                                // 关闭事件
-                                socket.onclose = function(event) {
-                                    console.log("Connection closed");
-                                };
+                                var entity_code = event.currentTarget.getAttribute("entity-code");
+                                console.log(entity_code)
                             })
                         })
 
@@ -784,10 +585,10 @@ But that's the difference in our opinions.</textarea>
         }
         
         document.getElementById('send').addEventListener('click',function(event){
-            var sql = document.getElementById('sql-text').value
-            console.log('sql - ' + sql)
-            if(sql && socket){
-                socket.send(sql)
+            var msg = document.getElementById('text').value
+            console.log('msg - ' + msg)
+            if(msg){
+                document.getElementById('text').innerHTML = ''
                 document.getElementById("chat-context").innerHTML += `
                                         <div class="chat-item">
                                             <div class="row align-items-end justify-content-end">
@@ -800,7 +601,7 @@ But that's the difference in our opinions.</textarea>
                                                             </div>
                                                         </div>
                                                         <div class="chat-bubble-body" style="white-space: nowrap;overflow-x: auto;">
-                                                            <p>`+sql+`</p>
+                                                            <p>`+msg+`</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -810,29 +611,42 @@ But that's the difference in our opinions.</textarea>
                 `
                 var div = document.getElementById('scrollable');
                 div.scrollTop = div.scrollHeight;
+                axios
+                    .get('/api/rest/v1/ai/deepseek/stream?input='+msg, request)
+                    .then(response => {
+                        console.log(response)
+                        document.getElementById("chat-context").innerHTML +=
+                        `
+                                        <div class="chat-item">
+                                            <div class="row align-items-end">
+                                                <div class="col-auto"><span class="avatar" style="background-image: url(/static/avatars/000f.jpg)"></span>
+                                                </div>
+                                                <div class="col col-lg-6">
+                                                    <div class="chat-bubble">
+                                                        <div class="chat-bubble-title">
+                                                            <div class="row">
+                                                                <div class="col chat-bubble-author">deepseek</div>
+                                                                <div class="col-auto chat-bubble-date">09:43</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="chat-bubble-body">
+                                                            <p>`+response.data+`</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                        `
+                        var div = document.getElementById('scrollable');
+                        div.scrollTop = div.scrollHeight;
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+
             }
         })
-    
-        var update = document.getElementById('update');
-        update.addEventListener('click', (e) => {
-            console.log("submit onclick...")
-            const form = document.querySelector('#databaseProfile');
-            console.log(form)
-            const formData = new FormData(form);
-            console.log(formData)
-            var request = Object.fromEntries(formData.entries());
-            const formJson = JSON.stringify(request);
-            console.log(formJson)
-            axios
-                .post('/database/add', request)
-                .then(response => {
-                    console.log(response)
-                    
-                })
-                .catch(error => {
-                    console.log(error) 
-                })
-        })
+
     });
 </script>
 </body>

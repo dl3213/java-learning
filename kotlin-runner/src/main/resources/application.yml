@@ -71,7 +71,7 @@ debug: false
 logging:
   level:
     root: info
-    org.springframework.r2dbc: DEBUG
+    org.springframework.r2dbc: warn
     io.asyncer.r2dbc.mysql.client.ReactorNettyClient: warn
     io.debezium: warn
     org.apache.flink: warn
