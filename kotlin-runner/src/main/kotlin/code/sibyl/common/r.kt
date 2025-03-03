@@ -9,11 +9,11 @@ import org.springframework.core.env.Environment
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.onErrorMap
 import reactor.util.context.Context
 import reactor.util.context.ContextView
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -573,5 +573,15 @@ object r {
 //                println("error => "+ it.message)
 //                Mono.just(startPath)
 //            }
+    }
+
+    @JvmStatic
+    fun close(inputStream: InputStream?) {
+        if (null != inputStream) {
+            try {
+                inputStream.close()
+            } catch (e: java.lang.Exception) {
+            }
+        }
     }
 }

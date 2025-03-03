@@ -46,6 +46,7 @@ spring:
       enabled: false
   r2dbc:
     url: r2dbc:h2:file:///./h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
+#    url: r2dbc:h2:file:///D:/4code/4java/workspace/java-learning/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
     pool:
       enabled: true
       max-size: 1024

@@ -61,7 +61,7 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     fun 文件补充hash() {
 //        log.info(
 //            "{} - 文件补充hash : {}",
@@ -72,7 +72,7 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     fun 视频文件补充thumbnail() {
 //        log.info(
 //            "{} - 视频文件补充thumbnail : {}",

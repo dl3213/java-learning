@@ -11,6 +11,7 @@ import code.sibyl.common.r.yyyy_MM_dd
 import code.sibyl.domain.base.BaseFile
 import code.sibyl.domain.biz.Book
 import code.sibyl.service.BookService
+import code.sibyl.service.sql.PostgresqlService
 import com.alibaba.fastjson2.JSONObject
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
@@ -51,10 +52,6 @@ class BookController {
 
     private val log = LoggerFactory.getLogger(BookController::class.java)
 
-    @Autowired
-    @Qualifier("sibyl-postgresql")
-    private val r2dbcEntityTemplate: R2dbcEntityTemplate? = null
-
     @GetMapping("/view.html")
     fun view(model: Model): Mono<String> {
         val welcome = "book/list-view"
@@ -77,7 +74,7 @@ class BookController {
     @ResponseBody
     fun uploadFile(@RequestPart("file") filePartMono: Mono<FilePart>, @PathVariable id: String): Mono<Response> {
         return Mono.zip(
-            r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java),
+            PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java),
             filePartMono
         )
             .flatMap {
@@ -97,7 +94,7 @@ class BookController {
     @ResponseBody
     fun getFileImage(@PathVariable id: String): Flux<DataBuffer> {
 
-        return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .flatMap { book ->
                 r.getAllFiles(book.absolutePath)
                     .take(1).next()
@@ -116,7 +113,7 @@ class BookController {
     fun detailPage(@RequestBody jsonObject: JSONObject, @PathVariable id: String): Mono<Response> {
         val pageNumber = jsonObject.getLong("pageNumber")
         val pageSize = jsonObject.getLong("pageSize")
-        return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .publishOn(Schedulers.boundedElastic())
             .flatMapMany { book ->
                 r.getAllFiles(book.absolutePath).flatMap { path -> Mono.zip(Mono.just(book), Mono.just(path)) }
@@ -165,8 +162,8 @@ class BookController {
                     .sort(sort)
                     .with(PageRequest.of(pageNumber - 1, pageSize)) // 0开始
                 Mono.zip(
-                    r2dbcEntityTemplate!!.count(query, Book::class.java),
-                    r2dbcEntityTemplate.select(query, Book::class.java).collectList()
+                    PostgresqlService.getBean().template()!!.count(query, Book::class.java),
+                    PostgresqlService.getBean().template().select(query, Book::class.java).collectList()
                 )
             }
             .map { t: Tuple2<Long?, List<Book>?> ->
@@ -186,15 +183,14 @@ class BookController {
     @DeleteMapping(value = ["/delete/{id}"])
     @ResponseBody
     fun delete(@PathVariable id: String): Mono<Response> {
-        System.err.println("delete -> $id")
-        return r2dbcEntityTemplate!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .flatMap { e: Book ->
                 //System.err.println(e.absolutePath)
                 e.isDeleted = "1"
                 e.updateTime = LocalDateTime.now()
                 e.updateId = defaultUserId()
-                r2dbcEntityTemplate.update(e)
+                PostgresqlService.getBean().template().update(e)
             }
             .map { e: Book? -> Response.success(e) }
     }

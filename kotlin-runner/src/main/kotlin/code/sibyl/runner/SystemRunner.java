@@ -50,7 +50,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-        BookService.getBean().move_test().subscribe();
+//        BookService.getBean().move_test().subscribe();
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         //UpdateService.getBean().file_clear().subscribe(); //
 

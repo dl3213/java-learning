@@ -2,19 +2,40 @@ SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public';
 
-select *
-from t_base_file;
+create table T_SYS_USER
+(
+    ID              BIGINT   primary key,
+    USERNAME        varchar(255),
+    NICKNAME        varchar(255),
+    PASSWORD        varchar(255),
+    PHONE_NUMBER    varchar(255),
+    LAST_LOGIN_TIME TIMESTAMP,
+    IS_DELETED      varchar(1) default 0 not null,
+    CREATE_TIME     TIMESTAMP,
+    CREATE_ID       BIGINT,
+    UPDATE_TIME     TIMESTAMP,
+    UPDATE_ID       BIGINT
+);
 
-alter table t_base_file
-    add _desc varchar(1024);
-
-update t_base_file
-set real_name='12'
-where id = '1';
+create table T_SYS_DATABASE
+(
+    ID          BIGINT   primary key,
+    NAME        varchar(255),
+    TYPE        varchar(255),
+    HOST        varchar(255),
+    PORT        varchar(255),
+    USERNAME    varchar(255),
+    PASSWORD    varchar(255),
+    DATABASE    varchar(255),
+    VERSION     INTEGER              default 0,
+    IS_DELETED  varchar(1) default '0' not null,
+    CREATE_TIME TIMESTAMP,
+    CREATE_ID   BIGINT
+);
 
 create table IF NOT EXISTS t_base_file
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY primary key,
+    id            BIGINT  primary key,
     file_name     varchar(255),
     real_name     varchar(255),
     type          varchar(64),
@@ -37,7 +58,7 @@ create table IF NOT EXISTS t_base_file
 
 create table t_biz_book
 (
-    id            BIGINT GENERATED ALWAYS AS IDENTITY primary key,
+    id            BIGINT  primary key,
     name          varchar(255),
     type          varchar(64),
     absolute_path varchar(1024),

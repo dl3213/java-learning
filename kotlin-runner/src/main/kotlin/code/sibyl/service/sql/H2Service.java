@@ -1,4 +1,4 @@
-package code.sibyl.service;
+package code.sibyl.service.sql;
 
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
@@ -10,15 +10,19 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-@Service
-@Slf4j
+//@Service
+//@Slf4j
 @RequiredArgsConstructor
-public class QueryService {
+public class H2Service {
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
-    public static QueryService getBean() {
-        return r.getBean(QueryService.class);
+    public static H2Service getBean() {
+        return r.getBean(H2Service.class);
+    }
+
+    public R2dbcEntityTemplate template(){
+        return r2dbcEntityTemplate;
     }
 
     public Flux<BaseFile> fileList(String fileName, String type) {

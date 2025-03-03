@@ -5,7 +5,7 @@ import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
 import code.sibyl.service.FileService;
-import code.sibyl.service.QueryService;
+import code.sibyl.service.sql.H2Service;
 import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,7 +28,6 @@ import reactor.core.publisher.Mono;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/photo")
@@ -99,81 +98,4 @@ public class PhotoController {
 //                .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
     }
 
-    @DeleteMapping(value = "/pixiv/delete/{id}")
-    @ResponseBody
-    public Mono<Response> pixiv_delete(@PathVariable String id) {
-        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
-                .flatMap(e -> {
-                    System.err.println(e.getAbsolutePath());
-                    e.setDeleted("1");
-                    e.setUpdateTime(LocalDateTime.now());
-                    e.setUpdateId(r.defaultUserId());
-//                    File file = new File(e.getAbsolutePath());
-//                    if (Objects.nonNull(file) && file.exists()) {
-//                        file.delete();
-//                    }
-                    return r2dbcEntityTemplate.update(e);
-                }).map(e -> Response.success(e));
-    }
-
-    @PostMapping("/pixiv/upload")
-    @ResponseBody
-    public Mono<Response> th_finance_collection_book_upload(@RequestPart("file") Mono<FilePart> filePartMono) {
-
-        return filePartMono
-                .flatMap(e -> Mono.zip(Mono.just(e.filename()), DataBufferUtils.join(e.content())))
-                .map(t -> {
-                    DataBuffer dataBuffer = t.getT2();
-                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                    dataBuffer.read(bytes);
-                    DataBufferUtils.release(dataBuffer);
-                    System.err.println(bytes.length);
-                    return new Tuple(t.getT1(), bytes);
-                })
-                .flatMap(t -> {
-                    String fileName = t.get(0);
-                    byte[] bytes = t.get(1);
-                    String detect = r.getBean(Tika.class).detect(bytes);
-                    String hash = r.hashBytes(bytes);
-                    return Mono.zip(
-                            Mono.just(fileName),
-                            Mono.just(bytes),
-                            Mono.just(detect),
-                            Mono.just(new Object()) , //ReactiveSecurityContextHolder.getContext(),
-                            QueryService.getBean().fileList(fileName, detect).collectList(),
-                            QueryService.getBean().fileListByHash(hash).collectList()
-                    );
-                })
-                .flatMap(t -> {
-                    String fileName = t.getT1();
-                    System.err.println(fileName);
-                    byte[] bytes = t.getT2();
-                    System.err.println(bytes.length);
-                    String fileType = t.getT3();
-                    System.err.println(fileType);
-                    Object user = (Object) t.getT4() ;//.getAuthentication().getPrincipal();
-                    System.err.println(user);
-                    List<BaseFile> baseFileList = t.getT5();
-                    System.err.println(baseFileList);
-                    List<BaseFile> hashList = t.getT6();
-
-                    if (!fileType.contains("image")) {
-                        return Mono.error(new RuntimeException("上传失败：非图像文件"));
-                    }
-                    if (CollectionUtils.isNotEmpty(baseFileList)) {
-                        return Mono.error(new RuntimeException("上传失败：同名图像文件已存在"));
-                    }
-                    if (CollectionUtils.isNotEmpty(hashList)) {
-                        return Mono.error(new RuntimeException("上传失败：相同hash文件已存在"));
-                    }
-
-                    String dir = r.fileBaseDir() + r.yyyy_MM_dd() + File.separator;
-                    String absolutePath = dir + fileName;
-                    BaseFile file = UpdateService.getBean().file(fileName, absolutePath, null, bytes, true);
-
-                    return r2dbcEntityTemplate.insert(file);
-                })
-                .map(e -> Response.success(e))
-                ;
-    }
 }

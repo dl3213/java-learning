@@ -1,7 +1,6 @@
 package code.sibyl.service.sql;
 
 import code.sibyl.common.r;
-import code.sibyl.service.UpdateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +11,14 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SibylMysqlService {
+public class MysqlService {
 
     @Autowired
     @Qualifier("sibyl-mysql")
     private R2dbcEntityTemplate sibylMysqlTemplate;
 
-    public static SibylMysqlService getBean() {
-        return r.getBean(SibylMysqlService.class);
+    public static MysqlService getBean() {
+        return r.getBean(MysqlService.class);
     }
 
     public R2dbcEntityTemplate template(){

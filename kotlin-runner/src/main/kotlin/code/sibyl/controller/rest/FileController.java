@@ -1,23 +1,19 @@
-package code.sibyl.controller.file;
+package code.sibyl.controller.rest;
 
-import code.sibyl.aop.Header;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
-import code.sibyl.domain.database.Database;
 import code.sibyl.model.FileInfo;
-import code.sibyl.service.DataBaseService;
 import code.sibyl.service.FileService;
+import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.http.HttpHeaders;
@@ -25,51 +21,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Controller
-@RequestMapping("/file")
+@RestController
+@RequestMapping("/api/rest/v1/file")
+@Slf4j
 public class FileController {
 
     @Autowired
     FileService storageService;
-    @Autowired
-    private DataBaseService dataBaseService;
-    @Autowired
-//    @Qualifier("sibyl-postgresql")
-    R2dbcEntityTemplate r2dbcEntityTemplate;
 
-    @GetMapping("/list-view")
-    public Mono<String> list_view(final Model model) {
-        return dataBaseService.list(null)
-                .collectList()
-                .doOnSuccess(list -> {
-                    model.addAttribute("list", list);
-                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
-                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
-                            .map(Field::getName)
-                            .collect(Collectors.toList());
-                    model.addAttribute("headerList", headerList);
-                    model.addAttribute("systemName", r.systemName());
-                    model.addAttribute("title", r.systemName());
-                })
-                .flatMap(e -> Mono.create(monoSink -> monoSink.success("file/list-view")));
-    }
 
     @PostMapping("/upload")
     @ResponseBody
@@ -81,7 +51,8 @@ public class FileController {
     @PostMapping(value = "/page")
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
-        Criteria criteria = Criteria.where("IS_DELETED").is("0"); //.and("type").like("image%");
+        String isDeleted = jsonObject.getString("isDeleted");
+        Criteria criteria = Criteria.where("IS_DELETED").is(isDeleted); //.and("type").like("image%");
 
         String type = jsonObject.getString("type");
         if (StringUtils.isNotBlank(type)) {
@@ -99,11 +70,11 @@ public class FileController {
         String hash = jsonObject.getString("hash");
         Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
         if ("1".equals(hash)) {
-            sha256Query = r2dbcEntityTemplate.getDatabaseClient()
-                    .sql(""" 
+            sha256Query = PostgresqlService.getBean().template().getDatabaseClient()
+                    .sql(STR."""
                             select * from (
                                 select sha256, count(1) as count from T_BASE_FILE
-                                where is_deleted = '0'
+                                where is_deleted = '\{isDeleted}' and sha256 is not null
                                 group by sha256
                             )t where count >=2
                             """)
@@ -116,7 +87,6 @@ public class FileController {
 
         Integer pageNumber = jsonObject.getInteger("pageNumber");
         Integer pageSize = jsonObject.getInteger("pageSize");
-        System.err.println(jsonObject);
         return Mono.zip(Mono.just(criteria), sha256Query)
                 .flatMap(tuple -> {
                     //System.err.println(tuple.getT2());
@@ -130,7 +100,7 @@ public class FileController {
                             .sort(sort)
                             .with(PageRequest.of(pageNumber - 1, pageSize)); // 0开始
 
-                    return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList());
+                    return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
                 .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
 
@@ -157,7 +127,7 @@ public class FileController {
         String hash = jsonObject.getString("hash");
         Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
         if ("1".equals(hash)) {
-            sha256Query = r2dbcEntityTemplate.getDatabaseClient()
+            sha256Query = PostgresqlService.getBean().template().getDatabaseClient()
                     .sql("""
                             select sha256, count(1) as count from T_BASE_FILE
                             where is_deleted = '0'
@@ -187,7 +157,7 @@ public class FileController {
                             .sort(sort)
                             .with(PageRequest.of(pageNumber - 1, pageSize)); // 0开始
 
-                    return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList());
+                    return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
                 .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
 
@@ -196,26 +166,24 @@ public class FileController {
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
     public Mono<Response> delete(@PathVariable String id) {
-        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
-                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("1");
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
-                    return r2dbcEntityTemplate.update(e);
+                    return PostgresqlService.getBean().template().update(e);
                 })
                 .map(e -> Response.success(e));
     }
     @PostMapping(value = "/restore/{id}")
     @ResponseBody
     public Mono<Response> restore(@PathVariable String id) {
-        return r2dbcEntityTemplate.selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
-                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("0");
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
-                    return r2dbcEntityTemplate.update(e);
+                    return PostgresqlService.getBean().template().update(e);
                 })
                 .map(e -> Response.success(e));
     }
@@ -252,7 +220,6 @@ public class FileController {
 
         try {
             boolean existed = storageService.delete(filename);
-
             if (existed) {
                 message = "Delete the file successfully: " + filename;
                 return Mono.just(ResponseEntity.ok().body(Response.success(message)));

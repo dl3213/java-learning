@@ -35,14 +35,14 @@ public class TestController {
             System.err.println(Thread.currentThread().isVirtual());
         }).join();
 
-        return Response.success("https://xn--0704-1yjs01cc-1o1uh94bqa577wbi6h.yjs11.cfd/?m=play&u=xnxx&k=187md9ba&p=");
+        return Response.success("1");
     }
 
     @RequestMapping(value = "/test/mono", method = {RequestMethod.GET, RequestMethod.POST})
     public Mono<Response> test_mono() {
 
 
-        return Mono.just("https://xn--0704-1yjs01cc-1o1uh94bqa577wbi6h.yjs11.cfd/?m=play&u=xnxx&k=187md9ba&p=")
+        return Mono.just("1")
                 .map(e -> {
                     System.err.println(Thread.currentThread());
                     System.err.println(Thread.currentThread().getName());

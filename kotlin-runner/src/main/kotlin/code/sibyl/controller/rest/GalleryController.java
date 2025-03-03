@@ -2,6 +2,7 @@ package code.sibyl.controller.rest;
 
 import code.sibyl.common.Response;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,10 +25,6 @@ import java.util.Objects;
 @Slf4j
 public class GalleryController {
 
-    @Autowired
-//    @Qualifier("sibyl-postgresql")
-    R2dbcEntityTemplate r2dbcEntityTemplate;
-
     @PostMapping(value = "/page")
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
@@ -49,7 +46,7 @@ public class GalleryController {
         String hash = jsonObject.getString("hash");
         Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
         if ("1".equals(hash)) {
-            sha256Query = r2dbcEntityTemplate.getDatabaseClient()
+            sha256Query = PostgresqlService.getBean().template().getDatabaseClient()
                     .sql(""" 
                             select * from (
                                 select sha256, count(1) as count from T_BASE_FILE
@@ -79,7 +76,7 @@ public class GalleryController {
                             .sort(sort)
                             .with(PageRequest.of(pageNumber - 1, pageSize)); // 0开始
 
-                    return Mono.zip(r2dbcEntityTemplate.count(query, BaseFile.class), r2dbcEntityTemplate.select(query, BaseFile.class).collectList());
+                    return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
                 .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
 

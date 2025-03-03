@@ -37,6 +37,7 @@ public class BilibiliTool {
     public static void main(String[] args) {
 
         List<String> strings = Arrays.asList(
+                "BV1BqXfYTEQq"
         );
         System.err.println(strings.size());
         strings.stream().forEach(item -> {
@@ -86,6 +87,10 @@ public class BilibiliTool {
             System.err.println("bvstring => " + string);
             close(content);
             JSONObject bvJson = JSONObject.parseObject(string);
+
+
+
+
             JSONObject data = bvJson.getJSONObject("data");
             String title = data.getString("title");
             //String cid = data.getString("cid");//

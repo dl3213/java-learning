@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import jakarta.persistence.*
+import lombok.Data
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
 
+@Data
 @Entity
 @Table(name = "T_BASE_FILE")
 @org.springframework.data.relational.core.mapping.Table(name = "T_BASE_FILE")

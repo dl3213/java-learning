@@ -3,6 +3,7 @@ package code.sibyl.service;
 import cn.hutool.crypto.SecureUtil;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.service.sql.PostgresqlService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -238,7 +239,7 @@ public class UpdateService {
     @NotNull
     public Mono<Long> 文件补充hash() {
         long start = System.currentTimeMillis();
-        DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
         return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and SHA256 IS NULL ")
                 .mapProperties(BaseFile.class)
                 .all()
@@ -249,7 +250,7 @@ public class UpdateService {
                     String absolutePath = item.getAbsolutePath();
                     File realFile = new File(absolutePath);
                     String sha256 = SecureUtil.sha256(realFile);
-                    log.info("[文件补充hash] [{}] {} --> sha256 = {}", Thread.currentThread().getName(), absolutePath, sha256);
+                    //log.info("[文件补充hash] [{}] {} --> sha256 = {}", Thread.currentThread().getName(), absolutePath, sha256);
                     return client.sql("update T_BASE_FILE set SHA256=:sha256 where id=:id")
                             .bind("id", item.getId())
                             .bind("sha256", sha256)
@@ -263,7 +264,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    //log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -272,13 +273,13 @@ public class UpdateService {
     @NotNull
     public Mono<Long> 图片补充大小() {
         long start = System.currentTimeMillis();
-        DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
         return client.sql("select * from T_BASE_FILE where type like 'image%' and (WIDTH is null or HEIGHT is null)")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(500)
+                .take(100)
                 .flatMap(item -> {
                     String absolutePath = item.getAbsolutePath();
                     File realFile = new File(absolutePath);
@@ -296,7 +297,7 @@ public class UpdateService {
                     }
                     int width = image.getWidth();
                     int height = image.getHeight();
-                    log.info("[图片补充大小] [{}] {} --> width = {}, height = {}", Thread.currentThread().getName(), absolutePath, width, height);
+                    //log.info("[图片补充大小] [{}] {} --> width = {}, height = {}", Thread.currentThread().getName(), absolutePath, width, height);
                     return client.sql("update T_BASE_FILE set height=:height, width=:width where id=:id")
                             .bind("id", item.getId())
                             .bind("height", height)
@@ -306,7 +307,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    //log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -315,16 +316,16 @@ public class UpdateService {
     @NotNull
     public Mono<Long> 视频文件补充thumbnail() {
         long start = System.currentTimeMillis();
-        DatabaseClient client = r2dbcEntityTemplate.getDatabaseClient();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
         return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (thumbnail is null)")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(500)
+                .take(100)
                 .flatMap(item -> {
                     String absolutePath = item.getAbsolutePath();
-                    System.err.println(absolutePath);
+                    //System.err.println(absolutePath);
                     File targetVideo = new File(absolutePath);
                     String thumbnailPath = null;
                     try {
@@ -342,7 +343,7 @@ public class UpdateService {
                                 f = converter.convert(rotate(src, Integer.parseInt(rotate)));
                             }
                             thumbnailPath = doExecuteFrame(f, targetVideo.getParentFile().getAbsolutePath(), item.getFileName());
-                            System.err.println(thumbnailPath);
+                            //System.err.println(thumbnailPath);
                             i++;
                         }
                         ff.stop();
@@ -350,9 +351,8 @@ public class UpdateService {
                     } catch (FFmpegFrameGrabber.Exception e) {
                         return Flux.error(new RuntimeException(e));
                     }
-                    System.err.println();
 
-                    log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
+                    //log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
                     return client.sql("update T_BASE_FILE set thumbnail=:thumbnailPath where id=:id")
                             .bind("id", item.getId())
                             .bind("thumbnailPath", thumbnailPath)
@@ -362,7 +362,7 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-                    //log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;

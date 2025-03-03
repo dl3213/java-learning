@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SibylPostgresqlService {
+public class PostgresqlService {
 
     @Autowired
     @Qualifier("sibyl-postgresql")
     private R2dbcEntityTemplate sibylPostgresqlTemplate;
 
-    public static SibylPostgresqlService getBean() {
-        return r.getBean(SibylPostgresqlService.class);
+    public static PostgresqlService getBean() {
+        return r.getBean(PostgresqlService.class);
     }
 
     public R2dbcEntityTemplate template(){

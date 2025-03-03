@@ -3,6 +3,7 @@ package code.sibyl.service;
 import cn.hutool.core.lang.Snowflake;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.service.sql.PostgresqlService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -37,11 +38,6 @@ public class FileService {
 
     private final Path root = Paths.get(r.fileBaseDir());
 
-
-    @Autowired
-//    @Qualifier("sibyl-postgresql")
-    private R2dbcEntityTemplate r2dbcEntityTemplate;
-
     public void init() {
 //        try {
 //            Files.createDirectories(root);
@@ -66,16 +62,20 @@ public class FileService {
                     log.info("[fileUpload] absoluteDir = {}", absoluteDir);
                     String absolutePath = absoluteDir + tempFileName;
                     log.info("[fileUpload] absolutePath = {}", absolutePath);
+                    String relativePath = r.yyyy_MM_dd() + File.separator + tempFileName;
+                    log.info("[fileUpload] relativePath = {}", relativePath);
                     try {
                         FileUtils.createParentDirectories(new File(absolutePath));
                     } catch (IOException e) {
                         return Mono.error(new RuntimeException(e));
                     }
-                    return filePart.transferTo(root.resolve(absolutePath)).then(Mono.zip(Mono.just(filename), Mono.just(absolutePath)));
+                    return filePart.transferTo(root.resolve(absolutePath)).then(Mono.zip(Mono.just(filename), Mono.just(absolutePath), Mono.just(fileUniqueId), Mono.just(relativePath)));
                 })
                 .flatMap(item -> {
                     BaseFile file = UpdateService.getBean().file(item.getT1(), item.getT2(), null, null, false);
-                    return r2dbcEntityTemplate.insert(file);
+                    file.setId(Long.valueOf(item.getT3()));
+                    file.setRelativePath(item.getT4());
+                    return PostgresqlService.getBean().template().insert(file);
                 });
     }
 
