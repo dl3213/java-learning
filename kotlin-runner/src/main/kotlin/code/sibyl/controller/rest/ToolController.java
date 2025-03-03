@@ -31,7 +31,7 @@ public class ToolController {
         return Mono.create(monoSink -> monoSink.success("tool/view"));
     }
 
-    @PostMapping("/bv/url")
+    @PostMapping("/bilibili/url")
     @ResponseBody
     public Mono<Response> get_bv_url(@RequestBody JSONObject jsonObject) {
 
