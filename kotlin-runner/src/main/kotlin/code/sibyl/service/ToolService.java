@@ -74,7 +74,6 @@ public class ToolService {
                 //url = "D:\\" + bvid + "-" + cid + ".mp4";
                 //downloadNew(url, url);
 
-                System.err.println();
             }
         } catch (Exception e) {
             e.printStackTrace();

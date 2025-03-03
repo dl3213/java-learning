@@ -36,8 +36,14 @@ function downloadXlsxWithPostRealUrl(url, body, callback){
         const href = window.URL.createObjectURL(blob); // 创建下载连接
         a.href = href;
         var header = xhr.getResponseHeader('Content-Disposition');
-        console.log('header:', header);
-        a.download = "1.mp4" // decodeURI(header.replace(/\s+/g, '').replace("attachment;filename*=utf-8''",""));
+        console.log('header => ', header);
+        var split = header.split(";");
+        console.log('split => ', split);
+        var data = split.filter(e => e.indexOf("filename")>=0)[0].replaceAll(`"`, ``).trim();
+        console.log('data => ', data, typeof data);
+        var fileName = data.split("=")[1].trim();
+        console.log('fileName:', fileName);
+        a.download = fileName; //decodeURI(header.replace(/\s+/g, '').replace("attachment;filename*=utf-8''",""));
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a); // 下载完移除元素
@@ -48,35 +54,4 @@ function downloadXlsxWithPostRealUrl(url, body, callback){
         //console.log("end -> " + url);
         callback()
     }
-}
-function downloadFile(url, request) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/download', true);
-    xhr.setRequestHeader('Authorization', 'Bearer your_token'); // 可选认证头
-    xhr.responseType = 'blob'; // 关键：指定响应类型为二进制
-
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            console.log(xhr)
-            const blob = xhr.response;
-            const fileName = '1.mp4'; // 或从响应头解析
-            // 创建临时链接触发下载
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } else {
-            alert('下载失败: ' + xhr.statusText);
-        }
-    };
-
-    xhr.onerror = function() {
-        alert('请求失败，请检查网络');
-    };
-
-    xhr.send();
 }

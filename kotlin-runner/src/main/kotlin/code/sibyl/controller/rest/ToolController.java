@@ -44,7 +44,7 @@ public class ToolController {
                 ;
     }
 
-    @PostMapping("/bv/download")
+    @PostMapping("/bilibili/download")
     @ResponseBody
     public Mono<ResponseEntity<Flux<DataBuffer>>> downloadFile(@RequestBody JSONObject jsonObject) {
         try {
