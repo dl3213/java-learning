@@ -285,18 +285,20 @@
         </div>
         <div class="page-body">
             <div class="container-xl">
-                <div class="row row-cards" id="gallery-context">
-                </div>
                 <div class="d-flex">
 
                     <ul class="pagination ms-auto align-items-center">
                         <li class="page-item">
-                            <a class="page-link" id="top" href="#" tabindex="-1" aria-disabled="true">
+                            <a class="page-link top-btn" href="#" tabindex="-1" aria-disabled="true">
                                 top
                             </a>
                         </li>
-
-                        <li class="page-item disabled" id="page-prev">
+                        <li class="page-item">
+                            <a class="page-link first-btn" href="#" tabindex="-1" aria-disabled="true">
+                                first
+                            </a>
+                        </li>
+                        <li class="page-item disabled page-prev-btn">
                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
                                 <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
@@ -307,12 +309,12 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="page-item"><a class="page-link page-index" href="#">1</a></li>
-                        <li class="page-item active"><a class="page-link page-index" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link page-index" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link page-index" href="#">4</a></li>
-                        <li class="page-item"><a class="page-link page-index" href="#">5</a></li>
-                        <li class="page-item" id="page-next">
+                        <li class="page-item"><a class="page-link page-index-top" href="#">1</a></li>
+                        <li class="page-item active"><a class="page-link page-index-top" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link page-index-top" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link page-index-top" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link page-index-top" href="#">5</a></li>
+                        <li class="page-item page-next-btn">
                             <a class="page-link" href="#">
                                 <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
@@ -324,11 +326,128 @@
                             </a>
                         </li>
                         <li class="page-item">
-                            <input type="text" class="form-control"  id="page-size"
+                            <a class="page-link last-btn" href="#" tabindex="-1" aria-disabled="true">
+                                last
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <input type="text" class="form-control page-size-input"
                                    name="example-text-input" value="12">
                         </li>
                         <li class="page-item">
-                            <select name="user[day]" class="form-select" id="page-select">
+                            <select name="user[day]" class="form-select page-select ">
+                            </select>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row row-cards" id="gallery-context">
+                </div>
+                <!--                <div class="d-flex">-->
+
+                <!--                    <ul class="pagination ms-auto align-items-center">-->
+                <!--                        <li class="page-item">-->
+                <!--                            <a class="page-link" id="top" href="#" tabindex="-1" aria-disabled="true">-->
+                <!--                                top-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item">-->
+                <!--                            <a class="page-link" id="first" href="#" tabindex="-1" aria-disabled="true">-->
+                <!--                                first-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item disabled" id="page-prev">-->
+                <!--                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">-->
+                <!--                                &lt;!&ndash; Download SVG icon from http://tabler-icons.io/i/chevron-left &ndash;&gt;-->
+                <!--                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"-->
+                <!--                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"-->
+                <!--                                     stroke-linecap="round" stroke-linejoin="round">-->
+                <!--                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>-->
+                <!--                                    <path d="M15 6l-6 6l6 6"/>-->
+                <!--                                </svg>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item"><a class="page-link page-index" href="#">1</a></li>-->
+                <!--                        <li class="page-item active"><a class="page-link page-index" href="#">2</a></li>-->
+                <!--                        <li class="page-item"><a class="page-link page-index" href="#">3</a></li>-->
+                <!--                        <li class="page-item"><a class="page-link page-index" href="#">4</a></li>-->
+                <!--                        <li class="page-item"><a class="page-link page-index" href="#">5</a></li>-->
+                <!--                        <li class="page-item" id="page-next">-->
+                <!--                            <a class="page-link" href="#">-->
+                <!--                                &lt;!&ndash; Download SVG icon from http://tabler-icons.io/i/chevron-right &ndash;&gt;-->
+                <!--                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"-->
+                <!--                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"-->
+                <!--                                     stroke-linecap="round" stroke-linejoin="round">-->
+                <!--                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>-->
+                <!--                                    <path d="M9 6l6 6l-6 6"/>-->
+                <!--                                </svg>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item">-->
+                <!--                            <a class="page-link" id="last" href="#" tabindex="-1" aria-disabled="true">-->
+                <!--                                last-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item">-->
+                <!--                            <input type="text" class="form-control"  id="page-size"-->
+                <!--                                   name="example-text-input" value="12">-->
+                <!--                        </li>-->
+                <!--                        <li class="page-item">-->
+                <!--                            <select name="user[day]" class="form-select" id="page-select">-->
+                <!--                            </select>-->
+                <!--                        </li>-->
+                <!--                    </ul>-->
+                <!--                </div>-->
+                <div class="d-flex">
+
+                    <ul class="pagination ms-auto align-items-center">
+                        <li class="page-item">
+                            <a class="page-link top-btn" href="#" tabindex="-1" aria-disabled="true">
+                                top
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link first-btn" href="#" tabindex="-1" aria-disabled="true">
+                                first
+                            </a>
+                        </li>
+                        <li class="page-item disabled page-prev-btn">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M15 6l-6 6l6 6"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="page-item"><a class="page-link page-index-bottom" href="#">1</a></li>
+                        <li class="page-item active"><a class="page-link page-index-bottom" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link page-index-bottom" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link page-index-bottom" href="#">4</a></li>
+                        <li class="page-item"><a class="page-link page-index-bottom" href="#">5</a></li>
+                        <li class="page-item page-next-btn">
+                            <a class="page-link" href="#">
+                                <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                                     stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M9 6l6 6l-6 6"/>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link last-btn" href="#" tabindex="-1" aria-disabled="true">
+                                last
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <input type="text" class="form-control page-size-input"
+                                   name="example-text-input" value="12">
+                        </li>
+                        <li class="page-item">
+                            <select name="user[day]" class="form-select page-select ">
                             </select>
                         </li>
                     </ul>
@@ -353,10 +472,11 @@
         console.log("DOMContentLoaded...")
 
         var danger_ok_btn = document.getElementById("danger_ok");
-        var pageSizeInput = document.getElementById("page-size");
+        var pageSizeInput = Array.from(document.getElementsByClassName("page-size-input"))[0];
         var keywordInput = document.getElementById("keyword");
-        var page_select = document.getElementById("page-select");
         var totalInfoDiv = document.getElementById("totalInfo");
+        var page_select_list = Array.from(document.getElementsByClassName("page-select"));
+
         var config = {
             maxFilesize: 10240000,
             uploadMultiple: false,
@@ -373,6 +493,7 @@
         var request = {
             pageNumber: 1,
             pageSize: pageSizeInput.value,
+            lastPageNumber: 1,
         }
         load_photo(request)
 
@@ -382,11 +503,14 @@
             }
         })
 
-        document.getElementById("page-select").addEventListener("change", function (event) {
-            var selectedValue = event.target.value;
-            console.log("Selected value is: " + selectedValue);
-            request.pageNumber = selectedValue
-            load_photo(request)
+
+        page_select_list.forEach(element => {
+            element.addEventListener("change", function (event) {
+                var selectedValue = event.target.value;
+                console.log("Selected value is: " + selectedValue);
+                request.pageNumber = selectedValue
+                load_photo(request)
+            })
         })
 
         document.getElementById("search-btn").addEventListener("click", function (event) {
@@ -397,7 +521,7 @@
         function buildGallery(item, url) {
             return `<div class="col-sm-8 col-sm-6 col-lg-4">
                         <div class="card card-sm">
-                            <a ` + (item.type.startsWith("video") ? 'data-fancybox="'+item.id+'"' : 'data-fancybox="gallery"') + ` href ="` + url + `" class="d-block"  data-fslightbox="gallery" >
+                            <a ` + (item.type.startsWith("video") ? 'data-fancybox="' + item.id + '"' : 'data-fancybox="gallery"') + ` href ="` + url + `" class="d-block"  data-fslightbox="gallery" >
                                 <img
                                     src="` + (item.type.startsWith("video") ? url + '.jpg' : url) + `"
                                     class="card-img-top"  >
@@ -443,13 +567,110 @@
                                         <div>` + (item.realName.length > 20 ? item.realName.substring(0, 20) + "..." : item.realName) + `</div>
                                         <div class="text-secondary">` + item.createTime + `</div>
                                     </div>
-                                    <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary ms-auto detail-btn">detail</a></div>
+                                    <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary ms-auto detail-btn" target="_blank">detail</a></div>
 
                         </div>
                       </div>
                     </div>
                 </div>`
         } // <div class="col-xs-4 col-md-2 col-lg-2"><a href="` + url + `" class="btn btn-primary  ms-auto">Go Detail</a></div>
+
+        function delete_btn_build() {
+            var delete_btn_list = document.getElementsByClassName("delete-btn");
+            for (let el of delete_btn_list) {
+                el.addEventListener('click', function (evt) {
+                    console.log(el.getAttribute("target-id"))
+                    //document.getElementById("modal-danger-context").textContent = "确认删除？"
+                    //document.getElementById("danger-btn").click();
+                    danger_ok_btn.setAttribute("target-id", el.getAttribute("target-id"))
+
+                    var id = danger_ok_btn.getAttribute("target-id");
+                    console.log(id)
+                    var parentElement = el.parentElement;
+                    if (id) {
+                        parentElement.innerHTML = `
+                                    <span class="input-icon-addon ms-3">
+                                          <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                                    </span>
+                                    `
+                        axios
+                            .delete('/api/rest/v1/file/delete/' + id)
+                            .then(response => {
+                                console.log(response)
+                                //alert(response.data.msg)
+                                if (response.data.code == 200) {
+                                    //document.getElementById("modal-success-context").textContent = response.data.msg
+                                    //document.getElementById("success-btn").click();
+                                    parentElement.innerHTML = `
+                                                <div class="alert alert-success" style="margin:0" role="alert">
+                                                  <div class="d-flex">
+                                                    <div>
+                                                      <!-- Download SVG icon from http://tabler-icons.io/i/check -->
+                                                      <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                `
+                                } else {
+                                    document.getElementById("modal-danger-context").textContent = response.data.msg
+                                    document.getElementById("danger-btn").click();
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error)
+                                document.getElementById("modal-danger-context").textContent = error.message
+                                document.getElementById("danger-btn").click();
+                            })
+                            .finally(() => {
+                                console.log('deleted')
+                                danger_ok_btn.setAttribute("target-id", "")
+                            })
+                    }
+
+                })
+            }
+        }
+
+        function page_index_bottom_build(data) {
+            var page_index_bottom = document.getElementsByClassName("page-index-bottom");
+            if (data.pageNumber > (3)) {
+
+            }
+            var start = data.pageNumber == 1 && data.pageNumber < 2 ? 1 : data.pageNumber - 2;
+            for (let el of page_index_bottom) {
+                el.innerText = start
+                start = numberAdd(start, 1)
+            }
+
+            for (let el of page_index_bottom) {
+                if (el.innerText == data.pageNumber) {
+                    el.parentElement.classList.add("active")
+                } else {
+                    el.parentElement.classList.remove("active")
+                }
+
+            }
+        }
+        function page_index_top_build(data) {
+            var page_index_bottom = document.getElementsByClassName("page-index-top");
+            if (data.pageNumber > (3)) {
+
+            }
+            var start = data.pageNumber == 1 && data.pageNumber < 2 ? 1 : data.pageNumber - 2;
+            for (let el of page_index_bottom) {
+                el.innerText = start
+                start = numberAdd(start, 1)
+            }
+
+            for (let el of page_index_bottom) {
+                if (el.innerText == data.pageNumber) {
+                    el.parentElement.classList.add("active")
+                } else {
+                    el.parentElement.classList.remove("active")
+                }
+
+            }
+        }
 
         function load_photo(request) {
 
@@ -469,44 +690,25 @@
                     console.log(totalInfo)
                     totalInfoDiv.innerHTML = totalInfo;
                     if (data.pageNumber == 1) {
-                        document.getElementById("page-prev").classList.add("disabled")
+                        Array.from(document.getElementsByClassName("page-prev-btn")).forEach(e => e.classList.add("disabled"))
                     } else {
-                        document.getElementById("page-prev").classList.remove("disabled")
+                        Array.from(document.getElementsByClassName("page-prev-btn")).forEach(e => e.classList.remove("disabled"))
                     }
 
                     var pageIndex_size = (data.total / data.pageSize)
-
-                    page_select.innerHTML = ""
+                    request.lastPageNumber = pageIndex_size + 1
+                    page_select_list.forEach(el => el.innerHTML = '')
                     pageIndex_size = pageIndex_size == 0 ? 1 : pageIndex_size;
                     for (let i = 1; i <= (pageIndex_size + 1); i++) {
                         if (i == data.pageNumber) {
-                            page_select.innerHTML += `<option selected value="` + i + `" >` + i + `</option>`
+                            page_select_list.forEach(el => el.innerHTML += `<option selected value="` + i + `" >` + i + `</option>`)
                         } else {
-                            page_select.innerHTML += `<option value="` + i + `" >` + i + `</option>`
+                            page_select_list.forEach(el => el.innerHTML += `<option value="` + i + `" >` + i + `</option>`)
                         }
                     }
 
-                    var page_index_list = document.getElementsByClassName("page-index");
-                    if (data.pageNumber > (3)) {
-
-                    }
-
-                    var start = data.pageNumber == 1 && data.pageNumber < 2 ? 1 : data.pageNumber - 2;
-                    for (let el of page_index_list) {
-                        el.innerText = start
-                        start = numberAdd(start, 1)
-                    }
-
-                    for (let el of page_index_list) {
-                        if (el.innerText == data.pageNumber) {
-                            el.parentElement.classList.add("active")
-                        } else {
-                            el.parentElement.classList.remove("active")
-                        }
-
-                    }
-
-
+                    page_index_top_build(data);
+                    page_index_bottom_build(data);
                     document.getElementById('gallery-context').innerHTML = ""
                     data.data.forEach(item => {
 
@@ -515,76 +717,30 @@
 
                         document.getElementById('gallery-context').innerHTML += div
 
-                        var delete_btn_list = document.getElementsByClassName("delete-btn");
-                        for (let el of delete_btn_list) {
-                            el.addEventListener('click', function (evt) {
-                                console.log(el.getAttribute("target-id"))
-                                //document.getElementById("modal-danger-context").textContent = "确认删除？"
-                                //document.getElementById("danger-btn").click();
-                                danger_ok_btn.setAttribute("target-id", el.getAttribute("target-id"))
-
-                                var id = danger_ok_btn.getAttribute("target-id");
-                                console.log(id)
-                                var parentElement = el.parentElement;
-                                if (id) {
-                                    parentElement.innerHTML = `
-                                    <span class="input-icon-addon ms-3">
-                                          <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                                    </span>
-                                    `
-                                    axios
-                                        .delete('/api/rest/v1/file/delete/' + id)
-                                        .then(response => {
-                                            console.log(response)
-                                            //alert(response.data.msg)
-                                            if (response.data.code == 200) {
-                                                //document.getElementById("modal-success-context").textContent = response.data.msg
-                                                //document.getElementById("success-btn").click();
-                                                parentElement.innerHTML = `
-                                                <div class="alert alert-success" style="margin:0" role="alert">
-                                                  <div class="d-flex">
-                                                    <div>
-                                                      <!-- Download SVG icon from http://tabler-icons.io/i/check -->
-                                                      <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                                `
-                                            } else {
-                                                document.getElementById("modal-danger-context").textContent = response.data.msg
-                                                document.getElementById("danger-btn").click();
-                                            }
-                                        })
-                                        .catch(error => {
-                                            console.log(error)
-                                            document.getElementById("modal-danger-context").textContent = error.message
-                                            document.getElementById("danger-btn").click();
-                                        })
-                                        .finally(() => {
-                                            console.log('deleted')
-                                            danger_ok_btn.setAttribute("target-id", "")
-                                        })
-                                }
-
-                            })
-                        }
+                        delete_btn_build()
                     })
                 })
                 .catch(error => {
                     console.log(error)
                 })
 
-            document.getElementById("top").click()
+            document.getElementById("top")?.click()
         }
 
-        var page_index_list = document.getElementsByClassName("page-index");
-        for (let el of page_index_list) {
+        var page_index_top_list = document.getElementsByClassName("page-index-top");
+        for (let el of page_index_top_list) {
             el.addEventListener('click', function (evt) {
                 request.pageNumber = el.innerText
                 load_photo(request)
             })
         }
-
+        var page_index_bottom_list = document.getElementsByClassName("page-index-bottom");
+        for (let el of page_index_bottom_list) {
+            el.addEventListener('click', function (evt) {
+                request.pageNumber = el.innerText
+                load_photo(request)
+            })
+        }
 
         danger_ok_btn.addEventListener('click', function (evt) {
             console.log("danger_ok...")
@@ -616,17 +772,35 @@
             }
         })
 
-        document.getElementById("page-prev").addEventListener('click', function (evt) {
-            if (request.pageNumber == 1) {
-                return
-            }
-            request.pageNumber = numberSub(request.pageNumber, 1)
-            load_photo(request)
+
+        Array.from(document.getElementsByClassName("page-prev-btn")).forEach(el => {
+            el.addEventListener('click', function (evt) {
+                request.pageNumber = numberSub(request.pageNumber, 1)
+                load_photo(request)
+            })
         })
-        document.getElementById("page-next").addEventListener('click', function (evt) {
-            request.pageNumber = numberAdd(request.pageNumber, 1)
-            load_photo(request)
+        Array.from(document.getElementsByClassName("page-next-btn")).forEach(el => {
+            el.addEventListener('click', function (evt) {
+                request.pageNumber = numberAdd(request.pageNumber, 1)
+                load_photo(request)
+            })
         })
+
+        Array.from(document.getElementsByClassName("first-btn")).forEach(el => {
+            el.addEventListener('click', function (evt) {
+                request.pageNumber = 1
+                load_photo(request)
+            })
+        })
+
+        Array.from(document.getElementsByClassName("last-btn")).forEach(el => {
+            el.addEventListener('click', function (evt) {
+                request.pageNumber = request.lastPageNumber
+                load_photo(request)
+            })
+        })
+
+
     });
 </script>
 </body>
