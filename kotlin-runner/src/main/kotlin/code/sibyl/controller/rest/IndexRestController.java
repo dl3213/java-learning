@@ -1,81 +1,32 @@
-package code.sibyl.controller;
+package code.sibyl.controller.rest;
 
-import code.sibyl.aop.ActionLog;
-import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
-import code.sibyl.domain.base.BaseFile;
 import code.sibyl.model.MenuDTO;
-import code.sibyl.service.SysUserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.query.Criteria;
-import org.springframework.data.relational.core.query.Query;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/api/rest/v1")
 @RequiredArgsConstructor
-public class IndexController {
-    private final DatabaseClient databaseClient;
+public class IndexRestController {
 
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
-
-    private Map<String, String> indexCache = new HashMap<>();
-
-    @RequestMapping({"/", "index", "main"})
-    public Mono<String> index(final Model model, ServerWebExchange exchange, @RequestParam(defaultValue = "index") String index
-//            ,
-//                              @AuthenticationPrincipal UserDetails userDetails,
-//                              @CurrentSecurityContext(expression = "authentication") Authentication authentication
-    ) {
-
-//        System.err.println("首页访问 --->" + index);
-//        System.err.println(exchange.getRequest().getURI().toString());
-//        System.err.println("client from = " + exchange.getRequest().getRemoteAddress());
-//        System.err.println("to server = " + exchange.getRequest().getLocalAddress());
-//        System.err.println(exchange.getRequest().getSslInfo());
-//        System.err.println(Thread.currentThread().getName());
-//        exchange.getRequest().getHeaders().entrySet().forEach(System.err::println);
-
-//        List<MenuDTO> menuTree = menuTree();
-//        model.addAttribute("menuTree", menuTree);
-
-        final String finalIndex = "index/" + index;
-        return Mono.zip(Mono.just(1), SysUserService.getBean().me())
-                .map(tuple -> {
-                    model.addAttribute("user", tuple.getT2());
-                    model.addAttribute("sys_icon", "static/sibyl.svg");
-                    model.addAttribute("alt", "SIBYL");
-                    model.addAttribute("systemName", r.systemName());
-                    model.addAttribute("title", r.systemName());
-                    return finalIndex;
-                });
-    }
-
-    @ResponseBody
     @RequestMapping(value = "/menu/tree/base", method = {RequestMethod.GET, RequestMethod.POST})
     public Response menuTreeBase() {
         List<MenuDTO> list = Arrays.asList(
                 new MenuDTO()
                         .setCode("Home")
                         .setName("Home")
-                        .setLinkUrl("/home")
                         .setIsActive(true)
                         .setHtml("""
                                 <li class="nav-item active">
-                                                            <a class="nav-link" target-link="/home" href="#">
+                                                            <a class="nav-link" target-link="/" target-link="/" >
                                                                 <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
                                                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
                                                                                            height="24" viewBox="0 0 24 24"
@@ -108,7 +59,7 @@ public class IndexController {
                                 """)
                         .setHtml("""
                                 <li class="nav-item dropdown">
-                                                            <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown"
+                                                            <a class="nav-link dropdown-toggle"  data-bs-toggle="dropdown"
                                                                data-bs-auto-close="outside" role="button" aria-expanded="true">
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/package -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
@@ -122,195 +73,195 @@ public class IndexController {
                                                             <div class="dropdown-menu">
                                                                 <div class="dropdown-menu-columns">
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="alerts.html">
+                                                                        <a class="dropdown-item" target-link="alerts.html">
                                                                             Alerts
                                                                         </a>
-                                                                        <a class="dropdown-item" href="accordion.html">
+                                                                        <a class="dropdown-item" target-link="accordion.html">
                                                                             Accordion
                                                                         </a>
                                                                         <div class="dropend">
-                                                                            <a class="dropdown-item dropdown-toggle" href="#sidebar-authentication"
+                                                                            <a class="dropdown-item dropdown-toggle" target-link="#sidebar-authentication"
                                                                                data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                                aria-expanded="false">
                                                                                 Authentication
                                                                             </a>
                                                                             <div class="dropdown-menu">
-                                                                                <a href="sign-in.html" class="dropdown-item">
+                                                                                <a target-link="sign-in.html" class="dropdown-item">
                                                                                     Sign in
                                                                                 </a>
-                                                                                <a href="sign-in-link.html" class="dropdown-item">
+                                                                                <a target-link="sign-in-link.html" class="dropdown-item">
                                                                                     Sign in link
                                                                                 </a>
-                                                                                <a href="sign-in-illustration.html" class="dropdown-item">
+                                                                                <a target-link="sign-in-illustration.html" class="dropdown-item">
                                                                                     Sign in with illustration
                                                                                 </a>
-                                                                                <a href="sign-in-cover.html" class="dropdown-item">
+                                                                                <a target-link="sign-in-cover.html" class="dropdown-item">
                                                                                     Sign in with cover
                                                                                 </a>
-                                                                                <a href="sign-up.html" class="dropdown-item">
+                                                                                <a target-link="sign-up.html" class="dropdown-item">
                                                                                     Sign up
                                                                                 </a>
-                                                                                <a href="forgot-password.html" class="dropdown-item">
+                                                                                <a target-link="forgot-password.html" class="dropdown-item">
                                                                                     Forgot password
                                                                                 </a>
-                                                                                <a href="terms-of-service.html" class="dropdown-item">
+                                                                                <a target-link="terms-of-service.html" class="dropdown-item">
                                                                                     Terms of service
                                                                                 </a>
-                                                                                <a href="auth-lock.html" class="dropdown-item">
+                                                                                <a target-link="auth-lock.html" class="dropdown-item">
                                                                                     Lock screen
                                                                                 </a>
-                                                                                <a href="2-step-verification.html" class="dropdown-item">
+                                                                                <a target-link="2-step-verification.html" class="dropdown-item">
                                                                                     2 step verification
                                                                                 </a>
-                                                                                <a href="2-step-verification-code.html" class="dropdown-item">
+                                                                                <a target-link="2-step-verification-code.html" class="dropdown-item">
                                                                                     2 step verification code
                                                                                 </a>
                                                                             </div>
                                                                         </div>
-                                                                        <a class="dropdown-item" href="blank.html">
+                                                                        <a class="dropdown-item" target-link="blank.html">
                                                                             Blank page
                                                                         </a>
-                                                                        <a class="dropdown-item" href="badges.html">
+                                                                        <a class="dropdown-item" target-link="badges.html">
                                                                             Badges
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="buttons.html">
+                                                                        <a class="dropdown-item" target-link="buttons.html">
                                                                             Buttons
                                                                         </a>
                                                                         <div class="dropend">
-                                                                            <a class="dropdown-item dropdown-toggle" href="#sidebar-cards"
+                                                                            <a class="dropdown-item dropdown-toggle" target-link="#sidebar-cards"
                                                                                data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                                aria-expanded="false">
                                                                                 Cards
                                                                                 <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                             </a>
                                                                             <div class="dropdown-menu">
-                                                                                <a href="cards.html" class="dropdown-item">
+                                                                                <a target-link="cards.html" class="dropdown-item">
                                                                                     Sample cards
                                                                                 </a>
-                                                                                <a href="card-actions.html" class="dropdown-item">
+                                                                                <a target-link="card-actions.html" class="dropdown-item">
                                                                                     Card actions
                                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                                 </a>
-                                                                                <a href="cards-masonry.html" class="dropdown-item">
+                                                                                <a target-link="cards-masonry.html" class="dropdown-item">
                                                                                     Cards Masonry
                                                                                 </a>
                                                                             </div>
                                                                         </div>
-                                                                        <a class="dropdown-item" href="carousel.html">
+                                                                        <a class="dropdown-item" target-link="carousel.html">
                                                                             Carousel
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="charts.html">
+                                                                        <a class="dropdown-item" target-link="charts.html">
                                                                             Charts
                                                                         </a>
-                                                                        <a class="dropdown-item" href="colors.html">
+                                                                        <a class="dropdown-item" target-link="colors.html">
                                                                             Colors
                                                                         </a>
-                                                                        <a class="dropdown-item" href="colorpicker.html">
+                                                                        <a class="dropdown-item" target-link="colorpicker.html">
                                                                             Color picker
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="datagrid.html">
+                                                                        <a class="dropdown-item" target-link="datagrid.html">
                                                                             Data grid
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="datatables.html">
+                                                                        <a class="dropdown-item" target-link="datatables.html">
                                                                             Datatables
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="dropdowns.html">
+                                                                        <a class="dropdown-item" target-link="dropdowns.html">
                                                                             Dropdowns
                                                                         </a>
-                                                                        <a class="dropdown-item" href="dropzone.html">
+                                                                        <a class="dropdown-item" target-link="dropzone.html">
                                                                             Dropzone
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
                                                                         <div class="dropend">
-                                                                            <a class="dropdown-item dropdown-toggle" href="#sidebar-error"
+                                                                            <a class="dropdown-item dropdown-toggle" target-link="#sidebar-error"
                                                                                data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                                aria-expanded="false">
                                                                                 Error pages
                                                                             </a>
                                                                             <div class="dropdown-menu">
-                                                                                <a href="error-404.html" class="dropdown-item">
+                                                                                <a target-link="error-404.html" class="dropdown-item">
                                                                                     404 page
                                                                                 </a>
-                                                                                <a href="error-500.html" class="dropdown-item">
+                                                                                <a target-link="error-500.html" class="dropdown-item">
                                                                                     500 page
                                                                                 </a>
-                                                                                <a href="error-maintenance.html" class="dropdown-item">
+                                                                                <a target-link="error-maintenance.html" class="dropdown-item">
                                                                                     Maintenance page
                                                                                 </a>
                                                                             </div>
                                                                         </div>
-                                                                        <a class="dropdown-item" href="flags.html">
+                                                                        <a class="dropdown-item" target-link="flags.html">
                                                                             Flags
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="inline-player.html">
+                                                                        <a class="dropdown-item" target-link="inline-player.html">
                                                                             Inline player
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
                                                                     </div>
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="lightbox.html">
+                                                                        <a class="dropdown-item" target-link="lightbox.html">
                                                                             Lightbox
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="lists.html">
+                                                                        <a class="dropdown-item" target-link="lists.html">
                                                                             Lists
                                                                         </a>
-                                                                        <a class="dropdown-item" href="modals.html">
+                                                                        <a class="dropdown-item" target-link="modals.html">
                                                                             Modal
                                                                         </a>
-                                                                        <a class="dropdown-item" href="maps.html">
+                                                                        <a class="dropdown-item" target-link="maps.html">
                                                                             Map
                                                                         </a>
-                                                                        <a class="dropdown-item" href="map-fullsize.html">
+                                                                        <a class="dropdown-item" target-link="map-fullsize.html">
                                                                             Map fullsize
                                                                         </a>
-                                                                        <a class="dropdown-item" href="maps-vector.html">
+                                                                        <a class="dropdown-item" target-link="maps-vector.html">
                                                                             Map vector
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="markdown.html">
+                                                                        <a class="dropdown-item" target-link="markdown.html">
                                                                             Markdown
                                                                         </a>
-                                                                        <a class="dropdown-item" href="navigation.html">
+                                                                        <a class="dropdown-item" target-link="navigation.html">
                                                                             Navigation
                                                                         </a>
-                                                                        <a class="dropdown-item" href="offcanvas.html">
+                                                                        <a class="dropdown-item" target-link="offcanvas.html">
                                                                             Offcanvas
                                                                         </a>
-                                                                        <a class="dropdown-item" href="pagination.html">
+                                                                        <a class="dropdown-item" target-link="pagination.html">
                                                                             <!-- Download SVG icon from http://tabler-icons.io/i/pie-chart -->
                                                                             Pagination
                                                                         </a>
-                                                                        <a class="dropdown-item" target-link="/placeholder.html" href="#">
+                                                                        <a class="dropdown-item" target-link="/placeholder.html" >
                                                                             Placeholder
                                                                         </a>
-                                                                        <a class="dropdown-item" href="steps.html">
+                                                                        <a class="dropdown-item" target-link="steps.html">
                                                                             Steps
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="stars-rating.html">
+                                                                        <a class="dropdown-item" target-link="stars-rating.html">
                                                                             Stars rating
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="tabs.html">
+                                                                        <a class="dropdown-item" target-link="tabs.html">
                                                                             Tabs
                                                                         </a>
-                                                                        <a class="dropdown-item" href="tags.html">
+                                                                        <a class="dropdown-item" target-link="tags.html">
                                                                             Tags
                                                                         </a>
-                                                                        <a class="dropdown-item" href="tables.html">
+                                                                        <a class="dropdown-item" target-link="tables.html">
                                                                             Tables
                                                                         </a>
-                                                                        <a class="dropdown-item" href="typography.html">
+                                                                        <a class="dropdown-item" target-link="typography.html">
                                                                             Typography
                                                                         </a>
-                                                                        <a class="dropdown-item" href="tinymce.html">
+                                                                        <a class="dropdown-item" target-link="tinymce.html">
                                                                             TinyMCE
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
@@ -336,7 +287,7 @@ public class IndexController {
                                 """)
                         .setHtml("""
                                 <li class="nav-item">
-                                                            <a class="nav-link" target-link="/form-elements.html" href="#">
+                                                            <a class="nav-link" target-link="/form-elements.html" >
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/checkbox -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                                                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -365,7 +316,7 @@ public class IndexController {
                                 """)
                         .setHtml("""
                                 <li class="nav-item dropdown">
-                                                            <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown"
+                                                            <a class="nav-link dropdown-toggle"  data-bs-toggle="dropdown"
                                                                data-bs-auto-close="outside" role="button" aria-expanded="false">
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
@@ -380,88 +331,88 @@ public class IndexController {
                                                             <div class="dropdown-menu">
                                                                 <div class="dropdown-menu-columns">
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="empty.html">
+                                                                        <a class="dropdown-item" target-link="empty.html">
                                                                             Empty page
                                                                         </a>
-                                                                        <a class="dropdown-item" href="cookie-banner.html">
+                                                                        <a class="dropdown-item" target-link="cookie-banner.html">
                                                                             Cookie banner
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="list-view.html">
+                                                                        <a class="dropdown-item" target-link="list-view.html">
                                                                             Chat
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="activity.html">
+                                                                        <a class="dropdown-item" target-link="activity.html">
                                                                             Activity
                                                                         </a>
-                                                                        <a class="dropdown-item" href="gallery.html">
+                                                                        <a class="dropdown-item" target-link="gallery.html">
                                                                             Gallery
                                                                         </a>
-                                                                        <a class="dropdown-item" href="invoice.html">
+                                                                        <a class="dropdown-item" target-link="invoice.html">
                                                                             Invoice
                                                                         </a>
-                                                                        <a class="dropdown-item" href="search-results.html">
+                                                                        <a class="dropdown-item" target-link="search-results.html">
                                                                             Search results
                                                                         </a>
-                                                                        <a class="dropdown-item" href="pricing.html">
+                                                                        <a class="dropdown-item" target-link="pricing.html">
                                                                             Pricing cards
                                                                         </a>
-                                                                        <a class="dropdown-item" href="pricing-table.html">
+                                                                        <a class="dropdown-item" target-link="pricing-table.html">
                                                                             Pricing table
                                                                         </a>
-                                                                        <a class="dropdown-item" href="faq.html">
+                                                                        <a class="dropdown-item" target-link="faq.html">
                                                                             FAQ
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="users.html">
+                                                                        <a class="dropdown-item" target-link="users.html">
                                                                             Users
                                                                         </a>
-                                                                        <a class="dropdown-item" href="license.html">
+                                                                        <a class="dropdown-item" target-link="license.html">
                                                                             License
                                                                         </a>
                                                                     </div>
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="logs.html">
+                                                                        <a class="dropdown-item" target-link="logs.html">
                                                                             Logs
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="music.html">
+                                                                        <a class="dropdown-item" target-link="music.html">
                                                                             Music
                                                                         </a>
-                                                                        <a class="dropdown-item" href="photogrid.html">
+                                                                        <a class="dropdown-item" target-link="photogrid.html">
                                                                             Photogrid
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="tasks.html">
+                                                                        <a class="dropdown-item" target-link="tasks.html">
                                                                             Tasks
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="uptime.html">
+                                                                        <a class="dropdown-item" target-link="uptime.html">
                                                                             Uptime monitor
                                                                         </a>
-                                                                        <a class="dropdown-item" href="widgets.html">
+                                                                        <a class="dropdown-item" target-link="widgets.html">
                                                                             Widgets
                                                                         </a>
-                                                                        <a class="dropdown-item" href="wizard.html">
+                                                                        <a class="dropdown-item" target-link="wizard.html">
                                                                             Wizard
                                                                         </a>
-                                                                        <a class="dropdown-item" href="settings.html">
+                                                                        <a class="dropdown-item" target-link="settings.html">
                                                                             Settings
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="trial-ended.html">
+                                                                        <a class="dropdown-item" target-link="trial-ended.html">
                                                                             Trial ended
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="job-listing.html">
+                                                                        <a class="dropdown-item" target-link="job-listing.html">
                                                                             Job listing
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="page-loader.html">
+                                                                        <a class="dropdown-item" target-link="page-loader.html">
                                                                             Page loader
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" target-link="modal.html" href="#">
+                                                                        <a class="dropdown-item" target-link="modal.html" >
                                                                             modal
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
@@ -514,7 +465,7 @@ public class IndexController {
                                 """)
                         .setHtml("""
                                 <li class="nav-item dropdown">
-                                                            <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown"
+                                                            <a class="nav-link dropdown-toggle"   data-bs-toggle="dropdown"
                                                                data-bs-auto-close="outside" role="button" aria-expanded="false">
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/layout-2 -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
@@ -532,46 +483,46 @@ public class IndexController {
                                                             <div class="dropdown-menu">
                                                                 <div class="dropdown-menu-columns">
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="/?index=layout-horizontal">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-horizontal">
                                                                             Horizontal
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-boxed">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-boxed">
                                                                             Boxed
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-vertical">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-vertical">
                                                                             Vertical
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-vertical-transparent">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-vertical-transparent">
                                                                             Vertical transparent
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-vertical-right">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-vertical-right">
                                                                             Right vertical
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-condensed">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-condensed">
                                                                             Condensed
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-combo">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-combo">
                                                                             Combined
                                                                         </a>
                                                                     </div>
                                                                     <div class="dropdown-menu-column">
-                                                                        <a class="dropdown-item" href="/?index=layout-navbar-dark">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-navbar-dark">
                                                                             Navbar dark
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-navbar-sticky">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-navbar-sticky">
                                                                             Navbar sticky
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-navbar-overlap">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-navbar-overlap">
                                                                             Navbar overlap
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-rtl">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-rtl">
                                                                             RTL mode
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-fluid">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-fluid">
                                                                             Fluid
                                                                         </a>
-                                                                        <a class="dropdown-item" href="/?index=layout-fluid-vertical">
+                                                                        <a class="dropdown-item" target-link="/?index=layout-fluid-vertical">
                                                                             Fluid vertical
                                                                         </a>
                                                                     </div>
@@ -596,7 +547,7 @@ public class IndexController {
                                 """)
                         .setHtml("""
                                 <li class="nav-item">
-                                                            <a class="nav-link" target-link="/icons.html" href="#">
+                                                            <a class="nav-link" target-link="/icons.html" >
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/ghost -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                                                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
@@ -619,7 +570,7 @@ public class IndexController {
                                 """)
                         .setHtml(""" 
                                 <li class="nav-item">   
-                                                  <a class="nav-link" href="emails.html" >
+                                                  <a class="nav-link" target-link="emails.html" >
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l9 6l9 -6l-9 -6l-9 6" /><path d="M21 9v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10" /><path d="M3 19l6 -6" /><path d="M15 13l6 6" /></svg>
                                                     </span>
@@ -640,7 +591,7 @@ public class IndexController {
                                 """)
                         .setHtml(""" 
                                 <li class="nav-item dropdown">
-                                                  <a class="nav-link dropdown-toggle" href="#navbar-help" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
+                                                  <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                                                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/lifebuoy -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M15 15l3.35 3.35" /><path d="M9 15l-3.35 3.35" /><path d="M5.65 5.65l3.35 3.35" /><path d="M18.35 5.65l-3.35 3.35" /></svg>
                                                     </span>
@@ -649,16 +600,16 @@ public class IndexController {
                                                     </span>
                                                   </a>
                                                   <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="https://tabler.io/docs" target="_blank" rel="noopener">
+                                                    <a class="dropdown-item" target-link="https://tabler.io/docs" target="_blank" rel="noopener">
                                                       Documentation
                                                     </a>
-                                                    <a class="dropdown-item" href="changelog.html">
+                                                    <a class="dropdown-item" target-link="changelog.html">
                                                       Changelog
                                                     </a>
-                                                    <a class="dropdown-item" href="https://github.com/tabler/tabler" target="_blank" rel="noopener">
+                                                    <a class="dropdown-item" target-link="https://github.com/tabler/tabler" target="_blank" rel="noopener">
                                                       Source code
                                                     </a>
-                                                    <a class="dropdown-item text-pink" href="https://github.com/sponsors/codecalm" target="_blank" rel="noopener">
+                                                    <a class="dropdown-item text-pink" target-link="https://github.com/sponsors/codecalm" target="_blank" rel="noopener">
                                                       <!-- Download SVG icon from http://tabler-icons.io/i/heart -->
                                                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-inline me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></svg>
                                                       Sponsor project!
@@ -673,7 +624,6 @@ public class IndexController {
         return Response.success(list);
     }
 
-    @ResponseBody
     @RequestMapping(value = "/menu/tree/sys", method = {RequestMethod.GET, RequestMethod.POST})
     public Response menuTreeSys() {
         MenuDTO Video = new MenuDTO()
@@ -683,7 +633,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/file/list-view" href="#">
+                                                    <a class="nav-link" target-link="/templates/file/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -713,7 +663,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/database/list-view" href="#">
+                                                    <a class="nav-link" target-link="/templates/database/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-database" width="24"
                                                    height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
@@ -737,7 +687,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/file/list-view" href="#">
+                                                    <a class="nav-link" target-link="/templates/file/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -760,7 +710,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/photo/list-view" href="#">
+                                                    <a class="nav-link" target-link="/templates/photo/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -780,7 +730,6 @@ public class IndexController {
                                                     </a>
                                                 </li>
                         """)
-                .setLinkUrl("/photo/list-view")
                 .setChildren(Arrays.asList());
         MenuDTO Gallery = new MenuDTO()
                 .setCode("Gallery")
@@ -789,7 +738,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/gallery.html" href="#">
+                                                    <a class="nav-link" target-link="/templates/gallery/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -818,7 +767,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                            <a class="nav-link" target-link="/api/rest/v1/book/view.html" href="#">
+                            <a class="nav-link" target-link="/templates/book/list-view.html" >
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-book"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6l0 13" /><path d="M12 6l0 13" /><path d="M21 6l0 13" /></svg>   
                                 </span>
@@ -835,7 +784,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                            <a class="nav-link" target-link="/api/rest/v1/tool/view.html" href="#">
+                            <a class="nav-link" target-link="/templates/tool/view.html" >
                                 <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-box"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /></svg>
                                 </span>
@@ -851,7 +800,7 @@ public class IndexController {
                         """)
                 .setHtml("""
                         <li class="nav-item">
-                            <a class="nav-link" target-link="/api/rest/v1/ai/view.html" href="#">
+                            <a class="nav-link" target-link="/templates/ai/list-view.html" >
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-ai"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 16v-6a2 2 0 1 1 4 0v6" /><path d="M8 13h4" /><path d="M16 8v8" /></svg>
                                 </span>
@@ -873,779 +822,5 @@ public class IndexController {
 
         );
         return Response.success(list);
-    }
-
-    @GetMapping({"home",})
-    @ActionLog(topic = "home首页", type = ActionType.OTHER)
-    public Mono<String> home(final Model model) {
-        String welcome = "index/home";
-        model.addAttribute("app-pid", ProcessHandle.current().pid());
-        return Mono.create(monoSink -> monoSink.success(welcome));
-    }
-
-    @GetMapping({"sys/main",})
-    public Mono<String> sys_main() {
-        String welcome = "default/welcome";
-        return Mono.create(monoSink -> monoSink.success(welcome));
-    }
-
-    @GetMapping({"pages/main",})
-    public Mono<String> page_main() {
-        String s = "default/pages/main";
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping("welcome")
-    public Mono<String> toWelcome() {
-        String welcome = "default/welcome";
-        return Mono.create(monoSink -> monoSink.success(welcome));
-    }
-
-    @GetMapping({"sign-in.html"})
-    public Mono<String> sign_in(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-
-        String s = "sign-in";
-        return exchange.getSession().flatMap(webSession -> {
-            model.addAttribute("systemName", r.systemName());
-            model.addAttribute("title", r.systemName());
-            model.addAttribute("msg", webSession.getAttributes().get("redirect-msg"));
-            return Mono.just(s);
-        });
-    }
-
-    @GetMapping({"sign-up.html"})
-    public Mono<String> sign_up(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        String s = "sign-up";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"profile.html"})
-    public Mono<String> profile(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        String s = "profile";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"sign-in-link.html"})
-    public Mono<String> sign_in_link(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        String s = "sign-in-link";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"sign-in-illustration.html"})
-    public Mono<String> sign_in_illustration(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        String s = "sign-in-illustration";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"sign-in-cover.html"})
-    public Mono<String> sign_in_cover(final Model model, ServerWebExchange exchange, ServerHttpRequest request) {
-        String s = "sign-in-cover";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"forgot-password.html"})
-    public Mono<String> forgot_password(final Model model) {
-        String s = "forgot-password";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"auth-lock.html"})
-    public Mono<String> auth_lock(final Model model) {
-        String s = "auth-lock";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"terms-of-service.html"})
-    public Mono<String> terms_of_service(final Model model) {
-        String s = "terms-of-service";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"2-step-verification.html"})
-    public Mono<String> _2_step_verification(final Model model) {
-        String s = "2-step-verification";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"2-step-verification-code.html"})
-    public Mono<String> _2_step_verification_code(final Model model) {
-        String s = "2-step-verification-code";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"settings.html"})
-    public Mono<String> settings(final Model model) {
-        String s = "settings";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/form-elements.html"})
-    public Mono<String> form_elements(final Model model) {
-        String s = "form-elements";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-vertical.html"})
-    public Mono<String> layout_vertical(final Model model) {
-        String s = "index/layout-vertical";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/uptime.html"})
-    public Mono<String> uptime(final Model model) {
-        String s = "uptime";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/lists.html"})
-    public Mono<String> lists(final Model model) {
-        String s = "lists";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/tables.html"})
-    public Mono<String> tables(final Model model) {
-        String s = "tables";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/emails.html"})
-    public Mono<String> emails(final Model model) {
-        String s = "emails";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/database.html"})
-    public Mono<String> database(final Model model) {
-        String s = "database";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/buttons.html"})
-    public Mono<String> buttons(final Model model) {
-        String s = "buttons";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/cards.html"})
-    public Mono<String> cards(final Model model) {
-        String s = "cards";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/card-actions.html"})
-    public Mono<String> card_aactions(final Model model) {
-        String s = "card-actions";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/cards-masonry.html"})
-    public Mono<String> cards_masonry(final Model model) {
-        String s = "cards-masonry";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/msg"})
-    public Mono<String> msg(final Model model) {
-        String s = "common/msg";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/list-view.html"})
-    public Mono<String> chat(final Model model) {
-        String s = "chat";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/empty.html"})
-    public Mono<String> empty(final Model model) {
-        String s = "empty";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/cookie-banner.html"})
-    public Mono<String> cookie_banner(final Model model) {
-        String s = "cookie-banner";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/activity.html"})
-    public Mono<String> activity(final Model model) {
-        String s = "activity";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/gallery.html"})
-    public Mono<String> gallery(final Model model) {
-        String s = "gallery/list-view";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-    @GetMapping({"/recycle.html"})
-    public Mono<String> recycle(final Model model) {
-        String s = "file/recycle-list-view";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/invoice.html"})
-    public Mono<String> invoice(final Model model) {
-        String s = "invoice";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/search-results.html"})
-    public Mono<String> search_results(final Model model) {
-        String s = "search-results";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/pricing.html"})
-    public Mono<String> pricing(final Model model) {
-        String s = "pricing";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/pricing-table.html"})
-    public Mono<String> pricing_table(final Model model) {
-        String s = "pricing-table";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/faq.html"})
-    public Mono<String> faq(final Model model) {
-        String s = "faq";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/users.html"})
-    public Mono<String> users(final Model model) {
-        String s = "users";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/license.html"})
-    public Mono<String> license(final Model model) {
-        String s = "license";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/logs.html"})
-    public Mono<String> logs(final Model model) {
-        String s = "logs";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/music.html"})
-    public Mono<String> music(final Model model) {
-        String s = "music";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/photogrid.html"})
-    public Mono<String> photogrid(final Model model) {
-        String s = "photogrid";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/tasks.html"})
-    public Mono<String> tasks(final Model model) {
-        String s = "tasks";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/widgets.html"})
-    public Mono<String> widgets(final Model model) {
-        String s = "widgets";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/wizard.html"})
-    public Mono<String> wizard(final Model model) {
-        String s = "wizard";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/trial-ended.html"})
-    public Mono<String> trial_ended(final Model model) {
-        String s = "trial-ended";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/job-listing.html"})
-    public Mono<String> job_listing(final Model model) {
-        String s = "job-listing";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/page-loader.html"})
-    public Mono<String> page_loader(final Model model) {
-        String s = "page-loader";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/icons.html"})
-    public Mono<String> icons(final Model model) {
-        String s = "icons";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-
-    @GetMapping({"/layout-horizontal.html"})
-    public Mono<String> layout_horizontal(final Model model) {
-        String s = "index/layout-horizontal";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-boxed.html"})
-    public Mono<String> layout_boxed(final Model model) {
-        String s = "index/layout-boxed";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-vertical-transparent.html"})
-    public Mono<String> layout_vertical_transparent(final Model model) {
-        String s = "index/layout-vertical-transparent";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-vertical-right.html"})
-    public Mono<String> layout_vertical_right(final Model model) {
-        String s = "index/layout-vertical-right";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-condensed.html"})
-    public Mono<String> layout_condensed(final Model model) {
-        String s = "index/layout-condensed";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-combo.html"})
-    public Mono<String> layout_combo(final Model model) {
-        String s = "index/layout-combo";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-navbar-dark.html"})
-    public Mono<String> layout_navbar_dark(final Model model) {
-        String s = "index/layout-navbar-dark";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-navbar-sticky.html"})
-    public Mono<String> layout_navbar_sticky(final Model model) {
-        String s = "index/layout-navbar-sticky";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-navbar-overlap.html"})
-    public Mono<String> layout_navbar_overlap(final Model model) {
-        String s = "index/layout-navbar-overlap";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-rtl.html"})
-    public Mono<String> layout_rtl(final Model model) {
-        String s = "index/layout-rtl";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-fluid.html"})
-    public Mono<String> layout_fluid(final Model model) {
-        String s = "index/layout-fluid";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/layout-fluid-vertical.html"})
-    public Mono<String> layout_fluid_vertical(final Model model) {
-        String s = "index/layout-fluid-vertical";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/alerts.html"})
-    public Mono<String> alerts(final Model model) {
-        String s = "alerts";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/accordion.html"})
-    public Mono<String> accordion(final Model model) {
-        String s = "accordion";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/blank.html"})
-    public Mono<String> blank(final Model model) {
-        String s = "blank";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/badges.html"})
-    public Mono<String> badges(final Model model) {
-        String s = "badges";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/carousel.html"})
-    public Mono<String> carousel(final Model model) {
-        String s = "carousel";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/charts.html"})
-    public Mono<String> charts(final Model model) {
-        String s = "charts";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/colors.html"})
-    public Mono<String> colors(final Model model) {
-        String s = "colors";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/colorpicker.html"})
-    public Mono<String> colorpicker(final Model model) {
-        String s = "colorpicker";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/datagrid.html"})
-    public Mono<String> datagrid(final Model model) {
-        String s = "datagrid";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/datatables.html"})
-    public Mono<String> datatables(final Model model) {
-        String s = "datatables";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/dropdowns.html"})
-    public Mono<String> dropdowns(final Model model) {
-        String s = "dropdowns";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/dropzone.html"})
-    public Mono<String> dropzone(final Model model) {
-        String s = "dropzone";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/error-404.html"})
-    public Mono<String> error_404(final Model model) {
-        String s = "error-404";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/error-500.html"})
-    public Mono<String> error_500(final Model model) {
-        String s = "error-500";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/error-maintenance.html"})
-    public Mono<String> error_maintenance(final Model model) {
-        String s = "error-maintenance";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/flags.html"})
-    public Mono<String> flags(final Model model) {
-        String s = "flags";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/inline-player.html"})
-    public Mono<String> inline_player(final Model model) {
-        String s = "inline-player";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/maps.html"})
-    public Mono<String> maps(final Model model) {
-        String s = "maps";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/map-fullsize.html"})
-    public Mono<String> map_fullsize(final Model model) {
-        String s = "map-fullsize";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/maps-vector.html"})
-    public Mono<String> maps_vector(final Model model) {
-        String s = "maps-vector";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/lightbox.html"})
-    public Mono<String> lightbox(final Model model) {
-        String s = "lightbox";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/markdown.html"})
-    public Mono<String> markdown(final Model model) {
-        String s = "markdown";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/navigation.html"})
-    public Mono<String> navigation(final Model model) {
-        String s = "navigation";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/offcanvas.html"})
-    public Mono<String> offcanvas(final Model model) {
-        String s = "offcanvas";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/pagination.html"})
-    public Mono<String> pagination(final Model model) {
-        String s = "pagination";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/placeholder.html"})
-    public Mono<String> placeholder(final Model model) {
-        String s = "placeholder";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/steps.html"})
-    public Mono<String> steps(final Model model) {
-        String s = "steps";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/stars-rating.html"})
-    public Mono<String> stars_rating(final Model model) {
-        String s = "stars-rating";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/tabs.html"})
-    public Mono<String> tabs(final Model model) {
-        String s = "tabs";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/tags.html"})
-    public Mono<String> tags(final Model model) {
-        String s = "tags";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/typography.html"})
-    public Mono<String> typography(final Model model) {
-        String s = "typography";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/tinymce.html"})
-    public Mono<String> tinymce(final Model model) {
-        String s = "tinymce";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/modal.html"})
-    public Mono<String> modal(final Model model) {
-        String s = "modals";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
-    }
-
-    @GetMapping({"/modals.html"})
-    public Mono<String> modals(final Model model) {
-        String s = "modals";
-        model.addAttribute("systemName", r.systemName());
-        model.addAttribute("title", r.systemName());
-        return Mono.create(monoSink -> monoSink.success(s));
     }
 }

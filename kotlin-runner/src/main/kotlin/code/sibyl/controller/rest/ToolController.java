@@ -63,6 +63,7 @@ public class ToolController {
 
             // 设置响应头
             HttpHeaders headers = new HttpHeaders();
+            headers.add("Access-Control-Expose-Headers", "Content-Disposition");
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             headers.setContentDispositionFormData("attachment", bv + ".mp4");
 

@@ -32,7 +32,7 @@ public class SystemInfoController {
         GlobalConfig.set(GlobalConfig.OSHI_OS_WINDOWS_CPU_UTILITY, true);
     }
 
-    private final int interval = 5;
+    private final int interval = 2;
 
     @GetMapping(value = "/cpu", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Response> cpu(ServerWebExchange serverWebExchange) {
