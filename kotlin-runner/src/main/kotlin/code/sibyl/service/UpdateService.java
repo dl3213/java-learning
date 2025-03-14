@@ -42,11 +42,6 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UpdateService {
 
-    @Autowired
-//    @Qualifier("sibyl-postgresql")
-    private R2dbcEntityTemplate r2dbcEntityTemplate;
-
-
     public static UpdateService getBean() {
         return r.getBean(UpdateService.class);
     }
@@ -54,18 +49,18 @@ public class UpdateService {
     public Mono<Long> file_clear() {
         //Path root = Path.of(r.fileBaseDir);
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
-        return r2dbcEntityTemplate.select(Query.query(criteria), BaseFile.class)
+        return PostgresqlService.getBean().template().select(Query.query(criteria), BaseFile.class)
                 .flatMap(e -> {
-                    System.err.println(e.getFileName());
+                    log.info("[file_clear] file = {} ", e.getFileName());
                     File file = new File(e.getAbsolutePath());
                     try {
                         file.delete();
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
-                    return r2dbcEntityTemplate.delete(e);
+                    return PostgresqlService.getBean().template().delete(e);
                 }).count().map(e -> {
-                    System.err.println(STR."pixiv_clear count = \{e}");
+                    log.info(STR."[file_clear] pixiv_clear count = \{e}");
                     return e;
                 });
     }
@@ -81,7 +76,7 @@ public class UpdateService {
     public Mono<Long> pixiv_init() {
         long start = System.currentTimeMillis();
         Path root = Path.of(r.fileBaseDir());
-        return r2dbcEntityTemplate.getDatabaseClient()
+        return PostgresqlService.getBean().template().getDatabaseClient()
                 .sql("select count(1) as count from T_BASE_FILE where 1=1")
                 .fetch()
                 .first()
@@ -112,7 +107,7 @@ public class UpdateService {
                         String fileName = path.getFileName().toString();
                         BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
                         System.err.println(STR."\{Thread.currentThread()} -> \{file.getAbsolutePath()}");
-                        return r2dbcEntityTemplate.insert(file);
+                        return PostgresqlService.getBean().template().insert(file);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                         return Mono.empty();
@@ -135,7 +130,7 @@ public class UpdateService {
         long start = System.currentTimeMillis();
         Path root = Path.of(r.fileBaseDir());
         Scheduler scheduler = Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class));
-        return r2dbcEntityTemplate.getDatabaseClient()
+        return PostgresqlService.getBean().template().getDatabaseClient()
                 .sql("select count(1) as count from T_BASE_FILE where 1=1")
                 .fetch()
                 .first()
@@ -173,7 +168,7 @@ public class UpdateService {
                         BaseFile file = this.file(fileName, path.toAbsolutePath().toString(), "pixiv", null, false);
                         //System.err.println(STR."PoolSize=\{scheduler.getPoolSize()}, activeCount=\{executor.getActiveCount()}, queueSize=\{executor.getQueueSize()}, thread=\{Thread.currentThread()}, file=\{file.getAbsolutePath()}");
                         //System.err.println(STR."thread=\{Thread.currentThread()}, file=\{file.getAbsolutePath()}");
-                        return r2dbcEntityTemplate.insert(file).map(_ -> 1L).onErrorReturn(0L);
+                        return PostgresqlService.getBean().template().insert(file).map(_ -> 1L).onErrorReturn(0L);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                         return Mono.empty();

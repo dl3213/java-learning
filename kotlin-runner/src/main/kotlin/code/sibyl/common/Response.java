@@ -20,7 +20,7 @@ public class Response extends HashMap<String, Object> {
 
     public Response() {
         put(CODE_NAME, 200);
-        put(MSG_NAME, "操作成功");
+        put(MSG_NAME, "success");
         put(DATA_NAME, null);
     }
 

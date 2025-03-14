@@ -812,9 +812,9 @@ public class IndexRestController {
                 .setChildren(Arrays.asList());
         List<MenuDTO> list = Arrays.asList(
                 Database,
-                file,
-                Video,
-                photo,
+//                file,
+//                Video,
+//                photo,
                 Gallery,
                 book,
                 tool,
