@@ -1,18 +1,17 @@
-package code.sibyl.controller.rest;
+package code.sibyl.controller.file;
 
-import code.sibyl.aop.ActionLog;
-import code.sibyl.aop.ActionType;
+import code.sibyl.aop.Header;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.domain.database.Database;
 import code.sibyl.model.FileInfo;
+import code.sibyl.service.DataBaseService;
 import code.sibyl.service.FileService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.PageRequest;
@@ -24,25 +23,49 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@RestController
-@RequestMapping("/api/rest/v1/file")
-@Slf4j
-public class FileController {
+@Controller
+@RequestMapping("/file")
+@Deprecated
+public class FileV1Controller {
 
     @Autowired
     FileService storageService;
+    @Autowired
+    private DataBaseService dataBaseService;
 
+    @GetMapping("/list-view")
+    public Mono<String> list_view(final Model model) {
+        return dataBaseService.list(null)
+                .collectList()
+                .doOnSuccess(list -> {
+                    model.addAttribute("list", list);
+                    List<String> headerList = Arrays.stream(Database.class.getDeclaredFields())
+                            .filter(e -> Objects.nonNull(e.getAnnotation(Header.class)))
+                            .map(Field::getName)
+                            .collect(Collectors.toList());
+                    model.addAttribute("headerList", headerList);
+                    model.addAttribute("systemName", r.systemName());
+                    model.addAttribute("title", r.systemName());
+                })
+                .flatMap(e -> Mono.create(monoSink -> monoSink.success("file/list-view")));
+    }
 
     @PostMapping("/upload")
     @ResponseBody
@@ -54,12 +77,7 @@ public class FileController {
     @PostMapping(value = "/page")
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
-//        r.sleep(10000);
-        String isDeleted = jsonObject.getString("isDeleted");
-        if(StringUtils.isBlank(isDeleted)){
-            isDeleted = "0";
-        }
-        Criteria criteria = Criteria.where("IS_DELETED").is(isDeleted); //.and("type").like("image%");
+        Criteria criteria = Criteria.where("IS_DELETED").is("0"); //.and("type").like("image%");
 
         String type = jsonObject.getString("type");
         if (StringUtils.isNotBlank(type)) {
@@ -78,10 +96,10 @@ public class FileController {
         Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
         if ("1".equals(hash)) {
             sha256Query = PostgresqlService.getBean().template().getDatabaseClient()
-                    .sql(STR."""
+                    .sql(""" 
                             select * from (
                                 select sha256, count(1) as count from T_BASE_FILE
-                                where is_deleted = '\{isDeleted}' and sha256 is not null
+                                where is_deleted = '0'
                                 group by sha256
                             )t where count >=2
                             """)
@@ -94,6 +112,7 @@ public class FileController {
 
         Integer pageNumber = jsonObject.getInteger("pageNumber");
         Integer pageSize = jsonObject.getInteger("pageSize");
+        System.err.println(jsonObject);
         return Mono.zip(Mono.just(criteria), sha256Query)
                 .flatMap(tuple -> {
                     //System.err.println(tuple.getT2());
@@ -109,43 +128,73 @@ public class FileController {
 
                     return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
-                .map(t -> {
-                    Response response = Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize);
-                    response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
-                    return response;
-                });
+                .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
 
     }
 
-    @GetMapping(value = "/detail/{id}")
+    @PostMapping(value = "/recycle/page")
     @ResponseBody
-    public Mono<Response> detail(@PathVariable String id) {
-        r.sleep(500);
-        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
-                .switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
-                .map(e -> Response.success(e));
-    }
+    public Mono<Response> recycle_page(@RequestBody JSONObject jsonObject) {
+        Criteria criteria = Criteria.where("IS_DELETED").is("1");
 
-    @PostMapping(value = "/update")
-    @ResponseBody
-    @ActionLog(topic = "file update", type = ActionType.UPDATE)
-    public Mono<Response> update(@RequestBody BaseFile baseFile) {
-        r.sleep(500);
-        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(baseFile.getId())), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{baseFile.getId()}不存在")))
-                .flatMap(e -> {
-                    BeanUtils.copyProperties(baseFile, e);
-                    return PostgresqlService.getBean().template().update(e);
-//                    return Mono.just(e);
+        String type = jsonObject.getString("type");
+        if (StringUtils.isNotBlank(type)) {
+            criteria = criteria.and("type").like(type + "%");
+        }
+        String keyword = jsonObject.getString("keyword");
+        if (StringUtils.isNotBlank(keyword)) {
+            criteria = criteria.and(
+                    Criteria.empty().and("real_name").like("%" + keyword + "%")
+                            .or("sha256").like("%" + keyword + "%")
+                            .or("type").like("%" + keyword + "%")
+                            .or("file_name").like("%" + keyword + "%")
+            );
+        }
+        String hash = jsonObject.getString("hash");
+        Mono<List<Object>> sha256Query = Mono.just(new ArrayList<>());
+        if ("1".equals(hash)) {
+            sha256Query = PostgresqlService.getBean().template().getDatabaseClient()
+                    .sql("""
+                            select sha256, count(1) as count from T_BASE_FILE
+                            where is_deleted = '0'
+                            group by sha256
+                            having count >=2
+                            """)
+                    .fetch()
+                    .all()
+                    .map(e -> e.get("sha256"))
+                    .switchIfEmpty(Mono.just("hash"))
+                    .collectList();
+        }
+
+        Integer pageNumber = jsonObject.getInteger("pageNumber");
+        Integer pageSize = jsonObject.getInteger("pageSize");
+
+        return Mono.zip(Mono.just(criteria), sha256Query)
+                .flatMap(tuple -> {
+                    //System.err.println(tuple.getT2());
+                    Criteria t1 = tuple.getT1();
+                    Sort sort = Sort.sort(BaseFile.class).by(BaseFile::getCreateTime).ascending();
+                    if (CollectionUtils.isNotEmpty(tuple.getT2())) {
+                        t1 = t1.and("sha256").in(tuple.getT2());
+                        sort = (Sort.sort(BaseFile.class).by(BaseFile::getSha256).ascending()).and(sort);
+                    }
+                    Query query = Query.query(t1)
+                            .sort(sort)
+                            .with(PageRequest.of(pageNumber - 1, pageSize)); // 0开始
+
+                    return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
-                .map(e -> Response.success(e));
+                .map(t -> Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize));
+
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
     public Mono<Response> delete(@PathVariable String id) {
-        r.sleep(1000);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
+                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("1");
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
@@ -153,13 +202,12 @@ public class FileController {
                 })
                 .map(e -> Response.success(e));
     }
-
     @PostMapping(value = "/restore/{id}")
     @ResponseBody
     public Mono<Response> restore(@PathVariable String id) {
-        r.sleep(1000);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
+                    System.err.println(e.getAbsolutePath());
                     e.setDeleted("0");
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
@@ -200,6 +248,7 @@ public class FileController {
 
         try {
             boolean existed = storageService.delete(filename);
+
             if (existed) {
                 message = "Delete the file successfully: " + filename;
                 return Mono.just(ResponseEntity.ok().body(Response.success(message)));

@@ -17,6 +17,8 @@ import java.io.InputStream
 import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -66,12 +68,12 @@ object r {
     val base64Decoder: Base64.Decoder = Base64.getDecoder();
 
     @JvmStatic
-    fun base64Encoder(): Base64.Encoder? {
+    fun base64Encoder(): Base64.Encoder {
         return base64Encoder;
     }
 
     @JvmStatic
-    fun base64Decoder(): Base64.Decoder? {
+    fun base64Decoder(): Base64.Decoder {
         return base64Decoder;
     }
 
@@ -583,5 +585,9 @@ object r {
             } catch (e: java.lang.Exception) {
             }
         }
+    }
+    @JvmStatic
+    fun urlDecode(str: String): String {
+        return URLEncoder.encode(str, "UTF-8");
     }
 }

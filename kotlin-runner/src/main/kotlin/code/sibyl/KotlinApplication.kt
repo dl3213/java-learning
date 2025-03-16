@@ -12,6 +12,7 @@ class KotlinApplication
 private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 
 fun main(args: Array<String>) {
+    System.setProperty("java.net.URLEncoder.encodePlus", "true");
     runApplication<KotlinApplication>(*args)
     log.info("app running in port = " + r.getBean(Environment::class.java).getProperty("server.port"))
     log.info("app running in env = " + r.env())
