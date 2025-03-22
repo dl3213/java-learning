@@ -9,7 +9,12 @@ import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.RestOptions;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchemaBuilder;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.runtime.minicluster.MiniCluster;
 import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
@@ -87,29 +92,37 @@ public class FlinkConfig {
         //System.setProperty("HADOOP_USER_NAME", "sibyl");
 
 
-        Properties dbProps = new Properties();
-        dbProps.put("jdbc.properties.useSSL", false);
-        dbProps.put("useSSL", false);
-        dbProps.put("allowPublicKeyRetrieval", true);
-        dbProps.put("sslMode", "DISABLED");
-        dbProps.put("enabledTLSProtocols", "TLSv1.2");
+//        Properties dbProps = new Properties();
+//        dbProps.put("jdbc.properties.useSSL", false);
+//        dbProps.put("useSSL", false);
+//        dbProps.put("allowPublicKeyRetrieval", true);
+//        dbProps.put("sslMode", "DISABLED");
+//        dbProps.put("enabledTLSProtocols", "TLSv1.2");
+//
+//        //通过FlinkCDC构建SourceFunction
+//
+//        MySqlSource<String> local_mysql = MySqlSource.<String>builder()
+//                .hostname("127.0.0.1")
+//                .port(3306)
+//                .username("root")
+//                .password("sibyl-mysql-0127")
+//                .databaseList("sibyl")    //监控的数据库
+////                .tableList("thlease_db.th_mater_store_info, thlease_db.th_crm_rent_out,  thlease_db.th_crm_customer_info")    //监控的数据库下的表
+//                .tableList("sibyl.*")    //监控的数据库下的表
+//                .scanNewlyAddedTableEnabled(true) // 动态加表
+//                .deserializer(new JsonDebeziumDeserializationSchema())//反序列化
+//                .debeziumProperties(dbProps)
+//                .startupOptions(StartupOptions.latest()) //
+//                .jdbcProperties(dbProps)
+//                .build();
 
-        //通过FlinkCDC构建SourceFunction
+//        env.fromSource(local_mysql, WatermarkStrategy.noWatermarks(), "local_mysql")
+//                .setParallelism(1)
+//                //.print()
+//                .addSink(new PrintRichSink())
+////                .sinkTo(new FluxSink())
+//        ;
 
-        MySqlSource<String> local_mysql = MySqlSource.<String>builder()
-                .hostname("127.0.0.1")
-                .port(3306)
-                .username("root")
-                .password("sibyl-mysql-0127")
-                .databaseList("sibyl")    //监控的数据库
-//                .tableList("thlease_db.th_mater_store_info, thlease_db.th_crm_rent_out,  thlease_db.th_crm_customer_info")    //监控的数据库下的表
-                .tableList("sibyl.*")    //监控的数据库下的表
-                .scanNewlyAddedTableEnabled(true) // 动态加表
-                .deserializer(new JsonDebeziumDeserializationSchema())//反序列化
-                .debeziumProperties(dbProps)
-                .startupOptions(StartupOptions.latest()) //
-                .jdbcProperties(dbProps)
-                .build();
 
         Properties properties = new Properties();
         properties.setProperty("snapshot.mode", "never");
@@ -137,16 +150,28 @@ public class FlinkConfig {
                 .startupOptions(com.ververica.cdc.connectors.base.options.StartupOptions.latest()) //
                 .build();
 
-        env.fromSource(local_mysql, WatermarkStrategy.noWatermarks(), "local_mysql")
-                .setParallelism(1)
-                //.print()
-                .addSink(new PrintRichSink())
-//                .sinkTo(new FluxSink())
-        ;
+
+        // 配置 Kafka Sink
+        Properties kafkaProperties = new Properties();
+        kafkaProperties.setProperty("group.id", "webflux-group");
+        KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
+                .setBootstrapServers("127.0.0.1:9092")
+                .setRecordSerializer(
+                        KafkaRecordSerializationSchema.builder()
+                                .setTopic("kotlin-runner-postgres-kafka-dev")
+                                .setValueSerializationSchema(new SimpleStringSchema())
+                                .build()
+
+                )
+                .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE) // 至少一次投递保证
+                .setKafkaProducerConfig(kafkaProperties)
+                .build();
 
         env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres")
                 .setParallelism(1)
-                .addSink(new PrintRichSink());
+                .sinkTo(kafkaSink)
+//                .addSink(kafkaSink)
+        ;
 
         env.executeAsync();
         log.info("flink-cdc start");

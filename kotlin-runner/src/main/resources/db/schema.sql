@@ -6,6 +6,7 @@ create table IF NOT EXISTS T_SYS_USER
     nickname        varchar(255),
     password        varchar(255),
     phone_number    varchar(255),
+    avatar    varchar(255),
     last_login_time TIMESTAMP,
     is_deleted      CHARACTER VARYING(1) default '0' not null,
     create_time     TIMESTAMP,

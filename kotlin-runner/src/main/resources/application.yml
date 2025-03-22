@@ -7,7 +7,7 @@ isDev: true
 logDetail: false
 
 flink:
-  enabled: false
+  enabled: true
 
 file:
   mode: ftp
@@ -61,6 +61,22 @@ spring:
   info:
     env:
       enabled: true
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    admin:
+      auto-create: true
+      fail-fast: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all         # 生产环境建议使用all
+      retries: 3        # 失败重试次数
+      linger-ms: 100    # 批量发送等待时间
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: webflux-group
   ai:
     ollama:
       base-url: http://localhost:11434  # Ollama 默认端口

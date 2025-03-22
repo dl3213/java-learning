@@ -692,8 +692,6 @@ public class IndexRestController {
         MenuDTO photo = new MenuDTO()
                 .setCode("Photo")
                 .setName("Photo")
-                .setIcon("""
-                        """)
                 .setHtml("""
                         <li class="nav-item">
                                                     <a class="nav-link" target-link="/templates/photo/list-view.html" >
@@ -720,8 +718,6 @@ public class IndexRestController {
         MenuDTO Gallery = new MenuDTO()
                 .setCode("Gallery")
                 .setName("Gallery")
-                .setIcon("""
-                        """)
                 .setHtml("""
                         <li class="nav-item">
                                                     <a class="nav-link" target-link="/templates/gallery/list-view.html" >
@@ -749,8 +745,6 @@ public class IndexRestController {
         MenuDTO book = new MenuDTO()
                 .setCode("Book")
                 .setName("Book")
-                .setIcon("""
-                        """)
                 .setHtml("""
                         <li class="nav-item">
                             <a class="nav-link" target-link="/templates/book/list-view.html" >
@@ -766,8 +760,6 @@ public class IndexRestController {
         MenuDTO tool = new MenuDTO()
                 .setCode("tool")
                 .setName("tool")
-                .setIcon("""
-                        """)
                 .setHtml("""
                         <li class="nav-item">
                             <a class="nav-link" target-link="/templates/tool/view.html" >
@@ -782,8 +774,6 @@ public class IndexRestController {
         MenuDTO ai = new MenuDTO()
                 .setCode("AI")
                 .setName("AI")
-                .setIcon("""
-                        """)
                 .setHtml("""
                         <li class="nav-item">
                             <a class="nav-link" target-link="/templates/ai/list-view.html" >
@@ -794,7 +784,6 @@ public class IndexRestController {
                             </a>
                         </li>
                         """)
-                .setLinkUrl("/ai.html")
                 .setChildren(Arrays.asList());
         List<MenuDTO> list = Arrays.asList(
                 music,

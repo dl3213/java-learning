@@ -2,6 +2,8 @@ package code.sibyl.runner;
 
 import code.sibyl.common.Response;
 import code.sibyl.event.Event;
+import code.sibyl.kafka.KafkaProducerService;
+import code.sibyl.kafka.KafkaService;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.BookService;
@@ -53,7 +55,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
 //        BookService.getBean().move_test().subscribe();
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         UpdateService.getBean().file_clear().subscribe(); //
-
+        KafkaService.getBean().send("test-topic", "test" + System.currentTimeMillis()).subscribe();
 //        LocalCache.getBean().test();//测试oom
 
 //        r.getBean(LocalCacheUtil.class).init();
