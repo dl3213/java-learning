@@ -73,3 +73,6 @@ create table t_biz_book
     update_time   timestamp,
     update_id     bigint
 );
+
+ALTER TABLE T_BASE_FILE REPLICA IDENTITY FULL;
+ALTER TABLE t_biz_book REPLICA IDENTITY FULL;

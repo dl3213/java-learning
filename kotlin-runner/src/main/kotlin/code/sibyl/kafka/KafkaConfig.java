@@ -24,22 +24,22 @@ import java.util.Map;
 public class KafkaConfig {
 
     // ================= 公共配置 =================
-    @Bean
-    public KafkaAdmin kafkaAdmin(@Value("${spring.kafka.bootstrap-servers}") String servers) {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        return new KafkaAdmin(configs);
-    }
-
-    @Bean
-    public KafkaAdmin.NewTopics createTopics() {
-        return new KafkaAdmin.NewTopics(
-                TopicBuilder.name("test-topic")
-                        .partitions(3)
-                        .replicas(1)
-                        .build()
-        );
-    }
+//    @Bean
+//    public KafkaAdmin kafkaAdmin(@Value("${spring.kafka.bootstrap-servers}") String servers) {
+//        Map<String, Object> configs = new HashMap<>();
+//        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+//        return new KafkaAdmin(configs);
+//    }
+//
+//    @Bean
+//    public KafkaAdmin.NewTopics createTopics() {
+//        return new KafkaAdmin.NewTopics(
+//                TopicBuilder.name("test-topic")
+//                        .partitions(3)
+//                        .replicas(1)
+//                        .build()
+//        );
+//    }
 
     // ================= 生产者配置 =================
     @Bean
@@ -56,34 +56,34 @@ public class KafkaConfig {
         return SenderOptions.create(props);
     }
 
-    @Bean
-    public KafkaSender<String, String> kafkaSender(SenderOptions<String, String> options) {
-        return KafkaSender.create(options);
-    }
+//    @Bean
+//    public KafkaSender<String, String> kafkaSender(SenderOptions<String, String> options) {
+//        return KafkaSender.create(options);
+//    }
 
     // ================= 消费者配置 =================
-    @Bean
-    public ReceiverOptions<String, String> consumerOptions(
-            @Value("${spring.kafka.bootstrap-servers}") String servers,
-            @Value("${spring.kafka.consumer.group-id}") String groupId) {
+//    @Bean
+//    public ReceiverOptions<String, String> consumerOptions(
+//            @Value("${spring.kafka.bootstrap-servers}") String servers,
+//            @Value("${spring.kafka.consumer.group-id}") String groupId) {
+//
+//        Map<String, Object> props = new HashMap<>();
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+//        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+//        props.putAll(Map.of(
+//                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+//                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+//                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
+//        ));
+//
+//        return ReceiverOptions.<String, String>create(props)
+//                .subscription(Collections.singleton("test-topic"));
+//    }
 
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        props.putAll(Map.of(
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
-        ));
-
-        return ReceiverOptions.<String, String>create(props)
-                .subscription(Collections.singleton("test-topic"));
-    }
-
-    @Bean
-    public KafkaReceiver<String, String> kafkaReceiver(ReceiverOptions<String, String> options) {
-        return KafkaReceiver.create(options);
-    }
+//    @Bean
+//    public KafkaReceiver<String, String> kafkaReceiver(ReceiverOptions<String, String> options) {
+//        return KafkaReceiver.create(options);
+//    }
 
     @Bean
     public ReactiveKafkaProducerTemplate<String, String> template(SenderOptions senderOptions) {

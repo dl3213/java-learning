@@ -6,7 +6,7 @@ import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class KafkaProducerService {
 
     private final KafkaSender<String, String> sender;

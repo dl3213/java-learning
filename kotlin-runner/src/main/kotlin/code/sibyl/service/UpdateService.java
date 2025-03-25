@@ -1,8 +1,10 @@
 package code.sibyl.service;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.domain.biz.Book;
 import code.sibyl.service.sql.PostgresqlService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,12 +48,33 @@ public class UpdateService {
         return r.getBean(UpdateService.class);
     }
 
+
+    public Mono<Long> book_clear() {
+        //Path root = Path.of(r.fileBaseDir);
+        Criteria criteria = Criteria.where("IS_DELETED").is("1");
+        return PostgresqlService.getBean().template().getDatabaseClient().sql("select * from t_biz_book_20250325 where is_deleted = '1'")
+                .mapProperties(Book.class)
+                .all()
+                .flatMap(e -> {
+                    log.info("[book_clear] file = {} ", e.getAbsolutePath());
+                    boolean deleted = FileUtil.del(e.getAbsolutePath());
+                    log.info("[book_clear] file = {} , deleted = {} ", e.getAbsolutePath(), deleted);
+                    return PostgresqlService.getBean().template().delete(e);
+//                    return Mono.just(e);
+                })
+                .count()
+                .map(e -> {
+                    log.info("[book_clear] count = {}", e);
+                    return e;
+                });
+    }
+
     public Mono<Long> file_clear() {
         //Path root = Path.of(r.fileBaseDir);
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
         return PostgresqlService.getBean().template().select(Query.query(criteria), BaseFile.class)
                 .flatMap(e -> {
-                    log.info("[file_clear] file = {} ", e.getFileName());
+                    log.info("[file_clear] file = {} ", e.getAbsolutePath());
                     File file = new File(e.getAbsolutePath());
                     try {
                         file.delete();
@@ -60,7 +83,7 @@ public class UpdateService {
                     }
                     return PostgresqlService.getBean().template().delete(e);
                 }).count().map(e -> {
-                    log.info(STR."[file_clear] pixiv_clear count = \{e}");
+                    log.info("[file_clear] count = {}", e);
                     return e;
                 });
     }

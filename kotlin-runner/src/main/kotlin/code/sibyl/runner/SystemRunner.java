@@ -52,63 +52,13 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-//        BookService.getBean().move_test().subscribe();
+        BookService.getBean().move_test().subscribe();
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         UpdateService.getBean().file_clear().subscribe(); //
-        KafkaService.getBean().send("test-topic", "test" + System.currentTimeMillis()).subscribe();
+//        UpdateService.getBean().book_clear().subscribe(); //
 //        LocalCache.getBean().test();//测试oom
 
 //        r.getBean(LocalCacheUtil.class).init();
-
-        //r.getBean(R2dbcRoutingConfig.class).connectionFactories().doOnNext(e -> System.err.println(e)).subscribe();
-//        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-//        MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
-//        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-//        System.err.println(runtimeMXBean.getVmName());
-// 程序运行时间
-//        Instant instant = Instant.ofEpochMilli(runtimeMXBean.getStartTime());
-//        System.err.println(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toString().replace("T", " "));
-        // 程序已运行时间   System.currentTimeMillis(), runtimeMXBean.getStartTime()
-
-//        System.err.println(System.currentTimeMillis() - runtimeMXBean.getStartTime());
-
-//        System.err.println(databaseClient);
-//        System.err.println(r2dbcEntityTemplate);
-//        ConnectionFactory connectionFactory = databaseClient.getConnectionFactory();
-//        ConnectionFactoryMetadata metadata = connectionFactory.getMetadata();
-//        System.err.println(metadata.getName());
-//        databaseClient.sql("select * from T_SYS_USER").fetch().all().map(m -> {
-//            System.err.println(m);
-//            return m;
-//        }).subscribe();
-//        HashMap<String, Object> map = new HashMap<>();
-////        map.put("sales_contract","SZ20240291");
-//        map.put("sales_contract_list",Arrays.asList("SZ20240291"));
-//        long start = System.currentTimeMillis();
-//        r.getBean(R2dbcRoutingConfig.class)
-//                .connectionFactoryMap()
-//                .map(e -> DatabaseClient.create(e.get("thlease_db")))
-//                .doOnSuccess(client -> {
-//                    client.sql("SELECT * FROM th_crm_rent_out where is_del = '0' and sales_contract in (:{sales_contract_list})")
-//                            //.bind("sales_contract", Arrays.asList("SZ20240291"))
-//                            .bindValues(map)
-//                            .fetch()
-//                            .all()
-//                            //.concatWith(client.sql("SELECT * FROM th_crm_rent_out where is_del = '0'").fetch().all())
-//                            .doFinally(e -> {
-//                                System.err.println("cost => " + (System.currentTimeMillis() - start));
-//                            })
-//                            .subscribe(item -> {
-//                                System.err.println(item);
-//                            });
-//
-//                }).subscribe();
-
-//        databaseRepository.findBy(Example.of(new Database()), x -> x.page(PageRequest.of(0, 1))).subscribe(e -> {
-//            System.err.println(e.getTotalPages());
-//            Class<? extends Page> aClass = e.getClass();
-//            e.get().forEach(System.err::println);
-//        });
 
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new Event(this, "runner-end"));

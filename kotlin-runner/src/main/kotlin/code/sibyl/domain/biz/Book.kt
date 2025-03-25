@@ -38,15 +38,15 @@ open class Book {
     open var description: String? = null
     open var isDeleted: String? = null
 
-    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
-    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
+    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
+    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
     open var createTime: LocalDateTime? = null
 
     @Column(name = "CREATE_ID")
     open var createId: Long? = null
 
-    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
-    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss)
+    @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
+    @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
     open var updateTime: LocalDateTime? = null
 
     open var updateId: Long? = null

@@ -45,8 +45,7 @@ object r {
     const val yyyy_MM_dd: String = "yyyy-MM-dd" //常用时间格式
     const val HH_mm_ss: String = "HH:mm:ss" //常用时间格式
     const val yyyy_MM_dd_HH_mm_ss: String = "yyyy-MM-dd HH:mm:ss" //常用时间格式
-    const val yyyy_MM_dd_HH_mm_ss_with_link: String = "yyyy_MM_dd_HH_mm_ss" //常用时间格式
-    const val yyyy_MM_dd_HH_mm_ss_SSS: String = "yyyy-MM-dd HH:mm:ss.[SSS]" //常用时间格式
+    const val yyyy_MM_dd_HH_mm_ss_SSSSSS: String = "yyyy-MM-dd HH:mm:ss.SSSSSS" //常用时间格式
 
     const val yyyy_MM: String = "yyyy-MM" //常用时间格式
 

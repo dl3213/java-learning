@@ -1,49 +1,37 @@
 package code.sibyl.controller.rest
 
-import cn.hutool.core.lang.Snowflake
 import code.sibyl.common.Response
 import code.sibyl.common.r
 import code.sibyl.common.r.defaultUserId
-import code.sibyl.common.r.fileBaseDir
-import code.sibyl.common.r.getBean
-import code.sibyl.common.r.systemName
-import code.sibyl.common.r.yyyy_MM_dd
+import code.sibyl.common.r.sleep
 import code.sibyl.domain.base.BaseFile
 import code.sibyl.domain.biz.Book
 import code.sibyl.service.BookService
 import code.sibyl.service.sql.PostgresqlService
 import com.alibaba.fastjson2.JSONObject
-import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.BeanUtils
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
 import org.springframework.http.MediaType
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Controller
-import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.MonoSink
 import reactor.core.scheduler.Schedulers
 import reactor.util.function.Tuple2
 import java.io.File
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
+import java.lang.StringTemplate.STR
 import java.nio.file.Paths
 import java.time.LocalDateTime
-import java.util.stream.Stream
 
 
 @Controller
@@ -52,29 +40,13 @@ class BookController {
 
     private val log = LoggerFactory.getLogger(BookController::class.java)
 
-    @GetMapping("/view.html")
-    fun view(model: Model): Mono<String> {
-        val welcome = "book/list-view"
-        model.addAttribute("systemName", systemName())
-        model.addAttribute("title", systemName())
-        return Mono.create { monoSink: MonoSink<String> -> monoSink.success(welcome) }
-    }
-
-    @GetMapping("/detail/view.html")
-    fun detailView(model: Model, @RequestParam("id") id: String?): Mono<String?> {
-        System.err.println(id)
-        val page = "book/detail-view"
-        model.addAttribute("systemName", systemName())
-        model.addAttribute("title", systemName())
-        model.addAttribute("entityId", id)
-        return Mono.create { monoSink: MonoSink<String?> -> monoSink.success(page) }
-    }
 
     @PostMapping("/upload/{id}")
     @ResponseBody
     fun uploadFile(@RequestPart("file") filePartMono: Mono<FilePart>, @PathVariable id: String): Mono<Response> {
         return Mono.zip(
-            PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java),
+            PostgresqlService.getBean().template()!!
+                .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java),
             filePartMono
         )
             .flatMap {
@@ -89,12 +61,12 @@ class BookController {
     }
 
 
-
     @GetMapping(value = ["/detail/first/{id}"], produces = [MediaType.IMAGE_JPEG_VALUE])
     @ResponseBody
     fun getFileImage(@PathVariable id: String): Flux<DataBuffer> {
 
-        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!
+            .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .flatMap { book ->
                 r.getAllFiles(book.absolutePath)
                     .take(1).next()
@@ -113,7 +85,8 @@ class BookController {
     fun detailPage(@RequestBody jsonObject: JSONObject, @PathVariable id: String): Mono<Response> {
         val pageNumber = jsonObject.getLong("pageNumber")
         val pageSize = jsonObject.getLong("pageSize")
-        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!
+            .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .publishOn(Schedulers.boundedElastic())
             .flatMapMany { book ->
                 r.getAllFiles(book.absolutePath).flatMap { path -> Mono.zip(Mono.just(book), Mono.just(path)) }
@@ -176,14 +149,52 @@ class BookController {
     @PostMapping(value = ["/add"])
     @ResponseBody
     fun add(@RequestBody book: Book): Mono<Response> {
-
         return BookService.bean.insert(book).map { item: Book? -> Response.success(item) }
+    }
+
+    @PostMapping(value = ["/update"])
+    @ResponseBody
+    fun update(@RequestBody book: Book): Mono<Response> {
+        sleep(500)
+        return PostgresqlService.getBean().template()
+            .selectOne(Query.query(Criteria.where("id").`is`(book.id as Any)), Book::class.java)
+            .switchIfEmpty(Mono.error(java.lang.RuntimeException("${book.id} 不存在")))
+            .flatMap { e: Book ->
+                BeanUtils.copyProperties(book, e)
+                PostgresqlService.getBean().template().update(e)
+            }
+            .map { e: Book? -> Response.success(e) }
+    }
+
+    @PutMapping(value = ["/put"])
+    @ResponseBody
+    fun put(@RequestBody book: Book): Mono<Response> {
+        sleep(500)
+        return (if (book.id != null)
+            PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").`is`(book.id as Any)), Book::class.java)
+                .switchIfEmpty(Mono.just(Book()))
+        else Mono.just(book))
+            .flatMap { e: Book ->
+                BeanUtils.copyProperties(book, e)
+                if (e.createTime == null) {
+                    e.createTime = LocalDateTime.now()
+                }
+                if (e.id == null) {
+                    BookService.bean.insert(book)
+                } else {
+                    e.updateTime = LocalDateTime.now()
+                    PostgresqlService.getBean().template().update(e)
+                }
+            }
+            .map { e: Book? -> Response.success(e) }
     }
 
     @DeleteMapping(value = ["/delete/{id}"])
     @ResponseBody
     fun delete(@PathVariable id: String): Mono<Response> {
-        return PostgresqlService.getBean().template()!!.selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+        return PostgresqlService.getBean().template()!!
+            .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .flatMap { e: Book ->
                 //System.err.println(e.absolutePath)
@@ -192,6 +203,15 @@ class BookController {
                 e.updateId = defaultUserId()
                 PostgresqlService.getBean().template().update(e)
             }
+            .map { e: Book? -> Response.success(e) }
+    }
+
+    @GetMapping(value = ["/detail/{id}"])
+    @ResponseBody
+    fun detail(@PathVariable id: String): Mono<Response> {
+        return PostgresqlService.getBean().template()!!
+            .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+            .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .map { e: Book? -> Response.success(e) }
     }
 }
