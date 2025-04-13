@@ -9,6 +9,7 @@ import code.sibyl.model.FileInfo;
 import code.sibyl.service.FileService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,9 +31,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @RestController
@@ -54,9 +60,9 @@ public class FileController {
     @PostMapping(value = "/page")
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
-//        r.sleep(10000);
+        //r.sleep(1000);
         String isDeleted = jsonObject.getString("isDeleted");
-        if(StringUtils.isBlank(isDeleted)){
+        if (StringUtils.isBlank(isDeleted)) {
             isDeleted = "0";
         }
         Criteria criteria = Criteria.where("IS_DELETED").is(isDeleted); //.and("type").like("image%");
@@ -91,29 +97,84 @@ public class FileController {
                     .switchIfEmpty(Mono.just("hash"))
                     .collectList();
         }
-
         Integer pageNumber = jsonObject.getInteger("pageNumber");
+        pageNumber = Objects.isNull(pageNumber) ? 1 : pageNumber;
         Integer pageSize = jsonObject.getInteger("pageSize");
+        pageSize = Objects.isNull(pageSize) ? 30 : pageSize;
+
+        Integer finalPageNumber = pageNumber;
+        Integer finalPageSize = pageSize;
         return Mono.zip(Mono.just(criteria), sha256Query)
                 .flatMap(tuple -> {
-                    //System.err.println(tuple.getT2());
                     Criteria t1 = tuple.getT1();
-                    Sort sort = Sort.sort(BaseFile.class).by(BaseFile::getCreateTime).ascending();
+                    String orderField = jsonObject.getString("orderField");
+                    final String methodName = STR."get\{orderField.substring(0, 1).toUpperCase()}\{orderField.substring(1)}";
+                    Function<BaseFile, ?> function = (Function<BaseFile, Object>) baseFile ->
+                    {
+                        try {
+                            return Arrays.stream(baseFile.getClass().getDeclaredMethods())
+                                    .filter(e -> (methodName).equals(e.getName()))
+                                    .findFirst()
+                                    .orElse(null)
+                                    .invoke(baseFile);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvocationTargetException e) {
+                            throw new RuntimeException(e);
+                        }
+                    };
+                    Sort.TypedSort<?> orders = Sort.sort(BaseFile.class).by(function);
+                    Sort sort = "asc".equals(jsonObject.getString("orderDirection")) ? orders.ascending() : orders.descending();
                     if (CollectionUtils.isNotEmpty(tuple.getT2())) {
                         t1 = t1.and("sha256").in(tuple.getT2());
                         sort = (Sort.sort(BaseFile.class).by(BaseFile::getSha256).ascending()).and(sort);
                     }
+
                     Query query = Query.query(t1)
                             .sort(sort)
-                            .with(PageRequest.of(pageNumber - 1, pageSize)); // 0开始
+                            .with(PageRequest.of(finalPageNumber - 1, finalPageSize)); // 0开始
 
                     return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
                 .map(t -> {
-                    Response response = Response.successPage(t.getT1(), t.getT2(), pageNumber, pageSize);
+                    Response response = Response.successPage(t.getT1(), t.getT2(), finalPageNumber, finalPageSize);
                     response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
                     return response;
                 });
+
+    }
+
+    // todo
+    @PostMapping(value = "/sql/page")
+    @ResponseBody
+    public Mono<Response> sql_page(@RequestBody JSONObject jsonObject) {
+
+        final Integer pageNumber = jsonObject.getInteger("pageNumber");
+        final Integer pageSize = jsonObject.getInteger("pageSize");
+        String keyword = jsonObject.getString("keyword");
+        keyword = StringUtils.isNotBlank(keyword) ? keyword : "";
+
+        Criteria criteria = Criteria.where("IS_DELETED").is("0").and("type").like("image%");
+        Query query = Query.query(criteria)
+                .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName))
+                .with(PageRequest.of(pageNumber, pageSize)) // 1开始
+                ;
+
+        return PostgresqlService.getBean().template().getDatabaseClient()
+                .sql("""
+                        select * from T_BASE_FILE 
+                        where IS_DELETED = '0' 
+                        and type like 'image%' 
+                        -- and SHA256 like '%' || :keyword || '%'
+                        order by FILE_NAME asc
+                        """)
+                //.bind("keyword", keyword)
+                .mapProperties(BaseFile.class)
+                .all()
+                .skip((pageNumber - 1) * pageSize)
+                .take(pageSize)
+                .collectList()
+                .map(list -> Response.successPage(0, list, pageNumber, pageSize));
 
     }
 
@@ -134,6 +195,7 @@ public class FileController {
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(baseFile.getId())), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{baseFile.getId()}不存在")))
                 .flatMap(e -> {
                     BeanUtils.copyProperties(baseFile, e);
+                    e.setUpdateTime(LocalDateTime.now());
                     return PostgresqlService.getBean().template().update(e);
 //                    return Mono.just(e);
                 })

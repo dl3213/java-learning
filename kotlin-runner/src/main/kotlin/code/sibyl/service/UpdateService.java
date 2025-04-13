@@ -74,7 +74,7 @@ public class UpdateService {
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
         return PostgresqlService.getBean().template().select(Query.query(criteria), BaseFile.class)
                 .flatMap(e -> {
-                    log.info("[file_clear] file = {} ", e.getAbsolutePath());
+                    log.info("[file_clear] file[{}] = {} ", e.getFileName(), e.getAbsolutePath());
                     File file = new File(e.getAbsolutePath());
                     try {
                         file.delete();

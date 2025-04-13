@@ -112,4 +112,8 @@ dl.ME3213
 
 2. ollama run deepseek-r1:14b
 
-https://tms.tanghenmt.com/gateway/kotlin-runner/dev
+
+ollama run deepseek-r1:14b
+ollama run llama3.1:8b
+ollama run qwen2.5:14b
+ollama run gemma3:12b
