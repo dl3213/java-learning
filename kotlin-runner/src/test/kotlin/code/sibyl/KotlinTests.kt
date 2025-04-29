@@ -16,16 +16,7 @@ class KotlinTests {
 
     @Test
     open fun javaTest() {
-        H2Service.getBean().template().select(Query.query(Criteria.empty()), Database::class.java)
-            .flatMap {
-                println(it)
-                PostgresqlService.getBean().template().insert(it);
-            }
-            .count()
-            .map {
-                System.err.println("count => $it")
-            }
-            .block()
+
     }
 
 }

@@ -62,5 +62,5 @@ open class BaseFile {
 
     @org.springframework.data.annotation.Transient
     @Transient
-    open var heartByCurrentUser: Boolean? = false
+    open var heartByCurrentUserCount: Int? = 0;
 }

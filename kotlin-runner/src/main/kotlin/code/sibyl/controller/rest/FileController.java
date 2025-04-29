@@ -10,7 +10,6 @@ import code.sibyl.model.FileInfo;
 import code.sibyl.service.FileService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +32,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +112,7 @@ public class FileController {
                             and entity_type =:entityType 
                             and user_id =:userId   
                             """)
-                    .bind("entityType",entityType)
+                    .bind("entityType", entityType)
                     .bind("userId", currentUserId)
                     .fetch()
                     .all()
@@ -172,28 +170,28 @@ public class FileController {
                         Mono.just(tuple.getT1()),
                         Mono.just(tuple.getT2()),
                         CollectionUtils.isNotEmpty(tuple.getT2()) ?
-                        PostgresqlService.getBean().template()
-                                .getDatabaseClient()
-                                .sql("""
-                                    select * from t_biz_user_heart 
-                                    where is_deleted = '0'
-                                    and entity_type =:entityType
-                                    and entity_id in (:entityIdList)
-                                    and user_id =:userId  
-                                    """)
-                                .bind("entityType",entityType)
-                                .bind("entityIdList", tuple.getT2().stream().map(e -> e.getId()).collect(Collectors.toList()))
-                                .bind("userId", currentUserId)
-                                .mapProperties(TBizUserHeart.class)
-                                .all()
-                                .collectList() : Mono.just(new ArrayList<TBizUserHeart>())
+                                PostgresqlService.getBean().template()
+                                        .getDatabaseClient()
+                                        .sql("""
+                                                select * from t_biz_user_heart 
+                                                where is_deleted = '0'
+                                                and entity_type =:entityType
+                                                and entity_id in (:entityIdList)
+                                                and user_id =:userId  
+                                                """)
+                                        .bind("entityType", entityType)
+                                        .bind("entityIdList", tuple.getT2().stream().map(e -> e.getId()).collect(Collectors.toList()))
+                                        .bind("userId", currentUserId)
+                                        .mapProperties(TBizUserHeart.class)
+                                        .all()
+                                        .collectList() : Mono.just(new ArrayList<TBizUserHeart>())
                 ))
                 .map(t -> {
 
                     List<BaseFile> collect = t.getT2().stream()
                             .peek(item -> {
-                                boolean heartByCurrentUser = t.getT3().stream().anyMatch(h -> item.getId().equals(h.getEntityId()));
-                                item.setHeartByCurrentUser(heartByCurrentUser);
+                                long heartByCurrentUserCount = t.getT3().stream().filter(h -> item.getId().equals(h.getEntityId())).count();
+                                item.setHeartByCurrentUserCount(Long.valueOf(heartByCurrentUserCount).intValue());
                             })
                             .collect(Collectors.toList());
                     Response response = Response.successPage(t.getT1(), collect, finalPageNumber, finalPageSize);
@@ -207,34 +205,13 @@ public class FileController {
     @PostMapping(value = "/sql/page")
     @ResponseBody
     public Mono<Response> sql_page(@RequestBody JSONObject jsonObject) {
-
-        final Integer pageNumber = jsonObject.getInteger("pageNumber");
-        final Integer pageSize = jsonObject.getInteger("pageSize");
-        String keyword = jsonObject.getString("keyword");
-        keyword = StringUtils.isNotBlank(keyword) ? keyword : "";
-
-        Criteria criteria = Criteria.where("IS_DELETED").is("0").and("type").like("image%");
-        Query query = Query.query(criteria)
-                .sort(Sort.sort(code.sibyl.domain.base.BaseFile.class).by(BaseFile::getFileName))
-                .with(PageRequest.of(pageNumber, pageSize)) // 1开始
-                ;
-
-        return PostgresqlService.getBean().template().getDatabaseClient()
-                .sql("""
-                        select * from T_BASE_FILE 
-                        where IS_DELETED = '0' 
-                        and type like 'image%' 
-                        -- and SHA256 like '%' || :keyword || '%'
-                        order by FILE_NAME asc
-                        """)
-                //.bind("keyword", keyword)
-                .mapProperties(BaseFile.class)
-                .all()
-                .skip((pageNumber - 1) * pageSize)
-                .take(pageSize)
-                .collectList()
-                .map(list -> Response.successPage(0, list, pageNumber, pageSize));
-
+        return PostgresqlService.getBean().fileQuery(jsonObject, BaseFile.class)
+                .map(tuple -> {
+                    //System.err.println(tuple);
+                    Response response = Response.successPage(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
+                    response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                    return response;
+                });
     }
 
     @GetMapping(value = "/detail/{id}")
@@ -318,28 +295,50 @@ public class FileController {
                         and entity_id =:entityId 
                         and user_id =:userId  
                         """)
-                .bind("entityType",entityType)
-                .bind("entityId",id)
-                .bind("userId",currentUserId)
+                .bind("entityType", entityType)
+                .bind("entityId", id)
+                .bind("userId", currentUserId)
                 .mapProperties(TBizUserHeart.class)
                 .first()
                 .switchIfEmpty(Mono.just(new TBizUserHeart()))
                 .flatMap(heart -> {
                     Long heartId = heart.getId();
-                    if(Objects.isNull(heartId)){
+                    Mono<TBizUserHeart> op;
+                    if (Objects.isNull(heartId)) {
                         heart.setId(r.id());
                         heart.setDeleted("0");
                         heart.setCreateTime(LocalDateTime.now());
                         heart.setEntityType(entityType);
                         heart.setUserId(currentUserId);
                         heart.setEntityId(id);
-                        return PostgresqlService.getBean().template().insert(heart);
-                    }else {
+                        op = PostgresqlService.getBean().template().insert(heart);
+                    } else {
                         heart.setDeleted("1");
                         heart.setUpdateTime(LocalDateTime.now());
-                        return PostgresqlService.getBean().template().update(heart);
+                        op = PostgresqlService.getBean().template().update(heart);
                     }
+                    return Mono.zip(
+                            op,
+                            Mono.just(String.valueOf(id))
+                    );
                 })
+                .flatMap(tuple ->
+                        Mono.zip(
+                                Mono.just(tuple.getT1()),
+                                PostgresqlService.getBean().template()
+                                        .getDatabaseClient()
+                                        .sql("""
+                                             select count(1) as count from t_biz_user_heart
+                                                where is_deleted = '0'
+                                                  and entity_type = 't_base_file'
+                                                  and entity_id = :id 
+                                            """)
+                                        .bind("id", id)
+                                        .fetch()
+                                        .first()
+                                        .map(e -> e.get("count"))
+                                        .switchIfEmpty(Mono.just(0))
+                        ))
                 .map(e -> Response.success(e));
     }
 
