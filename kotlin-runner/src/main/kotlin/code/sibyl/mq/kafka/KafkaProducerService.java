@@ -1,10 +1,8 @@
-package code.sibyl.kafka;
+package code.sibyl.mq.kafka;
 import code.sibyl.common.r;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
-import org.springframework.stereotype.Service;
 
 //@Service
 public class KafkaProducerService {

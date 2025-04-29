@@ -1,5 +1,6 @@
 package code.sibyl.common
 
+import cn.hutool.core.lang.Snowflake
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
@@ -500,12 +501,13 @@ object r {
         return predicate.test(a, b)
     }
 
-    fun main123(args: Array<String?>?) {
-    }
-
     @JvmStatic
     fun defaultUserId(): Long {
         return 0L;
+    }
+    @JvmStatic
+    fun id(): Long {
+        return r.getBean(Snowflake::class.java).nextId();
     }
 
     @JvmStatic

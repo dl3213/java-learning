@@ -20,6 +20,7 @@ import org.apache.flink.runtime.minicluster.MiniCluster;
 import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
 import org.apache.flink.runtime.state.storage.FileSystemCheckpointStorage;
 import org.apache.flink.streaming.api.CheckpointingMode;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.catalog.ObjectPath;
@@ -167,10 +168,13 @@ public class FlinkConfig {
                 .setKafkaProducerConfig(kafkaProperties)
                 .build();
 
-        env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres")
-                .setParallelism(1)
+
+        DataStreamSource<String> dataStreamSource = env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres");
+        dataStreamSource.print().name("Console Sink");
+        //dataStreamSource.addSink();
+        dataStreamSource
+                .setParallelism(2)
                 .sinkTo(kafkaSink)
-//                .addSink(kafkaSink)
         ;
 
         env.executeAsync();

@@ -1,4 +1,4 @@
-package code.sibyl.kafka;
+package code.sibyl.mq.kafka;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

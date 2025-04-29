@@ -1,7 +1,6 @@
 package code.sibyl.domain.base
 
 import code.sibyl.common.r
-import com.alibaba.fastjson2.annotation.JSONField
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
@@ -9,7 +8,6 @@ import jakarta.persistence.*
 import lombok.Data
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
-import java.util.function.Function
 
 @Data
 @Entity
@@ -56,5 +54,13 @@ open class BaseFile {
     open var updateTime: LocalDateTime? = null
 
     open var updateId: Long? = null
+    open var clickCount: Int? = 0;
 
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var heartCount: Int? = 0;
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var heartByCurrentUser: Boolean? = false
 }

@@ -2,18 +2,15 @@ package code.sibyl.runner;
 
 import code.sibyl.common.Response;
 import code.sibyl.event.Event;
-import code.sibyl.kafka.KafkaProducerService;
-import code.sibyl.kafka.KafkaService;
+import code.sibyl.mq.rabbit.MessageProducer;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
-import code.sibyl.service.BookService;
 import code.sibyl.service.FileService;
 import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -52,6 +49,11 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+
+
+        MessageProducer.getBean().sendMessage("test-msg-sibyl" + System.currentTimeMillis()).subscribe();
+        MessageProducer.getBean().sendMessage("test-msg-sibyl" + System.currentTimeMillis()).subscribe();
+
 //        BookService.getBean().move_test().subscribe();
 //        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
         UpdateService.getBean().file_clear().subscribe(); //

@@ -1,4 +1,4 @@
-package code.sibyl.kafka;
+package code.sibyl.mq.kafka;
 
 import code.sibyl.common.r;
 import lombok.AllArgsConstructor;

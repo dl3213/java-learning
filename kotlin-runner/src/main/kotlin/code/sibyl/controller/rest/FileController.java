@@ -1,5 +1,6 @@
 package code.sibyl.controller.rest;
 
+import code.sibyl.TBizUserHeart;
 import code.sibyl.aop.ActionLog;
 import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
@@ -39,6 +40,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -61,6 +63,9 @@ public class FileController {
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
         //r.sleep(1000);
+        long currentUserId = r.defaultUserId();
+        final String entityType = "t_base_file";
+
         String isDeleted = jsonObject.getString("isDeleted");
         if (StringUtils.isBlank(isDeleted)) {
             isDeleted = "0";
@@ -95,7 +100,28 @@ public class FileController {
                     .all()
                     .map(e -> e.get("sha256"))
                     .switchIfEmpty(Mono.just("hash"))
-                    .collectList();
+                    .collectList()
+                    .switchIfEmpty(Mono.just(Arrays.asList("hash")))
+            ;
+        }
+        String heart = jsonObject.getString("heart");
+        Mono<List<Object>> heartQuery = Mono.just(new ArrayList<>());
+        if ("1".equals(heart)) {
+            heartQuery = PostgresqlService.getBean().template().getDatabaseClient()
+                    .sql("""
+                            select distinct entity_id from t_biz_user_heart 
+                            where is_deleted = '0' 
+                            and entity_type =:entityType 
+                            and user_id =:userId   
+                            """)
+                    .bind("entityType",entityType)
+                    .bind("userId", currentUserId)
+                    .fetch()
+                    .all()
+                    .map(e -> e.get("entity_id"))
+                    .switchIfEmpty(Mono.just(0L))
+                    .collectList()
+                    .switchIfEmpty(Mono.just(Arrays.asList(0L)));
         }
         Integer pageNumber = jsonObject.getInteger("pageNumber");
         pageNumber = Objects.isNull(pageNumber) ? 1 : pageNumber;
@@ -104,7 +130,7 @@ public class FileController {
 
         Integer finalPageNumber = pageNumber;
         Integer finalPageSize = pageSize;
-        return Mono.zip(Mono.just(criteria), sha256Query)
+        return Mono.zip(Mono.just(criteria), sha256Query, heartQuery)
                 .flatMap(tuple -> {
                     Criteria t1 = tuple.getT1();
                     String orderField = jsonObject.getString("orderField");
@@ -126,8 +152,14 @@ public class FileController {
                     Sort.TypedSort<?> orders = Sort.sort(BaseFile.class).by(function);
                     Sort sort = "asc".equals(jsonObject.getString("orderDirection")) ? orders.ascending() : orders.descending();
                     if (CollectionUtils.isNotEmpty(tuple.getT2())) {
+                        System.err.println("sha256 -> " + tuple.getT2());
                         t1 = t1.and("sha256").in(tuple.getT2());
                         sort = (Sort.sort(BaseFile.class).by(BaseFile::getSha256).ascending()).and(sort);
+                    }
+                    if (CollectionUtils.isNotEmpty(tuple.getT3())) {
+                        System.err.println("heart -> " + tuple.getT3());
+                        t1 = t1.and("id").in(tuple.getT3());
+                        sort = (Sort.sort(BaseFile.class).by(BaseFile::getCreateTime).ascending()).and(sort);
                     }
 
                     Query query = Query.query(t1)
@@ -136,8 +168,35 @@ public class FileController {
 
                     return Mono.zip(PostgresqlService.getBean().template().count(query, BaseFile.class), PostgresqlService.getBean().template().select(query, BaseFile.class).collectList());
                 })
+                .flatMap(tuple -> Mono.zip(
+                        Mono.just(tuple.getT1()),
+                        Mono.just(tuple.getT2()),
+                        CollectionUtils.isNotEmpty(tuple.getT2()) ?
+                        PostgresqlService.getBean().template()
+                                .getDatabaseClient()
+                                .sql("""
+                                    select * from t_biz_user_heart 
+                                    where is_deleted = '0'
+                                    and entity_type =:entityType
+                                    and entity_id in (:entityIdList)
+                                    and user_id =:userId  
+                                    """)
+                                .bind("entityType",entityType)
+                                .bind("entityIdList", tuple.getT2().stream().map(e -> e.getId()).collect(Collectors.toList()))
+                                .bind("userId", currentUserId)
+                                .mapProperties(TBizUserHeart.class)
+                                .all()
+                                .collectList() : Mono.just(new ArrayList<TBizUserHeart>())
+                ))
                 .map(t -> {
-                    Response response = Response.successPage(t.getT1(), t.getT2(), finalPageNumber, finalPageSize);
+
+                    List<BaseFile> collect = t.getT2().stream()
+                            .peek(item -> {
+                                boolean heartByCurrentUser = t.getT3().stream().anyMatch(h -> item.getId().equals(h.getEntityId()));
+                                item.setHeartByCurrentUser(heartByCurrentUser);
+                            })
+                            .collect(Collectors.toList());
+                    Response response = Response.successPage(t.getT1(), collect, finalPageNumber, finalPageSize);
                     response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
                     return response;
                 });
@@ -226,6 +285,60 @@ public class FileController {
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
                     return PostgresqlService.getBean().template().update(e);
+                })
+                .map(e -> Response.success(e));
+    }
+
+    @PostMapping(value = "/click/{id}")
+    @ResponseBody
+    public Mono<Response> click(@PathVariable Long id) {
+
+        return PostgresqlService.getBean().template()
+                .getDatabaseClient()
+                .sql("update T_BASE_FILE set click_count = click_count + 1 where id = :id")
+                .bind("id", id)
+                .fetch()
+                .rowsUpdated()
+                .flatMap(update -> PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在"))))
+                .map(e -> Response.success(e));
+    }
+
+    @PostMapping(value = "/heart/{id}")
+    @ResponseBody
+    public Mono<Response> heart(@PathVariable Long id) {
+        long currentUserId = r.defaultUserId();
+        final String entityType = "t_base_file";
+
+        return PostgresqlService.getBean().template()
+                .getDatabaseClient()
+                .sql("""
+                        select * from t_biz_user_heart 
+                        where is_deleted = '0'
+                        and entity_type =:entityType
+                        and entity_id =:entityId 
+                        and user_id =:userId  
+                        """)
+                .bind("entityType",entityType)
+                .bind("entityId",id)
+                .bind("userId",currentUserId)
+                .mapProperties(TBizUserHeart.class)
+                .first()
+                .switchIfEmpty(Mono.just(new TBizUserHeart()))
+                .flatMap(heart -> {
+                    Long heartId = heart.getId();
+                    if(Objects.isNull(heartId)){
+                        heart.setId(r.id());
+                        heart.setDeleted("0");
+                        heart.setCreateTime(LocalDateTime.now());
+                        heart.setEntityType(entityType);
+                        heart.setUserId(currentUserId);
+                        heart.setEntityId(id);
+                        return PostgresqlService.getBean().template().insert(heart);
+                    }else {
+                        heart.setDeleted("1");
+                        heart.setUpdateTime(LocalDateTime.now());
+                        return PostgresqlService.getBean().template().update(heart);
+                    }
                 })
                 .map(e -> Response.success(e));
     }
