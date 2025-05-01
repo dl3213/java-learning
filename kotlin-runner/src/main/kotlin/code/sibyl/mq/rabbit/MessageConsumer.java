@@ -15,8 +15,7 @@ public class MessageConsumer {
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("t_base_file"),
-            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic"),
-            key = "flink.cdc.postgres.t_base_file.*"
+            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic")
     ))
     public void file_handler(String message) {
         log.info("rabbit mq t_base_file_handler -> {}", message);
@@ -24,8 +23,7 @@ public class MessageConsumer {
 
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("t_biz_book"),
-            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic"),
-            key = "flink.cdc.postgres.t_biz_book.*"
+            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic")
     ))
     public void t_biz_book_handler(String message) {
         log.info("rabbit mq t_biz_book_handler -> {}", message);

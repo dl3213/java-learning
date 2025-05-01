@@ -161,7 +161,7 @@ public class FlinkConfig {
                 String op = jsonObject.getString("op");
 
                 String routingKey = STR."flink.cdc.\{db}.\{table}.\{op}";
-                log.info("{} -> {} -> {}", table, op, routingKey);
+                log.info("{} -> {} -> {} -> {}", db, table, op, routingKey);
                 SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).convertAndSend(RabbitMQConfig.Exchange, routingKey , new Message(element.getBytes()));
                 SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", routingKey, element);
             }
