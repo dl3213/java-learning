@@ -9,6 +9,7 @@ import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.connector.sink2.Sink;
@@ -158,8 +159,11 @@ public class FlinkConfig {
                 String db = source.getString("db");
                 String table = source.getString("table");
                 String op = jsonObject.getString("op");
-                SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).send(RabbitMQConfig.Exchange, STR."flink-cdc.\{db}.\{table}.\{op}", new Message(element.getBytes()));
-                SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", STR."flink-cdc.flink-cdc.\{db}.\{table}.\{op}", element);
+
+                String routingKey = STR."flink.cdc.\{db}.\{table}.\{op}";
+                log.info("{} -> {} -> {}", table, op, routingKey);
+                SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).convertAndSend(RabbitMQConfig.Exchange, routingKey , new Message(element.getBytes()));
+                SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", routingKey, element);
             }
         });
         env.executeAsync();

@@ -591,4 +591,11 @@ object r {
     fun urlDecode(str: String): String {
         return URLEncoder.encode(str, "UTF-8");
     }
+
+    @JvmStatic
+    fun snakeToCamel(snakeStr: String): String {
+        return snakeStr.replace("_(.)".toRegex()) {
+            if (it.groupValues.size > 1) it.groupValues[1].uppercase() else ""
+        }
+    }
 }
