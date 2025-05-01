@@ -1,4 +1,4 @@
-package code.sibyl
+package code.sibyl.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

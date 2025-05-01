@@ -1,15 +1,18 @@
 package code.sibyl.flink;
 
+import cn.hutool.extra.spring.SpringUtil;
 import code.sibyl.common.r;
+import code.sibyl.mq.rabbit.RabbitMQConfig;
+import com.alibaba.fastjson2.JSONObject;
 import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
-import com.ververica.cdc.connectors.mysql.source.MySqlSource;
-import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -23,12 +26,17 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.table.catalog.ObjectPath;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
 
@@ -40,9 +48,7 @@ public class FlinkConfig {
 
     @Bean
     public MiniCluster miniCluster() throws Exception {
-        MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder()
-                .setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090))
-                .build();
+        MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder().setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090)).build();
         MiniCluster miniCluster = new MiniCluster(configuration);
         miniCluster.start();
         //miniCluster.close();
@@ -134,49 +140,28 @@ public class FlinkConfig {
         //properties.setProperty("heartbeat.interval.ms", String.valueOf(DEFAULT_HEARTBEAT_MS));
 
 
-        JdbcIncrementalSource<String> local_postgres = PostgresSourceBuilder.PostgresIncrementalSource.<String>builder()
-                .hostname("127.0.0.1")
-                .port(5432)
-                .database("postgres")
-                .schemaList("public")
-                .tableList("public.*")
-                .username("postgres")
-                .password("sibyl-postgres-0127")
+        JdbcIncrementalSource<String> local_postgres = PostgresSourceBuilder.PostgresIncrementalSource.<String>builder().hostname("127.0.0.1").port(5432).database("postgres").schemaList("public").tableList("public.*").username("postgres").password("sibyl-postgres-0127")
                 //.slotName("flink")
                 .decodingPluginName("pgoutput") // use pgoutput for PostgreSQL 10+ //   ALTER TABLE t_biz_book REPLICA IDENTITY FULL; -- 执行这个之后update 才有before
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .debeziumProperties(properties)
-                .includeSchemaChanges(true) // output the schema changes as well
+                .deserializer(new JsonDebeziumDeserializationSchema()).debeziumProperties(properties).includeSchemaChanges(true) // output the schema changes as well
                 .splitSize(2) // the split size of each snapshot split
                 .startupOptions(com.ververica.cdc.connectors.base.options.StartupOptions.latest()) //
                 .build();
-
-
-        // 配置 Kafka Sink
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("group.id", "webflux-group");
-        KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
-                .setBootstrapServers("127.0.0.1:9092")
-                .setRecordSerializer(
-                        KafkaRecordSerializationSchema.builder()
-                                .setTopic("kotlin-runner-postgres-kafka-dev")
-                                .setValueSerializationSchema(new SimpleStringSchema())
-                                .build()
-
-                )
-                .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE) // 至少一次投递保证
-                .setKafkaProducerConfig(kafkaProperties)
-                .build();
-
-
         DataStreamSource<String> dataStreamSource = env.fromSource(local_postgres, WatermarkStrategy.noWatermarks(), "local_postgres");
-        dataStreamSource.print().name("Console Sink");
-        //dataStreamSource.addSink();
-        dataStreamSource
-                .setParallelism(2)
-                .sinkTo(kafkaSink)
-        ;
-
+//        dataStreamSource.sinkTo((Sink<String>) context -> new MqSinkWriter());
+        dataStreamSource.addSink(new SinkFunction<>() {
+            @Override
+            public void invoke(String element) throws Exception {
+                log.info("Sinking element: {}", element);
+                JSONObject jsonObject = JSONObject.parseObject(element);
+                JSONObject source = jsonObject.getJSONObject("source");
+                String db = source.getString("db");
+                String table = source.getString("table");
+                String op = jsonObject.getString("op");
+                SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).send(RabbitMQConfig.Exchange, STR."flink-cdc.\{db}.\{table}.\{op}", new Message(element.getBytes()));
+                SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", STR."flink-cdc.flink-cdc.\{db}.\{table}.\{op}", element);
+            }
+        });
         env.executeAsync();
         log.info("flink-cdc start");
         return env;

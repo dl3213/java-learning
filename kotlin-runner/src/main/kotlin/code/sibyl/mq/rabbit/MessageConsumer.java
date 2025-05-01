@@ -1,32 +1,33 @@
 package code.sibyl.mq.rabbit;
 
-import code.sibyl.common.r;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import reactor.rabbitmq.Receiver;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MessageConsumer {
-    private final Receiver receiver;
 
-    public static MessageConsumer getBean() {
-        return r.getBean(MessageConsumer.class);
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(RabbitMQConfig.QUEUE),
+            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic"),
+            key = "flink-cdc.postgres.t_base_file.*"
+    ))
+    public void file_handler(String message) {
+        log.info("rabbit mq file_handler -> {}", message);
     }
 
-    @PostConstruct
-    public void startConsuming() {
-        System.err.println("code.sibyl.rabbit.MessageConsumer");
-        receiver.consumeAutoAck("demo.queue")
-                .map(delivery -> {
-                    String s = new String(delivery.getBody());
-                    System.err.println(s);
-                    return s;
-                })
-                .doOnNext(msg -> log.info("code.sibyl.rabbit.MessageConsumer -> Received message: {}", msg))
-                .subscribe();
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(RabbitMQConfig.QUEUE),
+            exchange = @Exchange(value = RabbitMQConfig.Exchange, type = "topic"),
+            key = "flink-cdc.postgres.t_biz_book.*"
+    ))
+    public void t_biz_book_handler(String message) {
+        log.info("rabbit mq t_biz_book_handler -> {}", message);
     }
 }

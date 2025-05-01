@@ -72,12 +72,14 @@ spring:
       auto-create: true
       fail-fast: true
     producer:
+      auto-create-topics: true
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
       acks: all         # 生产环境建议使用all
       retries: 3        # 失败重试次数
       linger-ms: 100    # 批量发送等待时间
     consumer:
+      auto-create-topics: true
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

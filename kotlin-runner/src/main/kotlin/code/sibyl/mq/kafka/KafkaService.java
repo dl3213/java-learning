@@ -14,24 +14,19 @@ import reactor.kafka.sender.SenderResult;
 @AllArgsConstructor
 public class KafkaService {
 
-    private final ReactiveKafkaProducerTemplate<String, String> kafkaTemplate;
-
     public static KafkaService getBean() {
         return r.getBean(KafkaService.class);
     }
 
-    @KafkaListener(topics = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group")
-    public void postgres(String message) {
-        System.err.println("Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
+    @KafkaListener(topicPattern = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group")
+    public void t_base_file(String message) {
+        System.err.println("t_base_file Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
     }
 
-    @KafkaListener(topics = "test-topic", groupId = "webflux-group")
-    public void test(String message) {
-        System.err.println("Received Message in topic 'test-topic': " + message);
-    }
+//    @KafkaListener(topicPattern = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group")
+//    public void t_biz_book(String message) {
+//        System.err.println("t_biz_book Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
+//    }
 
-    public Mono<SenderResult<Void>> send(String topic, String message) {
-        return kafkaTemplate.send(topic, message);
-    }
 }
 

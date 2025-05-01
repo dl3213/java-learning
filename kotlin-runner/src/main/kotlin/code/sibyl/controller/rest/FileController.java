@@ -1,6 +1,6 @@
 package code.sibyl.controller.rest;
 
-import code.sibyl.TBizUserHeart;
+import code.sibyl.domain.TBizUserHeart;
 import code.sibyl.aop.ActionLog;
 import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
