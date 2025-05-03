@@ -51,12 +51,8 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
         log.info("系统初始化工作--start");
 
 //        BookService.getBean().move_test().subscribe();
-//        UpdateService.getBean().pixiv_init_parallel().subscribe(); //
-        UpdateService.getBean().file_clear().subscribe(); //
+//        UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
-//        LocalCache.getBean().test();//测试oom
-
-//        r.getBean(LocalCacheUtil.class).init();
 
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new Event(this, "runner-end"));

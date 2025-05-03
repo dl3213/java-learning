@@ -15,6 +15,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.util.function.Tuple4
+import java.time.Duration
 
 @Service
 @Slf4j
@@ -104,7 +105,7 @@ class PostgresqlService {
             sibylPostgresqlTemplate!!.databaseClient?.sql(selectSql)!!.mapProperties(clazz).all().collectList(),
             Mono.just(pageNumber),
             Mono.just(pageSize)
-        )
+        ).delaySubscription(Duration.ofMillis(500));
     }
 
 }
