@@ -1,6 +1,8 @@
 package code.sibyl.domain.base
 
 import code.sibyl.common.r
+import code.sibyl.service.cdc.LocalDateTimeDeserializer
+import com.alibaba.fastjson2.annotation.JSONField
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
@@ -45,12 +47,14 @@ open class BaseFile {
 
     @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
     @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
+    @JSONField(deserializeUsing = LocalDateTimeDeserializer::class)
     open var createTime: LocalDateTime? = null
 
     open var createId: Long? = null
 
     @DateTimeFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
     @JsonFormat(pattern = r.yyyy_MM_dd_HH_mm_ss_SSSSSS)
+    @JSONField(deserializeUsing = LocalDateTimeDeserializer::class)
     open var updateTime: LocalDateTime? = null
 
     open var updateId: Long? = null

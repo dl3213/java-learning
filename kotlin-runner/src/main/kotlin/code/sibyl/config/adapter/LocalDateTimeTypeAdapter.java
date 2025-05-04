@@ -10,9 +10,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-public class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDate> {
+public class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDateTime> {
     @Override
-    public void write(final JsonWriter jsonWriter, final LocalDate localDate) throws IOException {
+    public void write(final JsonWriter jsonWriter, final LocalDateTime localDate) throws IOException {
         if (localDate == null) {
             jsonWriter.nullValue();
             return;
@@ -21,11 +21,11 @@ public class LocalDateTimeTypeAdapter extends TypeAdapter<LocalDate> {
     }
 
     @Override
-    public LocalDate read(final JsonReader jsonReader) throws IOException {
+    public LocalDateTime read(final JsonReader jsonReader) throws IOException {
         if (jsonReader.peek() == JsonToken.NULL) {
             jsonReader.nextNull();
             return null;
         }
-        return ZonedDateTime.parse(jsonReader.nextString()).toLocalDate();
+        return ZonedDateTime.parse(jsonReader.nextString()).toLocalDateTime();
     }
 }

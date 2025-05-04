@@ -1,8 +1,5 @@
 package code.sibyl.flink;
 
-import code.sibyl.common.SpringUtil;
-import code.sibyl.mq.rabbit.MessageProducer;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.connector.sink2.SinkWriter;
 

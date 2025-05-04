@@ -1,6 +1,7 @@
 package code.sibyl.mq.kafka;
 
 import code.sibyl.common.r;
+import code.sibyl.service.cdc.Handler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,6 +22,7 @@ public class KafkaService {
     @KafkaListener(topicPattern = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group")
     public void t_base_file(String message) {
         System.err.println("t_base_file Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
+        r.getBean(Handler.class, Handler.beanNamePrev + "t_base_file").handler(message).subscribe();
     }
 
 //    @KafkaListener(topicPattern = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group")

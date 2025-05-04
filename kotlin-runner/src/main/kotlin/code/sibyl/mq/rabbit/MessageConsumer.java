@@ -19,6 +19,7 @@ public class MessageConsumer {
     ))
     public void file_handler(String message) {
         log.info("rabbit mq t_base_file_handler -> {}", message);
+
     }
 
     @RabbitListener(bindings = @QueueBinding(
@@ -27,5 +28,6 @@ public class MessageConsumer {
     ))
     public void t_biz_book_handler(String message) {
         log.info("rabbit mq t_biz_book_handler -> {}", message);
+
     }
 }

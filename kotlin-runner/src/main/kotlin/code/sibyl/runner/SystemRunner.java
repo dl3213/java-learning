@@ -2,7 +2,6 @@ package code.sibyl.runner;
 
 import code.sibyl.common.Response;
 import code.sibyl.event.Event;
-import code.sibyl.mq.rabbit.MessageProducer;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
@@ -51,7 +50,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
         log.info("系统初始化工作--start");
 
 //        BookService.getBean().move_test().subscribe();
-//        UpdateService.getBean().file_clear().subscribe(); //
+        UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
 
         log.info("系统初始化工作--end");
