@@ -38,15 +38,6 @@ public class FileService {
 
     private final Path root = Paths.get(r.fileBaseDir());
 
-    public void init() {
-//        try {
-//            Files.createDirectories(root);
-//            r.INSTANCE.setBaseDir("");
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not initialize folder for upload!");
-//        }
-    }
-
     public Mono<BaseFile> save(Mono<FilePart> filePartMono) {
 
         return filePartMono

@@ -1,11 +1,24 @@
 package code.sibyl.service;
 
+import org.bytedeco.javacpp.Loader;
+import org.bytedeco.opencv.opencv_java;
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.*;
+import org.opencv.features2d.BFMatcher;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.ORB;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.StringTemplate.STR;
 
@@ -18,14 +31,50 @@ public class FfmpegService {
 
     public final static Runtime runtime = Runtime.getRuntime();
 
-    public static void main(String[] args) throws Exception {
 
 
+    public static void main123(String[] args) throws Exception {
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-        FfmpegService.copy("", "", STR."01:36:35", STR."01:42:46");
-//        FfmpegService.showWindowSize("E:\\4me\\video\\1.mp4");
+        String path1 = "";
+        path1 = "D:\\z\\1864319636821118976.png";
+        path1 = "E:/sibyl-system/file/2025-01-23/1882441280106139648.png";
+        path1 = "E:/sibyl-system/file/2025-03-17/1901623869651947520.jpg";
+        path1 = "E:/sibyl-system/file/2025-01-23/1882441280215191552.jpeg"; // 相似图
+        String path2 = "E:/sibyl-system/file/2024-12-04/1864319636821118976.png";
+
+        Mat img1 = Imgcodecs.imread(path1);
+        Mat img2 = Imgcodecs.imread(path2);
+
+        // 初始化ORB检测器
+        ORB orb = ORB.create(
+                1000,            // 增加特征点数量  ;特征匹配数 = 这里 * 0.7 视为相似， 默认500
+                1.2f,            // 多尺度检测
+                8,               // 深层金字塔
+                31,              // 更大边缘阈值
+                0,
+                2,
+                ORB.HARRIS_SCORE, // 更好的特征点评分
+                31,
+                20
+        );
+        MatOfKeyPoint kp1 = new MatOfKeyPoint(), kp2 = new MatOfKeyPoint();
+        Mat desc1 = new Mat(), desc2 = new Mat();
+
+        // 检测特征点
+        orb.detectAndCompute(img1, new Mat(), kp1, desc1);
+        orb.detectAndCompute(img2, new Mat(), kp2, desc2);
+
+        // 匹配特征点
+        BFMatcher matcher = BFMatcher.create(BFMatcher.BRUTEFORCE_HAMMING, true);
+        MatOfDMatch matches = new MatOfDMatch();
+        matcher.match(desc1, desc2, matches);
+
+        // 计算匹配率
+        long totalMatches = matches.rows();
+        System.out.println("特征匹配数: " + totalMatches);
+
     }
-
 
 
     public static void copy(String fromFile, String toFile, String stateTime, String endTime) throws Exception {

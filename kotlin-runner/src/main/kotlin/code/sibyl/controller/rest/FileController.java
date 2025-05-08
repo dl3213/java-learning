@@ -342,50 +342,26 @@ public class FileController {
                 .map(e -> Response.success(e));
     }
 
-    @RequestMapping(value = "/list", method = {RequestMethod.GET, RequestMethod.POST})
+
+    @PostMapping(value = "/convert-format/{id}")
     @ResponseBody
-    public ResponseEntity<Flux<FileInfo>> getListFiles() {
-        Stream<FileInfo> fileInfoStream = storageService.loadAll()
-                .map(path -> {
-                    String filename = path.getFileName().toString();
-                    String url = UriComponentsBuilder.newInstance().path("/files/{filename}").buildAndExpand(filename).toUriString();
-                    File file = new File(r.fileBaseDir() + File.separator + path.getFileName());
-                    return new FileInfo(filename, url, 0l, file.isDirectory(), file.isFile());
-                });
+    public Mono<Response> convertFormat(@PathVariable Long id) {
+        long currentUserId = r.defaultUserId();
+        final String entityType = "t_base_file";
 
-        Flux<FileInfo> fileInfosFlux = Flux.fromStream(fileInfoStream);
-
-        return ResponseEntity.status(HttpStatus.OK).body(fileInfosFlux);
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .map(e -> Response.success(e));
     }
 
-    @GetMapping("/files/{filename:.+}")
+    @PostMapping(value = "/find-similar/{id}")
     @ResponseBody
-    public ResponseEntity<Flux<DataBuffer>> getFile(@PathVariable String filename) {
-        Flux<DataBuffer> file = storageService.load(filename);
-
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM).body(file);
+    public Mono<Response> findSimilar(@PathVariable Long id) {
+        long currentUserId = r.defaultUserId();
+        final String entityType = "t_base_file";
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .map(e -> Response.success(e));
     }
-
-    @DeleteMapping("/files/{filename:.+}")
-    @ResponseBody
-    public Mono<ResponseEntity<Response>> deleteFile(@PathVariable String filename) {
-        String message = "";
-
-        try {
-            boolean existed = storageService.delete(filename);
-            if (existed) {
-                message = "Delete the file successfully: " + filename;
-                return Mono.just(ResponseEntity.ok().body(Response.success(message)));
-            }
-
-            message = "The file does not exist!";
-            return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(Response.success(message)));
-        } catch (Exception e) {
-            message = "Could not delete the file: " + filename + ". Error: " + e.getMessage();
-            return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Response.success(message)));
-        }
-    }
-
 
 }
