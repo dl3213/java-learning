@@ -41,12 +41,7 @@ public class MysqlMetadata implements Metadata {
         return this.databaseClient.sql(this.queryTableListSql)
                 .fetch()
                 .all()
-                .map(item -> {
-                    System.err.println(item);
-                    Object obj = item.get(STR."Tables_in_\{this.dbName}");
-                    System.err.println(obj);
-                    return String.valueOf(obj);
-                });
+                .map(item -> String.valueOf(item.get(STR."Tables_in_\{this.dbName}")));
     }
 
     @Override

@@ -50,7 +50,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-//        BackupService.getBean().backup("sibyl", r.getBean(R2dbcEntityTemplate.class, "sibyl-mysql")).subscribe();
+        BackupService.getBean().backup("sibyl", r.getBean(R2dbcEntityTemplate.class, "sibyl-mysql")).subscribe();
 //        BookService.getBean().move_test().subscribe();
         UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
