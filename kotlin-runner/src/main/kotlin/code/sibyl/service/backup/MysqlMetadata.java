@@ -8,13 +8,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class H2Metadata implements Metadata {
+public class MysqlMetadata implements Metadata {
     private String name;
     private String dbName;
     private List<String> tableNameList;
@@ -23,11 +21,11 @@ public class H2Metadata implements Metadata {
             show tables;     
              """;
 
-    public H2Metadata(String dbName, DatabaseClient databaseClient) {
+    public MysqlMetadata(String dbName, DatabaseClient databaseClient) {
         this.dbName = dbName;
         this.databaseClient = databaseClient;
     }
-    public H2Metadata(String dbName, String name, DatabaseClient databaseClient) {
+    public MysqlMetadata(String dbName, String name, DatabaseClient databaseClient) {
         this.dbName = dbName;
         this.name = name;
         this.databaseClient = databaseClient;
@@ -43,7 +41,12 @@ public class H2Metadata implements Metadata {
         return this.databaseClient.sql(this.queryTableListSql)
                 .fetch()
                 .all()
-                .map(item -> String.valueOf(item.get("TABLE_NAME")));
+                .map(item -> {
+                    System.err.println(item);
+                    Object obj = item.get(STR."Tables_in_\{this.dbName}");
+                    System.err.println(obj);
+                    return String.valueOf(obj);
+                });
     }
 
     @Override
@@ -53,7 +56,7 @@ public class H2Metadata implements Metadata {
 
 
     public static Mono<Metadata> build(String dbName, String name, DatabaseClient databaseClient) {
-        return Mono.just(new H2Metadata(dbName, name, databaseClient));
+        return Mono.just(new MysqlMetadata(dbName, name, databaseClient));
     }
 
 

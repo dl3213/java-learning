@@ -5,12 +5,15 @@ import reactor.core.publisher.Mono;
 
 public class MetadataBuilder {
 
-    public static Mono<Metadata> build(String name, DatabaseClient databaseClient) {
+    public static Mono<Metadata> build(String dbName, String name, DatabaseClient databaseClient) {
         switch (name) {
             case "H2" -> {
-                return H2Metadata.build(name, databaseClient);
+                return H2Metadata.build(dbName, name, databaseClient);
             }
-            default -> throw new RuntimeException();
+            case "MySQL" -> {
+                return MysqlMetadata.build(dbName, name, databaseClient);
+            }
+            default -> throw new NullPointerException();
         }
     }
 }

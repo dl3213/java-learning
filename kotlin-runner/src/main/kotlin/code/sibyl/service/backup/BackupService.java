@@ -40,29 +40,28 @@ public class BackupService {
     public Mono<Long> backup(String dbName, DatabaseClient databaseClient) {
         ConnectionFactory connectionFactory = databaseClient.getConnectionFactory();
         String name = connectionFactory.getMetadata().getName();
-        System.err.println(STR."\{name} -> \{dbName}");
-        ApplicationHome applicationHome = new ApplicationHome(getClass());
-        String absolutePath = applicationHome.getDir().getAbsolutePath();
-        System.err.println(STR."ApplicationHome -> \{absolutePath}");
+        log.info("[{BackupService.backup]: {}", STR."\{name} -> \{dbName}");
+        String absolutePath = r.absolutePath();
+        log.info("[{BackupService.backup]: {}", STR."ApplicationHome -> \{absolutePath}");
         String classPath = ClassLoader.getSystemResource("").getPath();
-        System.err.println(STR."classPath -> \{absolutePath}");
+        log.info("[{BackupService.backup]: {}", STR."classPath -> \{absolutePath}");
         String projectPath = new File("").getAbsolutePath();
-        System.err.println(STR."projectPath -> \{absolutePath}");
+        log.info("[{BackupService.backup]: {}", STR."projectPath -> \{absolutePath}");
 
         final String backupPath = STR."\{absolutePath}\{File.separator}backup\{File.separator}\{dbName}\{File.separator}\{r.yyyy_MM_dd()}\{File.separator}";
-        System.err.println(STR."backupPath -> \{backupPath}");
+        log.info("[{BackupService.backup]: {}", STR."backupPath -> \{backupPath}");
         File fileDir = new File(backupPath);
         if (!fileDir.exists()) {
             fileDir.mkdirs();
         }
         final String formatted = LocalDateTime.now().format(DateTimeFormatter.ofPattern(r.yyyy_MM_dd));
-        Mono<Metadata> metadataMono = MetadataBuilder.build(name, databaseClient);
-        return metadataMono
+        return MetadataBuilder.build(dbName, name, databaseClient)
                 .flatMapMany(item -> item.tableNameList().flatMap(tableName -> Mono.zip(Mono.just(item), Mono.just(tableName))))
                 .flatMap(tuple2 -> {
                     String tableName = tuple2.getT2();
-//                    System.err.println(tableName);
+                    log.info("[{BackupService.backup]: tableName = {}", tableName);
                     final String backupTableFile = STR."\{backupPath}\{tableName}-\{formatted}.sql";
+                    log.info("[{BackupService.backup]: backupTableFile = {}", backupTableFile);
                     File tableSqlFile = new File(backupTableFile);
 
                     try {
@@ -96,12 +95,17 @@ public class BackupService {
                     return item;
                 })
                 .count()
-                .map(count ->{
-                    System.err.println(STR."backup end: count -> \{count}");
+                .map(count -> {
+                    log.info("[{BackupService.backup]: {}", STR."backup end: count -> \{count}");
                     return count;
                 })
                 .then()
-                .thenReturn(1L);
+                .thenReturn(1L)
+                .onErrorResume(throwable -> {
+                    throwable.printStackTrace();
+                    return Mono.just(0L);
+                })
+                ;
 
     }
 
