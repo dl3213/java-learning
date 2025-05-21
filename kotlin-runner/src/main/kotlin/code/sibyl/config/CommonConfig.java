@@ -5,6 +5,7 @@ import cn.hutool.core.util.IdUtil;
 import code.sibyl.common.r;
 import code.sibyl.config.adapter.LocalDateTimeTypeAdapter;
 import code.sibyl.config.adapter.LocalDateTypeAdapter;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -20,6 +21,8 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaOptions;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,6 +65,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 //@EnableWebFlux
@@ -215,4 +219,24 @@ public class CommonConfig {
         return chatClient;
     }
 
+
+    public static final String cacheName_30MINUTES = "Caffeine-CACHE-30MINUTES";
+
+    @Primary
+    @Bean(name = "localEntityCacheManager")
+    public CacheManager localEntityCacheManager() {
+        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+        Caffeine caffeine = Caffeine.newBuilder()
+                .evictionListener((key, value, removalCause) -> log.info("[cache-eviction]{} - {} - {} ", key, value, removalCause))
+                .removalListener((key, value, removalCause) -> log.info("[cache-removal]{} - {} - {} ", key, value, removalCause))
+                .maximumSize(1024)     // 最大容量
+                .expireAfterWrite(30, TimeUnit.MINUTES)     //
+                .expireAfterAccess(30, TimeUnit.MINUTES);  // 分钟不访问自动丢弃
+//              .executor(ThreadPoolUtil.getThreadPool()); // 走线程池，需自定义线程池,可不用
+        caffeineCacheManager.setCaffeine(caffeine);
+        caffeineCacheManager.setCacheNames(Arrays.asList(cacheName_30MINUTES));  // 设定缓存器名称
+        caffeineCacheManager.setAllowNullValues(true);// 值不可为空\
+        //caffeineCacheManager.setAsyncCacheMode(true);
+        return caffeineCacheManager;
+    }
 }

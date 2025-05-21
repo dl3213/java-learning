@@ -22,9 +22,9 @@ public class KafkaService {
     }
 
     @KafkaListener(topicPattern = "kotlin-runner-postgres-kafka-dev", groupId = "webflux-group", properties = {""})
-    public void t_base_file(String message) {
-        System.err.println("t_base_file Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
-        r.getBean(Handler.class, Handler.beanNamePrev + "t_base_file").handler(message).subscribe();
+    public void cdc(String message) {
+        System.err.println("KafkaService Received Message in topic 'kotlin-runner-postgres-kafka-dev': " + message);
+        //r.getBean(Handler.class, Handler.beanNamePrev + "t_base_file").handler(message).subscribe();
         //acknowledgment.acknowledge(); // 如果spring.kafka.consumer.enable-auto-commit=true，方法参数不能包含Acknowledgment ack，否则会报错
     }
 

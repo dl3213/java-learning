@@ -65,6 +65,9 @@ public class User {
     @Column(name = "update_id")
     private Long updateId;
 
+    private String steamId;
+    private String steamWebApiKey;
+
     public User(Long id, String username, String nickname) {
         this.id = id;
         this.username = username;

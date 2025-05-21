@@ -6,6 +6,7 @@ import code.sibyl.event.Event;
 import code.sibyl.repository.DatabaseRepository;
 import code.sibyl.repository.eos.EosRepository;
 import code.sibyl.service.FileService;
+import code.sibyl.service.SteamService;
 import code.sibyl.service.UpdateService;
 import code.sibyl.service.backup.BackupService;
 import com.alibaba.fastjson2.JSONObject;
@@ -51,9 +52,12 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
         BackupService.getBean().backup("sibyl", r.getBean(R2dbcEntityTemplate.class, "sibyl-mysql")).subscribe();
+//        BackupService.getBean().backup("postgres", r.getBean(R2dbcEntityTemplate.class, "sibyl-postgresql")).subscribe();
 //        BookService.getBean().move_test().subscribe();
         UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
+
+        SteamService.getBean().friendList().subscribe();
 
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new Event(this, "runner-end"));

@@ -13,7 +13,10 @@ public class MetadataBuilder {
             case "MySQL" -> {
                 return MysqlMetadata.build(dbName, name, databaseClient);
             }
-            default -> throw new NullPointerException();
+            case "PostgreSQL" -> {
+                return MysqlMetadata.build(dbName, name, databaseClient);
+            }
+            default -> throw new NullPointerException(name);
         }
     }
 }

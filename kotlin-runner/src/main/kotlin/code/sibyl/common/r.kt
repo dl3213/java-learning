@@ -25,9 +25,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.function.BiPredicate
@@ -596,6 +594,28 @@ object r {
     fun snakeToCamel(snakeStr: String): String {
         return snakeStr.replace("_(.)".toRegex()) {
             if (it.groupValues.size > 1) it.groupValues[1].uppercase() else ""
+        }
+    }
+
+    @JvmStatic
+    fun long2localDateTime(long: Long?): LocalDateTime? {
+        if (long == null) return null;
+        // 创建Instant对象
+        val instant = Instant.ofEpochMilli(long)
+        // 转换为OffsetDateTime，这里使用UTC偏移量（你也可以使用其他偏移量）
+        val offsetDateTime = instant.atZone(ZoneOffset.systemDefault()) // 系统默认时区
+        // 从OffsetDateTime转换为LocalDateTime（这会去掉偏移量）
+        return offsetDateTime.toLocalDateTime()
+    }
+
+    @JvmStatic
+    fun str2localDateTime(str: String?, formatter: String?): LocalDateTime? {
+        try {
+            var dateTime = cn.hutool.core.date.DateUtil.parse(str as CharSequence, formatter)
+            return dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
     }
 }
