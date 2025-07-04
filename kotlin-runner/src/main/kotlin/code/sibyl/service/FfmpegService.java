@@ -76,10 +76,29 @@ public class FfmpegService {
 
     }
 
+    public static void main(String[] args) throws Exception {
+        FfmpegService.copy("C:\\迅雷下载\\hhd800.com@PRED-452.mp4", "D:\\4pc\\dl3213\\PRED-452-1.mp4", "01:53:10","02:00:08" );
+//        FfmpegService.convert2mp4("E:\\kill la kill\\[Beatrice-Raws] Kill la Kill 02 [BDRip 1920x1080 x264 FLAC].mkv", "E:\\kill la kill\\op.mp4");
+    }
+
+    public static void convert2mp4(String fromFile, String toFile) throws Exception{
+        String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v copy -c:a copy \"\{toFile}\"";
+        System.err.println(command);
+        Process process = runtime.exec(command );
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        String line;
+        while ((line = errorReader.readLine()) != null) {
+            System.out.println(STR."FFmpeg --> : \{line}");
+        }
+        process.waitFor();
+        System.out.println("Conversion completed successfully.");
+    }
 
     public static void copy(String fromFile, String toFile, String stateTime, String endTime) throws Exception {
 
-        Process process = runtime.exec(STR."\{ffmpeg} -ss \{stateTime} -to \{endTime} -i \{fromFile}  -c copy \{toFile}");
+        String command = STR."\{ffmpeg} -ss \{stateTime} -to \{endTime} -i \"\{fromFile}\"  -c copy \"\{toFile}\"";
+        System.err.println(command);
+        Process process = runtime.exec(command );
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
         while ((line = errorReader.readLine()) != null) {
@@ -90,7 +109,7 @@ public class FfmpegService {
     }
 
     public static void showWindowSize(String filePath) throws Exception {
-        String command = STR."\{ffprobe} -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \{filePath}";
+        String command = STR."\{ffprobe} -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"\{filePath}\"";
         System.err.println(command);
         Process process = runtime.exec(command);
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getInputStream()));

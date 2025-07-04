@@ -49,25 +49,25 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     fun 图片补充大小() {
         UpdateService.getBean().图片补充大小().subscribe()
     }
 
     @Async
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     fun 文件补充hash() {
         UpdateService.getBean().文件补充hash().subscribe();
     }
 
     @Async
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     fun 视频文件补充thumbnail() {
         UpdateService.getBean().视频文件补充thumbnail().subscribe();
     }
 
     @Async
-    @Scheduled(cron = "0 0 0/6 * * ?")
+    @Scheduled(cron = "0 0 0/2 * * ?")
     fun friendList() {
         SteamService.getBean().friendList().subscribe()
     }

@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -120,13 +121,20 @@ public class SteamService {
                                     Mono.just(friendList),
                                     Mono.just(e),
                                     PostgresqlService.getBean().template().getDatabaseClient()
-                                            .sql("update t_biz_steam_friend set relation_ship = null where steam_id =:steamId")
+                                            .sql("update t_biz_steam_friend set relationship = null where steam_id =:steamId")
                                             .bind("steamId", tuple.getT1().getSteamId()).fetch().rowsUpdated()
                             ))
                             .onErrorResume(throwable -> {
                                 System.err.println("error in GetPlayerSummaries...");
                                 throwable.printStackTrace();
-                                return Mono.empty();
+                                return Mono.zip(
+                                        Mono.just(currentUser),
+                                        Mono.just(friendList),
+                                        Mono.just(new JSONObject()),
+                                        PostgresqlService.getBean().template().getDatabaseClient()
+                                                .sql("update t_biz_steam_friend set relationship = null where steam_id =:steamId")
+                                                .bind("steamId", tuple.getT1().getSteamId()).fetch().rowsUpdated()
+                                );
                             });
                 })
                 .flatMapMany(tuple -> {
@@ -140,7 +148,7 @@ public class SteamService {
                                 friend.setId(null);
                                 friend.setSteamId(currentUser.getSteamId());
                                 friend.setStreamFriendId(json.getString("steamid"));
-                                friend.setFriendSince(r.long2localDateTime(json.getLong("friend_since")));
+                                friend.setFriendSince(r.long2localDateTime(json.getLong("friend_since"), ZoneId.of("UTC-4")).plusYears(-1)); // ? 多了一年?
                                 friend.setRelationship(json.getString("relationship"));
                                 friend.setDeleted("0");
                                 return Mono.zip(Mono.just(currentUser), Mono.just(friend));
@@ -163,8 +171,11 @@ public class SteamService {
                     SteamFriend ifExists = tuple.getT3();
                     if (Objects.isNull(ifExists.getId())) {
                         entity.setId(r.id());
+                        log.info("[SteamFriend] insert = {}", entity.getId());
                         return PostgresqlService.getBean().template().insert(entity);
                     } else {
+                        entity.setId(ifExists.getId());
+                        log.info("[SteamFriend] update = {}", entity.getId());
                         return PostgresqlService.getBean().template().update(entity);
                     }
                 })

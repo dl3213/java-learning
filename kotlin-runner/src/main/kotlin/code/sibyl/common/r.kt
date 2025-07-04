@@ -19,7 +19,6 @@ import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -607,6 +606,16 @@ object r {
         // 从OffsetDateTime转换为LocalDateTime（这会去掉偏移量）
         return offsetDateTime.toLocalDateTime()
     }
+    @JvmStatic
+    fun long2localDateTime(long: Long?, zoneId: ZoneId): LocalDateTime? {
+        if (long == null) return null;
+        // 创建Instant对象
+        val instant = Instant.ofEpochMilli(long)
+        // 转换为OffsetDateTime，这里使用UTC偏移量（你也可以使用其他偏移量）
+        val offsetDateTime = instant.atZone(zoneId) // 系统默认时区
+        // 从OffsetDateTime转换为LocalDateTime（这会去掉偏移量）
+        return offsetDateTime.toLocalDateTime()
+    }
 
     @JvmStatic
     fun str2localDateTime(str: String?, formatter: String?): LocalDateTime? {
@@ -618,4 +627,35 @@ object r {
             return null
         }
     }
+}
+
+fun main() {
+    var long = 1772579346000L
+    println(long.toString().length)
+    println(r.long2localDateTime(long, ZoneId.of("UTC-4")))
+    println(r.long2localDateTime(long))
+
+    println()
+    var currentTimeMillis = System.currentTimeMillis()
+    println(currentTimeMillis)
+    println(r.long2localDateTime(currentTimeMillis))
+    println()
+
+    println(r.long2localDateTime(1609459200000L))
+
+    println()
+
+    val timestamp = 1772579346000L // UTC 2023-12-31T12:00:00Z
+    val dateTimeUtc = LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(timestamp),
+        ZoneId.of("UTC-04")
+    )
+    println("UTC 时间: $dateTimeUtc") // 2023-12-31T12:00
+
+
+    // 方案2：转换为目标时区（如上海时间 UTC+8）
+    val shanghaiTime = Instant.ofEpochMilli(timestamp)
+        .atZone(ZoneId.of("Asia/Shanghai"))
+    val dateTimeShanghai = shanghaiTime.toLocalDateTime()
+    println("上海时间: $dateTimeShanghai")
 }
