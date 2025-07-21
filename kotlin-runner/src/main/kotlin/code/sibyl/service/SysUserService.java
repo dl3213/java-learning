@@ -1,17 +1,15 @@
 package code.sibyl.service;
 
 import code.sibyl.common.r;
-import code.sibyl.domain.base.BaseFile;
 import code.sibyl.domain.sys.User;
-import code.sibyl.repository.SysUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -20,9 +18,9 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(value = R2dbcEntityTemplate.class)
 public class SysUserService {
 
-    private final SysUserRepository sysUserRepository;
     private final DatabaseClient databaseClient;
 
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
@@ -38,12 +36,6 @@ public class SysUserService {
                 ;
     }
 
-    public Mono<User> save(User user) {
-        return sysUserRepository.save(user);
-    }
 
-    public Flux<User> list() {
-        return sysUserRepository.list();
-    }
 
 }

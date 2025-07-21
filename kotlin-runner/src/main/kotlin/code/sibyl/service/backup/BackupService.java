@@ -12,6 +12,8 @@ import com.alibaba.fastjson2.JSONWriter;
 import io.r2dbc.spi.ConnectionFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(value = R2dbcEntityTemplate.class)
 public class BackupService {
 
     public static BackupService getBean() {

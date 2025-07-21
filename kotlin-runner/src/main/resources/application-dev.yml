@@ -12,6 +12,7 @@ spring:
         enabled: false
 
 data-source:
+  enable: true
   sibyl-mysql:
     enable: true
     driver: mysql

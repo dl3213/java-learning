@@ -10,6 +10,7 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/database")
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "data-source.enable", havingValue = "true", matchIfMissing = false)
 public class DataBaseController {
 
     private final DataBaseService dataBaseService;
@@ -86,7 +88,7 @@ public class DataBaseController {
     @GetMapping("/update-view")
     public Mono<String> update_view(final Model model, String id) throws ExecutionException, InterruptedException {
         model.addAttribute("typeList", DataBaseTypeEnum.values());
-        Database target = dataBaseService.findById(Long.valueOf(id)).toFuture().get();
+        Database target = dataBaseService.findById(String.valueOf(Long.valueOf(id))).toFuture().get();
         model.addAttribute("target", target);
         return Mono.create(monoSink -> monoSink.success("database/update-view"));
     }
@@ -97,7 +99,7 @@ public class DataBaseController {
 
         return Mono.just(id)
                 .map(e -> Long.valueOf(id))
-                .flatMap(e -> dataBaseService.findById(e))
+                .flatMap(e -> dataBaseService.findById(String.valueOf(e)))
                 //.map(e -> e)
                 .doOnSuccess(e -> model.addAttribute("target", e))
                 .flatMap(e -> Mono.create(monoSink -> monoSink.success("database/connect-view")));

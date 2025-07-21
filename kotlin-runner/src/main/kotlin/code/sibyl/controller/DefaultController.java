@@ -7,7 +7,6 @@ import code.sibyl.common.r;
 import code.sibyl.domain.sys.User;
 import code.sibyl.dto.QueryDTO;
 import code.sibyl.dto.TestDTO;
-import code.sibyl.repository.eos.EosRepository;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +31,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/default")
 public class DefaultController {
 
-    private final EosRepository eosRepository;
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final MessageSource messageSource;
 
     @GetMapping("/greeting")
@@ -42,15 +39,6 @@ public class DefaultController {
         System.err.println(locale);
         System.err.println(messageSource.getClass());
         return Mono.just(messageSource.getMessage("greeting", null, locale));
-    }
-
-    @GetMapping("/json")
-    @ResponseBody
-    public Mono<Response> json(String url) {
-        return r2dbcEntityTemplate.select(User.class)
-                .all()
-                .collectList()
-                .map(e -> r.success(e));
     }
 
     @GetMapping(value = "/getUrl")
@@ -135,49 +123,6 @@ public class DefaultController {
             return Mono.just(JSONObject.toJSONString(json));
         }).subscribe(e -> System.err.println(e));
         return Response.success(System.currentTimeMillis());
-    }
-
-    @RequestMapping(value = "/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    public Mono<Response> test() {
-        System.err.println("/default/finance/threport/com.primeton.finance.report.report_mat_cz.biz.ext");
-
-//        return eosRepository.sumTest().map(item -> {
-//            System.err.println("return ->");
-//            System.err.println(item);
-//            return Response.success(item);
-//        });
-//        return eosRepository.backNum("SZ20240291", "3302010001").map(item -> {
-//            System.err.println(item);
-//            return item;
-//        }).collectList().map(item -> {
-//            System.err.println("return ->");
-//            System.err.println(item);
-//            return Response.success(item);
-//        }).doOnError(t -> {
-//            System.err.println("doOnError");
-//            t.printStackTrace();
-//        }).doOnSuccess(r -> {
-//            System.err.println("doOnSuccess");
-//            System.err.println(r);
-//        }).doOnTerminate(() -> {
-//            System.err.println("doOnTerminate");
-//        });
-
-        return eosRepository.test()
-//                .publishOn(Schedulers.parallel())
-//                .flatMap(item -> Mono.zip(Mono.just(item), eosRepository.backNum_from(item.getSales_contract(), item.getMaterial_code())))
-//                .map(item -> item.getT1().setBack_num(item.getT2().toString()))
-                .collectList()
-                .flatMap(list -> {
-                    List<String> sales_contract_list = list.stream().filter(Objects::nonNull).map(TestDTO::getSales_contract).collect(Collectors.toList());
-                    List<String> material_code_list = list.stream().filter(Objects::nonNull).map(TestDTO::getMaterial_code).collect(Collectors.toList());
-                    QueryDTO queryDTO = QueryDTO.builder().setContractCodeList(sales_contract_list);
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("contractCodeList", sales_contract_list);
-                    return Mono.zip(Mono.just(list), eosRepository.findByCustomParams(map).collectList());
-                })
-                .map(r -> Response.success(r));
     }
 
     /**

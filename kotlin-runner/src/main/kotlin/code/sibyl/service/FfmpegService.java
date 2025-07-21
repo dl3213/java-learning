@@ -10,10 +10,7 @@ import org.opencv.features2d.ORB;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -30,7 +27,6 @@ public class FfmpegService {
     public final static String ffprobe = STR."\{basePath}ffprobe.exe";
 
     public final static Runtime runtime = Runtime.getRuntime();
-
 
 
     public static void main123(String[] args) throws Exception {
@@ -77,14 +73,72 @@ public class FfmpegService {
     }
 
     public static void main(String[] args) throws Exception {
-        FfmpegService.copy("C:\\迅雷下载\\hhd800.com@PRED-452.mp4", "D:\\4pc\\dl3213\\PRED-452-1.mp4", "01:53:10","02:00:08" );
-//        FfmpegService.convert2mp4("E:\\kill la kill\\[Beatrice-Raws] Kill la Kill 02 [BDRip 1920x1080 x264 FLAC].mkv", "E:\\kill la kill\\op.mp4");
+
+
+//        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "05:22", "05:25");
+        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
+
     }
 
-    public static void convert2mp4(String fromFile, String toFile) throws Exception{
+
+
+
+    public static void sound(String filePath, String outputDir, String output, String stateTime, String endTime) {
+        String command =  STR."ffmpeg -i \"\{filePath}\" -vn -ss \{stateTime} -to \{endTime} -acodec pcm_s16le -ar 44100 -ac 2 \"\{outputDir}\\\{output}_audio_clip.wav\"";
+
+        System.err.println(command);
+        try {
+            File file = new File(outputDir);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+
+            // 执行FFmpeg命令
+            Process process = new ProcessBuilder(command.split(" ")).start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line); // 打印FFmpeg的输出，以便调试
+            }
+
+            int exitCode = process.waitFor(); // 等待进程结束
+            System.out.println("Exited with code: " + exitCode);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void videoFrame(String filePath, String outputDir, String output, String stateTime, String endTime) {
+        String command =  STR."ffmpeg -i \"\{filePath}\" -ss \{stateTime} -to \{endTime} -vsync 0 \"\{outputDir}\\\{output}_%08d.png\"";
+
+        System.err.println(command);
+        try {
+            File file = new File(outputDir);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+
+            // 执行FFmpeg命令
+            Process process = new ProcessBuilder(command.split(" ")).start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line); // 打印FFmpeg的输出，以便调试
+            }
+
+            int exitCode = process.waitFor(); // 等待进程结束
+            System.out.println("Exited with code: " + exitCode);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void convert2mp4(String fromFile, String toFile) throws Exception {
         String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v copy -c:a copy \"\{toFile}\"";
         System.err.println(command);
-        Process process = runtime.exec(command );
+        Process process = runtime.exec(command);
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
         while ((line = errorReader.readLine()) != null) {
@@ -98,7 +152,7 @@ public class FfmpegService {
 
         String command = STR."\{ffmpeg} -ss \{stateTime} -to \{endTime} -i \"\{fromFile}\"  -c copy \"\{toFile}\"";
         System.err.println(command);
-        Process process = runtime.exec(command );
+        Process process = runtime.exec(command);
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
         while ((line = errorReader.readLine()) != null) {
@@ -106,6 +160,7 @@ public class FfmpegService {
         }
         process.waitFor();
         System.out.println("Conversion completed successfully.");
+
     }
 
     public static void showWindowSize(String filePath) throws Exception {

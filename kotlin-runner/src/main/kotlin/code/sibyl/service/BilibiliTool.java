@@ -36,17 +36,35 @@ public class BilibiliTool {
 
     public static void main(String[] args) {
 
-        List<String> strings = Arrays.asList(
-                "BV1BqXfYTEQq"
-        );
-        System.err.println(strings.size());
-        strings.stream().forEach(item -> {
-            try {
-                bilibiliDownloadVideo(item);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+//        List<String> strings = Arrays.asList(
+//                "BV1BqXfYTEQq"
+//        );
+//        System.err.println(strings.size());
+//        strings.stream().forEach(item -> {
+//            try {
+//                bilibiliDownloadVideo(item);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
+
+        allVideo();
+    }
+
+    public static void allVideo(){
+        String upId = "3536997073291285";
+        String url = "https://space.bilibili.com/3536997073291285";
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();) {
+            HttpGet get = new HttpGet(url);
+            get.setHeader("cookie", getCookie());
+            get.setHeader("Uaer-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36");
+            CloseableHttpResponse response = httpClient.execute(get);
+            InputStream content = response.getEntity().getContent();
+            String string = IOUtils.toString(content, Charset.forName("utf-8"));
+            System.err.println("response => " + string);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -63,7 +81,7 @@ public class BilibiliTool {
     private static String getCookie() {
 
         return """
-                buvid4=B0D8C4F1-19BA-C893-3C07-45A7F21D60B664363-023123112-o4ni5UDK5a3zSIFeUd70zQ%3D%3D; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; buvid_fp_plain=undefined; enable_web_push=DISABLE; header_theme_version=CLOSE; CURRENT_BLACKGAP=0; FEED_LIVE_VERSION=V_WATCHLATER_PIP_WINDOW; go-back-dyn=1; historyviewmode=list; buvid3=B98504AD-F503-5AD6-B9B4-57D8CBF3986758338infoc; b_nut=1735560337; _uuid=310462B75-4A28-9E3F-1F102-849AFE6B148932264infoc; hit-dyn-v2=1; CURRENT_QUALITY=80; enable_feed_channel=DISABLE; rpdid=|(k||lRJlRJu0J'u~J)YYYY~R; LIVE_BUVID=AUTO6017386770844761; fingerprint=a1b14c043db0f76975753d85d58b71f6; buvid_fp=a1b14c043db0f76975753d85d58b71f6; home_feed_column=5; browser_resolution=2327-1228; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDAzODY0ODYsImlhdCI6MTc0MDEyNzIyNiwicGx0IjotMX0.GXnoxoC_SLRTRFR3i6KNu1FZlxD2Rhxa-EWGz6UO9V8; bili_ticket_expires=1740386426; SESSDATA=af16cd7e%2C1755780469%2Ccf89c%2A22CjDN8BSUfXk8KW6q-ROxVYEPvFYiy709T03LNwAGkvr87SuNbMMFa-an6u5XCAPP9MwSVjFpVGdtaE14S3U0Zk03bXpCS2c1cVVXNjFzZmhoSTdYZGVmWXB3YzJfeG5CeVRiTWwwTHRfd0dKcmk0Nzd0RTV1U1pGY0tuQ2pnQ01selVBSjduX09BIIEC; bili_jct=76f49aeee490e768c52d4016e355cd5c; sid=7kxstglr; bp_t_offset_11885873=1037116726606561280; CURRENT_FNVAL=4048; PVID=2; bsource=search_baidu; b_lsid=E6C1A7BB_19532ED600E
+                buvid4=B0D8C4F1-19BA-C893-3C07-45A7F21D60B664363-023123112-o4ni5UDK5a3zSIFeUd70zQ%3D%3D; DedeUserID=11885873; DedeUserID__ckMd5=1c1d7cd5a933ec09; buvid_fp_plain=undefined; enable_web_push=DISABLE; go-back-dyn=1; historyviewmode=list; buvid3=B98504AD-F503-5AD6-B9B4-57D8CBF3986758338infoc; b_nut=1735560337; _uuid=310462B75-4A28-9E3F-1F102-849AFE6B148932264infoc; hit-dyn-v2=1; CURRENT_QUALITY=80; rpdid=|(k||lRJlRJu0J'u~J)YYYY~R; LIVE_BUVID=AUTO6017386770844761; enable_feed_channel=ENABLE; fingerprint=43b98cabb1ac2f4686e878b91a5e2d67; buvid_fp=43b98cabb1ac2f4686e878b91a5e2d67; header_theme_version=OPEN; theme-tip-show=SHOWED; theme-avatar-tip-show=SHOWED; home_feed_column=5; browser_resolution=2327-1228; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTI4MzQ2NzAsImlhdCI6MTc1MjU3NTQxMCwicGx0IjotMX0.wIpXpiRiQw7o6l7q7g_3V3WunF3CnOZ280JAM_aHV-w; bili_ticket_expires=1752834610; SESSDATA=7db5afbd%2C1768127470%2C99aa2%2A72CjA6eV8Z3c3Mxi78NM_gjCj1DesrLh1PVf01NGalzfaCoZThP5WzsBqZSy6P5Cn9CHMSVk1XQkFVSTU4ajNfTzBWMUhkeW5qUGpqc3lYRWN4XzlMa0tuZ25iX3M4THpHeDNXemN3T1ExRnZFYnhvWjdxakJ6WndvdHpsVEFoeUFVcnNGQlFVeEdnIIEC; bili_jct=f572e804e0596ae46510d5ece66cf208; PVID=1; sid=6fafps33; b_lsid=E1D10E2E9_198134BA500; bsource=search_baidu; CURRENT_FNVAL=4048; bp_t_offset_11885873=1090217297072619520
                 """.toString().trim();
     }
 

@@ -1,11 +1,9 @@
 package code.sibyl.service
 
 import cn.hutool.core.lang.Snowflake
-import code.sibyl.common.Response
 import code.sibyl.common.r
 import code.sibyl.common.r.getBean
 import code.sibyl.common.r.walk
-import code.sibyl.controller.rest.BookController
 import code.sibyl.domain.biz.Book
 import lombok.RequiredArgsConstructor
 import lombok.extern.slf4j.Slf4j
@@ -13,6 +11,7 @@ import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
@@ -29,6 +28,7 @@ import java.util.*
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(value = [R2dbcEntityTemplate::class])
 class BookService {
 
     private val log = LoggerFactory.getLogger(BookService::class.java)
@@ -121,7 +121,6 @@ class BookService {
         book.serialNumber = null
         return r2dbcEntityTemplate!!.insert(book);
     }
-
 
     companion object {
         @JvmStatic

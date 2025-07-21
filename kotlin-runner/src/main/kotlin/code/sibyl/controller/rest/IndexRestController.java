@@ -218,11 +218,11 @@ public class IndexRestController {
                         """)
                 .setChildren(Arrays.asList());
         MenuDTO Gallery = new MenuDTO()
-                .setCode("Gallery")
-                .setName("Gallery")
+                .setCode("File")
+                .setName("File")
                 .setHtml("""
                         <li class="nav-item">
-                                                    <a class="nav-link" target-link="/templates/gallery/list-view.html" >
+                                                    <a class="nav-link" target-link="/templates/file/list-view.html" >
                                             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/mail-opened -->
                                               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

@@ -4,6 +4,8 @@ import code.sibyl.common.r
 import com.alibaba.fastjson2.JSONObject
 import org.apache.http.client.utils.URLEncodedUtils
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketHandler
@@ -15,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 // @MessageMapping和@SendTo
 @Component
+@ConditionalOnBean(value = [R2dbcEntityTemplate::class])
 class DataBaseSocket : WebSocketHandler {
 
     private val log = LoggerFactory.getLogger(DataBaseSocket::class.java)
@@ -53,7 +56,7 @@ class DataBaseSocket : WebSocketHandler {
         return session.send(
             session.receive()
                 .map { m -> m.payloadAsText }
-                .flatMap { text -> Mono.zip( Mono.just(text), DataBaseService.getBean().findById(id)) } // todo
+                .flatMap { text -> Mono.zip( Mono.just(text), DataBaseService.getBean().findById(id.toString())) } // todo
                 .doOnNext { tuple ->
                     log.info("from client: ${tuple.t1}")
                     clientMap += session to DatabaseClient.create(DataBaseService.getBean().getConnectionFactoryByDatabaseEntity(tuple.t2))

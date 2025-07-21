@@ -28,9 +28,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class IndexController {
-    private final DatabaseClient databaseClient;
-
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
 
     private Map<String, String> indexCache = new HashMap<>();
 

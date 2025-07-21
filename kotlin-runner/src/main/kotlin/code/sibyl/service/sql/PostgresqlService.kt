@@ -71,7 +71,7 @@ class PostgresqlService {
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}'
             ${if(!type.isNullOrBlank()) "and type like '${type}%'" else "" }
-            ${if(!keyword.isNullOrBlank()) "and (real_name like '%${keyword}%' or sha256 like '%${keyword}%' or type like '%${keyword}%' or file_name like '%${keyword}%' ) " else "" }
+            ${if(!keyword.isNullOrBlank()) "and (real_name like '%${keyword}%' or sha256 like '%${keyword}%' or type like '%${keyword}%' or file_name like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else "" }
             ${if(hash == "1") """
                 and sha256 in (
                     select sha256 from (

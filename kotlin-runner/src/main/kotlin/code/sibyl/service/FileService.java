@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 @Deprecated
+@ConditionalOnBean(value = R2dbcEntityTemplate.class)
 public class FileService {
 
     private final Path root = Paths.get(r.fileBaseDir());

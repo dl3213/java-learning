@@ -4,11 +4,15 @@ import code.sibyl.cache.LocalCache
 import code.sibyl.service.DataBaseSocket
 import io.r2dbc.spi.ConnectionFactory
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.FileSystemResource
-import org.springframework.core.io.Resource
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
@@ -17,18 +21,12 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.HandlerMapping
-import org.springframework.web.reactive.function.server.RouterFunction
-import org.springframework.web.reactive.function.server.RouterFunctions
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
-import java.io.File
-import java.util.*
-import java.util.function.Function
-import java.util.function.IntFunction
 
 
 @Configuration
-@EnableR2dbcRepositories("code.sibyl.repository")
+//@EnableAutoConfiguration(exclude = [ R2dbcAutoConfiguration::class, HibernateJpaAutoConfiguration::class])
 class AppConfig {
 
     private val log = LoggerFactory.getLogger(AppConfig::class.java)
@@ -52,17 +50,18 @@ class AppConfig {
      * db 初始化
      * @return
      */
-    @Bean
-    fun initializer(connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
-        val initializer = ConnectionFactoryInitializer()
-        initializer.setConnectionFactory(connectionFactory)
-        val populator = CompositeDatabasePopulator()
-        val resource = ClassPathResource("/db/schema.sql")
-        populator.addPopulators(ResourceDatabasePopulator(resource))
-        initializer.setDatabasePopulator(populator)
-        log.info("db-initializer = {} {}", connectionFactory.metadata.name, resource.path);
-        return initializer
-    }
+//    @Bean
+//    @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
+//    fun initializer(connectionFactory: ConnectionFactory): ConnectionFactoryInitializer {
+//        val initializer = ConnectionFactoryInitializer()
+//        initializer.setConnectionFactory(connectionFactory)
+//        val populator = CompositeDatabasePopulator()
+//        val resource = ClassPathResource("/db/schema.sql")
+//        populator.addPopulators(ResourceDatabasePopulator(resource))
+//        initializer.setDatabasePopulator(populator)
+//        log.info("db-initializer = {} {}", connectionFactory.metadata.name, resource.path);
+//        return initializer
+//    }
 
     /**
      * 全局跨域配置

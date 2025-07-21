@@ -1,24 +1,16 @@
 package code.sibyl.runner;
 
 import code.sibyl.common.Response;
-import code.sibyl.common.r;
 import code.sibyl.event.Event;
-import code.sibyl.repository.DatabaseRepository;
-import code.sibyl.repository.eos.EosRepository;
-import code.sibyl.service.FileService;
-import code.sibyl.service.SteamService;
 import code.sibyl.service.UpdateService;
-import code.sibyl.service.backup.BackupService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -31,33 +23,22 @@ import java.util.*;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "runnerEnabled", havingValue = "true", matchIfMissing = false)
 public class SystemRunner implements CommandLineRunner, DisposableBean {
 
-
-    @Value("${runnerEnabled}")
-    private boolean runnerEnabled;
     @Value("${isDev}")
     private boolean isDev;
-    private final DatabaseClient databaseClient;
 
-    private final R2dbcEntityTemplate r2dbcEntityTemplate;
-    private final DatabaseRepository databaseRepository;
-    private final FileService fileService;
-    private final EosRepository eosRepository;
     private final ApplicationContext applicationContext;
-    private final ChatClient chatClient;
-    private final org.springframework.ai.ollama.OllamaChatModel ollamaChatModel;
 
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
-//        BackupService.getBean().backup("sibyl", r.getBean(R2dbcEntityTemplate.class, "sibyl-mysql")).subscribe();
-//        BackupService.getBean().backup("postgres", r.getBean(R2dbcEntityTemplate.class, "sibyl-postgresql")).subscribe();
-//        BookService.getBean().move_test().subscribe();
+
         UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
 
-        SteamService.getBean().friendList().subscribe();
+//        SteamService.getBean().friendList().subscribe();
 
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new Event(this, "runner-end"));

@@ -1,43 +1,32 @@
 package code.sibyl.service;
 
-import code.sibyl.aop.DS;
 import code.sibyl.common.DataBaseTypeEnum;
 import code.sibyl.common.r;
 import code.sibyl.domain.database.Database;
-import code.sibyl.repository.DatabaseRepository;
 import com.alibaba.fastjson2.JSONObject;
 import io.asyncer.r2dbc.mysql.MySqlConnectionConfiguration;
 import io.asyncer.r2dbc.mysql.MySqlConnectionFactory;
-import io.r2dbc.pool.ConnectionPool;
-import io.r2dbc.pool.ConnectionPoolConfiguration;
-import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-//@DS("bi-1")
+@ConditionalOnBean(value = R2dbcEntityTemplate.class)
 public class DataBaseService {
 
-    private final DatabaseRepository databaseRepository;
     private final DatabaseClient databaseClient;
 
     public static DataBaseService getBean() {
@@ -61,23 +50,23 @@ public class DataBaseService {
                 .one();
     }
 
-    public Mono<Database> findById(Long id) {
-        return databaseRepository.findById(id).switchIfEmpty(Mono.just(Database._default()));
-    }
+//    public Mono<Database> findById(Long id) {
+//        return databaseRepository.findById(id).switchIfEmpty(Mono.just(Database._default()));
+//    }
 
 
     public void connect(String id) {
-        databaseRepository.findById(Long.valueOf(id))
-                .doOnSuccess(database -> System.err.println(database))
-                .map(database -> getConnectionFactoryByDatabaseEntity(database))
-                .map(DatabaseClient::create)
-                .map(c -> c.sql("select now()").fetch().all().map(e -> {
-                    System.err.println("end");
-                    System.err.println(e);
-                    return e;
-                }).subscribe())
-                .subscribe()
-        ;
+//        databaseRepository.findById(Long.valueOf(id))
+//                .doOnSuccess(database -> System.err.println(database))
+//                .map(database -> getConnectionFactoryByDatabaseEntity(database))
+//                .map(DatabaseClient::create)
+//                .map(c -> c.sql("select now()").fetch().all().map(e -> {
+//                    System.err.println("end");
+//                    System.err.println(e);
+//                    return e;
+//                }).subscribe())
+//                .subscribe()
+//        ;
 //                .map(c -> c.fetch().all().map(m -> {
 //                    System.err.println(m);
 //                    return m;
@@ -102,16 +91,16 @@ public class DataBaseService {
 
 
     public void backup(String id) {
-        Mono.just(id)
-                .map(Long::valueOf)
-                .flatMap(e -> databaseRepository.findById(e))
-                .map(database -> getConnectionFactoryWith(database))
-                .map(e -> e.setDatabaseClient(DatabaseClient.create(e.getConnectionFactory())))
-                .flatMapMany(e -> getAllTables(e.getDatabaseClient()).fetch().all())
-                .subscribe(e -> {
-                    System.err.println(e);
-                    System.err.println();
-                })
+//        Mono.just(id)
+//                .map(Long::valueOf)
+//                .flatMap(e -> databaseRepository.findById(e))
+//                .map(database -> getConnectionFactoryWith(database))
+//                .map(e -> e.setDatabaseClient(DatabaseClient.create(e.getConnectionFactory())))
+//                .flatMapMany(e -> getAllTables(e.getDatabaseClient()).fetch().all())
+//                .subscribe(e -> {
+//                    System.err.println(e);
+//                    System.err.println();
+//                })
 //                .map(c -> c.sql("select now()").fetch().all().map(e -> {
 //                    System.err.println("end");
 //                    System.err.println(e);
