@@ -54,6 +54,7 @@ public class FfmpegService {
                 31,
                 20
         );
+
         MatOfKeyPoint kp1 = new MatOfKeyPoint(), kp2 = new MatOfKeyPoint();
         Mat desc1 = new Mat(), desc2 = new Mat();
 
@@ -75,8 +76,9 @@ public class FfmpegService {
     public static void main(String[] args) throws Exception {
 
 
-//        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "05:22", "05:25");
-        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
+        FfmpegService.copy(" ", "E:\\素材\\NINJA SLAYER\\other",  "02:59", "03:03");
+//        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
+//        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 
     }
 
