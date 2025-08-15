@@ -29,7 +29,6 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.util.function.Tuple2
 import java.io.File
-import java.lang.StringTemplate.STR
 import java.nio.file.Paths
 import java.time.LocalDateTime
 
@@ -40,6 +39,16 @@ class BookController {
 
     private val log = LoggerFactory.getLogger(BookController::class.java)
 
+    @PostMapping(value = ["/sql/page"])
+    @ResponseBody
+    fun sql_page(@RequestBody jsonObject: JSONObject?): Mono<Response> {
+        return PostgresqlService.getBean().bookQuery(jsonObject!!, Book::class.java)
+            .map { tuple ->
+                val response = Response.successPage(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4())
+                response["prevUrl"] = r.staticFileBasePath.replace("**", "")
+                response
+            }
+    }
 
     @PostMapping("/upload/{id}")
     @ResponseBody
@@ -83,8 +92,8 @@ class BookController {
     @PostMapping(value = ["/detail/page/{id}"])
     @ResponseBody
     fun detailPage(@RequestBody jsonObject: JSONObject, @PathVariable id: String): Mono<Response> {
-        val pageNumber = jsonObject.getLong("pageNumber")
-        val pageSize = jsonObject.getLong("pageSize")
+        var pageNumber = jsonObject.getLong("pageNumber")
+        var pageSize = jsonObject.getLong("pageSize")
         return PostgresqlService.getBean().template()!!
             .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .publishOn(Schedulers.boundedElastic())
@@ -94,9 +103,7 @@ class BookController {
             .skip((pageNumber - 1) * pageSize)  // 跳过前面页的数据
             .take(pageSize)             // 取当前页的数据量
             .map {
-                //println("path -> $it")
                 var realFile = File(it.t2.toString())
-                //println("file -> ${realFile.name}")
                 var file = BaseFile()
                 file.id = id.toLong()
                 file.fileName = realFile.name
@@ -106,7 +113,7 @@ class BookController {
                 file
             }
             .collectList()
-            .map { r.success(it) }
+            .map { Response.successPage(100, it, pageNumber.toInt(), pageSize.toInt()) }
     }
 
     @PostMapping(value = ["/page"])

@@ -50,4 +50,16 @@ open class Book {
     open var updateTime: LocalDateTime? = null
 
     open var updateId: Long? = null
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var clickCount: Int? = 0;
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var heartCount: Int? = 0;
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var heartByCurrentUserCount: Int? = 0;
 }
