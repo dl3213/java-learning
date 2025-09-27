@@ -36,17 +36,16 @@ public class BilibiliTool {
 
     public static void main(String[] args) {
 
-//        List<String> strings = Arrays.asList(
-//                "BV1BqXfYTEQq"
-//        );
-//        System.err.println(strings.size());
-//        strings.stream().forEach(item -> {
-//            try {
-//                bilibiliDownloadVideo(item);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
+        List<String> strings = Arrays.asList(
+        );
+        System.err.println(strings.size());
+        strings.stream().forEach(item -> {
+            try {
+                bilibiliDownloadVideo(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         allVideo();
     }

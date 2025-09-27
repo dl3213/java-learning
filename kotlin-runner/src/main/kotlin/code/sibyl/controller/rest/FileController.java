@@ -7,6 +7,7 @@ import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
 import code.sibyl.model.FileInfo;
+import code.sibyl.service.FfmpegService;
 import code.sibyl.service.FileService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
@@ -52,8 +53,9 @@ public class FileController {
 
     @PostMapping("/upload")
     @ResponseBody
-    public Mono<ResponseEntity<Response>> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono) {
-        return storageService.save(filePartMono)
+    public Mono<ResponseEntity<Response>> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono, @RequestPart("json")  String json) {
+        System.err.println(json);
+        return storageService.save(filePartMono, json)
                 .map((baseFile) -> ResponseEntity.ok().body(Response.success(baseFile)));
     }
 
@@ -328,11 +330,11 @@ public class FileController {
                                 PostgresqlService.getBean().template()
                                         .getDatabaseClient()
                                         .sql("""
-                                             select count(1) as count from t_biz_user_heart
-                                                where is_deleted = '0'
-                                                  and entity_type = 't_base_file'
-                                                  and entity_id = :id 
-                                            """)
+                                                 select count(1) as count from t_biz_user_heart
+                                                    where is_deleted = '0'
+                                                      and entity_type = 't_base_file'
+                                                      and entity_id = :id 
+                                                """)
                                         .bind("id", id)
                                         .fetch()
                                         .first()
@@ -361,6 +363,27 @@ public class FileController {
         final String entityType = "t_base_file";
         return PostgresqlService.getBean().template()
                 .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .map(e -> Response.success(e));
+    }
+
+
+    @PostMapping(value = "/video/copy")
+    @ResponseBody
+    @ActionLog(topic = "video copy", type = ActionType.UPDATE)
+    public Mono<Response> videoCopy(@RequestBody JSONObject jsonObject) {
+        r.sleep(500);
+        final String id = jsonObject.getString("id");
+        final String startTime = jsonObject.getString("startTime");
+        final String endTime = jsonObject.getString("endTime");
+        final String toPath = jsonObject.getString("toPath");
+
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .map(file -> {
+                    String toPathName = toPath + File.separator + file.getRealName() + "-" + System.currentTimeMillis() + "." + file.getSuffix();
+                    FfmpegService.copy(file.getAbsolutePath(), toPathName, startTime, endTime);
+                    return file;
+                })
                 .map(e -> Response.success(e));
     }
 

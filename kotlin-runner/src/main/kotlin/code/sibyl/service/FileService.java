@@ -4,9 +4,11 @@ import cn.hutool.core.lang.Snowflake;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
 import code.sibyl.service.sql.PostgresqlService;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -40,22 +42,23 @@ public class FileService {
 
     private final Path root = Paths.get(r.fileBaseDir());
 
-    public Mono<BaseFile> save(Mono<FilePart> filePartMono) {
-
+    public Mono<BaseFile> save(Mono<FilePart> filePartMono, final String json) {
+        JSONObject jsonObject = StringUtils.isNotBlank(json) ? JSONObject.parseObject(json) : new JSONObject();
+        String code = jsonObject.getString("code");
         return filePartMono
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
                 .flatMap(filePart -> {
                     log.info("[fileUpload] {} ", STR."Receiving File:\{filePart.filename()}");
-                    String filename = filePart.filename();
+                    final String filename = filePart.filename();
                     String[] split = filename.split("\\.");
-                    String fileUniqueId = String.valueOf(r.getBean(Snowflake.class).nextId());
-                    String tempFileName = fileUniqueId + (split != null && split.length > 0 ? "." + split[split.length - 1] : "");
+                    final String fileUniqueId = String.valueOf(r.getBean(Snowflake.class).nextId());
+                    final String tempFileName = "pixiv".equals(code) ? filename : fileUniqueId + (split != null && split.length > 0 ? "." + split[split.length - 1] : "");
                     log.info("[fileUpload] tempFileName = {}", tempFileName);
-                    String absoluteDir = r.fileBaseDir() + r.yyyy_MM_dd() + File.separator;
+                    final String absoluteDir = r.fileBaseDir() + r.yyyy_MM_dd() + File.separator;
                     log.info("[fileUpload] absoluteDir = {}", absoluteDir);
-                    String absolutePath = absoluteDir + tempFileName;
+                    final String absolutePath = absoluteDir + tempFileName;
                     log.info("[fileUpload] absolutePath = {}", absolutePath);
-                    String relativePath = r.yyyy_MM_dd() + File.separator + tempFileName;
+                    final String relativePath = r.yyyy_MM_dd() + File.separator + tempFileName;
                     log.info("[fileUpload] relativePath = {}", relativePath);
                     try {
                         FileUtils.createParentDirectories(new File(absolutePath));
@@ -65,7 +68,7 @@ public class FileService {
                     return filePart.transferTo(root.resolve(absolutePath)).then(Mono.zip(Mono.just(filename), Mono.just(absolutePath), Mono.just(fileUniqueId), Mono.just(relativePath)));
                 })
                 .flatMap(item -> {
-                    BaseFile file = UpdateService.getBean().file(item.getT1(), item.getT2(), null, null, false);
+                    BaseFile file = UpdateService.getBean().file(item.getT1(), item.getT2(), code, null, false);
                     file.setId(Long.valueOf(item.getT3()));
                     file.setRelativePath(item.getT4());
                     return PostgresqlService.getBean().template().insert(file);

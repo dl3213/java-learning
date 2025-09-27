@@ -1,5 +1,6 @@
 package code.sibyl;
 
+import code.sibyl.service.FfmpegService;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -11,6 +12,10 @@ import java.util.function.Consumer;
 public class Main {
 
     public static void main(String[] args) {
+        FfmpegService.copy(" ", "C:\\4me\\4ai\\", "011138", "011623");
+    }
+
+    public static void main2(String[] args) {
         File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

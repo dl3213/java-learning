@@ -50,21 +50,21 @@ class Task {
     }
 
     @Async
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
     fun 图片补充大小() {
         UpdateService.getBean().图片补充大小().subscribe()
     }
 
     @Async
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
     fun 文件补充hash() {
         UpdateService.getBean().文件补充hash().subscribe();
     }
 
     @Async
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
     fun 视频文件补充thumbnail() {
         UpdateService.getBean().视频文件补充thumbnail().subscribe();

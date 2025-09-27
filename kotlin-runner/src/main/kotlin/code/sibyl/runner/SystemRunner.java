@@ -36,7 +36,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
 
-//        UpdateService.getBean().file_clear().subscribe(); //
+        UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
 
         SteamService.getBean().friendList().subscribe();

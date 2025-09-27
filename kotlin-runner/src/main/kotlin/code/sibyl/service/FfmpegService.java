@@ -1,5 +1,11 @@
 package code.sibyl.service;
 
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.ArrayUtil;
+import jodd.util.ArraysUtil;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bytedeco.javacpp.Loader;
 import org.bytedeco.opencv.opencv_java;
 import org.opencv.calib3d.Calib3d;
@@ -16,6 +22,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.StringTemplate.STR;
 
@@ -73,25 +80,25 @@ public class FfmpegService {
 
     }
 
+
     public static void main(String[] args) throws Exception {
 
 
-        FfmpegService.copy(" ", "E:\\素材\\NINJA SLAYER\\other",  "02:59", "03:03");
+//        FfmpegService.copy("C:\\4me\\4ai\\ -C.mp4", "C:\\4me\\", "000737", "002318");
 //        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
 //        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 
+        FfmpegService.convert2mp4("E:/sibyl-system/file/2025-09-07/1964674431620091904.mp4", "C:\\4me\\4ai\\1756561803741.mp4");
     }
 
 
-
-
     public static void sound(String filePath, String outputDir, String output, String stateTime, String endTime) {
-        String command =  STR."ffmpeg -i \"\{filePath}\" -vn -ss \{stateTime} -to \{endTime} -acodec pcm_s16le -ar 44100 -ac 2 \"\{outputDir}\\\{output}_audio_clip.wav\"";
+        String command = STR."ffmpeg -i \"\{filePath}\" -vn -ss \{stateTime} -to \{endTime} -acodec pcm_s16le -ar 44100 -ac 2 \"\{outputDir}\\\{output}_audio_clip.wav\"";
 
         System.err.println(command);
         try {
             File file = new File(outputDir);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdirs();
             }
 
@@ -112,12 +119,12 @@ public class FfmpegService {
     }
 
     public static void videoFrame(String filePath, String outputDir, String output, String stateTime, String endTime) {
-        String command =  STR."ffmpeg -i \"\{filePath}\" -ss \{stateTime} -to \{endTime} -vsync 0 \"\{outputDir}\\\{output}_%08d.png\"";
+        String command = STR."ffmpeg -i \"\{filePath}\" -ss \{stateTime} -to \{endTime} -vsync 0 \"\{outputDir}\\\{output}_%08d.png\"";
 
         System.err.println(command);
         try {
             File file = new File(outputDir);
-            if(!file.exists()){
+            if (!file.exists()) {
                 file.mkdirs();
             }
 
@@ -138,7 +145,7 @@ public class FfmpegService {
     }
 
     public static void convert2mp4(String fromFile, String toFile) throws Exception {
-        String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v copy -c:a copy \"\{toFile}\"";
+        String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v libx264 -c:a aac \"\{toFile}\"";
         System.err.println(command);
         Process process = runtime.exec(command);
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -150,18 +157,49 @@ public class FfmpegService {
         System.out.println("Conversion completed successfully.");
     }
 
-    public static void copy(String fromFile, String toFile, String stateTime, String endTime) throws Exception {
+    public static void copy(String fromFilePath, String toFilePath, String startTime, String endTime) {
+        copy(fromFilePath, toFilePath, startTime, endTime, "");
+    }
 
-        String command = STR."\{ffmpeg} -ss \{stateTime} -to \{endTime} -i \"\{fromFile}\"  -c copy \"\{toFile}\"";
-        System.err.println(command);
-        Process process = runtime.exec(command);
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String line;
-        while ((line = errorReader.readLine()) != null) {
-            System.out.println(STR."FFmpeg --> : \{line}");
+    public static void copy(String fromFilePath, String toFilePath, String startTime, String endTime, String prefix) {
+
+        try {
+            if (startTime.length() % 2 != 0) {
+                throw new RuntimeException("开始时间不是偶数");
+            }
+            if (endTime.length() % 2 != 0) {
+                throw new RuntimeException("结束时间不是偶数");
+            }
+            if (endTime.compareTo(startTime) <= 0) {
+                throw new RuntimeException("ERROR: 结束时间 <= 开始时间");
+            }
+
+            startTime = ListUtil.split(Arrays.stream(startTime.split("")).collect(Collectors.toList()), 2).stream().map(e -> e.stream().collect(Collectors.joining())).collect(Collectors.joining(":"));
+            endTime = ListUtil.split(Arrays.stream(endTime.split("")).collect(Collectors.toList()), 2).stream().map(e -> e.stream().collect(Collectors.joining())).collect(Collectors.joining(":"));
+
+            File fromFile = new File(fromFilePath);
+            String fromFileName = fromFile.getName();
+            File toFile = new File(toFilePath);
+            if (toFile.isDirectory()) {
+                toFilePath = toFilePath + File.separator + (StringUtils.isBlank(prefix) ? FileNameUtil.getName(fromFilePath) : prefix) + "_" + startTime.replace(":", "_") + "_to_" + endTime.replace(":", "_") + "." + FileNameUtil.getSuffix(fromFileName);
+            }
+            String command = STR."\{ffmpeg} -ss \"\{startTime}\" -to \"\{endTime}\" -i \"\{fromFilePath}\"  -c copy \"\{toFilePath}\"";
+            System.err.println(command);
+//            if (true) {
+//                return;
+//            }
+
+            Process process = runtime.exec(command);
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            while ((line = errorReader.readLine()) != null) {
+                System.out.println(STR."FFmpeg --> : \{line}");
+            }
+            process.waitFor();
+            System.out.println("Conversion completed successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        process.waitFor();
-        System.out.println("Conversion completed successfully.");
 
     }
 
