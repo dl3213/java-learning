@@ -52,45 +52,30 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-sql-client-templates</artifactId>
-      <version>4.5.7</version>
+      <version>${vertx.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-codegen</artifactId>
-      <version>4.5.7</version>
+      <version>${vertx.version}</version>
       <classifier>processor</classifier>
     </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-validation</artifactId>
-    </dependency>
-<!--    <dependency>-->
-<!--      <groupId>io.vertx</groupId>-->
-<!--      <artifactId>vertx-web-templ-thymeleaf</artifactId>-->
-<!--    </dependency>-->
+
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web</artifactId>
+      <version>${vertx.version}</version>
     </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-mysql-client</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-jdbc-client</artifactId>
-      <version>4.5.7</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.4.0</version>
+      <version>${vertx.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>2.3.232</version>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-pg-client</artifactId>
+      <version>${vertx.version}</version>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -116,11 +101,20 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-reactive-streams</artifactId>
     </dependency>
-<!--    <dependency>-->
-<!--      <groupId>org.jetbrains.kotlin</groupId>-->
-<!--      <artifactId>kotlin-stdlib-jdk8</artifactId>-->
-<!--      <version>${kotlin.version}</version>-->
-<!--    </dependency>-->
+
+    <!-- SLF4J API -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+
+    <!-- Logback Classic Implementation -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
@@ -166,7 +160,7 @@
         <artifactId>kotlin-maven-plugin</artifactId>
         <version>${kotlin.version}</version>
         <configuration>
-          <jvmTarget>17</jvmTarget>
+          <jvmTarget>21</jvmTarget>
         </configuration>
         <executions>
           <execution>

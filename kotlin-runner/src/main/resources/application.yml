@@ -61,33 +61,6 @@ spring:
   info:
     env:
       enabled: true
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
-  kafka:
-    bootstrap-servers: 127.0.0.1:9092
-    admin:
-      auto-create: true
-      fail-fast: true
-    producer:
-      auto-create-topics: true
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      acks: all         # 生产环境建议使用all
-      retries: 3        # 失败重试次数
-      linger-ms: 100    # 批量发送等待时间
-    consumer:
-      auto-commit-offset: true
-      auto-commit-interval: 1000
-      auto-create-topics: true
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      group-id: webflux-group
-    listener:
-      ack-mode: RECORD
   ai:
     ollama:
       base-url: http://localhost:11434  # Ollama 默认端口

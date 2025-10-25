@@ -1,41 +1,32 @@
 package code.sibyl
 
-import code.sibyl.common.r
-import code.sibyl.database.Repository
-import code.sibyl.service.BeanService
-import code.sibyl.service.SystemService
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.vertx.core.Launcher
 import io.vertx.rxjava3.core.AbstractVerticle
 import io.vertx.rxjava3.ext.web.Router
+import org.slf4j.LoggerFactory
 
 
 class RxJava3Runner : AbstractVerticle() {
 
+    private val log = LoggerFactory.getLogger(RxJava3Runner::class.java)
+    var port = 8088;
+
     override fun start() {
         val router: Router = Router.router(vertx)
-        //router.route().handler(StaticHandler.create());
         router.route()
             .handler { context -> context.response().putHeader("content-type", "text/html").end("Hello World!") };
-        Repository.getInstance().builder(vertx).subscribe()
-//        SystemService.getInstance().pixiv_init(vertx)
-//        Repository.getInstance().test()
-        vertx.createHttpServer().requestHandler(router).listen(9000);
-        println("RxJava3Runner listen in 9000...")
-        //println(BeanService.getMap())
-        r.sleep(5000)
-//        SystemService.getInstance().pixiv_init(vertx)
-        SystemService.getInstance().pixiv_init_parallel(vertx)
+        vertx.createHttpServer().requestHandler(router).listen(port);
+        var pid = ProcessHandle.current().pid()
+        log.info("java.version = {}", System.getProperty("java.version"))
+        log.info("RxJava3Runner[${pid}] listen in ${port}...")
     }
 
     override fun stop() {
         super.stop()
-        println("RxJava3Runner stop...")
+        log.info("RxJava3Runner stop...")
     }
 }
 
-fun main() {
-    println("java.version -> " + System.getProperty("java.version"))
+fun main(args: Array<String>) {
     Launcher.executeCommand("run", RxJava3Runner::class.java.getName())
 }

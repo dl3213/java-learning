@@ -49,7 +49,7 @@ public class BackupService {
         ConnectionFactory connectionFactory = databaseClient.getConnectionFactory();
         String name = connectionFactory.getMetadata().getName();
         log.info("[BackupService.backup] {}", STR."\{name} -> \{dbName}");
-        String absolutePath = r.absolutePath();
+        String absolutePath = "E:\\sibyl-system\\"; // r.absolutePath();
         log.info("[BackupService.backup] {}", STR."ApplicationHome -> \{absolutePath}");
 
         final String backupPath = STR."\{absolutePath}\{File.separator}backup\{File.separator}\{dbName}\{File.separator}\{r.yyyy_MM_dd()}\{File.separator}";
@@ -63,7 +63,7 @@ public class BackupService {
                 .flatMapMany(item -> item.tableNameList().flatMap(tableName -> Mono.zip(Mono.just(item), Mono.just(tableName))))
                 .flatMap(tuple2 -> {
                     String tableName = tuple2.getT2();
-                    //log.info("[BackupService.backup] tableName = {}", tableName);
+                    log.info("[BackupService.backup] tableName = {}", tableName);
                     final String backupTableSqlFile = STR."\{backupPath}\{tableName}-\{formatted}.sql";
                     final String backupTableJsonFile = STR."\{backupPath}\{tableName}-\{formatted}.json";
                     //log.info("[BackupService.backup] backupTableSqlFile = {}", backupTableSqlFile);
@@ -138,9 +138,7 @@ public class BackupService {
                                 throwable.printStackTrace();
                             })
                             .count()
-                            //.doOnNext(count -> log.info("[BackupService.backup] table = {}, count = {}", tableName, count))
                             .doAfterTerminate(() -> {
-                                //log.info("[BackupService.backup] doAfterTerminate: table = {} sqlWriter + jsonWriter closed, ", tableName);
                                 try {
                                     sqlWriter.flush();
                                 } catch (IOException e) {
@@ -159,7 +157,7 @@ public class BackupService {
                                 try {
                                     jsonWriter.close();
                                 } catch (IOException e) {
-
+                                    throw new RuntimeException(e);
                                 }
                             });
                 })

@@ -14,7 +14,9 @@ private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
 fun main(args: Array<String>) {
     System.setProperty("java.net.URLEncoder.encodePlus", "true");
     runApplication<KotlinApplication>(*args)
+    var pid = ProcessHandle.current().pid()
     log.info("app running in port = " + r.getBean(Environment::class.java).getProperty("server.port"))
+    log.info("app pid = {} ", pid)
     log.info("app running in env = " + r.env())
     log.info("app running in path = " + r.absolutePath())
     log.info("app running in fileBaseDir = " + r.fileBaseDir())

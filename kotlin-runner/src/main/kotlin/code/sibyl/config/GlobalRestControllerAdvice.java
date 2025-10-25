@@ -11,12 +11,13 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+//@ControllerAdvice
 @Slf4j
+@Deprecated
 public class GlobalRestControllerAdvice {
 
-    @ExceptionHandler(WebExchangeBindException.class)
-    @ResponseBody
+//    @ExceptionHandler(WebExchangeBindException.class)
+//    @ResponseBody
     public Response exceptionHandler(WebExchangeBindException exception) {
         exception.printStackTrace();
         BindingResult bindingResult = exception.getBindingResult();
@@ -31,8 +32,8 @@ public class GlobalRestControllerAdvice {
         return Response.error(500, msg);
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
+//    @ExceptionHandler(Exception.class)
+//    @ResponseBody
     public Response exceptionHandler(Exception exception) {
         exception.printStackTrace();
         return Response.error(500, exception.getMessage());

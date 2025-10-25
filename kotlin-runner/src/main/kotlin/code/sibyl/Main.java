@@ -1,8 +1,11 @@
 package code.sibyl;
 
+import code.sibyl.common.r;
 import code.sibyl.service.FfmpegService;
 import org.apache.commons.io.FileUtils;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -11,11 +14,15 @@ import java.util.function.Consumer;
 
 public class Main {
 
-    public static void main(String[] args) {
-        FfmpegService.copy(" ", "C:\\4me\\4ai\\", "011138", "011623");
+
+
+    public static void main12(String[] args) {
+        FfmpegService.copy("E:/sibyl-system/file/2025-09-23/1970346240822611968.mp4", "C:\\4me\\", "020906", "023056","SSIS-588-C");
+        FfmpegService.copy("E:/sibyl-system/file/2025-04-07/1908969267043373056.mp4", "C:\\4me\\", "003209", "003537","ABF-062");
+        FfmpegService.copy("E:/sibyl-system/file/2025-04-07/1908969267043373056.mp4", "C:\\4me\\", "020623", "022454","ABF-062");
     }
 
-    public static void main2(String[] args) {
+    public static void main(String[] args) {
         File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

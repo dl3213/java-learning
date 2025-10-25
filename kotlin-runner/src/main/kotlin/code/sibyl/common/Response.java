@@ -16,7 +16,7 @@ public class Response extends HashMap<String, Object> {
 
     private static String DATA_NAME = "data";
     private static String CODE_NAME = "code";
-    private static String MSG_NAME = "msg";
+    private static String MSG_NAME = "message";
 
     public Response() {
         put(CODE_NAME, 200);
@@ -59,7 +59,7 @@ public class Response extends HashMap<String, Object> {
     public static Response success(Integer code, Object data) {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 200);
-        responseVO.put(MSG_NAME, "操作成功");
+        responseVO.put(MSG_NAME, "success");
         responseVO.put(DATA_NAME, data);
         return responseVO;
     }
@@ -67,7 +67,7 @@ public class Response extends HashMap<String, Object> {
     public static Response successPage(long total, Object data, int pageNumber, int pageSize) {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 200);
-        responseVO.put(MSG_NAME, "操作成功");
+        responseVO.put(MSG_NAME, "success");
         responseVO.put(DATA_NAME, data);
         responseVO.put("total", total);
         responseVO.put("pageNumber", pageNumber);

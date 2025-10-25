@@ -88,9 +88,28 @@ public class FfmpegService {
 //        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
 //        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 
-        FfmpegService.convert2mp4("E:/sibyl-system/file/2025-09-07/1964674431620091904.mp4", "C:\\4me\\4ai\\1756561803741.mp4");
+//        FfmpegService.convert2mp4("E:/sibyl-system/file/2025-09-07/1964674431620091904.mp4", "C:\\4me\\4ai\\1756561803741.mp4");
+        FfmpegService.mp3("D:\\z\\真正想哈的基米脸上是没有笑容的【哈基米：关山酒】.mp4");
     }
 
+    public static void mp3(String filePath){
+        try {
+
+            File fromFile = new File(filePath);
+            String fromFileName = fromFile.getName();
+
+            // 构建FFmpeg命令
+            String command = STR."ffmpeg -i \"\{filePath}\" -vn -ar 44100 -ac 2 -ab 192k -f mp3 \"\{fromFile.getParentFile().getAbsolutePath()}\\\{fromFileName}_audio_clip.mp3\"";
+            // 执行命令
+            Process process = Runtime.getRuntime().exec(command);
+            // 等待命令执行完成
+            process.waitFor();
+            System.out.println("音频提取完成！");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public static void sound(String filePath, String outputDir, String output, String stateTime, String endTime) {
         String command = STR."ffmpeg -i \"\{filePath}\" -vn -ss \{stateTime} -to \{endTime} -acodec pcm_s16le -ar 44100 -ac 2 \"\{outputDir}\\\{output}_audio_clip.wav\"";

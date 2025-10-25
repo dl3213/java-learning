@@ -27,6 +27,7 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import reactor.core.CorePublisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -85,7 +86,13 @@ public class UpdateService {
                         exception.printStackTrace();
                     }
                     return PostgresqlService.getBean().template().delete(e);
-                }).count().map(e -> {
+                })
+                .doOnError(throwable -> {
+                    log.error("[file_clear] error -> {}", throwable.getMessage());
+                    throwable.printStackTrace();
+                })
+                .count()
+                .map(e -> {
                     log.info("[file_clear] count = {}", e);
                     return e;
                 });
@@ -266,7 +273,7 @@ public class UpdateService {
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(100)
+                .take(500)
                 .flatMap(item -> BaseFileHandler.getBean().sha256(item))
                 .count()
                 .map(count -> {
@@ -313,5 +320,6 @@ public class UpdateService {
                 })
                 ;
     }
+
 
 }

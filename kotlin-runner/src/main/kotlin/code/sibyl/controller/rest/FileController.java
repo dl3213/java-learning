@@ -53,8 +53,8 @@ public class FileController {
 
     @PostMapping("/upload")
     @ResponseBody
-    public Mono<ResponseEntity<Response>> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono, @RequestPart("json")  String json) {
-        System.err.println(json);
+    public Mono<ResponseEntity<Response>> uploadFile(@RequestPart("file") Mono<FilePart> filePartMono, @RequestPart("json") String json) {
+        //System.err.println(json);
         return storageService.save(filePartMono, json)
                 .map((baseFile) -> ResponseEntity.ok().body(Response.success(baseFile)));
     }
@@ -250,6 +250,28 @@ public class FileController {
                     e.setUpdateTime(LocalDateTime.now());
                     e.setUpdateId(r.defaultUserId());
                     return PostgresqlService.getBean().template().update(e);
+                })
+                .map(e -> Response.success(e));
+    }
+
+    @DeleteMapping(value = "/pixiv/delete/all/{id}")
+    @ResponseBody
+    public Mono<Response> pixivDeleteAll(@PathVariable String id) {
+        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .flatMap(e -> {
+                    String[] split = e.getRealName().split("_p");
+                    return PostgresqlService.getBean().template().getDatabaseClient().sql("""
+                                    update t_base_file
+                                    set is_deleted = '1',
+                                    update_time = :updateTime,
+                                    update_id = :updateId
+                                    where is_deleted = '0' and code = 'pixiv' and real_name like (:pixivId || '_%')
+                                    """)
+                            .bind("pixivId", split[0])
+                            .bind("updateTime", LocalDateTime.now())
+                            .bind("updateId",r.defaultUserId())
+                            .fetch()
+                            .rowsUpdated();
                 })
                 .map(e -> Response.success(e));
     }

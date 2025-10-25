@@ -2,7 +2,6 @@ package code.sibyl.flink;
 
 import cn.hutool.extra.spring.SpringUtil;
 import code.sibyl.common.r;
-import code.sibyl.mq.rabbit.RabbitMQConfig;
 import com.alibaba.fastjson2.JSONObject;
 import com.ververica.cdc.connectors.base.source.jdbc.JdbcIncrementalSource;
 import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
@@ -20,21 +19,15 @@ import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchemaBuilder;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.core.fs.Path;
-import org.apache.flink.runtime.minicluster.MiniCluster;
-import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
 import org.apache.flink.runtime.state.storage.FileSystemCheckpointStorage;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.table.catalog.ObjectPath;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,16 +40,16 @@ import java.util.Properties;
 @Slf4j
 public class FlinkConfig {
 
-    @Bean
-    public MiniCluster miniCluster() throws Exception {
-        MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder().setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090)).build();
-        MiniCluster miniCluster = new MiniCluster(configuration);
-        miniCluster.start();
-        //miniCluster.close();
-        //miniCluster.isRunning();
-        log.info("flink MiniCluster start");
-        return miniCluster;
-    }
+//    @Bean
+//    public MiniCluster miniCluster() throws Exception {
+//        MiniClusterConfiguration configuration = new MiniClusterConfiguration.Builder().setConfiguration(new org.apache.flink.configuration.Configuration().set(RestOptions.PORT, 9090)).build();
+//        MiniCluster miniCluster = new MiniCluster(configuration);
+//        miniCluster.start();
+//        //miniCluster.close();
+//        //miniCluster.isRunning();
+//        log.info("flink MiniCluster start");
+//        return miniCluster;
+//    }
 
 
     @Bean
@@ -153,7 +146,7 @@ public class FlinkConfig {
         dataStreamSource.addSink(new SinkFunction<>() {
             @Override
             public void invoke(String element) throws Exception {
-                log.info("Sinking element: {}", element);
+//                log.info("Sinking element: {}", element);
                 JSONObject jsonObject = JSONObject.parseObject(element);
                 JSONObject source = jsonObject.getJSONObject("source");
                 String db = source.getString("db");
@@ -161,12 +154,12 @@ public class FlinkConfig {
                 String op = jsonObject.getString("op");
 
                 String routingKey = STR."flink.cdc.\{db}.\{table}.\{op}";
-                log.info("{} -> {} -> {} -> {}", db, table, op, routingKey);
-                SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).convertAndSend(RabbitMQConfig.Exchange, routingKey , new Message(element.getBytes()));
-                SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", routingKey, element);
+//                log.info("{} -> {} -> {} -> {}", db, table, op, routingKey);
+//                SpringUtil.getApplicationContext().getBean(RabbitTemplate.class).convertAndSend(RabbitMQConfig.Exchange, routingKey , new Message(element.getBytes()));
+//                SpringUtil.getApplicationContext().getBean(KafkaTemplate.class).send(STR."kotlin-runner-postgres-kafka-dev", routingKey, element);
             }
         });
-        env.executeAsync();
+//        env.executeAsync();
         log.info("flink-cdc start");
         return env;
     }

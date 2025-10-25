@@ -39,7 +39,7 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
         UpdateService.getBean().file_clear().subscribe(); //
 //        UpdateService.getBean().book_clear().subscribe(); //
 
-        SteamService.getBean().friendList().subscribe();
+//        SteamService.getBean().friendList().subscribe();
 
         log.info("系统初始化工作--end");
         applicationContext.publishEvent(new Event(this, "runner-end"));

@@ -381,7 +381,6 @@ object r {
         }
     }
 
-
     /**
      * 获取bean
      */
@@ -505,6 +504,10 @@ object r {
     @JvmStatic
     fun id(): Long {
         return r.getBean(Snowflake::class.java).nextId();
+    }
+    @JvmStatic
+    fun nextId(): Long {
+        return getBean(Snowflake::class.java).nextId()
     }
 
     @JvmStatic

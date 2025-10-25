@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Query
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.util.function.Tuple4
@@ -29,6 +31,14 @@ class PostgresqlService {
         return sibylPostgresqlTemplate!!
     }
 
+    fun <T> selectById(id: Any, obj: T): Mono<out T> {
+        return template().selectOne(Query.query(Criteria.where("id").`is`(id)), obj!!::class.java);
+    }
+
+    fun deleteById(id: Any, tableName: String): Mono<Long> {
+        return template().databaseClient.sql("update ${tableName!!} set is_deleted = '1' where id = ${id!!}").fetch().rowsUpdated()
+    }
+
     companion object {
 
         @JvmStatic
@@ -38,9 +48,7 @@ class PostgresqlService {
     }
 
 
-
     fun <T> fileQuery(jsonObject: JSONObject, clazz: Class<out T>): Mono<Tuple4<Long, List<T>, Int, Int>> {
-
         val currentUserId = defaultUserId()
         val entityType = "t_base_file"
         val pageNumber = jsonObject.getInteger("pageNumber")
@@ -49,6 +57,7 @@ class PostgresqlService {
         var isDeleted = jsonObject.getString("isDeleted")
         var type = jsonObject.getString("type")
         var code = jsonObject.getString("code")
+        var codeNe = jsonObject.getString("codeNe")
         var keyword = jsonObject.getString("keyword")
         var hash = jsonObject.getString("hash")
         var heart = jsonObject.getString("heart")
@@ -71,27 +80,35 @@ class PostgresqlService {
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}'
-            ${if(!type.isNullOrBlank()) "and type like '${type}%'" else "" }
-            ${if(!code.isNullOrBlank()) "and code = '${code}'" else "" }
-            ${if(!keyword.isNullOrBlank()) "and (real_name like '%${keyword}%' or sha256 like '%${keyword}%' or type like '%${keyword}%' or file_name like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else "" }
-            ${if(hash == "1") """
+            ${if (!type.isNullOrBlank()) "and type like '${type}%'" else ""}
+            ${if (!code.isNullOrBlank()) "and code = '${code}'" else ""} 
+            ${if (!codeNe.isNullOrBlank()) "and code != '${codeNe}'" else ""} 
+            ${if (!keyword.isNullOrBlank()) "and (real_name like '%${keyword}%' or sha256 like '%${keyword}%' or type like '%${keyword}%' or file_name like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else ""}
+            ${
+            if (hash == "1") """
                 and sha256 in (
                     select sha256 from (
                     select sha256, count(1) as count from T_BASE_FILE
-                    where is_deleted = '${isDeleted}' and sha256 is not null
+                    where is_deleted = '${isDeleted}' 
+                    and sha256 is not null
+                    ${if (!code.isNullOrBlank()) "and code = '${code}'" else ""} 
+                    ${if (!codeNe.isNullOrBlank()) "and code != '${codeNe}'" else ""} 
                     group by sha256
                     )t where count >=2 
                 )
-            """.trimIndent() else "" }
-            ${if(heart == "1") """
+            """.trimIndent() else ""
+        }
+            ${
+            if (heart == "1") """
                 and id in (
                     select distinct entity_id from t_biz_user_heart 
                     where is_deleted = '${isDeleted}' 
                     and entity_type ='${entityType}' 
                     and user_id = '${currentUserId}' 
                 )
-            """.trimIndent() else "" }
-            order by ${if(hash == "1") "sha256 asc," else ""} ${if(!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if(!orderDirection.isNullOrBlank()) orderDirection else "asc"} 
+            """.trimIndent() else ""
+        }
+            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"}, create_time asc
         """.trimIndent()
         var countSql = "select count(1) as count from (${sql}) temp";
         println("countSql --->")
@@ -141,9 +158,10 @@ class PostgresqlService {
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}'
-            ${if(!type.isNullOrBlank()) "and type like '${type}%'" else "" }
-            ${if(!keyword.isNullOrBlank()) "and (name like '%${keyword}%' or type like '%${keyword}%' or serial_number like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else "" }
-            ${if(hash == "1") """
+            ${if (!type.isNullOrBlank()) "and type like '${type}%'" else ""}
+            ${if (!keyword.isNullOrBlank()) "and (name like '%${keyword}%' or type like '%${keyword}%' or serial_number like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else ""}
+            ${
+            if (hash == "1") """
                 and sha256 in (
                     select sha256 from (
                     select sha256, count(1) as count from T_BASE_FILE
@@ -151,16 +169,19 @@ class PostgresqlService {
                     group by sha256
                     )t where count >=2 
                 )
-            """.trimIndent() else "" }
-            ${if(heart == "1") """
+            """.trimIndent() else ""
+        }
+            ${
+            if (heart == "1") """
                 and id in (
                     select distinct entity_id from t_biz_user_heart 
                     where is_deleted = '${isDeleted}' 
                     and entity_type ='${entityType}' 
                     and user_id = '${currentUserId}' 
                 )
-            """.trimIndent() else "" }
-            order by ${if(hash == "1") "sha256 asc," else ""} ${if(!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if(!orderDirection.isNullOrBlank()) orderDirection else "asc"} 
+            """.trimIndent() else ""
+        }
+            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"} 
         """.trimIndent()
         var countSql = "select count(1) as count from (${sql}) temp";
         println("countSql --->")
@@ -180,10 +201,12 @@ class PostgresqlService {
     }
 
 }
+
 fun String.camelToSnakeCase(): String {
     // 使用正则匹配大写字母前的位置（非开头），插入下划线
     return this.replace(Regex("(?<!^)(?=[A-Z])"), "_").toLowerCase()
 }
+
 fun main(args: Array<String>) {
     println("123")
     println("createTime".camelToSnakeCase())

@@ -33,32 +33,35 @@ create table T_SYS_DATABASE
     CREATE_ID   BIGINT
 );
 
-create table IF NOT EXISTS t_base_file
+create table t_base_file
 (
-    id            BIGINT  primary key,
+    id            bigint                                     not null
+        primary key,
     file_name     varchar(255),
     real_name     varchar(255),
     type          varchar(64),
-    ABSOLUTE_PATH varchar(1024),
+    absolute_path varchar(1024),
     relative_path varchar(1024),
-    size          BIGINT,
+    size          bigint,
     suffix        varchar(64),
-    SERIAL_NUMBER varchar(255),
+    serial_number varchar(255),
     sha256        varchar(64),
-    code          varchar(64),
-    width         int,
-    height        int,
-    is_deleted    varchar(1) default '0' not null,
-    CREATE_TIME   TIMESTAMP,
-    CREATE_ID     BIGINT,
-    UPDATE_TIME   TIMESTAMP,
-    UPDATE_ID     BIGINT,
-    THUMBNAIL     varchar(1024)
+    code          varchar(64) default ''::character varying  not null,
+    width         integer,
+    height        integer,
+    is_deleted    varchar(1)  default '0'::character varying not null,
+    create_time   timestamp,
+    create_id     bigint,
+    update_time   timestamp,
+    update_id     bigint,
+    thumbnail     varchar(1024),
+    click_count   integer     default 0                      not null
 );
 
 create table t_biz_book
 (
-    id            BIGINT  primary key,
+    id            bigint                                    not null
+        primary key,
     name          varchar(255),
     type          varchar(64),
     absolute_path varchar(1024),
@@ -66,12 +69,12 @@ create table t_biz_book
     page_num      bigint,
     serial_number varchar(255),
     code          varchar(64),
-    description   varchar(1024),
-    is_deleted    varchar(1) default '0'::character varying not null,
+    is_deleted    varchar(2) default '0'::character varying not null,
     create_time   timestamp,
     create_id     bigint,
     update_time   timestamp,
-    update_id     bigint
+    update_id     bigint,
+    description   varchar(1024)
 );
 
 ALTER TABLE T_BASE_FILE REPLICA IDENTITY FULL;

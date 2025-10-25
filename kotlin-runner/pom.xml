@@ -22,6 +22,7 @@
     </properties>
     <dependencies>
 
+
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
@@ -63,35 +64,6 @@
             <artifactId>auth</artifactId>
             <version>0.0.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.projectreactor.kafka/reactor-kafka -->
-        <dependency>
-            <groupId>io.projectreactor.kafka</groupId>
-            <artifactId>reactor-kafka</artifactId>
-            <version>1.3.23</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit-stream</artifactId>
-        </dependency>
-        <!-- Reactor RabbitMQ -->
-        <dependency>
-            <groupId>io.projectreactor.rabbitmq</groupId>
-            <artifactId>reactor-rabbitmq</artifactId>
-            <version>1.5.6</version>
-        </dependency>
-
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>

@@ -37,15 +37,11 @@ class Task {
         log.info("[test2 -- 5000] [{}] end", Thread.currentThread().name)
     }
 
-//    @Async
-//    @Scheduled(cron = "0 0 0 * * ?")
+    @Async
+    @Scheduled(cron = "0 0 0 * * ?")
     fun backup(){
         BackupService.getBean()
-            .backup("sibyl", getBean(R2dbcEntityTemplate::class.java))
-            .map { e: Long? ->
-                System.err.println(e)
-                e
-            }
+            .backup("postgres", getBean(R2dbcEntityTemplate::class.java))
             .subscribe()
     }
 
