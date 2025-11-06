@@ -62,7 +62,6 @@ public class FileController {
     @PostMapping(value = "/page")
     @ResponseBody
     public Mono<Response> page(@RequestBody JSONObject jsonObject) {
-        //r.sleep(1000);
         long currentUserId = r.defaultUserId();
         final String entityType = "t_base_file";
 
@@ -219,7 +218,6 @@ public class FileController {
     @GetMapping(value = "/detail/{id}")
     @ResponseBody
     public Mono<Response> detail(@PathVariable String id) {
-        r.sleep(500);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
                 .switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .map(e -> Response.success(e));
@@ -229,7 +227,6 @@ public class FileController {
     @ResponseBody
     @ActionLog(topic = "file update", type = ActionType.UPDATE)
     public Mono<Response> update(@RequestBody BaseFile baseFile) {
-        r.sleep(500);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(baseFile.getId())), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{baseFile.getId()}不存在")))
                 .flatMap(e -> {
                     BeanUtils.copyProperties(baseFile, e);
@@ -243,7 +240,6 @@ public class FileController {
     @DeleteMapping(value = "/delete/{id}")
     @ResponseBody
     public Mono<Response> delete(@PathVariable String id) {
-        r.sleep(1000);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
                     e.setDeleted("1");
@@ -276,10 +272,72 @@ public class FileController {
                 .map(e -> Response.success(e));
     }
 
+    @GetMapping(value = "/pixiv/heart/all/{id}")
+    @ResponseBody
+    public Mono<Response> pixivHeartAll(@PathVariable String id) {
+
+        long currentUserId = r.defaultUserId();
+        final String entityType = "t_base_file";
+
+        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .flatMapMany(e -> {
+                    String[] split = e.getRealName().split("_p");
+                    Criteria criteria = Criteria.where("is_deleted").is("0")
+                            .and("code").is("pixiv")
+                            .and("real_name").like(STR."\{split[0]}%")
+                            ;
+                    return PostgresqlService.getBean().template().select(Query.query(criteria), BaseFile.class);
+                })
+                .flatMap(baseFile -> Mono.zip(Mono.just(baseFile), PostgresqlService.getBean().template()
+                        .getDatabaseClient()
+                        .sql("""
+                        select * from t_biz_user_heart 
+                        where is_deleted = '0'
+                        and entity_type =:entityType
+                        and entity_id =:entityId 
+                        and user_id =:userId  
+                        """)
+                        .bind("entityType", entityType)
+                        .bind("entityId", baseFile.getId())
+                        .bind("userId", currentUserId)
+                        .mapProperties(TBizUserHeart.class)
+                        .first().switchIfEmpty(Mono.just(new TBizUserHeart()))))
+                .flatMap(tuple -> {
+
+                    BaseFile baseFile = tuple.getT1();
+                    TBizUserHeart heart = tuple.getT2();
+
+                    Long heartId = heart.getId();
+                    heart.setDeleted("0");
+                    heart.setCreateTime(LocalDateTime.now());
+                    heart.setEntityType(entityType);
+                    heart.setUserId(currentUserId);
+                    heart.setEntityId(baseFile.getId());
+                    Mono<TBizUserHeart> op;
+                    if (Objects.isNull(heartId)) {
+                        heart.setId(r.id());
+                        heart.setDeleted("0");
+                        heart.setCreateTime(LocalDateTime.now());
+                        heart.setEntityType(entityType);
+                        heart.setUserId(currentUserId);
+                        heart.setEntityId(baseFile.getId());
+                        op = PostgresqlService.getBean().template().insert(heart);
+                    } else {
+                        heart.setDeleted("1");
+                        heart.setUpdateTime(LocalDateTime.now());
+                        op = PostgresqlService.getBean().template().update(heart);
+                    }
+                    return op;
+                })
+                .count()
+                .map(e -> Response.success(e));
+    }
+
+
     @PostMapping(value = "/restore/{id}")
     @ResponseBody
     public Mono<Response> restore(@PathVariable String id) {
-        r.sleep(1000);
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
                     e.setDeleted("0");
@@ -393,7 +451,6 @@ public class FileController {
     @ResponseBody
     @ActionLog(topic = "video copy", type = ActionType.UPDATE)
     public Mono<Response> videoCopy(@RequestBody JSONObject jsonObject) {
-        r.sleep(500);
         final String id = jsonObject.getString("id");
         final String startTime = jsonObject.getString("startTime");
         final String endTime = jsonObject.getString("endTime");

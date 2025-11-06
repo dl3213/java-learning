@@ -5,7 +5,6 @@ import lombok.ToString;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  通用返回格式
@@ -17,10 +16,12 @@ public class Response extends HashMap<String, Object> {
     private static String DATA_NAME = "data";
     private static String CODE_NAME = "code";
     private static String MSG_NAME = "message";
+    private static String MSG_NAME_SHORT = "msg";
 
     public Response() {
         put(CODE_NAME, 200);
         put(MSG_NAME, "success");
+        put(MSG_NAME_SHORT, "success");
         put(DATA_NAME, null);
     }
 
@@ -45,6 +46,7 @@ public class Response extends HashMap<String, Object> {
     public static Response success(int code, String msg) {
         Response responseVO = new Response();
         responseVO.put(MSG_NAME, msg);
+        responseVO.put(MSG_NAME_SHORT, msg);
         responseVO.put(CODE_NAME, code);
         return responseVO;
     }
@@ -52,6 +54,7 @@ public class Response extends HashMap<String, Object> {
     public static Response success(String msg, Object data) {
         Response responseVO = new Response();
         responseVO.put(MSG_NAME, msg);
+        responseVO.put(MSG_NAME_SHORT, "success");
         responseVO.put(DATA_NAME, data);
         return responseVO;
     }
@@ -60,6 +63,7 @@ public class Response extends HashMap<String, Object> {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 200);
         responseVO.put(MSG_NAME, "success");
+        responseVO.put(MSG_NAME_SHORT, "success");
         responseVO.put(DATA_NAME, data);
         return responseVO;
     }
@@ -68,6 +72,7 @@ public class Response extends HashMap<String, Object> {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 200);
         responseVO.put(MSG_NAME, "success");
+        responseVO.put(MSG_NAME_SHORT, "success");
         responseVO.put(DATA_NAME, data);
         responseVO.put("total", total);
         responseVO.put("pageNumber", pageNumber);
@@ -85,6 +90,7 @@ public class Response extends HashMap<String, Object> {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME,i);
         responseVO.put(MSG_NAME,msg);
+        responseVO.put(MSG_NAME_SHORT, msg);
         responseVO.put(DATA_NAME, data);
         return responseVO;
     }
@@ -93,6 +99,7 @@ public class Response extends HashMap<String, Object> {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, 404);
         responseVO.put(MSG_NAME, msg);
+        responseVO.put(MSG_NAME_SHORT, msg);
         return responseVO;
     }
 
@@ -100,6 +107,7 @@ public class Response extends HashMap<String, Object> {
         Response responseVO = new Response();
         responseVO.put(CODE_NAME, code);
         responseVO.put(MSG_NAME, msg);
+        responseVO.put(MSG_NAME_SHORT, msg);
         return responseVO;
     }
 
