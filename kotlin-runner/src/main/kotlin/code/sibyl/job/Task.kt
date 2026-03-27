@@ -3,12 +3,14 @@ package code.sibyl.job
 import code.sibyl.KotlinApplication
 import code.sibyl.common.r.getBean
 import code.sibyl.common.r.sleep
+import code.sibyl.service.BookService
 import code.sibyl.service.SteamService
 import code.sibyl.service.UpdateService
 import code.sibyl.service.backup.BackupService
 import lombok.RequiredArgsConstructor
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.Scheduled
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = ["job.enabled"], havingValue = "true", matchIfMissing = false)
 class Task {
 
     private val log = LoggerFactory.getLogger(KotlinApplication::class.java)
@@ -67,9 +70,30 @@ class Task {
     }
 
     @Async
+    @Scheduled(cron = "0 0/1 * * * ?")
+    @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
+    fun 视频文件补充时长() {
+        UpdateService.getBean().视频文件补充时长().subscribe();
+    }
+
+//    @Async
+//    @Scheduled(cron = "0 0 0/1 * * ?")
+//    @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
+    fun bigVideo2m3u8() {
+        UpdateService.getBean().bigVideo2m3u8().subscribe()
+    }
+
+    @Async
     @Scheduled(cron = "0 0 0/2 * * ?")
     @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
     fun friendList() {
         SteamService.getBean().friendList().subscribe()
+    }
+
+    @Async
+    @Scheduled(cron = "0 0/1 * * * ?")
+    @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
+    fun book() {
+        BookService.bean.pageNumBuild().subscribe()
     }
 }

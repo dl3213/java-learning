@@ -30,18 +30,25 @@ public class AutoParalogue {
     public AutoParalogue() throws AWTException {
     }
 
+    public static void main1(String[] args) {
+        while (true){
+            Point point = getMousePosition();
+            log.info("鼠标坐标: X={}, Y={}", point.x, point.y);
+        }
+    }
+
     public static void main(String[] args) throws AWTException {
         r.sleep(3000L);
 
         // X=121, Y=243
         // X=121, Y=318
-        // X=121, Y=393
+        // X=121, Y=KJ
         // X=121, Y=488
         // X=121, Y=513
         final long 鼠标事件间隔 = 3000L;
-        final long 鼠标期间间隔 = 4500L;
+        final long 鼠标期间间隔 = 3500L;
         CompletableFuture<Void> mouse = CompletableFuture.runAsync(() -> {
-            boolean p = true  ;
+            boolean p = true;
             while (p) {
 //                r.sleep(鼠标事件间隔);
 

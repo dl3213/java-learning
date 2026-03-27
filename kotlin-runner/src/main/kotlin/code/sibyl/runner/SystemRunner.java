@@ -2,6 +2,7 @@ package code.sibyl.runner;
 
 import code.sibyl.common.Response;
 import code.sibyl.event.Event;
+import code.sibyl.service.BookService;
 import code.sibyl.service.SteamService;
 import code.sibyl.service.UpdateService;
 import com.alibaba.fastjson2.JSONObject;
@@ -35,9 +36,10 @@ public class SystemRunner implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws Exception {
         log.info("系统初始化工作--start");
+//        BookService.getBean().move_test().subscribe();
 
         UpdateService.getBean().file_clear().subscribe(); //
-//        UpdateService.getBean().book_clear().subscribe(); //
+        UpdateService.getBean().book_clear().subscribe(); //
 
 //        SteamService.getBean().friendList().subscribe();
 

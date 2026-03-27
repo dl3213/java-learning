@@ -9,11 +9,18 @@ import code.sibyl.domain.base.BaseFile;
 import code.sibyl.model.FileInfo;
 import code.sibyl.service.FfmpegService;
 import code.sibyl.service.FileService;
+import code.sibyl.service.FileUploadService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.opencv.core.*;
+import org.opencv.features2d.BFMatcher;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.ORB;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,7 +33,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.Part;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +58,8 @@ public class FileController {
 
     @Autowired
     FileService storageService;
-
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @PostMapping("/upload")
     @ResponseBody
@@ -57,6 +67,86 @@ public class FileController {
         //System.err.println(json);
         return storageService.save(filePartMono, json)
                 .map((baseFile) -> ResponseEntity.ok().body(Response.success(baseFile)));
+    }
+
+
+    /**
+     * 响应式文件夹上传接口
+     */
+    @PostMapping(value = "/folder-reactive", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ApiResponse<UploadResult>> uploadFolderReactive(
+            @RequestPart("files") Flux<FilePart> files,
+            @RequestPart("paths") Flux<String> paths,
+            @RequestPart(value = "folderName", required = false) String folderName,
+            @RequestPart(value = "totalFiles", required = false) String totalFiles) {
+
+        return files.collectList()
+                .zipWith(paths.collectList())
+                .flatMap(tuple -> {
+                    List<FilePart> fileList = tuple.getT1();
+                    List<String> pathList = tuple.getT2();
+
+                    String actualFolderName = folderName != null ? folderName : "unnamed";
+
+                    return fileUploadService.uploadFolderReactive(fileList, pathList, actualFolderName)
+                            .map(result -> ApiResponse.success(
+                                    "文件夹上传成功",
+                                    result
+                            ))
+                            .onErrorResume(e -> Mono.just(
+                                    ApiResponse.error("上传失败", e.getMessage())
+                            ));
+                });
+    }
+
+    /**
+     * 传统方式文件夹上传接口（兼容MultipartFile）
+     */
+    @PostMapping(value = "/folder", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<ApiResponse<UploadResult>> uploadFolder(
+            @RequestPart("files") List<MultipartFile> files,
+            @RequestPart("paths") List<String> paths,
+            @RequestPart(value = "folderName", required = false) String folderName,
+            @RequestPart(value = "totalFiles", required = false) Integer totalFiles) {
+
+        String actualFolderName = folderName != null ? folderName : "unnamed";
+
+        return fileUploadService.uploadFolderTraditional(files, paths, actualFolderName)
+                .map(result -> ApiResponse.success(
+                        "文件夹上传成功",
+                        result
+                ))
+                .onErrorResume(e -> Mono.just(
+                        ApiResponse.error("上传失败", e.getMessage())
+                ));
+    }
+
+    /**
+     * 处理混合multipart请求
+     */
+    @PostMapping(value = "/folder-mixed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ApiResponse<UploadResult>> uploadFolderMixed(@RequestBody Mono<Part> partMono) {
+        return partMono.flatMap(part -> {
+            // 这里可以处理更复杂的multipart请求
+            return Mono.just(ApiResponse.error("暂不支持", "此接口暂未实现"));
+        });
+    }
+
+    /**
+     * 测试接口
+     */
+    @GetMapping("/test")
+    public Mono<ApiResponse<String>> test() {
+        return Mono.just(ApiResponse.success("服务正常运行", "Folder Upload WebFlux Service"));
+    }
+
+    /**
+     * 健康检查接口
+     */
+    @GetMapping("/health")
+    public Mono<ApiResponse<String>> healthCheck() {
+        return Mono.just(ApiResponse.success("服务健康", "OK"));
     }
 
     @PostMapping(value = "/page")
@@ -206,7 +296,7 @@ public class FileController {
     @PostMapping(value = "/sql/page")
     @ResponseBody
     public Mono<Response> sql_page(@RequestBody JSONObject jsonObject) {
-        return PostgresqlService.getBean().fileQuery(jsonObject, BaseFile.class)
+        return PostgresqlService.getBean().fileQuery(jsonObject)
                 .map(tuple -> {
                     //System.err.println(tuple);
                     Response response = Response.successPage(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
@@ -255,17 +345,22 @@ public class FileController {
     public Mono<Response> pixivDeleteAll(@PathVariable String id) {
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
-                    String[] split = e.getRealName().split("_p");
+                    String[] split = e.getRealName().contains("_p") ? e.getRealName().split("_p") : e.getRealName().split("-p");
                     return PostgresqlService.getBean().template().getDatabaseClient().sql("""
                                     update t_base_file
                                     set is_deleted = '1',
                                     update_time = :updateTime,
                                     update_id = :updateId
-                                    where is_deleted = '0' and code = 'pixiv' and real_name like (:pixivId || '_%')
+                                    where is_deleted = '0' and code = 'pixiv' 
+                                    and (
+                                    real_name like ('%' || :pixivId || '_p%')
+                                    or
+                                    real_name like ('%' || :pixivId || '-p%')
+                                    )
                                     """)
                             .bind("pixivId", split[0])
                             .bind("updateTime", LocalDateTime.now())
-                            .bind("updateId",r.defaultUserId())
+                            .bind("updateId", r.defaultUserId())
                             .fetch()
                             .rowsUpdated();
                 })
@@ -285,19 +380,18 @@ public class FileController {
                     String[] split = e.getRealName().split("_p");
                     Criteria criteria = Criteria.where("is_deleted").is("0")
                             .and("code").is("pixiv")
-                            .and("real_name").like(STR."\{split[0]}%")
-                            ;
+                            .and("real_name").like(STR."\{split[0]}%");
                     return PostgresqlService.getBean().template().select(Query.query(criteria), BaseFile.class);
                 })
                 .flatMap(baseFile -> Mono.zip(Mono.just(baseFile), PostgresqlService.getBean().template()
                         .getDatabaseClient()
                         .sql("""
-                        select * from t_biz_user_heart 
-                        where is_deleted = '0'
-                        and entity_type =:entityType
-                        and entity_id =:entityId 
-                        and user_id =:userId  
-                        """)
+                                select * from t_biz_user_heart 
+                                where is_deleted = '0'
+                                and entity_type =:entityType
+                                and entity_id =:entityId 
+                                and user_id =:userId  
+                                """)
                         .bind("entityType", entityType)
                         .bind("entityId", baseFile.getId())
                         .bind("userId", currentUserId)
@@ -436,14 +530,86 @@ public class FileController {
                 .map(e -> Response.success(e));
     }
 
+    @PostMapping(value = "/convert2m3u8/{id}")
+    @ResponseBody
+    public Mono<Response> convert2m3u8(@PathVariable Long id) {
+
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .flatMap(entity -> {
+                    String absolutePath = entity.getAbsolutePath();
+                    String m3u8Path = File.separator + "m3u8" + File.separator + entity.getId() + File.separator + entity.getId() + ".m3u8";
+                    File fromFile = new File(absolutePath);
+                    String toFilePath = r.fileBaseDir() + File.separator + "cache" + m3u8Path;
+                    File toFile = new File(toFilePath);
+                    r.createParentDirectories(toFile);
+                    FfmpegService.convert2m3u8(
+                            absolutePath, toFilePath
+                    );
+                    entity.setM3u8Path(m3u8Path);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .map(e -> {
+                    Response response = Response.success(e);
+                    response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                    return response;
+                });
+    }
+
     @PostMapping(value = "/find-similar/{id}")
     @ResponseBody
     public Mono<Response> findSimilar(@PathVariable Long id) {
-        long currentUserId = r.defaultUserId();
-        final String entityType = "t_base_file";
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         return PostgresqlService.getBean().template()
                 .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
-                .map(e -> Response.success(e));
+                .map(e -> Arrays.asList(e))
+//                .flatMap(entity -> {
+//                    String targetPath = entity.getAbsolutePath();
+//                    log.info("[findSimilar] targetPath = {}", targetPath);
+////                    ORB orb = ORB.create();
+//
+//                    ORB orb = ORB.create(
+//                            500,  // 增加特征点数量  ;特征匹配数 = 这里 * 0.4 视为相似， 默认500
+//                            1.2f,  // 多尺度检测
+//                            8,  // 深层金字塔
+//                            31,  // 更大边缘阈值
+//                            0,
+//                            2,
+//                            ORB.HARRIS_SCORE,  // 更好的特征点评分
+//                            31,
+//                            20
+//                    );
+//
+//                    return PostgresqlService.getBean().template().getDatabaseClient()
+//                            .sql("""
+//                                    select * from t_base_file
+//                                    where is_deleted = '0'
+//                                    and type = :type
+//                                    and code not in ('pixiv')
+//                                    and id != :id
+//                                    and size >= :min
+//                                    and size <= :max
+//                                    """)
+//                            .bind("id", entity.getId())
+//                            .bind("type", entity.getType())
+//                            .bind("min", entity.getSize() - 10240000 / 4)
+//                            .bind("max", entity.getSize() + 10240000 / 4)
+//                            .mapProperties(BaseFile.class)
+//                            .all()
+//                            .filter(item -> {
+//                                long totalMatches = r.matches(targetPath, item.getAbsolutePath(), orb);
+////                                double totalMatches = r.matchesV2(targetPath, item.getAbsolutePath(), orb);
+//                                log.info("[findSimilar] input = {}, totalMatches = {} ", item.getAbsolutePath(), totalMatches);
+//                                return totalMatches >= (500 * 0.4);
+//                            })
+//                            .collectList()
+//                            ;
+//                })
+                .map(e -> {
+                    Response response = Response.success(e);
+                    response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                    return response;
+                });
     }
 
 

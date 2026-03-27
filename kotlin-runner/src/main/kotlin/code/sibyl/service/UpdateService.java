@@ -56,7 +56,7 @@ public class UpdateService {
     public Mono<Long> book_clear() {
         //Path root = Path.of(r.fileBaseDir);
         Criteria criteria = Criteria.where("IS_DELETED").is("1");
-        return PostgresqlService.getBean().template().getDatabaseClient().sql("select * from t_biz_book_20250325 where is_deleted = '1'")
+        return PostgresqlService.getBean().template().getDatabaseClient().sql("select * from t_biz_book where is_deleted = '1'")
                 .mapProperties(Book.class)
                 .all()
                 .flatMap(e -> {
@@ -277,7 +277,7 @@ public class UpdateService {
                 .flatMap(item -> BaseFileHandler.getBean().sha256(item))
                 .count()
                 .map(count -> {
-                    log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+//                    log.info("[文件补充hash] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -296,7 +296,7 @@ public class UpdateService {
                 .flatMap(item -> BaseFileHandler.getBean().图片补充大小(item))
                 .count()
                 .map(count -> {
-                    log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+//                    log.info("[图片补充大小] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
@@ -315,11 +315,57 @@ public class UpdateService {
                 .flatMap(item -> BaseFileHandler.getBean().视频文件补充thumbnail(item))
                 .count()
                 .map(count -> {
-                    log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+//                    log.info("[视频文件补充thumbnail] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    return count;
+                })
+                ;
+    }
+
+    @NotNull
+    public Mono<Long> 视频文件补充时长() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (video_duration_second is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+//                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .take(100)
+                .flatMap(item -> BaseFileHandler.getBean().视频文件补充时长(item))
+                .count()
+                .map(count -> {
+//                    log.info("[视频文件补充时长] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
                     return count;
                 })
                 ;
     }
 
 
+    @NotNull
+    public Mono<Long> bigVideo2m3u8() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and size >= 6462193653 and (m3u8_path is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .flatMap(entity -> {
+                    String absolutePath = entity.getAbsolutePath();
+                    String m3u8Path = File.separator + "m3u8" + File.separator + entity.getId() + File.separator + entity.getId() + ".m3u8";
+                    File fromFile = new File(absolutePath);
+                    String toFilePath = r.fileBaseDir() + File.separator + "cache" + m3u8Path ;
+                    File toFile = new File(toFilePath);
+                    r.createParentDirectories(toFile);
+                    FfmpegService.convert2m3u8(
+                            absolutePath, toFilePath
+                    );
+                    entity.setM3u8Path(m3u8Path);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .count()
+                .map(count -> {
+//                    log.info("[bigVideo2m3u8] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    return count;
+                });
+
+    }
 }

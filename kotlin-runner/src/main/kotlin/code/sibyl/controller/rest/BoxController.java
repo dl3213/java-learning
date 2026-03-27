@@ -54,8 +54,8 @@ public class BoxController {
             entity.setUpdateId(r.defaultUserId());
             entity.setUpdateTime(LocalDateTime.now());
         }
-
-
+        entity.setDeleted("0");
+        System.err.println(entity);
         return isInsert ?
                 PostgresqlService.getBean().template()
                         .insert(entity)

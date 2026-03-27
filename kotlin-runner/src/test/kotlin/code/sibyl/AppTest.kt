@@ -1,6 +1,8 @@
 package code.sibyl
 
 import code.sibyl.common.r
+import code.sibyl.service.BookService
+import code.sibyl.service.BookService.Companion.bean
 import code.sibyl.service.UpdateService
 import code.sibyl.service.backup.BackupService
 import code.sibyl.service.sql.PostgresqlService
@@ -13,13 +15,20 @@ import java.io.FileInputStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-@SpringBootTest
-class KotlinApplicationTests {
+@SpringBootTest(properties = arrayOf("job.enabled=false"))
+class AppTest {
 
+    @Test
+    open fun book() {
+        //BookService.bean.move_test().block()
+        BookService.bean.pageNumBuild().block()
+    }
 
     @Test
     open fun contextLoads() {
-        UpdateService.getBean().视频文件补充thumbnail().block();
+//        UpdateService.getBean().视频文件补充thumbnail().block();
+//        UpdateService.getBean().bigVideo2m3u8().block();
+        UpdateService.getBean().视频文件补充时长().block();
     }
 
     @Test

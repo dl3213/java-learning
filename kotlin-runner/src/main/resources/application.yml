@@ -6,6 +6,9 @@ auth: false
 isDev: true
 logDetail: false
 
+job:
+  enabled: true
+
 flink:
   enabled: true
 

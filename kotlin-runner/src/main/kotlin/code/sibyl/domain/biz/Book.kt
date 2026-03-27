@@ -30,7 +30,7 @@ open class Book {
 
     open var relativePath: String? = null
 
-    open var pageNum: Long? = null
+    open var pageNum: String? = null
 
     open var serialNumber: String? = null
 
@@ -62,4 +62,8 @@ open class Book {
     @org.springframework.data.annotation.Transient
     @Transient
     open var heartByCurrentUserCount: Int? = 0;
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var htmlTemplate: String = "";
 }

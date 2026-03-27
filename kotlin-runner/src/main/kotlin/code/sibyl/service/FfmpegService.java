@@ -3,6 +3,7 @@ package code.sibyl.service;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ArrayUtil;
+import code.sibyl.common.r;
 import jodd.util.ArraysUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +37,9 @@ public class FfmpegService {
     public final static Runtime runtime = Runtime.getRuntime();
 
 
-    public static void main123(String[] args) throws Exception {
+    public static void main2(String[] args) throws Exception {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
 
         String path1 = "";
         path1 = "D:\\z\\1864319636821118976.png";
@@ -84,15 +86,18 @@ public class FfmpegService {
     public static void main(String[] args) throws Exception {
 
 
-//        FfmpegService.copy("C:\\4me\\4ai\\ -C.mp4", "C:\\4me\\", "000737", "002318");
+//        FfmpegService.copy("E:/sibyl-system/file/2025-09-22/1970153286908645376.mp4", "C:\\dl3213\\4me\\dl3213\\", "004853", "005126", "123");
 //        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
 //        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 
 //        FfmpegService.convert2mp4("E:/sibyl-system/file/2025-09-07/1964674431620091904.mp4", "C:\\4me\\4ai\\1756561803741.mp4");
-        FfmpegService.mp3("D:\\z\\真正想哈的基米脸上是没有笑容的【哈基米：关山酒】.mp4");
+        FfmpegService.convert2mp4("E:/sibyl-system/file/2025-11-23/1992617805878530048.mp4", "C:\\dl3213\\MR 1080p.mp4");
+//        FfmpegService.mp3("D:\\z\\真正想哈的基米脸上是没有笑容的【哈基米：关山酒】.mp4");
+//        FfmpegService.mp3("E:\\sibyl-system\\file\\mymusic\\金志文 - 空城.m4a");
+//        FfmpegService.convert2m3u8( "E:/sibyl-system/file/2025-06-08/1931441975119187968.mp4", "D:\\z\\1931441975119187968.m3u8");
     }
 
-    public static void mp3(String filePath){
+    public static void mp3(String filePath) {
         try {
 
             File fromFile = new File(filePath);
@@ -163,17 +168,39 @@ public class FfmpegService {
         }
     }
 
-    public static void convert2mp4(String fromFile, String toFile) throws Exception {
-        String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v libx264 -c:a aac \"\{toFile}\"";
-        System.err.println(command);
-        Process process = runtime.exec(command);
-        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String line;
-        while ((line = errorReader.readLine()) != null) {
-            System.out.println(STR."FFmpeg --> : \{line}");
+    public static void convert2m3u8(String fromFile, String toFile) {
+        try {
+            String command = STR."\{ffmpeg} -i \"\{fromFile}\" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls \"\{toFile}\"";
+            System.err.println(command);
+            Process process = runtime.exec(command);
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            while ((line = errorReader.readLine()) != null) {
+                System.out.println(STR."FFmpeg --> : \{line}");
+            }
+            process.waitFor();
+            System.out.println("Conversion completed successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        process.waitFor();
-        System.out.println("Conversion completed successfully.");
+    }
+
+
+    public static void convert2mp4(String fromFile, String toFile)  {
+        try {
+            String command = STR."\{ffmpeg} -i \"\{fromFile}\" -c:v libx264 -c:a aac \"\{toFile}\"";
+            System.err.println(command);
+            Process process = runtime.exec(command);
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            while ((line = errorReader.readLine()) != null) {
+                System.out.println(STR."FFmpeg --> : \{line}");
+            }
+            process.waitFor();
+            System.out.println("Conversion completed successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void copy(String fromFilePath, String toFilePath, String startTime, String endTime) {

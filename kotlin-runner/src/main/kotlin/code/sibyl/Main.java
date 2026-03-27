@@ -15,11 +15,8 @@ import java.util.function.Consumer;
 public class Main {
 
 
-
     public static void main12(String[] args) {
-        FfmpegService.copy("E:/sibyl-system/file/2025-09-23/1970346240822611968.mp4", "C:\\4me\\", "020906", "023056","SSIS-588-C");
-        FfmpegService.copy("E:/sibyl-system/file/2025-04-07/1908969267043373056.mp4", "C:\\4me\\", "003209", "003537","ABF-062");
-        FfmpegService.copy("E:/sibyl-system/file/2025-04-07/1908969267043373056.mp4", "C:\\4me\\", "020623", "022454","ABF-062");
+
     }
 
     public static void main(String[] args) {

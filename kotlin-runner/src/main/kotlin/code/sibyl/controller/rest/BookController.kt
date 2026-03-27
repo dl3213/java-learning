@@ -92,8 +92,8 @@ class BookController {
     @PostMapping(value = ["/detail/page/{id}"])
     @ResponseBody
     fun detailPage(@RequestBody jsonObject: JSONObject, @PathVariable id: String): Mono<Response> {
-        var pageNumber = jsonObject.getLong("pageNumber")
-        var pageSize = jsonObject.getLong("pageSize")
+        var pageNumber = jsonObject.getLong("pageNumber")?:1
+        var pageSize = jsonObject.getLong("pageSize")?:30
         return PostgresqlService.getBean().template()!!
             .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
             .publishOn(Schedulers.boundedElastic())

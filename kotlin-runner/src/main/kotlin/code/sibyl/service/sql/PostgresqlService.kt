@@ -4,6 +4,7 @@ import code.sibyl.common.SpringUtil
 import code.sibyl.common.r
 import code.sibyl.common.r.defaultUserId
 import code.sibyl.common.r.getBean
+import code.sibyl.domain.base.BaseFile
 import code.sibyl.service.BookService
 import com.alibaba.fastjson2.JSONObject
 import com.mysql.cj.util.StringUtils
@@ -36,7 +37,8 @@ class PostgresqlService {
     }
 
     fun deleteById(id: Any, tableName: String): Mono<Long> {
-        return template().databaseClient.sql("update ${tableName!!} set is_deleted = '1' where id = ${id!!}").fetch().rowsUpdated()
+        return template().databaseClient.sql("update ${tableName!!} set is_deleted = '1' where id = ${id!!}").fetch()
+            .rowsUpdated()
     }
 
     companion object {
@@ -48,23 +50,29 @@ class PostgresqlService {
     }
 
 
-    fun <T> fileQuery(jsonObject: JSONObject, clazz: Class<out T>): Mono<Tuple4<Long, List<T>, Int, Int>> {
+    fun fileQuery(jsonObject: JSONObject): Mono<Tuple4<Long, List<BaseFile>, Int, Int>> {
+        System.err.println(jsonObject)
         val currentUserId = defaultUserId()
         val entityType = "t_base_file"
-        val pageNumber = jsonObject.getInteger("pageNumber")
-        val pageSize = jsonObject.getInteger("pageSize")
+        val pageNumber = jsonObject.getInteger("pageNumber") ?: 1
+        val pageSize = jsonObject.getInteger("pageSize") ?: 12
 
-        var isDeleted = jsonObject.getString("isDeleted")
+        var optionField = jsonObject.getString("optionField")
+
+        var isDeleted = if ("isDeleted" == optionField) jsonObject.getString("optionValue") else "0"
         var type = jsonObject.getString("type")
-        var code = jsonObject.getString("code")
-        var codeNe = jsonObject.getString("codeNe")
+        var code = jsonObject.getString("code") ?: ""
         var keyword = jsonObject.getString("keyword")
-        var hash = jsonObject.getString("hash")
-        var heart = jsonObject.getString("heart")
+        var hash = if ("hash" == optionField) jsonObject.getString("optionValue") else "0"
+        var heart = if ("heart" == optionField) jsonObject.getString("optionValue") else "0"
         var orderField = jsonObject.getString("orderField")
         var orderDirection = jsonObject.getString("orderDirection")
         var sql = """
-            select main.*, COALESCE(heart_count.count,0 ) as heart_count, COALESCE(heart_by_current_user.count,0 ) as heart_by_current_user_count
+            select main.*,
+            COALESCE(heart_count.count,0 ) as heart_count, 
+            COALESCE(heart_by_current_user.count,0 ) as heart_by_current_user_count, 
+            case when main.type like 'image%' or main.type like 'video%' then 'gallery' else 'card' end as html_template,
+            1 as ret
             from T_BASE_FILE main
             left join (
                 select entity_id, count(1) as count from t_biz_user_heart
@@ -79,11 +87,10 @@ class PostgresqlService {
                   and user_id = '${currentUserId}'
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
-            where IS_DELETED = '${isDeleted}'
-            ${if (!type.isNullOrBlank()) "and type like '${type}%'" else ""}
-            ${if (!code.isNullOrBlank()) "and code = '${code}'" else ""} 
-            ${if (!codeNe.isNullOrBlank()) "and code != '${codeNe}'" else ""} 
-            ${if (!keyword.isNullOrBlank()) "and (real_name like '%${keyword}%' or sha256 like '%${keyword}%' or type like '%${keyword}%' or file_name like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else ""}
+            where IS_DELETED = '${isDeleted}' and main.code not in ('music')
+            ${if (!type.isNullOrBlank()) "and type ilike '${type}%'" else ""}
+            ${"and code = '${code}'"}  
+            ${if (!keyword.isNullOrBlank()) "and (real_name ilike '%${keyword}%' or type ilike '%${keyword}%' or file_name ilike '%${keyword}%' or code ilike '%${keyword}%' or cast(id as varchar) ilike '%${keyword}%') " else ""}
             ${
             if (hash == "1") """
                 and sha256 in (
@@ -91,8 +98,7 @@ class PostgresqlService {
                     select sha256, count(1) as count from T_BASE_FILE
                     where is_deleted = '${isDeleted}' 
                     and sha256 is not null
-                    ${if (!code.isNullOrBlank()) "and code = '${code}'" else ""} 
-                    ${if (!codeNe.isNullOrBlank()) "and code != '${codeNe}'" else ""} 
+                    ${"and code = '${code}'"}  
                     group by sha256
                     )t where count >=2 
                 )
@@ -108,7 +114,7 @@ class PostgresqlService {
                 )
             """.trimIndent() else ""
         }
-            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"}, create_time asc
+            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"}  NULLS LAST, create_time asc
         """.trimIndent()
         var countSql = "select count(1) as count from (${sql}) temp";
         println("countSql --->")
@@ -121,28 +127,57 @@ class PostgresqlService {
         println("selectSql --->")
         return Mono.zip(
             sibylPostgresqlTemplate!!.databaseClient?.sql(countSql)!!.fetch().first().map { it.get("count") as Long },
-            sibylPostgresqlTemplate!!.databaseClient?.sql(selectSql)!!.mapProperties(clazz).all().collectList(),
+            sibylPostgresqlTemplate!!.databaseClient?.sql(selectSql)!!.mapProperties(BaseFile::class.java)
+                .all()
+                .map {
+                    it.htmlTemplate = if (it.type?.startsWith("image", true) == true || it.type?.startsWith(
+                            "video",
+                            true
+                        ) == true
+                    ) "gallery" else "card"
+                    it.gallery = if (it.type?.startsWith("video", true) == true) it.id.toString() else "gallery"
+                    it.sizeDescription = fileSizeDescription(it.size)
+                    it
+                }
+                .collectList(),
             Mono.just(pageNumber),
             Mono.just(pageSize)
-        ).delaySubscription(Duration.ofMillis(500));
+        );
     }
+
+    private fun fileSizeDescription(size: Long?): String? {
+        if (size == null) return ""
+        var sizeStr = size.toString()
+        if (size < r._1kb) return sizeStr + "byte";
+        if (size >= r._1kb && size <= r._1mb) return String.format("%.2f", (size / 1024.0)).toString() + "KB";
+        if (size >= r._1mb && size <= r._1gb) return String.format("%.2f", size / 1024.0 / 1024.0).toString() + "MB";
+        if (size >= r._1gb) return String.format("%.2f", size / 1024.0 / 1024.0 / 1024.0).toString() + "GB";
+        return sizeStr
+    }
+
 
     fun <T> bookQuery(jsonObject: JSONObject, clazz: Class<out T>): Mono<Tuple4<Long, List<T>, Int, Int>> {
 
         val currentUserId = defaultUserId()
         val entityType = "t_biz_book"
-        val pageNumber = jsonObject.getInteger("pageNumber")
-        val pageSize = jsonObject.getInteger("pageSize")
-
-        var isDeleted = jsonObject.getString("isDeleted")
+        val pageNumber = jsonObject.getInteger("pageNumber") ?: 1
+        val pageSize = jsonObject.getInteger("pageSize") ?: 12
+        var optionField = jsonObject.getString("optionField")
+        var isDeleted = if ("isDeleted" == optionField) jsonObject.getString("optionValue") else "0"
         var type = jsonObject.getString("type")
+        var code = jsonObject.getString("code") ?: ""
         var keyword = jsonObject.getString("keyword")
-        var hash = jsonObject.getString("hash")
-        var heart = jsonObject.getString("heart")
+        var hash = if ("hash" == optionField) jsonObject.getString("optionValue") else "0"
+        var heart = if ("heart" == optionField) jsonObject.getString("optionValue") else "0"
         var orderField = jsonObject.getString("orderField")
         var orderDirection = jsonObject.getString("orderDirection")
         var sql = """
-            select main.*, COALESCE(heart_count.count,0 ) as heart_count, COALESCE(heart_by_current_user.count,0 ) as heart_by_current_user_count
+            select main.*, 
+            COALESCE(heart_count.count,0 ) as heart_count, 
+            COALESCE(heart_by_current_user.count,0 ) as heart_by_current_user_count,
+            '1' as is_gallery,
+            'book' as html_template,
+            1 as ret
             from t_biz_book main
             left join (
                 select entity_id, count(1) as count from t_biz_user_heart
@@ -158,30 +193,10 @@ class PostgresqlService {
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}'
-            ${if (!type.isNullOrBlank()) "and type like '${type}%'" else ""}
-            ${if (!keyword.isNullOrBlank()) "and (name like '%${keyword}%' or type like '%${keyword}%' or serial_number like '%${keyword}%' or code like '%${keyword}%' or cast(id as varchar) like '%${keyword}%') " else ""}
-            ${
-            if (hash == "1") """
-                and sha256 in (
-                    select sha256 from (
-                    select sha256, count(1) as count from T_BASE_FILE
-                    where is_deleted = '${isDeleted}' and sha256 is not null
-                    group by sha256
-                    )t where count >=2 
-                )
-            """.trimIndent() else ""
-        }
-            ${
-            if (heart == "1") """
-                and id in (
-                    select distinct entity_id from t_biz_user_heart 
-                    where is_deleted = '${isDeleted}' 
-                    and entity_type ='${entityType}' 
-                    and user_id = '${currentUserId}' 
-                )
-            """.trimIndent() else ""
-        }
-            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"} 
+          
+            ${if (!keyword.isNullOrBlank()) "and (name ilike '%${keyword}%' or type ilike '%${keyword}%' or serial_number ilike '%${keyword}%' or code ilike '%${keyword}%' or cast(id as varchar) ilike '%${keyword}%') " else ""}
+              
+            order by ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"} 
         """.trimIndent()
         var countSql = "select count(1) as count from (${sql}) temp";
         println("countSql --->")
@@ -197,7 +212,7 @@ class PostgresqlService {
             sibylPostgresqlTemplate!!.databaseClient?.sql(selectSql)!!.mapProperties(clazz).all().collectList(),
             Mono.just(pageNumber),
             Mono.just(pageSize)
-        ).delaySubscription(Duration.ofMillis(500));
+        );
     }
 
 }

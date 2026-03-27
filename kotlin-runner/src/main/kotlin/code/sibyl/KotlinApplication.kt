@@ -1,6 +1,7 @@
 package code.sibyl
 
 import code.sibyl.common.r
+import org.opencv.core.Core
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -33,5 +34,6 @@ fun main(args: Array<String>) {
     log.info("JVM spec version: ${System.getProperty("java.specification.version")}")
     log.info("JVM spec vendor: ${System.getProperty("java.specification.vendor")}")
     log.info("JVM spec name: ${System.getProperty("java.specification.name")}")
+    log.info("OpenCV version: " + Core.VERSION);
 
 }

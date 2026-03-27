@@ -2,9 +2,15 @@ package code.sibyl.common
 
 import cn.hutool.core.lang.Snowflake
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
+import org.apache.commons.io.FileUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.apache.commons.lang3.time.DateUtils
+import org.opencv.core.*
+import org.opencv.features2d.BFMatcher
+import org.opencv.features2d.DescriptorMatcher
+import org.opencv.features2d.ORB
+import org.opencv.imgcodecs.Imgcodecs
 import org.springframework.boot.system.ApplicationHome
 import org.springframework.core.env.Environment
 import org.springframework.web.server.ServerWebExchange
@@ -31,6 +37,7 @@ import java.util.function.BiPredicate
 import java.util.function.Function
 import java.util.stream.Collectors
 import java.util.stream.Stream
+import kotlin.math.max
 
 
 /**
@@ -51,6 +58,10 @@ object r {
     const val MM: String = "MM" //常用时间格式
 
     private val IMAGE_EXTENSIONS = arrayOf("jpg", "jpeg", "png", "gif", "bmp", "webp")
+
+    const val _1kb = 1024L;
+    const val _1mb = _1kb * 1024L ;
+    const val _1gb = _1mb * 1024L;
 
     // 图片文件头的前几个字节
     private val IMAGE_FILE_HEADERS = arrayOf(
@@ -243,7 +254,7 @@ object r {
 
     @JvmStatic
     fun fileBaseDir(): String? {
-        if ("prod".equals(r.env())) {
+        if ("prod" == r.env()) {
             return r.absolutePath() + File.separator + "file" + File.separator
         } else {
             return r.getBean(Environment::class.java).getProperty("file.path");
@@ -630,35 +641,125 @@ object r {
             return null
         }
     }
+
+    @JvmStatic
+    fun createParentDirectories(file: File) {
+        FileUtils.createParentDirectories(file)
+    }
+
+    @JvmStatic
+    fun matches(
+        targetPath: String,
+        AbsolutePath: String,
+        orb: ORB,
+        kp1: MatOfKeyPoint,
+        kp2: MatOfKeyPoint,
+        desc1: Mat,
+        desc2: Mat
+    ): Long {
+        val img1 = Imgcodecs.imread(targetPath)
+        val img2 = Imgcodecs.imread(AbsolutePath)
+
+        // 检测特征点
+        orb.detectAndCompute(img1, Mat(), kp1, desc1)
+        orb.detectAndCompute(img2, Mat(), kp2, desc2)
+
+        // 匹配特征点
+        val matcher = BFMatcher.create(BFMatcher.BRUTEFORCE_HAMMING, true)
+        val matches = MatOfDMatch()
+        matcher.match(desc1, desc2, matches)
+        // 计算匹配率
+        return matches.rows().toLong()
+    }
+
+    @JvmStatic
+    fun matches(
+        targetPath: String,
+        AbsolutePath: String,
+        orb: ORB
+    ): Long {
+        val img1 = Imgcodecs.imread(targetPath)
+        val img2 = Imgcodecs.imread(AbsolutePath)
+
+        val kp1 = MatOfKeyPoint()
+        val kp2 = MatOfKeyPoint()
+        val desc1 = Mat()
+        val desc2 = Mat()
+        // 检测特征点
+        orb.detectAndCompute(img1, Mat(), kp1, desc1)
+        orb.detectAndCompute(img2, Mat(), kp2, desc2)
+
+        // 匹配特征点
+        val matcher = BFMatcher.create(BFMatcher.BRUTEFORCE_HAMMING, true)
+        val matches = MatOfDMatch()
+        matcher.match(desc1, desc2, matches)
+        // 计算匹配率
+       return matches.rows().toLong() // nfeatures * 0.4 视为类似
+    }
+
+    @JvmStatic
+    fun matchesV2(targetPath: String, AbsolutePath: String, orb: ORB): Double {
+
+        val image1 = Imgcodecs.imread(targetPath, Imgcodecs.IMREAD_GRAYSCALE)
+        val image2 = Imgcodecs.imread(AbsolutePath, Imgcodecs.IMREAD_GRAYSCALE)
+
+        // 检测关键点和计算描述符
+        val keypoints1 = MatOfKeyPoint()
+        val keypoints2 = MatOfKeyPoint()
+        val descriptors1 = Mat()
+        val descriptors2 = Mat()
+        orb.detectAndCompute(image1, Mat(), keypoints1, descriptors1)
+        orb.detectAndCompute(image2, Mat(), keypoints2, descriptors2)
+
+
+        // 使用BFMatcher进行匹配（汉明距离）
+        val matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING)
+        val matches = MatOfDMatch()
+        matcher.match(descriptors1, descriptors2, matches)
+
+        // 筛选良好匹配（Lowe's ratio test的简化版）
+        val matchList = matches.toList()
+        var maxDist = 0.0
+        var minDist = 100.0
+        for (dMatch in matchList) {
+            val dist = dMatch.distance.toDouble()
+            if (dist < minDist) minDist = dist
+            if (dist > maxDist) maxDist = dist
+        }
+        val goodMatches: MutableList<DMatch> = ArrayList()
+        for (dMatch in matchList) {
+            if (dMatch.distance <= max(2 * minDist, 0.02)) {
+                goodMatches.add(dMatch)
+            }
+        }
+
+        // 计算匹配度
+       return (goodMatches.size.toDouble() / matchList.size);
+    }
 }
 
 fun main() {
-    var long = 1772579346000L
-    println(long.toString().length)
-    println(r.long2localDateTime(long, ZoneId.of("UTC-4")))
-    println(r.long2localDateTime(long))
-
-    println()
-    var currentTimeMillis = System.currentTimeMillis()
-    println(currentTimeMillis)
-    println(r.long2localDateTime(currentTimeMillis))
-    println()
-
-    println(r.long2localDateTime(1609459200000L))
-
-    println()
-
-    val timestamp = 1772579346000L // UTC 2023-12-31T12:00:00Z
-    val dateTimeUtc = LocalDateTime.ofInstant(
-        Instant.ofEpochMilli(timestamp),
-        ZoneId.of("UTC-04")
+    System.loadLibrary(Core.NATIVE_LIBRARY_NAME)
+    val orb = ORB.create()
+    // 初始化ORB检测器
+    val orb2 = ORB.create(
+        500,  // 增加特征点数量  ;特征匹配数 = 这里 * 0.4 视为相似， 默认500
+        1.2f,  // 多尺度检测
+        8,  // 深层金字塔
+        31,  // 更大边缘阈值
+        0,
+        2,
+        ORB.HARRIS_SCORE,  // 更好的特征点评分
+        31,
+        20
     )
-    println("UTC 时间: $dateTimeUtc") // 2023-12-31T12:00
-
-
-    // 方案2：转换为目标时区（如上海时间 UTC+8）
-    val shanghaiTime = Instant.ofEpochMilli(timestamp)
-        .atZone(ZoneId.of("Asia/Shanghai"))
-    val dateTimeShanghai = shanghaiTime.toLocalDateTime()
-    println("上海时间: $dateTimeShanghai")
+//     println(r.matchesV2("E:/sibyl-system/file/2024-12-29/1873303347876990976.PNG", "E:/sibyl-system/file/2024-12-29/1873303349324025856.PNG", orb))
+//     println(r.matchesV2("E:/sibyl-system/file/2024-12-29/1873303347876990976.PNG", "E:/sibyl-system/file/2024-12-29/1873303349760233472.PNG", orb))
+//     println(r.matchesV2("E:/sibyl-system/file/2024-12-29/1873303353677713408.JPG", "E:/sibyl-system/file/2024-12-29/1873303354113921024.JPG", orb))
+//     println(r.matchesV2("E:/sibyl-system/file/2025-09-27/30937410_p1.jpg", "E:/sibyl-system/file/2025-09-27/30937410_p2.jpg", orb))
+//     println(r.matchesV2("E:/sibyl-system/file/2025-09-27/30937410_p6.jpg", "E:/sibyl-system/file/2025-09-27/30937410_p7.jpg", orb))
+//     println(r.matches("E:/sibyl-system/file/2025-09-27/20928347_p1.jpg", "E:/sibyl-system/file/2025-09-27/20928347_p2.jpg", orb2))
+//     println(r.matchesV2("E:/sibyl-system/file/2025-09-27/20928347_p1.jpg", "E:/sibyl-system/file/2025-09-27/20928347_p2.jpg", orb2))
+     println(r.matches("E:/sibyl-system/file/2024-12-29/1873303351517646848.PNG", "E:/sibyl-system/file/2024-12-29/1873303351731556352.PNG", orb2))
+     println(r.matchesV2("E:/sibyl-system/file/2024-12-29/1873303351517646848.PNG", "E:/sibyl-system/file/2024-12-29/1873303351731556352.PNG", orb))
 }

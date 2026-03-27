@@ -21,8 +21,10 @@ import reactor.core.publisher.Mono;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 @Component(Handler.beanNamePrev + "t_base_file")
@@ -150,6 +152,59 @@ public class BaseFileHandler implements Handler<BaseFile> {
                     throwable.printStackTrace();
                     return Mono.just(item);
                 });
+    }
+
+    public Mono<BaseFile> 视频文件补充时长(BaseFile item) {
+        if (Objects.isNull(item)) return Mono.just(new BaseFile());
+        if (StringUtils.isBlank(item.getAbsolutePath())) return Mono.just(item);
+        if (StringUtils.isBlank(item.getType())) return Mono.just(item);
+        if (!item.getType().startsWith("video")) return Mono.just(item);
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        String absolutePath = item.getAbsolutePath();
+        double duration = this.getDurationWithFFprobe(absolutePath);
+        //log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
+        return client.sql("update T_BASE_FILE set video_duration_second = :duration where id = :id")
+                .bind("id", item.getId())
+                .bind("duration", duration)
+                .fetch()
+                .rowsUpdated()
+                .then(Mono.just(item))
+                .onErrorResume(throwable -> {
+                    throwable.printStackTrace();
+                    return Mono.just(item);
+                });
+    }
+
+    public static double getDurationWithFFprobe(String videoPath)  {
+      try {
+          ProcessBuilder pb = new ProcessBuilder(
+                  "ffprobe", "-v", "error",
+                  "-select_streams", "v:0",
+                  "-show_entries", "stream=duration",
+                  "-of", "default=noprint_wrappers=1:nokey=1",
+                  videoPath
+          );
+
+          Process process = pb.start();
+          BufferedReader reader = new BufferedReader(
+                  new InputStreamReader(process.getInputStream()));
+
+          String output = reader.readLine();
+          process.waitFor();
+
+          if (output != null && !output.isEmpty()) {
+              return Double.parseDouble(output);
+          }
+
+          throw new RuntimeException("无法获取视频时长");
+      }catch (Exception e){
+          e.printStackTrace();
+          return 0.0;
+      }
+    }
+
+    public enum TimeUnit {
+        SECONDS, MILLISECONDS, MINUTES, HOURS
     }
 
     /**
