@@ -109,4 +109,9 @@ open class BaseFile {
     /** 相似度处理失败时的错误信息 */
     open var similarityErrorMsg: String? = null
 
+    // ===== 文件标签 =====
+    @org.springframework.data.annotation.Transient
+    @Transient
+    open var tags: List<Tag>? = null
+
 }

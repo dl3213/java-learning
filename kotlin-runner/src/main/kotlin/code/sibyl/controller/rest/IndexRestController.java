@@ -372,8 +372,8 @@ public class IndexRestController {
 
 
         list.add(home);
-//        list.add(Interface);
-//        list.add(form);
+        list.add(Interface);
+        list.add(form);
         list.add(Layout);
         list.addAll(getCustomizeMenu());
         return Response.success(list);

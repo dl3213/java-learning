@@ -6,6 +6,7 @@ import code.sibyl.aop.ActionType;
 import code.sibyl.common.Response;
 import code.sibyl.common.r;
 import code.sibyl.domain.base.BaseFile;
+import code.sibyl.domain.base.Tag;
 import code.sibyl.model.FileInfo;
 import code.sibyl.service.FfmpegService;
 import code.sibyl.service.FileService;
@@ -22,6 +23,8 @@ import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.ORB;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.PageRequest;
@@ -45,11 +48,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.beans.FeatureDescriptor;
 
 @RestController
 @RequestMapping("/api/rest/v1/file")
@@ -295,10 +301,45 @@ public class FileController {
     // todo
     @PostMapping(value = "/sql/page")
     @ResponseBody
+    @Deprecated
     public Mono<Response> sql_page(@RequestBody JSONObject jsonObject) {
+        String withTags = jsonObject.getString("withTags");
         return PostgresqlService.getBean().fileQuery(jsonObject)
+                .flatMap(tuple -> {
+                    List<BaseFile> files = tuple.getT2();
+                    if (!"1".equalsIgnoreCase(withTags) || files.isEmpty()) {
+                        return Mono.just(tuple);
+                    }
+                    // 收集所有 file id
+                    List<Long> fileIds = files.stream()
+                            .map(BaseFile::getId)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList());
+                    // 查询这些文件的所有标签
+                    return PostgresqlService.getBean().template()
+                            .select(Query.query(
+                                    Criteria.where("is_deleted").is("0")
+                                            .and("entity_type").is("t_base_file")
+                                            .and("entity_id").in(fileIds)
+                            ), Tag.class)
+                            .collectList()
+                            .map(tags -> {
+                                // 按 entityId 分组
+                                Map<Long, List<Tag>> tagsByFileId = new HashMap<>();
+                                for (Tag tag : tags) {
+                                    tagsByFileId.computeIfAbsent(tag.getEntityId(), k -> new ArrayList<>()).add(tag);
+                                }
+                                // 挂到每个文件上
+                                for (BaseFile file : files) {
+                                    if (file.getId() != null) {
+                                        List<Tag> fileTags = tagsByFileId.get(file.getId());
+                                        file.setTags(fileTags != null ? fileTags : new ArrayList<>());
+                                    }
+                                }
+                                return tuple;
+                            });
+                })
                 .map(tuple -> {
-                    //System.err.println(tuple);
                     Response response = Response.successPage(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
                     response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
                     return response;
@@ -317,14 +358,25 @@ public class FileController {
     @ResponseBody
     @ActionLog(topic = "file update", type = ActionType.UPDATE)
     public Mono<Response> update(@RequestBody BaseFile baseFile) {
-        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(baseFile.getId())), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{baseFile.getId()}不存在")))
-                .flatMap(e -> {
-                    BeanUtils.copyProperties(baseFile, e);
-                    e.setUpdateTime(LocalDateTime.now());
-                    return PostgresqlService.getBean().template().update(e);
-//                    return Mono.just(e);
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(baseFile.getId())), BaseFile.class)
+                .switchIfEmpty(Mono.error(new RuntimeException("Entity with ID " + baseFile.getId() + " does not exist")))
+                .flatMap(existingEntity -> {
+                    // Copy non-null properties from `baseFile` to `existingEntity`
+                    BeanUtils.copyProperties(baseFile, existingEntity, getNullPropertyNames(baseFile));
+                    existingEntity.setUpdateTime(LocalDateTime.now());
+                    return PostgresqlService.getBean().template().update(existingEntity);
                 })
-                .map(e -> Response.success(e));
+                .map(updatedEntity -> Response.success(updatedEntity));
+    }
+
+    // Helper method to get null property names
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        return Arrays.stream(src.getPropertyDescriptors())
+                .map(FeatureDescriptor::getName)
+                .filter(propertyName -> src.getPropertyValue(propertyName) == null)
+                .toArray(String[]::new);
     }
 
     @DeleteMapping(value = "/delete/{id}")
