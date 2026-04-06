@@ -171,195 +171,195 @@ public class IndexRestController {
                                                     <div class="dropdown-menu">
                                                         <div class="dropdown-menu-columns">
                                                             <div class="dropdown-menu-column">
-                                                                <a class="dropdown-item" href="alerts.html">
+                                                                <a class="dropdown-item" target-link="alerts.html">
                                                                     Alerts
                                                                 </a>
-                                                                <a class="dropdown-item" href="accordion.html">
+                                                                <a class="dropdown-item" target-link="accordion.html">
                                                                     Accordion
                                                                 </a>
                                                                 <div class="dropend">
-                                                                    <a class="dropdown-item dropdown-toggle" href="#sidebar-authentication"
+                                                                    <a class="dropdown-item dropdown-toggle" target-link="#sidebar-authentication"
                                                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                        aria-expanded="false">
                                                                         Authentication
                                                                     </a>
                                                                     <div class="dropdown-menu">
-                                                                        <a href="sign-in.html" class="dropdown-item">
+                                                                        <a target-link="sign-in.html" class="dropdown-item">
                                                                             Sign in
                                                                         </a>
-                                                                        <a href="sign-in-link.html" class="dropdown-item">
+                                                                        <a target-link="sign-in-link.html" class="dropdown-item">
                                                                             Sign in link
                                                                         </a>
-                                                                        <a href="sign-in-illustration.html" class="dropdown-item">
+                                                                        <a target-link="sign-in-illustration.html" class="dropdown-item">
                                                                             Sign in with illustration
                                                                         </a>
-                                                                        <a href="sign-in-cover.html" class="dropdown-item">
+                                                                        <a target-link="sign-in-cover.html" class="dropdown-item">
                                                                             Sign in with cover
                                                                         </a>
-                                                                        <a href="sign-up.html" class="dropdown-item">
+                                                                        <a target-link="sign-up.html" class="dropdown-item">
                                                                             Sign up
                                                                         </a>
-                                                                        <a href="forgot-password.html" class="dropdown-item">
+                                                                        <a target-link="forgot-password.html" class="dropdown-item">
                                                                             Forgot password
                                                                         </a>
-                                                                        <a href="terms-of-service.html" class="dropdown-item">
+                                                                        <a target-link="terms-of-service.html" class="dropdown-item">
                                                                             Terms of service
                                                                         </a>
-                                                                        <a href="auth-lock.html" class="dropdown-item">
+                                                                        <a target-link="auth-lock.html" class="dropdown-item">
                                                                             Lock screen
                                                                         </a>
-                                                                        <a href="2-step-verification.html" class="dropdown-item">
+                                                                        <a target-link="2-step-verification.html" class="dropdown-item">
                                                                             2 step verification
                                                                         </a>
-                                                                        <a href="2-step-verification-code.html" class="dropdown-item">
+                                                                        <a target-link="2-step-verification-code.html" class="dropdown-item">
                                                                             2 step verification code
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                                <a class="dropdown-item" href="blank.html">
+                                                                <a class="dropdown-item" target-link="blank.html">
                                                                     Blank page
                                                                 </a>
-                                                                <a class="dropdown-item" href="badges.html">
+                                                                <a class="dropdown-item" target-link="badges.html">
                                                                     Badges
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="buttons.html">
+                                                                <a class="dropdown-item" target-link="buttons.html">
                                                                     Buttons
                                                                 </a>
                                                                 <div class="dropend">
-                                                                    <a class="dropdown-item dropdown-toggle" href="#sidebar-cards"
+                                                                    <a class="dropdown-item dropdown-toggle" target-link="#sidebar-cards"
                                                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                        aria-expanded="false">
                                                                         Cards
                                                                         <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                     </a>
                                                                     <div class="dropdown-menu">
-                                                                        <a href="cards.html" class="dropdown-item">
+                                                                        <a target-link="cards.html" class="dropdown-item">
                                                                             Sample cards
                                                                         </a>
-                                                                        <a href="card-actions.html" class="dropdown-item">
+                                                                        <a target-link="card-actions.html" class="dropdown-item">
                                                                             Card actions
                                                                             <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                         </a>
-                                                                        <a href="cards-masonry.html" class="dropdown-item">
+                                                                        <a target-link="cards-masonry.html" class="dropdown-item">
                                                                             Cards Masonry
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                                <a class="dropdown-item" href="carousel.html">
+                                                                <a class="dropdown-item" target-link="carousel.html">
                                                                     Carousel
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="charts.html">
+                                                                <a class="dropdown-item" target-link="charts.html">
                                                                     Charts
                                                                 </a>
-                                                                <a class="dropdown-item" href="colors.html">
+                                                                <a class="dropdown-item" target-link="colors.html">
                                                                     Colors
                                                                 </a>
-                                                                <a class="dropdown-item" href="colorpicker.html">
+                                                                <a class="dropdown-item" target-link="colorpicker.html">
                                                                     Color picker
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="datagrid.html">
+                                                                <a class="dropdown-item" target-link="datagrid.html">
                                                                     Data grid
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="datatables.html">
+                                                                <a class="dropdown-item" target-link="datatables.html">
                                                                     Datatables
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="dropdowns.html">
+                                                                <a class="dropdown-item" target-link="dropdowns.html">
                                                                     Dropdowns
                                                                 </a>
-                                                                <a class="dropdown-item" href="dropzone.html">
+                                                                <a class="dropdown-item" target-link="dropzone.html">
                                                                     Dropzone
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
                                                                 <div class="dropend">
-                                                                    <a class="dropdown-item dropdown-toggle" href="#sidebar-error"
+                                                                    <a class="dropdown-item dropdown-toggle" target-link="#sidebar-error"
                                                                        data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button"
                                                                        aria-expanded="false">
                                                                         Error pages
                                                                     </a>
                                                                     <div class="dropdown-menu">
-                                                                        <a href="error-404.html" class="dropdown-item">
+                                                                        <a target-link="error-404.html" class="dropdown-item">
                                                                             404 page
                                                                         </a>
-                                                                        <a href="error-500.html" class="dropdown-item">
+                                                                        <a target-link="error-500.html" class="dropdown-item">
                                                                             500 page
                                                                         </a>
-                                                                        <a href="error-maintenance.html" class="dropdown-item">
+                                                                        <a target-link="error-maintenance.html" class="dropdown-item">
                                                                             Maintenance page
                                                                         </a>
                                                                     </div>
                                                                 </div>
-                                                                <a class="dropdown-item" href="flags.html">
+                                                                <a class="dropdown-item" target-link="flags.html">
                                                                     Flags
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="inline-player.html">
+                                                                <a class="dropdown-item" target-link="inline-player.html">
                                                                     Inline player
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
                                                             </div>
                                                             <div class="dropdown-menu-column">
-                                                                <a class="dropdown-item" href="lightbox.html">
+                                                                <a class="dropdown-item" target-link="lightbox.html">
                                                                     Lightbox
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="lists.html">
+                                                                <a class="dropdown-item" target-link="lists.html">
                                                                     Lists
                                                                 </a>
-                                                                <a class="dropdown-item" href="modals.html">
+                                                                <a class="dropdown-item" target-link="modals.html">
                                                                     Modal
                                                                 </a>
-                                                                <a class="dropdown-item" href="maps.html">
+                                                                <a class="dropdown-item" target-link="maps.html">
                                                                     Map
                                                                 </a>
-                                                                <a class="dropdown-item" href="map-fullsize.html">
+                                                                <a class="dropdown-item" target-link="map-fullsize.html">
                                                                     Map fullsize
                                                                 </a>
-                                                                <a class="dropdown-item" href="maps-vector.html">
+                                                                <a class="dropdown-item" target-link="maps-vector.html">
                                                                     Map vector
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="markdown.html">
+                                                                <a class="dropdown-item" target-link="markdown.html">
                                                                     Markdown
                                                                 </a>
-                                                                <a class="dropdown-item" href="navigation.html">
+                                                                <a class="dropdown-item" target-link="navigation.html">
                                                                     Navigation
                                                                 </a>
-                                                                <a class="dropdown-item" href="offcanvas.html">
+                                                                <a class="dropdown-item" target-link="offcanvas.html">
                                                                     Offcanvas
                                                                 </a>
-                                                                <a class="dropdown-item" href="pagination.html">
+                                                                <a class="dropdown-item" target-link="pagination.html">
                                                                     <!-- Download SVG icon from http://tabler-icons.io/i/pie-chart -->
                                                                     Pagination
                                                                 </a>
                                                                 <a class="dropdown-item" target-link="/placeholder.html" href="#">
                                                                     Placeholder
                                                                 </a>
-                                                                <a class="dropdown-item" href="steps.html">
+                                                                <a class="dropdown-item" target-link="steps.html">
                                                                     Steps
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="stars-rating.html">
+                                                                <a class="dropdown-item" target-link="stars-rating.html">
                                                                     Stars rating
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>
-                                                                <a class="dropdown-item" href="tabs.html">
+                                                                <a class="dropdown-item" target-link="tabs.html">
                                                                     Tabs
                                                                 </a>
-                                                                <a class="dropdown-item" href="tags.html">
+                                                                <a class="dropdown-item" target-link="tags.html">
                                                                     Tags
                                                                 </a>
-                                                                <a class="dropdown-item" href="tables.html">
+                                                                <a class="dropdown-item" target-link="tables.html">
                                                                     Tables
                                                                 </a>
-                                                                <a class="dropdown-item" href="typography.html">
+                                                                <a class="dropdown-item" target-link="typography.html">
                                                                     Typography
                                                                 </a>
-                                                                <a class="dropdown-item" href="tinymce.html">
+                                                                <a class="dropdown-item" target-link="tinymce.html">
                                                                     TinyMCE
                                                                     <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>
                                                                 </a>

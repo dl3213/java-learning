@@ -87,7 +87,7 @@ open class BaseFile {
 
     @org.springframework.data.annotation.Transient
     @Transient
-    open var gallery: String = "";
+    open var gallery: String? = "";
 
     // ===== 图片相似度向量相关字段 =====
 

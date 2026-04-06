@@ -419,6 +419,33 @@ public class FileController {
                 .map(e -> Response.success(e));
     }
 
+    @PostMapping(value = "/pixiv/restore/all/{id}")
+    @ResponseBody
+    public Mono<Response> pixivRestoreAll(@PathVariable String id) {
+        return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
+                .flatMap(e -> {
+                    String[] split = e.getRealName().contains("_p") ? e.getRealName().split("_p") : e.getRealName().split("-p");
+                    return PostgresqlService.getBean().template().getDatabaseClient().sql("""
+                                    update t_base_file
+                                    set is_deleted = '0',
+                                    update_time = :updateTime,
+                                    update_id = :updateId
+                                    where is_deleted = '1' and code = 'pixiv' 
+                                    and (
+                                    real_name like ('%' || :pixivId || '_p%')
+                                    or
+                                    real_name like ('%' || :pixivId || '-p%')
+                                    )
+                                    """)
+                            .bind("pixivId", split[0])
+                            .bind("updateTime", LocalDateTime.now())
+                            .bind("updateId", r.defaultUserId())
+                            .fetch()
+                            .rowsUpdated();
+                })
+                .map(e -> Response.success(e));
+    }
+
     @GetMapping(value = "/pixiv/heart/all/{id}")
     @ResponseBody
     public Mono<Response> pixivHeartAll(@PathVariable String id) {
@@ -664,6 +691,40 @@ public class FileController {
                 });
     }
 
+
+    /**
+     * 获取所有不重复的code值（来源标识）
+     * 用于文件筛选下拉框
+     */
+    @GetMapping(value = "/codes")
+    @ResponseBody
+    public Mono<Response> codes() {
+        return PostgresqlService.getBean().template()
+                .getDatabaseClient()
+                .sql("SELECT DISTINCT code FROM t_base_file WHERE is_deleted = '0' AND code IS NOT NULL AND code != '' ORDER BY code")
+                .fetch()
+                .all()
+                .map(e -> e.get("code"))
+                .collectList()
+                .map(list -> Response.success(list));
+    }
+
+    /**
+     * 获取所有不重复的type值（MIME类型）
+     * 用于文件筛选下拉框
+     */
+    @GetMapping(value = "/types")
+    @ResponseBody
+    public Mono<Response> types() {
+        return PostgresqlService.getBean().template()
+                .getDatabaseClient()
+                .sql("SELECT DISTINCT type FROM t_base_file WHERE is_deleted = '0' AND type IS NOT NULL AND type != '' ORDER BY type")
+                .fetch()
+                .all()
+                .map(e -> e.get("type"))
+                .collectList()
+                .map(list -> Response.success(list));
+    }
 
     @PostMapping(value = "/video/copy")
     @ResponseBody

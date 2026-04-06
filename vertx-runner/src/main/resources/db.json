@@ -1,0 +1,7 @@
+{
+  "url": "jdbc:h2:D:\\4code\\4java\\workspace\\java-learning\\kotlin-runner\\h2\\sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023",
+  "user": "sibyl",
+  "password": "sibyl-h2-2023",
+  "max_pool_size": 1024,
+  "min_pool_size": 64
+}
