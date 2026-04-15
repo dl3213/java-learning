@@ -534,6 +534,23 @@ public class IndexRestController {
                         </li>
                         """)
                 .setChildren(Arrays.asList());
+
+        MenuDTO config = new MenuDTO()
+                .setCode("config")
+                .setName("config")
+                .setHtml("""
+                        <li class="nav-item">
+                            <a class="nav-link" target-link="/templates/system/list-view.html" >
+                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-book"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" /><path d="M3 6l0 13" /><path d="M12 6l0 13" /><path d="M21 6l0 13" /></svg>   
+                                </span>
+                                <span class="nav-link-title">config</span>
+                            </a>
+                        </li>
+                        """)
+                .setLinkUrl("")
+                .setChildren(Arrays.asList());
+
         MenuDTO test = new MenuDTO()
                 .setCode("Test")
                 .setName("Test")
@@ -552,9 +569,10 @@ public class IndexRestController {
                 book,
                 Box,
                 music,
-                Database,
-                tool,
-                test
+//                Database,
+                config
+//                ,
+//                test
 //                , ai
         );
     }

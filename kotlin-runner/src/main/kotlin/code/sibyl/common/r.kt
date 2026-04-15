@@ -405,6 +405,11 @@ object r {
         return SpringUtil.getBean(name, clazz)
     }
 
+    @JvmStatic
+    fun <T> getBean( name: String?, clazz: Class<T>? ): T {
+        return SpringUtil.getBean(name, clazz)
+    }
+
     /**
      * 无异常解析时间字符串
      */
