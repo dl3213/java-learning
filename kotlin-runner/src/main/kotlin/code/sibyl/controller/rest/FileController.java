@@ -169,7 +169,21 @@ public class FileController {
 
         String type = jsonObject.getString("type");
         if (StringUtils.isNotBlank(type)) {
-            criteria = criteria.and("type").like(type + "%");
+            String[] typeParts = type.split(",");
+            Criteria typeCriteria = Criteria.empty();
+            boolean first = true;
+            for (String t : typeParts) {
+                t = t.trim();
+                if (StringUtils.isNotBlank(t)) {
+                    if (first) {
+                        typeCriteria = typeCriteria.and("type").like(t + "%");
+                        first = false;
+                    } else {
+                        typeCriteria = typeCriteria.or("type").like(t + "%");
+                    }
+                }
+            }
+            criteria = criteria.and(typeCriteria);
         }
         String keyword = jsonObject.getString("keyword");
         if (StringUtils.isNotBlank(keyword)) {
@@ -301,7 +315,6 @@ public class FileController {
     // todo
     @PostMapping(value = "/sql/page")
     @ResponseBody
-    @Deprecated
     public Mono<Response> sql_page(@RequestBody JSONObject jsonObject) {
         String withTags = jsonObject.getString("withTags");
         return PostgresqlService.getBean().fileQuery(jsonObject)
@@ -312,7 +325,7 @@ public class FileController {
                     }
                     // 收集所有 file id
                     List<Long> fileIds = files.stream()
-                            .map(BaseFile::getId)
+                            .map(e -> e.getId())
                             .filter(Objects::nonNull)
                             .collect(Collectors.toList());
                     // 查询这些文件的所有标签
@@ -323,16 +336,17 @@ public class FileController {
                                             .and("entity_id").in(fileIds)
                             ), Tag.class)
                             .collectList()
+                            .switchIfEmpty(Mono.just(new ArrayList<>()))
                             .map(tags -> {
                                 // 按 entityId 分组
                                 Map<Long, List<Tag>> tagsByFileId = new HashMap<>();
                                 for (Tag tag : tags) {
-                                    tagsByFileId.computeIfAbsent(tag.getEntityId(), k -> new ArrayList<>()).add(tag);
+                                    tagsByFileId.computeIfAbsent(Long.valueOf((tag.getEntityId())), k -> new ArrayList<>()).add(tag);
                                 }
                                 // 挂到每个文件上
                                 for (BaseFile file : files) {
                                     if (file.getId() != null) {
-                                        List<Tag> fileTags = tagsByFileId.get(file.getId());
+                                        List<Tag> fileTags = tagsByFileId.get((file.getId()));
                                         file.setTags(fileTags != null ? fileTags : new ArrayList<>());
                                     }
                                 }
@@ -701,7 +715,7 @@ public class FileController {
     public Mono<Response> codes() {
         return PostgresqlService.getBean().template()
                 .getDatabaseClient()
-                .sql("SELECT DISTINCT code FROM t_base_file WHERE is_deleted = '0' AND code IS NOT NULL AND code != '' ORDER BY code")
+                .sql("SELECT DISTINCT code FROM t_base_file WHERE is_deleted = '0' AND code IS NOT NULL  ORDER BY code")
                 .fetch()
                 .all()
                 .map(e -> e.get("code"))
@@ -716,9 +730,10 @@ public class FileController {
     @GetMapping(value = "/types")
     @ResponseBody
     public Mono<Response> types() {
+
         return PostgresqlService.getBean().template()
                 .getDatabaseClient()
-                .sql("SELECT DISTINCT type FROM t_base_file WHERE is_deleted = '0' AND type IS NOT NULL AND type != '' ORDER BY type")
+                .sql("SELECT DISTINCT type FROM t_base_file WHERE is_deleted = '0' AND type IS NOT NULL  ORDER BY type")
                 .fetch()
                 .all()
                 .map(e -> e.get("type"))

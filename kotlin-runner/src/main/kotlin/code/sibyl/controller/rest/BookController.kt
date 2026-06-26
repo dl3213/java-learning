@@ -221,4 +221,28 @@ class BookController {
             .switchIfEmpty(Mono.error(RuntimeException("${id}不存在")))
             .map { e: Book? -> Response.success(e) }
     }
+
+
+    @ResponseBody
+    @PostMapping("/open-folder/{id}")
+    fun openFolder(@PathVariable id: String): Mono<Response> {
+        return PostgresqlService.getBean().template()!!
+            .selectOne(Query.query(Criteria.where("id").`is`(id)), Book::class.java)
+            .flatMap { book ->
+                val absolutePath = book.absolutePath ?: ""
+                log.info("[$absolutePath] $absolutePath")
+                val folderPath = Paths.get(absolutePath)?.toString() ?: ""
+                log.info("[$folderPath] $folderPath")
+                Mono.fromCallable {
+                    try {
+                        ProcessBuilder("explorer.exe", folderPath).start()
+                        Response.success()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Response.error(e.message)
+                    }
+                }
+            }
+            .defaultIfEmpty(Response.success())
+    }
 }

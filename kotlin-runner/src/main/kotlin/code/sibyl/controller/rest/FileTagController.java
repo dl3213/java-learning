@@ -49,8 +49,8 @@ public class FileTagController {
      */
     @PostMapping("/add")
     public Mono<Response> addTag(@RequestBody JSONObject json) {
-        Long fileId = json.getLong("fileId");
-        Long tagId = json.getLong("tagId");
+        String fileId = json.getString("fileId");
+        String tagId = json.getString("tagId");
 
         return PostgresqlService.getBean().template()
                 .selectOne(Query.query(
@@ -73,7 +73,7 @@ public class FileTagController {
                                 }
                                 Tag newTag = new Tag();
                                 newTag.setId(r.id());
-                                newTag.setEntityId(fileId);
+                                newTag.setEntityId(Long.valueOf(String.valueOf(fileId)));
                                 newTag.setEntityType(ENTITY_TYPE);
                                 newTag.setName(tag.getName());
                                 newTag.setDeleted("0");
@@ -153,9 +153,9 @@ public class FileTagController {
                                 // 不存在则新增
                                 Tag newTag = new Tag();
                                 newTag.setId(r.id());
-                                newTag.setEntityId(fileId);
+                                newTag.setEntityId(Long.valueOf(String.valueOf(fileId)));
                                 newTag.setEntityType(ENTITY_TYPE);
-                                newTag.setName(tagName.trim());
+                                newTag.setName(tagName.toLowerCase().trim());
                                 newTag.setDeleted("0");
                                 newTag.setCreateTime(LocalDateTime.now());
                                 newTag.setCreateId(r.defaultUserId());
@@ -188,7 +188,7 @@ public class FileTagController {
                 .flatMap(file -> {
                     Tag newTag = new Tag();
                     newTag.setId(r.id());
-                    newTag.setEntityId(fileId);
+                    newTag.setEntityId(Long.valueOf(String.valueOf(fileId)));
                     newTag.setEntityType(ENTITY_TYPE);
                     newTag.setName(tagName.trim());
                     newTag.setDeleted("0");
@@ -211,6 +211,20 @@ public class FileTagController {
         }
         return PostgresqlService.getBean().template()
                 .select(Query.query(criteria), Tag.class)
+                .collectList()
+                .map(Response::success);
+    }
+
+    @GetMapping("/name/distinct/all")
+    public Mono<Response> nameDistinctAll(@RequestParam(required = false) String entityType) {
+        Criteria criteria = Criteria.where("is_deleted").is("0");
+        if (entityType != null && !entityType.isBlank()) {
+            criteria = criteria.and("entity_type").is(entityType);
+        }
+        return PostgresqlService.getBean().template()
+                .select(Query.query(criteria), Tag.class)
+                .map(e -> e.getName())
+                .distinct()
                 .collectList()
                 .map(Response::success);
     }

@@ -1,6 +1,8 @@
 package code.sibyl.domain.base
 
 import code.sibyl.domain.BaseEntity
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
@@ -14,6 +16,7 @@ open class Tag : BaseEntity() {
     open var name: String? = null
 
     @Column(name = "entity_id")
+    @JsonSerialize(using = ToStringSerializer::class)
     open var entityId: Long? = null
 
     @Column(name = "entity_type", length = 32)

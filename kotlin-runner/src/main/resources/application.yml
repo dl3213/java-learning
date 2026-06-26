@@ -4,6 +4,11 @@ app:
 runnerEnabled: true
 auth: false
 isDev: true
+
+# IP 白名单 - /api/rest/** 仅允许以下 IP 访问
+ip-whitelist:
+  enabled: true
+  ips: 127.0.0.1,::1,0:0:0:0:0:0:0:1,192.168.10.63,192.168.10.64,192.168.10.51,192.168.10.55,192.168.10.52
 logDetail: false
 
 job:

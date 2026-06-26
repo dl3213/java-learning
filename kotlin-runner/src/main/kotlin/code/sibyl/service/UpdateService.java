@@ -10,6 +10,7 @@ import code.sibyl.service.sql.PostgresqlService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -237,6 +238,9 @@ public class UpdateService {
 
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         baseFile.setSuffix(suffix);
+        if(StringUtils.isBlank(code)){
+            code = "default";
+        }
         baseFile.setCode(code);
         baseFile.setSerialNumber(null);
         baseFile.setDeleted("0");

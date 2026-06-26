@@ -41,7 +41,7 @@ open class BaseFile {
 
     open var serialNumber: String? = null
 
-    open var code: String? = null
+    open var code: String? = "default"
     open var width: Int? = null
     open var height: Int? = null
     open var thumbnail: String? = null

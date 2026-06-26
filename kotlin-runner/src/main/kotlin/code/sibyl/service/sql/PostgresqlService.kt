@@ -65,6 +65,9 @@ class PostgresqlService {
         var keyword = jsonObject.getString("keyword")
         var hash = jsonObject.getString("hash") ?: "0"
         var heart = jsonObject.getString("heart") ?: "0"
+        var tags = jsonObject.getString("tags") ?: ""
+        var typeList = type?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() }
+        var codeList = code.split(",").map { it.trim() }.filter { it.isNotBlank() }
         var orderField = jsonObject.getString("orderField")
         var orderDirection = jsonObject.getString("orderDirection")
         var sql = """
@@ -88,8 +91,18 @@ class PostgresqlService {
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}' 
-            ${if (!type.isNullOrBlank()) "and type ilike '${type}%'" else ""}
-            ${"and code = '${code}'"}  
+            ${if (!typeList.isNullOrEmpty()) "and (" + typeList.joinToString(" or ") { "type ilike '${it}%'" } + ")" else ""}
+            ${if (codeList.isNotEmpty()) "and code in (" + codeList.joinToString(",") { "'${it}'" } + ")" else ""}
+            ${
+            if (!tags.isNullOrBlank()) """
+                and main.id in (
+                    select distinct entity_id from t_base_tag 
+                    where is_deleted = '0' 
+                    and entity_type = '${entityType}' 
+                    and name in (${tags.split(",").filter { it.isNotBlank() }.joinToString(",") { "'${it.trim()}'" }})
+                )
+            """.trimIndent() else ""
+        }
             ${if (!keyword.isNullOrBlank()) "and (real_name ilike '%${keyword}%' or type ilike '%${keyword}%' or file_name ilike '%${keyword}%' or code ilike '%${keyword}%' or cast(id as varchar) ilike '%${keyword}%') " else ""}
             ${
             if (hash == "1") """
@@ -98,7 +111,7 @@ class PostgresqlService {
                     select sha256, count(1) as count from T_BASE_FILE
                     where is_deleted = '${isDeleted}' 
                     and sha256 is not null
-                    ${"and code = '${code}'"}  
+                    ${if (codeList.isNotEmpty()) "and code in (" + codeList.joinToString(",") { "'${it}'" } + ")" else ""}
                     group by sha256
                     )t where count >=2 
                 )
@@ -162,13 +175,12 @@ class PostgresqlService {
         val entityType = "t_biz_book"
         val pageNumber = jsonObject.getInteger("pageNumber") ?: 1
         val pageSize = jsonObject.getInteger("pageSize") ?: 12
-        var optionField = jsonObject.getString("optionField")
-        var isDeleted = if ("isDeleted" == optionField) jsonObject.getString("optionValue") else "0"
+        var isDeleted = jsonObject.getString("isDeleted") ?: "0"
         var type = jsonObject.getString("type")
         var code = jsonObject.getString("code") ?: ""
         var keyword = jsonObject.getString("keyword")
-        var hash = if ("hash" == optionField) jsonObject.getString("optionValue") else "0"
-        var heart = if ("heart" == optionField) jsonObject.getString("optionValue") else "0"
+        var hash = jsonObject.getString("hash") ?: "0"
+        var heart = jsonObject.getString("heart") ?: "0"
         var orderField = jsonObject.getString("orderField")
         var orderDirection = jsonObject.getString("orderDirection")
         var sql = """

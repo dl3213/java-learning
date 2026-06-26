@@ -20,7 +20,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        File dir = new File("D:\\4game\\steam\\steamapps\\workshop\\content\\431960");
+        File dir = new File("C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\431960");
         Date beginDate = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDateStr = simpleDateFormat.format(beginDate);
@@ -29,7 +29,7 @@ public class Main {
             System.err.println(file + " = > " + file.getName());
             try {
                 String name = file.getName();
-                FileUtils.moveFile(file, new File("D:\\4pc\\dl3213\\" + name.replace(".", "-" + System.currentTimeMillis() + ".")));
+                FileUtils.moveFile(file, new File("C:\\dl3213\\4me\\" + name.replace(".", "-" + System.currentTimeMillis() + ".")));
             } catch (IOException e) {
                 e.printStackTrace();
             }

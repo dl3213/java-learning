@@ -37,7 +37,9 @@ public class BilibiliTool {
     public static void main(String[] args) {
 
         List<String> strings = Arrays.asList(
-                "BV1E5QTBmEyS"
+                "BV1W1BFBKEEn",
+                "BV1wpqoBsE59",
+                "BV121EQ6MEzr"
         );
         System.err.println(strings.size());
         strings.stream().forEach(item -> {
@@ -141,7 +143,7 @@ public class BilibiliTool {
                 String url = durl.getJSONArray("backup_url").getString(0);
                 System.err.println("url => " + url);
 
-                downloadNew(url, "D:\\" + bvid + "-" + cid + ".mp4");
+                downloadNew(url, "C:\\dl3213\\" + bvid + "-" + cid + ".mp4");
 
                 System.err.println();
             }

@@ -29,7 +29,7 @@ import static java.lang.StringTemplate.STR;
 
 public class FfmpegService {
 
-    public final static String basePath = "D:\\4code\\4dev\\ffmpeg-7.1-essentials_build\\bin\\";
+    public final static String basePath = "C:\\dl3213\\4dev\\tool\\ffmpeg-7.1-essentials_build\\bin\\";
 
     public final static String ffmpeg = STR."\{basePath}ffmpeg.exe";
     public final static String ffprobe = STR."\{basePath}ffprobe.exe";
@@ -86,7 +86,6 @@ public class FfmpegService {
     public static void main(String[] args) throws Exception {
 
 
-        FfmpegService.copy(" ", "C:\\dl3213\\4me\\", "000023", "001006" );
 //        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
 //        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 

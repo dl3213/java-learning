@@ -148,7 +148,9 @@ public class SteamService {
                                 friend.setId(null);
                                 friend.setSteamId(currentUser.getSteamId());
                                 friend.setStreamFriendId(json.getString("steamid"));
-                                friend.setFriendSince(r.long2localDateTime(json.getLong("friend_since"), ZoneId.of("UTC-4")).plusYears(-1)); // ? 多了一年?
+                                Long friendSince = json.getLong("friend_since");
+                                log.info("[SteamFriend] steamId = {}, streamFriendId = {}, friendSince = {} ", friend.getSteamId(), friend.getStreamFriendId(), friendSince);
+                                friend.setFriendSince(r.long2localDateTime(friendSince, ZoneId.of("UTC-4")) ); // ? 多了一年?
                                 friend.setRelationship(json.getString("relationship"));
                                 friend.setDeleted("0");
                                 return Mono.zip(Mono.just(currentUser), Mono.just(friend));
