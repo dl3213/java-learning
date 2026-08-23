@@ -91,6 +91,12 @@ open class BaseFile {
 
     // ===== 图片相似度向量相关字段 =====
 
+    /** 感知哈希 pHash (64bit DCT, 16 位十六进制字符串) */
+    open var phash: String? = null
+
+    /** 边缘哈希 eHash (64bit Canny 边缘密度指纹;纯色背景变化不敏感) */
+    open var ehash: String? = null
+
     /** ORB 向量维度 (固定256) */
     open var vectorDim: Int? = null
 
@@ -105,6 +111,9 @@ open class BaseFile {
 
     /** 处理状态: pending/processing/completed/failed */
     open var similarityStatus: String? = null
+
+    /** Pixiv 作品ID（从文件名 _p 前缀提取） */
+    open var pixivCode: String? = null
 
     /** 相似度处理失败时的错误信息 */
     open var similarityErrorMsg: String? = null

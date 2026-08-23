@@ -1,0 +1,20 @@
+services:
+  kotlin-runner:
+    build: .
+    image: kotlin-runner:0.0.1
+    container_name: kotlin-runner
+    # 配置文件里 Redis/MySQL/PG/Ollama 全是 127.0.0.1，host 网络直接复用宿主机中间件
+    # 注意：host 网络在 Linux 上原生支持；Windows/macOS 的 Docker Desktop 需较新版本并手动开启
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      # 调整 JVM 参数改这里即可，无需重建镜像
+      JAVA_OPTS: "-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
+      # 如需切换环境（默认 dev 写在 config/application.yml 里）：
+      # SPRING_PROFILES_ACTIVE: prod
+    volumes:
+      # jar 内不含 application*.yml，此目录必须存在且非空（首次部署从构建产物拷贝）
+      - ./config:/app/config
+      - ./h2:/app/h2      # H2 文件库持久化
+      - ./logs:/app/logs  # 应用日志

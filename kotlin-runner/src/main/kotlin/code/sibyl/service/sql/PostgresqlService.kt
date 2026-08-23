@@ -60,6 +60,7 @@ class PostgresqlService {
         //var optionField = jsonObject.getString("optionField")
 
         var isDeleted = jsonObject.getString("isDeleted") ?: "0"
+        var fileId = jsonObject.getString("id") ?: ""
         var type = jsonObject.getString("type")
         var code = jsonObject.getString("code") ?: ""
         var keyword = jsonObject.getString("keyword")
@@ -70,6 +71,7 @@ class PostgresqlService {
         var codeList = code.split(",").map { it.trim() }.filter { it.isNotBlank() }
         var orderField = jsonObject.getString("orderField")
         var orderDirection = jsonObject.getString("orderDirection")
+        var idFilter = if (!fileId.isNullOrBlank()) "and main.id = '${fileId}'" else ""
         var sql = """
             select main.*,
             COALESCE(heart_count.count,0 ) as heart_count, 
@@ -91,6 +93,7 @@ class PostgresqlService {
                 group by entity_id
             ) heart_by_current_user on heart_by_current_user.entity_id = main.id
             where IS_DELETED = '${isDeleted}' 
+            ${idFilter}
             ${if (!typeList.isNullOrEmpty()) "and (" + typeList.joinToString(" or ") { "type ilike '${it}%'" } + ")" else ""}
             ${if (codeList.isNotEmpty()) "and code in (" + codeList.joinToString(",") { "'${it}'" } + ")" else ""}
             ${

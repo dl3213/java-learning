@@ -272,12 +272,11 @@ public class UpdateService {
     public Mono<Long> 文件补充hash() {
         long start = System.currentTimeMillis();
         DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and SHA256 IS NULL ")
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and SHA256 IS NULL limit 500")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(500)
                 .flatMap(item -> BaseFileHandler.getBean().sha256(item))
                 .count()
                 .map(count -> {
@@ -291,12 +290,11 @@ public class UpdateService {
     public Mono<Long> 图片补充大小() {
         long start = System.currentTimeMillis();
         DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where type like 'image%' and (WIDTH is null or HEIGHT is null)")
+        return client.sql("select * from T_BASE_FILE where type like 'image%' and (WIDTH is null or HEIGHT is null) limit 100")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(100)
                 .flatMap(item -> BaseFileHandler.getBean().图片补充大小(item))
                 .count()
                 .map(count -> {
@@ -310,12 +308,11 @@ public class UpdateService {
     public Mono<Long> 视频文件补充thumbnail() {
         long start = System.currentTimeMillis();
         DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (thumbnail is null)")
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (thumbnail is null) limit 100")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(100)
                 .flatMap(item -> BaseFileHandler.getBean().视频文件补充thumbnail(item))
                 .count()
                 .map(count -> {
@@ -329,12 +326,11 @@ public class UpdateService {
     public Mono<Long> 视频文件补充时长() {
         long start = System.currentTimeMillis();
         DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (video_duration_second is null)")
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (video_duration_second is null) limit 100")
                 .mapProperties(BaseFile.class)
                 .all()
                 .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
 //                .subscribeOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
-                .take(100)
                 .flatMap(item -> BaseFileHandler.getBean().视频文件补充时长(item))
                 .count()
                 .map(count -> {
@@ -349,15 +345,26 @@ public class UpdateService {
     public Mono<Long> bigVideo2m3u8() {
         long start = System.currentTimeMillis();
         DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
-        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and size >= 6462193653 and (m3u8_path is null)")
+        // >= 5GB 的 mp4 视频(5*1024^3=5368709120);wmv 等非 H.264 容器流复制出来的 HLS 浏览器无法解码,跳过
+        // concatMap 串行转换:避免多个 ffmpeg 同时读写 USB 机械盘导致 IO 争抢;size desc 大文件优先
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and suffix = 'mp4' and size >= 5368709120 and (m3u8_path is null) order by size desc")
                 .mapProperties(BaseFile.class)
                 .all()
-                .flatMap(entity -> {
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .concatMap(entity -> {
                     String absolutePath = entity.getAbsolutePath();
                     String m3u8Path = File.separator + "m3u8" + File.separator + entity.getId() + File.separator + entity.getId() + ".m3u8";
                     File fromFile = new File(absolutePath);
+                    if (!fromFile.exists()) {
+                        log.warn("[bigVideo2m3u8] 源文件不存在, 跳过: {}", absolutePath);
+                        return Mono.empty();
+                    }
                     String toFilePath = r.fileBaseDir() + File.separator + "cache" + m3u8Path ;
                     File toFile = new File(toFilePath);
+                    // 重切保护:先清空该视频的旧切片目录,避免失败重跑留下孤儿分片
+                    if (toFile.getParentFile().exists()) {
+                        FileUtil.del(toFile.getParentFile());
+                    }
                     r.createParentDirectories(toFile);
                     FfmpegService.convert2m3u8(
                             absolutePath, toFilePath
@@ -367,9 +374,90 @@ public class UpdateService {
                 })
                 .count()
                 .map(count -> {
-//                    log.info("[bigVideo2m3u8] count = {}, cost = {}", count, (System.currentTimeMillis() - start));
+                    log.info("[bigVideo2m3u8] 完成 {} 个, 耗时 {} ms", count, (System.currentTimeMillis() - start));
                     return count;
                 });
 
+    }
+
+    /**
+     * 图片回填 pHash 感知哈希(近似重复检测用)
+     * - 仅常用图片格式(OpenCV imread 支持;gif 不支持,跳过)
+     * - 串行执行;解码失败的跳过并告警
+     * - 注:eHash 方案已实现待启用(ImageHashService.computeHashes 可同时算双指纹,
+     *        t_base_file.ehash 列已建);启用时把 WHERE 改为 (phash is null or ehash is null)
+     *        并改用 computeHashes 回填两列
+     */
+    public Mono<Long> 图片补充phash() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'image%' and lower(suffix) in ('jpg','jpeg','png','bmp','webp') and (phash is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .concatMap(entity -> {
+                    String absolutePath = entity.getAbsolutePath();
+                    File f = new File(absolutePath);
+                    if (!f.exists()) {
+                        log.warn("[图片补充phash] 源文件不存在, 跳过: {}", absolutePath);
+                        return Mono.empty();
+                    }
+                    String hash = ImageHashService.pHash(absolutePath);
+                    if (StringUtils.isBlank(hash)) {
+                        log.warn("[图片补充phash] 解码失败, 跳过: {}", absolutePath);
+                        return Mono.empty();
+                    }
+                    entity.setPhash(hash);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .count()
+                .map(count -> {
+                    log.info("[图片补充phash] 完成 {} 个, 耗时 {} ms", count, (System.currentTimeMillis() - start));
+                    return count;
+                });
+    }
+
+    @NotNull
+    public Mono<Long> pixiv补充pixivCode() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and code = 'pixiv' and pixiv_code is null ")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .flatMap(entity -> {
+                    String fileName = entity.getFileName();
+                    if (StringUtils.isBlank(fileName)) return Mono.empty();
+                    // 从文件名提取 pixivCode: "144428583_p4.png" / "144428583_-4.png" / "140720083.gif" → "144428583" / "140720083"
+                    String pixivCode = null;
+                    // 先尝试分隔符模式: "144428583_p4.png" → "144428583"
+                    String[] separators = {"_p", "_-", "_", "-"};
+                    for (String sep : separators) {
+                        int idx = fileName.indexOf(sep);
+                        if (idx > 0) {
+                            String candidate = fileName.substring(0, idx);
+                            if (candidate.matches("\\d+")) {
+                                pixivCode = candidate;
+                                break;
+                            }
+                        }
+                    }
+                    // 没有分隔符，尝试整个文件名（不含后缀）: "140720083.gif" → "140720083"
+                    if (pixivCode == null) {
+                        int dot = fileName.lastIndexOf(".");
+                        String nameWithoutExt = dot > 0 ? fileName.substring(0, dot) : fileName;
+                        if (nameWithoutExt.matches("\\d+")) {
+                            pixivCode = nameWithoutExt;
+                        }
+                    }
+                    if (pixivCode == null) return Mono.empty();
+                    entity.setPixivCode(pixivCode);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .count()
+                .map(count -> {
+//                    log.info("[pixiv补充pixivCode] count = {}, cost = {}ms", count, (System.currentTimeMillis() - start));
+                    return count;
+                });
     }
 }

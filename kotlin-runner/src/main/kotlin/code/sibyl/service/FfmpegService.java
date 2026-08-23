@@ -85,7 +85,7 @@ public class FfmpegService {
 
     public static void main(String[] args) throws Exception {
 
-
+        FfmpegService.copy("E:/sibyl-system/file/2026-07-05/2073570026400649216.mp4", "C:\\dl3213\\4me", "000004","002003", "123");
 //        FfmpegService.videoFrame("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "template", "02:59", "03:03");
 //        FfmpegService.sound("E:\\ニンジャスレイヤー NINJA SLAYER TVRIP+BDRIP\\ニンジャスレイヤー BDRIP 1920x1080\\02.mkv", "E:\\素材\\NINJA SLAYER\\other", "hello"+System.currentTimeMillis(), "04:51", "04:53"); // 用 model_bs_roformer_ep_317_sdr_12.9755 分割人声
 

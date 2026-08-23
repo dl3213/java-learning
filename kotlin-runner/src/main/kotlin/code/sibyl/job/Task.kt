@@ -96,4 +96,11 @@ class Task {
     fun book() {
         BookService.bean.pageNumBuild().subscribe()
     }
+
+    @Async
+    @Scheduled(cron = "0 0/1 * * * ?")
+    @ConditionalOnBean(value = [R2dbcEntityTemplate::class])
+    fun pixiv补充pixivCode() {
+        UpdateService.getBean().pixiv补充pixivCode().subscribe()
+    }
 }

@@ -138,8 +138,13 @@ public class BaseFileHandler implements Handler<BaseFile> {
             }
             ff.stop();
 
-        } catch (FFmpegFrameGrabber.Exception e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return Mono.error(new RuntimeException(e));
+        }
+        if(StringUtils.isBlank(thumbnailPath)){
+            log.error("[视频文件补充thumbnail] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
+            return Mono.just(item);
         }
         //log.info("[图片补充大小] [{}] {} --> thumbnailPath = {} ", Thread.currentThread().getName(), absolutePath, thumbnailPath);
         return client.sql("update T_BASE_FILE set thumbnail=:thumbnailPath where id=:id")

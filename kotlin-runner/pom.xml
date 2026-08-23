@@ -19,6 +19,8 @@
         <flink.version>1.20.0</flink.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 默认跳过测试(保持原行为);命令行 -Dsurefire.skip=false 开启 -->
+        <surefire.skip>true</surefire.skip>
     </properties>
     <dependencies>
 
@@ -266,6 +268,9 @@
 
     <!-- 第三方jar分离  -->
     <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <!-- 测试源码根:缺失时 kotlin:testCompile 报 No sources to compile -->
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <defaultGoal>compile</defaultGoal>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
@@ -349,6 +354,25 @@
                         <plugin>spring</plugin>
                     </compilerPlugins>
                 </configuration>
+                <executions>
+                    <!-- 将 Kotlin 编译绑定到 Maven 生命周期；缺失时 mvn 打包不含任何 class -->
+                    <!-- 混合源码（java+kt 同在 src/main/kotlin）：必须先于 maven-compiler 的 default-compile 执行 -->
+                    <execution>
+                        <id>compile</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <!-- 测试源码编译(src/test/kotlin),配合 surefire.skip=false 可命令行跑测试 -->
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
@@ -392,12 +416,12 @@
                 </executions>
             </plugin>
 
-            <!-- 跳过测试编译 -->
+            <!-- 跳过测试编译(默认跳过;命令行 -Dsurefire.skip=false 开启) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>${surefire.skip}</skip>
                 </configuration>
             </plugin>
 

@@ -1,0 +1,95 @@
+app:
+  key: sibyl-kotlin
+
+runnerEnabled: true
+auth: false
+isDev: true
+
+# IP 白名单 - /api/rest/** 仅允许以下 IP 访问
+ip-whitelist:
+  enabled: true
+  ips: 127.0.0.1,::1,0:0:0:0:0:0:0:1,192.168.10.63,192.168.10.64,192.168.10.51, 192.168.10.52,192.168.10.55,192.168.10.53,192.168.10.54
+logDetail: false
+
+job:
+  enabled: true
+
+flink:
+  enabled: true
+
+file:
+  mode: ftp
+  path: E:\sibyl-system\file\ # 必须/结尾
+
+server:
+  port: 8080
+  shutdown: graceful
+  tomcat:
+    connection-timeout: 3600000
+
+spring:
+  application:
+    name: kotlin-runner
+  profiles:
+    active: dev
+    include: db, quartz
+  main:
+    keep-alive: true
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      exclude: logs/**
+      enabled: false
+  r2dbc:
+    url: r2dbc:h2:file:///./h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
+#    url: r2dbc:h2:file:///D:/4code/4java/workspace/java-learning/h2/sibyl;AUTO_SERVER=TRUE;MODE=LEGACY;NON_KEYWORDS=VALUE;USER=sibyl;PASSWORD=sibyl-h2-2023
+    pool:
+      enabled: true
+      max-size: 1024
+      min-idle: 64
+      initial-size: 64
+  h2:
+    console:
+      enable: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  info:
+    env:
+      enabled: true
+  ai:
+    ollama:
+      base-url: http://localhost:11434  # Ollama 默认端口
+      chat:
+        model: deepseek-r1:14b  # 需与本地部署的模型名称一致
+
+
+debug: false
+logging:
+  level:
+    root: info
+    org.springframework.r2dbc: warn
+    io.asyncer.r2dbc.mysql.client.ReactorNettyClient: warn
+    io.debezium: warn
+    org.apache.flink: warn
+    sun.rmi: warn
+  file:
+    name: ./logs/sibyl-runner-log.log #这里因为是内部module就多加一层文件夹
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 360
+
+

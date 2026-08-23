@@ -1,0 +1,30 @@
+
+env: prod
+
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: sibyl-postgres-0127
+      database: 0
+      repositories:
+        enabled: false
+
+data-source:
+  sibyl-mysql:
+    enable: true
+    driver: mysql
+    host: 127.0.0.1
+    port: 3306
+    database: sibyl
+    user: root
+    password: sibyl-mysql-0127
+  sibyl-postgresql:
+    enable: true
+    driver: postgresql
+    host: 127.0.0.1
+    port: 5432
+    database: postgres
+    user: postgres
+    password: sibyl-postgres-0127

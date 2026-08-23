@@ -11,6 +11,8 @@ import code.sibyl.model.FileInfo;
 import code.sibyl.service.FfmpegService;
 import code.sibyl.service.FileService;
 import code.sibyl.service.FileUploadService;
+import code.sibyl.service.ImageHashService;
+import code.sibyl.service.ImageSimilarityService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -334,7 +337,7 @@ public class FileController {
                                     Criteria.where("is_deleted").is("0")
                                             .and("entity_type").is("t_base_file")
                                             .and("entity_id").in(fileIds)
-                            ), Tag.class)
+                            ).sort(Sort.by(Sort.Direction.ASC, "name")), Tag.class)
                             .collectList()
                             .switchIfEmpty(Mono.just(new ArrayList<>()))
                             .map(tags -> {
@@ -411,20 +414,15 @@ public class FileController {
     public Mono<Response> pixivDeleteAll(@PathVariable String id) {
         return PostgresqlService.getBean().template().selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class).switchIfEmpty(Mono.error(new RuntimeException(STR."\{id}不存在")))
                 .flatMap(e -> {
-                    String[] split = e.getRealName().contains("_p") ? e.getRealName().split("_p") : e.getRealName().split("-p");
                     return PostgresqlService.getBean().template().getDatabaseClient().sql("""
                                     update t_base_file
                                     set is_deleted = '1',
                                     update_time = :updateTime,
                                     update_id = :updateId
                                     where is_deleted = '0' and code = 'pixiv' 
-                                    and (
-                                    real_name like ('%' || :pixivId || '_p%')
-                                    or
-                                    real_name like ('%' || :pixivId || '-p%')
-                                    )
+                                    and pixiv_code = :pixivId
                                     """)
-                            .bind("pixivId", split[0])
+                            .bind("pixivId", e.getPixivCode())
                             .bind("updateTime", LocalDateTime.now())
                             .bind("updateId", r.defaultUserId())
                             .fetch()
@@ -702,6 +700,59 @@ public class FileController {
                     Response response = Response.success(e);
                     response.put("prevUrl", r.staticFileBasePath.replace("**", ""));
                     return response;
+                });
+    }
+
+    /**
+     * pHash 相似图片搜索(感知哈希:识别同图不同尺寸/格式/JPG压缩损/轻水印/小裁剪)
+     *
+     * 请求示例:
+     *   GET /api/rest/v1/file/similar-by-phash/{id}?threshold=10&limit=20
+     *
+     * 参数说明:
+     *   @param id        目标图片的 t_base_file.id(路径参数,必填)
+     *                    - 以该图的 pHash 为基准,在库内全部 image 类型(已回填 phash)中检索
+     *                    - 若该图尚未回填 phash(新上传/批量任务未覆盖),会用 absolutePath
+     *                      现场计算一次,仅本次查询有效、不写库;持久化请走 UpdateService.图片补充phash
+     *   @param threshold 汉明距离阈值,默认 10,合法范围 0~64
+     *                    - 计算方式:两个 64bit 指纹异或后统计 1 的个数,越小越严格
+     *                    - 调参参考:0~4 基本同一张图;5~8 高度相似(缩放/转码);
+     *                                9~14 宽松(可能引入误报);>14 不建议使用
+     *   @param limit     返回条数上限,默认 20
+     *
+     * 返回结构:
+     *   data    = [{id, realName, relativePath, suffix, size, phash, ..., distance}, ...]
+     *             按 distance 升序;id 为字符串(避免前端 Long 精度丢失)
+     *   prevUrl = "/static-file/"(前端拼接图片 URL:prevUrl + relativePath)
+     *   threshold = 本次实际使用的阈值
+     */
+    @GetMapping(value = "/similar-by-phash/{id}")
+    @ResponseBody
+    public Mono<Response> similarByPhash(@PathVariable Long id,
+                                         @RequestParam(defaultValue = "10") int threshold,
+                                         @RequestParam(defaultValue = "20") int limit) {
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .flatMap(entity -> {
+                    String stored = entity.getPhash();
+                    Mono<String> targetMono = StringUtils.isNotBlank(stored)
+                            ? Mono.just(stored)
+                            : Mono.fromCallable(() -> ImageHashService.pHash(entity.getAbsolutePath()))
+                                    .subscribeOn(Schedulers.boundedElastic());
+                    return targetMono.flatMap(target -> {
+                        if (StringUtils.isBlank(target)) {
+                            Response resp = Response.success(new ArrayList<>());
+                            resp.put("msg", "目标图片无法计算 pHash");
+                            return Mono.just(resp);
+                        }
+                        return ImageSimilarityService.getBean().searchByPhash(id, target, threshold, limit)
+                                .map(list -> {
+                                    Response resp = Response.success(list);
+                                    resp.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                                    resp.put("threshold", threshold);
+                                    return resp;
+                                });
+                    });
                 });
     }
 

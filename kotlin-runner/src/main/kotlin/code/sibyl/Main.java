@@ -15,9 +15,6 @@ import java.util.function.Consumer;
 public class Main {
 
 
-    public static void main12(String[] args) {
-
-    }
 
     public static void main(String[] args) {
         File dir = new File("C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\431960");

@@ -7,6 +7,7 @@ import code.sibyl.domain.base.Tag;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.data.relational.core.query.Query;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 文件标签管理接口
@@ -112,21 +114,33 @@ public class FileTagController {
     }
 
     /**
-     * 绑定标签到文件（按名称）
+     * 绑定标签到文件（按名称，支持逗号分隔多个标签）
      * POST /file/tag/bind
      * body: { entityId: String, tag: String }
-     * 如果 name + entityId 在表中不存在则新增，否则什么都不做
+     * 分割前端传入的逗号分隔 tag 列表，逐个检查 name + entityId 是否已存在，
+     * 不存在则新增，已存在则跳过（不删除已有标签）
      */
     @PostMapping("/bind")
     public Mono<Response> bindTags(@RequestBody JSONObject json) {
         String entityId = json.getString("entityId");
-        String tagName = json.getString("tag");
+        String tagStr = json.getString("tag");
 
-        if (entityId == null || entityId.isBlank() || tagName == null || tagName.isBlank()) {
+        if (entityId == null || entityId.isBlank() || tagStr == null || tagStr.isBlank()) {
             return Mono.just(Response.error("entityId 和 tag 不能为空"));
         }
 
         Long fileId = Long.parseLong(entityId);
+
+        // 分割前端传入的逗号分隔 tag 列表
+        List<String> tagList = Arrays.stream(tagStr.split(","))
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
+        if (tagList.isEmpty()) {
+            return Mono.just(Response.error("tag 列表不能为空"));
+        }
 
         // 先查文件是否存在
         return PostgresqlService.getBean().template()
@@ -136,33 +150,21 @@ public class FileTagController {
                 ), BaseFile.class)
                 .switchIfEmpty(Mono.error(new RuntimeException("文件不存在")))
                 .flatMap(file -> {
-                    // 检查 name + entityId 是否已存在
-                    return PostgresqlService.getBean().template()
-                            .select(Query.query(
-                                    Criteria.where("is_deleted").is("0")
-                                            .and("entity_id").is(fileId)
-                                            .and("entity_type").is(ENTITY_TYPE)
-                                            .and("name").is(tagName.trim())
-                            ), Tag.class)
-                            .collectList()
-                            .flatMap(existing -> {
-                                if (!existing.isEmpty()) {
-                                    // 已存在，什么都不做
-                                    return Mono.empty();
-                                }
-                                // 不存在则新增
-                                Tag newTag = new Tag();
-                                newTag.setId(r.id());
-                                newTag.setEntityId(Long.valueOf(String.valueOf(fileId)));
-                                newTag.setEntityType(ENTITY_TYPE);
-                                newTag.setName(tagName.toLowerCase().trim());
-                                newTag.setDeleted("0");
-                                newTag.setCreateTime(LocalDateTime.now());
-                                newTag.setCreateId(r.defaultUserId());
-                                return PostgresqlService.getBean().template().insert(newTag);
-                            });
-                })
-                .map(Response::success);
+                    String fileCode = file.getCode();
+                    String pixivCode = file.getPixivCode();
+                    // 逐个 tag 检查并新增（目标文件）
+                    List<Mono<?>> ops = new ArrayList<>();
+                    for (String tagName : tagList) {
+                        ops.add(bindOneTag(fileId, tagName));
+                    }
+                    // 标签绑定到目标文件后，如果是 pixiv 且有 pixivCode，同步到同 pixivCode 的其他文件
+                    return Flux.merge(ops).then(Mono.defer(() -> {
+                        if ("pixiv".equals(fileCode) && pixivCode != null && !pixivCode.isBlank()) {
+                            return bindTagsToSiblings(fileId, pixivCode, tagList);
+                        }
+                        return Mono.just(Response.success());
+                    }));
+                });
     }
 
     /**
@@ -199,8 +201,56 @@ public class FileTagController {
                 .map(Response::success);
     }
 
+    // ===== 辅助方法 =====
+
+    /** 为单个文件插入一个标签（已存在则跳过） */
+    private Mono<?> bindOneTag(Long entityId, String tagName) {
+        return PostgresqlService.getBean().template()
+                .select(Query.query(
+                        Criteria.where("is_deleted").is("0")
+                                .and("entity_id").is(entityId)
+                                .and("entity_type").is(ENTITY_TYPE)
+                                .and("name").is(tagName)
+                ), Tag.class)
+                .collectList()
+                .flatMap(existing -> {
+                    if (!existing.isEmpty()) return Mono.empty();
+                    Tag newTag = new Tag();
+                    newTag.setId(r.id());
+                    newTag.setEntityId(entityId);
+                    newTag.setEntityType(ENTITY_TYPE);
+                    newTag.setName(tagName);
+                    newTag.setDeleted("0");
+                    newTag.setCreateTime(LocalDateTime.now());
+                    newTag.setCreateId(r.defaultUserId());
+                    return PostgresqlService.getBean().template().insert(newTag);
+                });
+    }
+
+    /** 如果 code=pixiv，将标签同步到同 pixiv_code 的所有文件 */
+    private Mono<Response> bindTagsToSiblings(Long fileId, String pixivCode, List<String> tagList) {
+        return PostgresqlService.getBean().template()
+                .select(Query.query(
+                        Criteria.where("is_deleted").is("0")
+                                .and("code").is("pixiv")
+                                .and("pixiv_code").is(pixivCode)
+                                .and("id").not(fileId)
+                ), BaseFile.class)
+                .collectList()
+                .flatMap(siblings -> {
+                    if (siblings.isEmpty()) return Mono.just(Response.success());
+                    List<Mono<?>> ops = new ArrayList<>();
+                    for (BaseFile sibling : siblings) {
+                        for (String tagName : tagList) {
+                            ops.add(bindOneTag(sibling.getId(), tagName));
+                        }
+                    }
+                    return Flux.merge(ops).then(Mono.just(Response.success()));
+                });
+    }
+
     /**
-     * 获取所有可用标签（可按 entityType 过滤）
+     * 获取所有可用标签（按 name 去重，可按 entityType 过滤）
      * GET /file/tag/all?entityType=t_base_file
      */
     @GetMapping("/all")
@@ -210,9 +260,16 @@ public class FileTagController {
             criteria = criteria.and("entity_type").is(entityType);
         }
         return PostgresqlService.getBean().template()
-                .select(Query.query(criteria), Tag.class)
+                .select(Query.query(criteria).sort(Sort.by(Sort.Direction.ASC, "name")), Tag.class)
                 .collectList()
-                .map(Response::success);
+                .map(tags -> {
+                    Map<String, Tag> unique = new LinkedHashMap<>();
+                    for (Tag t : tags) {
+                        String key = t.getName() != null ? t.getName() : "";
+                        unique.putIfAbsent(key, t);
+                    }
+                    return Response.success(unique.values());
+                });
     }
 
     @GetMapping("/name/distinct/all")
@@ -222,7 +279,7 @@ public class FileTagController {
             criteria = criteria.and("entity_type").is(entityType);
         }
         return PostgresqlService.getBean().template()
-                .select(Query.query(criteria), Tag.class)
+                .select(Query.query(criteria).sort(Sort.by(Sort.Direction.ASC, "name")), Tag.class)
                 .map(e -> e.getName())
                 .distinct()
                 .collectList()
