@@ -97,6 +97,21 @@ open class BaseFile {
     /** 边缘哈希 eHash (64bit Canny 边缘密度指纹;纯色背景变化不敏感) */
     open var ehash: String? = null
 
+    /** 视频缩略图指纹 vphash (64bit DCT, 16 位十六进制;取视频封面帧,用于相似视频初筛) */
+    open var vphash: String? = null
+
+    /** 视频多帧指纹 vhash(逗号分隔的多个 16 位十六进制,均匀抽帧 + 中心裁剪,抗水印) */
+    open var vhash: String? = null
+
+    /** vhash 实际帧数 */
+    open var vhashFrames: Int? = null
+
+    /** 图片相似分组标签(由批量任务聚类生成;有值=存在相似伙伴,供页面"图片相似"选项排序) */
+    open var similarGroup: String? = null
+
+    /** 视频相似分组标签(多帧指纹聚类;供页面"视频相似"选项排序) */
+    open var videoSimilarGroup: String? = null
+
     /** ORB 向量维度 (固定256) */
     open var vectorDim: Int? = null
 

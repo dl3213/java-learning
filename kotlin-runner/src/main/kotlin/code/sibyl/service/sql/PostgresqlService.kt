@@ -66,6 +66,9 @@ class PostgresqlService {
         var keyword = jsonObject.getString("keyword")
         var hash = jsonObject.getString("hash") ?: "0"
         var heart = jsonObject.getString("heart") ?: "0"
+        // 页面级相似选项:similar=图片相似(phash 聚类组),similarVideo=视频相似(多帧指纹聚类组)
+        var similar = jsonObject.getString("similar") ?: "0"
+        var similarVideo = jsonObject.getString("similarVideo") ?: "0"
         var tags = jsonObject.getString("tags") ?: ""
         var typeList = type?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() }
         var codeList = code.split(",").map { it.trim() }.filter { it.isNotBlank() }
@@ -130,7 +133,23 @@ class PostgresqlService {
                 )
             """.trimIndent() else ""
         }
-            order by ${if (hash == "1") "sha256 asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"}  NULLS LAST, create_time asc
+            ${if (similar == "1") """
+                and similar_group is not null
+                and similar_group in (
+                    select similar_group from T_BASE_FILE
+                    where similar_group is not null and is_deleted = '${isDeleted}'
+                    group by similar_group having count(1) >= 2
+                )
+            """.trimIndent() else ""}
+            ${if (similarVideo == "1") """
+                and video_similar_group is not null
+                and video_similar_group in (
+                    select video_similar_group from T_BASE_FILE
+                    where video_similar_group is not null and is_deleted = '${isDeleted}'
+                    group by video_similar_group having count(1) >= 2
+                )
+            """.trimIndent() else ""}
+            order by ${if (hash == "1") "sha256 asc," else ""}${if (similar == "1") "similar_group asc," else ""}${if (similarVideo == "1") "video_similar_group asc," else ""} ${if (!orderField.isNullOrBlank()) orderField.camelToSnakeCase() else "create_time"} ${if (!orderDirection.isNullOrBlank()) orderDirection else "asc"}  NULLS LAST, create_time asc
         """.trimIndent()
         var countSql = "select count(1) as count from (${sql}) temp";
         println("countSql --->")

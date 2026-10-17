@@ -127,6 +127,24 @@ public class ImageHashService {
     }
 
     /**
+     * 解析视频封面对应的图片路径(用于视频相似初筛的指纹来源)
+     * 优先 thumbnail 字段,回退 {absolutePath}.jpg(缩略图约定,前端预览同款)
+     *
+     * @return 实际存在的路径;都不存在返回 null
+     */
+    public static String thumbnailPath(String thumbnail, String absolutePath) {
+        if (thumbnail != null && !thumbnail.trim().isEmpty()) {
+            java.io.File f = new java.io.File(thumbnail.trim());
+            if (f.exists() && f.isFile()) return f.getAbsolutePath();
+        }
+        if (absolutePath != null && !absolutePath.trim().isEmpty()) {
+            java.io.File f2 = new java.io.File(absolutePath.trim() + ".jpg");
+            if (f2.exists() && f2.isFile()) return f2.getAbsolutePath();
+        }
+        return null;
+    }
+
+    /**
      * 两个十六进制指纹的汉明距离
      *
      * @return 距离(0~64);任一入参非法返回 Integer.MAX_VALUE

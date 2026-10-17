@@ -76,8 +76,8 @@ public class AutoParalogue {
                 robot.mouseMove(121, 513);
                 mouseLeftClick(robot);
 
-//                Point point = getMousePosition();
-//                log.info("鼠标坐标: X={}, Y={}", point.x, point.y);
+                Point point = getMousePosition();
+                log.info("鼠标坐标: X={}, Y={}", point.x, point.y);
             }
         });
 
@@ -113,7 +113,10 @@ public class AutoParalogue {
 
     private static void mouseLeftClick(Robot robot) {
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); // 按下左键:cite[1]:cite[7]
+//        log.info("鼠标左键 按下");
+        r.sleep(200);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); // 释放左键:cite[1]:cite[7]
+//        log.info("鼠标左键 放开");
     }
 
 

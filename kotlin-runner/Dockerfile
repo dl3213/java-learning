@@ -10,9 +10,13 @@ WORKDIR /app
 # （manifest 的 Class-Path 依赖该目录结构，config/ 会被运行时挂载覆盖）
 COPY target/kotlin-runner/ .
 
+# 启动脚本：每次启动自动探测宿主机局域网 IP 并幂等写入白名单
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
 ENV TZ=Asia/Shanghai \
     JAVA_OPTS="-Xms256m -Xmx256m -XX:+HeapDumpOnOutOfMemoryError"
 
-# sh -c + exec：SIGTERM 直达 java 进程，配合 server.shutdown: graceful 实现优雅停机
+# 入口脚本内部 exec java：SIGTERM 直达 java 进程，配合 server.shutdown: graceful 实现优雅停机
 # 编译启用了 preview 特性，运行必须带 --enable-preview 且 JDK 大版本为 21
-ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS --enable-preview -jar kotlin-runner-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["sh","/app/docker-entrypoint.sh"]

@@ -3,6 +3,7 @@ package code.sibyl
 import code.sibyl.common.r
 import code.sibyl.service.BookService
 import code.sibyl.service.BookService.Companion.bean
+import code.sibyl.service.SteamService
 import code.sibyl.service.UpdateService
 import code.sibyl.service.backup.BackupService
 import code.sibyl.service.sql.PostgresqlService
@@ -21,7 +22,8 @@ class AppTest {
     @Test
     open fun book() {
         //BookService.bean.move_test().block()
-        BookService.bean.pageNumBuild().block()
+//        BookService.bean.pageNumBuild().block()
+        SteamService.getBean().friendList().block()
     }
 
     @Test
@@ -74,6 +76,100 @@ class AppTest {
         else {
             println("命中 ${hits.size} 张:")
             hits.forEach { println("  距离=${it["distance"]}  id=${it["id"]}  ${it["real_name"]}") }
+        }
+    }
+
+    /**
+     * 视频回填 vphash(视频封面帧指纹,相似视频初筛)
+     * - 全库视频约 3000 个,读缩略图 jpg 计算指纹,预计几分钟
+     * - 重复执行安全:只补 vphash 为空的
+     */
+    @Test
+    // powershell -ExecutionPolicy Bypass -File C:\dl3213\4dev\workspace\java-learning\kotlin-runner\backfill-video-vphash.ps1
+    // powershell -ExecutionPolicy Bypass -File C:\dl3213\4dev\workspace\java-learning\kotlin-runner\backfill-video-vhash-frames.ps1
+    open fun videoVphashBackfill() {
+        val count = UpdateService.getBean().视频补充vphash().block()
+        println("[videoVphashBackfill] 完成回填 $count 个")
+    }
+
+    /**
+     * 视频相似初筛演示
+     * - 随机取一个已回填 vphash 的视频,按汉明距离 <=10 打印 Top-10
+     * - distance=0 表示封面帧指纹完全一致
+     * - 注意:仅输出 id/距离/大小,不打印文件名(避免 NSFW 标题进日志)
+     */
+    @Test
+    open fun videoVphashSearchDemo() {
+        val client = PostgresqlService.getBean().template().getDatabaseClient()
+        val sample = client
+            .sql("select id, vphash from t_base_file where is_deleted='0' and type like 'video%' and vphash is not null order by random() limit 1")
+            .fetch().first().block() ?: return println("库中还没有已回填 vphash 的视频,先跑 videoVphashBackfill")
+        val id = (sample["id"] as Number).toLong()
+        println("查询源: id=$id  vphash=${sample["vphash"]}")
+        val hits = code.sibyl.service.ImageSimilarityService.getBean()
+            .searchByVphash(id, sample["vphash"] as String, 10, 10).block()
+        if (hits.isNullOrEmpty()) println("阈值内无相似视频")
+        else {
+            println("命中 ${hits.size} 个:")
+            hits.forEach { println("  距离=${it["distance"]}  id=${it["id"]}  size=${it["size"]}") }
+        }
+    }
+
+    /**
+     * 图片相似分组(页面"相似"选项用)
+     * - 按 phash 汉明距离 ≤10 聚类,给每组写 similar_group 标签;全量重算(先清旧标签)
+     * - 1 万张图约 5000 万次比对,Java 侧秒级完成
+     * - 跑完后在文件页面勾选 options → 相似,列表只显示有相似伙伴的图片并按组相邻排序
+     */
+    @Test
+    open fun imgSimilarGroupsBuild() {
+        val count = UpdateService.getBean().图片补充相似分组().block()
+        println("[imgSimilarGroupsBuild] 完成相似分组 $count 组")
+    }
+
+    /**
+     * 视频相似分组(页面"视频相似"选项用)
+     * - 判据:对应帧汉明距离 ≤8 的帧数 ≥ max(4, ceil(较短帧数×0.6))
+     * - 3000 个视频约 460 万对,Java 侧约 1~3 秒;全量重算(先清旧标签)
+     * - 需要 vhash 已回填(videoVhashFramesBackfill)
+     */
+    @Test
+    open fun videoSimilarGroupsBuild() {
+        val count = UpdateService.getBean().视频补充相似分组().block()
+        println("[videoSimilarGroupsBuild] 完成视频相似分组 $count 组")
+    }
+
+    /**
+     * 视频回填多帧指纹 vhash(方案 B:12 帧均匀抽帧 + 中心裁剪 80%)
+     * - 每个视频:ffprobe 探时长 + 12 次关键帧 seek,HDD 上约 3~5 秒/个
+     * - 3000 个视频预计 3~5 小时,建议夜间跑;幂等,只补 vhash 为空的
+     * - 命令: powershell -ExecutionPolicy Bypass -File backfill-video-vhash-frames.ps1
+     */
+    @Test
+    open fun videoVhashFramesBackfill() {
+        val count = UpdateService.getBean().视频补充vhash().block()
+        println("[videoVhashFramesBackfill] 完成回填 $count 个")
+    }
+
+    /**
+     * 多帧相似视频演示(只输出 id/命中帧数/大小,不打印文件名)
+     * - 相似判据:12 帧里 ≥8 帧的汉明距离 ≤8
+     */
+    @Test
+    open fun videoVhashFramesSearchDemo() {
+        val client = PostgresqlService.getBean().template().getDatabaseClient()
+        val sample = client
+            .sql("select id, vhash from t_base_file where is_deleted='0' and type like 'video%' and vhash is not null order by random() limit 1")
+            .fetch().first().block() ?: return println("库中还没有 vhash 的视频,先跑 videoVhashFramesBackfill")
+        val id = (sample["id"] as Number).toLong()
+        val csv = sample["vhash"] as String
+        println("查询源: id=$id  frames=${csv.split(",").size}")
+        val hits = code.sibyl.service.ImageSimilarityService.getBean()
+            .searchByVhashFrames(id, csv, 8, 8, 10).block()
+        if (hits.isNullOrEmpty()) println("未找到相似视频(12 帧里 ≥8 帧命中)")
+        else {
+            println("命中 ${hits.size} 个:")
+            hits.forEach { println("  命中帧=${it["hits"]}/${it["vhash_frames"]}  id=${it["id"]}  size=${it["size"]}") }
         }
     }
 

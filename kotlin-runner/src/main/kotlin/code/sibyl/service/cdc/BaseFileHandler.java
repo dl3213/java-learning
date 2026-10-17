@@ -203,6 +203,7 @@ public class BaseFileHandler implements Handler<BaseFile> {
 
           throw new RuntimeException("无法获取视频时长");
       }catch (Exception e){
+          System.err.println(videoPath);
           e.printStackTrace();
           return 0.0;
       }

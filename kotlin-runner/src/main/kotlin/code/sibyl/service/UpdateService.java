@@ -42,6 +42,11 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -415,6 +420,226 @@ public class UpdateService {
                     log.info("[图片补充phash] 完成 {} 个, 耗时 {} ms", count, (System.currentTimeMillis() - start));
                     return count;
                 });
+    }
+
+    /**
+     * 视频回填 vphash(视频封面帧指纹,相似视频初筛用)
+     * - 指纹来源:thumbnail 字段的缩略图,回退 {absolutePath}.jpg
+     * - 抗转码/分辨率变化(32x32 下采样);对加水印首帧有一定鲁棒性
+     * - 串行执行,幂等(只补 vphash is null)
+     */
+    public Mono<Long> 视频补充vphash() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (vphash is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .concatMap(entity -> {
+                    String thumbPath = ImageHashService.thumbnailPath(entity.getThumbnail(), entity.getAbsolutePath());
+                    if (thumbPath == null) {
+                        log.warn("[视频补充vphash] 缩略图不存在, 跳过: id={} thumbnail={}", entity.getId(), entity.getThumbnail());
+                        return Mono.empty();
+                    }
+                    String hash = ImageHashService.pHash(thumbPath);
+                    if (StringUtils.isBlank(hash)) {
+                        log.warn("[视频补充vphash] 解码失败, 跳过: {}", thumbPath);
+                        return Mono.empty();
+                    }
+                    entity.setVphash(hash);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .count()
+                .map(count -> {
+                    log.info("[视频补充vphash] 完成 {} 个, 耗时 {} ms", count, (System.currentTimeMillis() - start));
+                    return count;
+                });
+    }
+
+    /**
+     * 视频回填多帧指纹 vhash(方案 B:均匀抽 12 帧 + 中心裁剪 + 每帧 pHash)
+     * - 抗水印/转码/分辨率变化;覆盖缩略图全黑导致 vphash 无效的视频
+     * - 每个视频需 ffprobe 探时长 + 12 次关键帧 seek,HDD 上约 3~5 秒/个
+     * - 串行执行,幂等(只补 vhash is null)
+     */
+    public Mono<Long> 视频补充vhash() {
+        long start = System.currentTimeMillis();
+        DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+        return client.sql("select * from T_BASE_FILE where IS_DELETED = '0' and type like 'video%' and (vhash is null)")
+                .mapProperties(BaseFile.class)
+                .all()
+                .publishOn(Schedulers.fromExecutor(r.getBean(ThreadPoolTaskExecutor.class)))
+                .concatMap(entity -> {
+                    String absolutePath = entity.getAbsolutePath();
+                    String[] hashes = VideoFrameHashService.frameHashes(absolutePath, VideoFrameHashService.DEFAULT_FRAMES);
+                    if (hashes == null || hashes.length == 0) {
+                        // 打"已尝试"标记(vhash 空串 + 帧数 0):避免坏文件/超时文件在后续回填中被无限重试
+                        log.warn("[视频补充vhash] 抽帧失败, 标记跳过: id={}", entity.getId());
+                        entity.setVhash("");
+                        entity.setVhashFrames(0);
+                        return PostgresqlService.getBean().template().update(entity);
+                    }
+                    entity.setVhash(VideoFrameHashService.join(hashes));
+                    entity.setVhashFrames(hashes.length);
+                    return PostgresqlService.getBean().template().update(entity);
+                })
+                .count()
+                .map(count -> {
+                    log.info("[视频补充vhash] 完成 {} 个, 耗时 {} ms", count, (System.currentTimeMillis() - start));
+                    return count;
+                });
+    }
+
+    /**
+     * 图片相似分组(页面"相似"选项用):按 phash 汉明距离聚类,给每组打 similar_group 标签
+     * - 并查集:10000 张图约 5000 万次比对,Java 侧毫秒级~秒级
+     * - 组标签取锚点图的 phash(组内唯一);退化指纹(全黑等)不参与
+     * - 全量重算:先清空旧标签再写入(阈值调整后重跑即可)
+     */
+    public Mono<Long> 图片补充相似分组() {
+        long start = System.currentTimeMillis();
+        final int THRESHOLD = 10;   // 汉明距离阈值,与前端 find-similar 默认一致
+        return Mono.fromCallable(() -> {
+            DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+            List<Map<String, Object>> rows = client.sql("""
+                            select id, phash from T_BASE_FILE
+                            where IS_DELETED = '0' and type like 'image%' and phash is not null
+                              and bit_count(('x'||phash)::bit(64)) between 8 and 56
+                            """)
+                    .fetch().all().collectList().block();
+            int n = rows == null ? 0 : rows.size();
+            if (n == 0) return 0L;
+
+            long[] ids = new long[n];
+            long[] hashes = new long[n];
+            for (int i = 0; i < n; i++) {
+                Map<String, Object> row = rows.get(i);
+                ids[i] = ((Number) row.get("id")).longValue();
+                hashes[i] = Long.parseUnsignedLong((String) row.get("phash"), 16);
+            }
+
+            // 并查集
+            int[] parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    if (Long.bitCount(hashes[i] ^ hashes[j]) <= THRESHOLD) {
+                        int ri = find(parent, i);
+                        int rj = find(parent, j);
+                        if (ri != rj) parent[rj] = ri;
+                    }
+                }
+            }
+
+            // 归组:仅保留成员数 >= 2 的组
+            Map<Integer, List<Long>> groups = new HashMap<>();
+            for (int i = 0; i < n; i++) {
+                groups.computeIfAbsent(find(parent, i), k -> new ArrayList<>()).add(ids[i]);
+            }
+
+            // 先清空旧标签
+            client.sql("update t_base_file set similar_group = null where similar_group is not null")
+                    .fetch().rowsUpdated().block();
+
+            long groupCount = 0;
+            for (Map.Entry<Integer, List<Long>> e : groups.entrySet()) {
+                List<Long> memberIds = e.getValue();
+                if (memberIds.size() < 2) continue;
+                String label = "ph:" + String.format("%016x", hashes[e.getKey()]);
+                String inList = memberIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+                client.sql("update t_base_file set similar_group = :label where id in (" + inList + ")")
+                        .bind("label", label)
+                        .fetch().rowsUpdated().block();
+                groupCount++;
+            }
+            return groupCount;
+        })
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnNext(c -> log.info("[图片补充相似分组] 完成 {} 组, 耗时 {} ms", c, (System.currentTimeMillis() - start)));
+    }
+
+    private static int find(int[] parent, int i) {
+        while (parent[i] != i) {
+            parent[i] = parent[parent[i]];
+            i = parent[i];
+        }
+        return i;
+    }
+
+    /**
+     * 视频相似分组(页面"视频相似"选项用):按多帧指纹命中聚类,给每组打 video_similar_group 标签
+     * - 判据:两视频对应帧汉明距离 ≤8 的帧数 ≥ max(4, ceil(较短帧数 × 0.6))
+     * - 并查集:3000 个视频约 460 万对 × 12 帧 ≈ 5500 万次位比较,Java 侧约 1~3 秒
+     * - 仅对有 vhash(多帧指纹)的视频生效;全量重算(先清旧标签)
+     */
+    public Mono<Long> 视频补充相似分组() {
+        long start = System.currentTimeMillis();
+        final int FRAME_THRESHOLD = 8;
+        return Mono.fromCallable(() -> {
+            DatabaseClient client = PostgresqlService.getBean().template().getDatabaseClient();
+            List<Map<String, Object>> rows = client.sql("""
+                            select id, vhash from T_BASE_FILE
+                            where IS_DELETED = '0' and type like 'video%' and vhash is not null and vhash <> ''
+                            """)
+                    .fetch().all().collectList().block();
+            int n = rows == null ? 0 : rows.size();
+            if (n == 0) return 0L;
+
+            long[] ids = new long[n];
+            long[][] hashes = new long[n][];
+            for (int i = 0; i < n; i++) {
+                Map<String, Object> row = rows.get(i);
+                ids[i] = ((Number) row.get("id")).longValue();
+                String[] parts = ((String) row.get("vhash")).split(",");
+                long[] hs = new long[parts.length];
+                for (int k = 0; k < parts.length; k++) {
+                    hs[k] = Long.parseUnsignedLong(parts[k].trim(), 16);
+                }
+                hashes[i] = hs;
+            }
+
+            int[] parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    int len = Math.min(hashes[i].length, hashes[j].length);
+                    if (len < 4) continue;                    // 帧数太少不参与
+                    int required = Math.max(4, (int) Math.ceil(len * 0.6));
+                    int hits = 0;
+                    for (int k = 0; k < len && hits < required; k++) {
+                        if (Long.bitCount(hashes[i][k] ^ hashes[j][k]) <= FRAME_THRESHOLD) hits++;
+                    }
+                    if (hits >= required) {
+                        int ri = find(parent, i);
+                        int rj = find(parent, j);
+                        if (ri != rj) parent[rj] = ri;
+                    }
+                }
+            }
+
+            Map<Integer, List<Long>> groups = new HashMap<>();
+            for (int i = 0; i < n; i++) {
+                groups.computeIfAbsent(find(parent, i), k -> new ArrayList<>()).add(ids[i]);
+            }
+
+            client.sql("update t_base_file set video_similar_group = null where video_similar_group is not null")
+                    .fetch().rowsUpdated().block();
+
+            long groupCount = 0;
+            for (Map.Entry<Integer, List<Long>> e : groups.entrySet()) {
+                List<Long> memberIds = e.getValue();
+                if (memberIds.size() < 2) continue;
+                String label = "vh:" + ids[e.getKey()];
+                String inList = memberIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+                client.sql("update t_base_file set video_similar_group = :label where id in (" + inList + ")")
+                        .bind("label", label)
+                        .fetch().rowsUpdated().block();
+                groupCount++;
+            }
+            return groupCount;
+        })
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnNext(c -> log.info("[视频补充相似分组] 完成 {} 组, 耗时 {} ms", c, (System.currentTimeMillis() - start)));
     }
 
     @NotNull

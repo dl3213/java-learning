@@ -636,6 +636,18 @@ object r {
         return offsetDateTime.toLocalDateTime()
     }
 
+    /**
+     * 将秒级时间戳（Unix timestamp in seconds）转换为 LocalDateTime
+     * 用于处理 Steam API 等返回的秒级时间戳
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun seconds2localDateTime(seconds: Long?, zoneId: ZoneId = ZoneOffset.UTC): LocalDateTime? {
+        if (seconds == null) return null
+        val instant = Instant.ofEpochSecond(seconds)
+        return instant.atZone(zoneId).toLocalDateTime()
+    }
+
     @JvmStatic
     fun str2localDateTime(str: String?, formatter: String?): LocalDateTime? {
         try {

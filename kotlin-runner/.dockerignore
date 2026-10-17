@@ -1,3 +1,4 @@
-# 只保留构建产物目录，其余一律不进构建上下文（需 BuildKit，Docker 23+ 默认启用）
+# 只保留构建产物目录 + 启动脚本，其余一律不进构建上下文（需 BuildKit，Docker 23+ 默认启用）
 **
 !target/kotlin-runner/**
+!docker-entrypoint.sh

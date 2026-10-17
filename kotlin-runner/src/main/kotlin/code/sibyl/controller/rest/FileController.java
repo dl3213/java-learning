@@ -13,6 +13,7 @@ import code.sibyl.service.FileService;
 import code.sibyl.service.FileUploadService;
 import code.sibyl.service.ImageHashService;
 import code.sibyl.service.ImageSimilarityService;
+import code.sibyl.service.VideoFrameHashService;
 import code.sibyl.service.sql.PostgresqlService;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -48,6 +52,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -756,6 +761,114 @@ public class FileController {
                 });
     }
 
+    /**
+     * 相似视频搜索(初筛):以视频封面帧的 pHash 指纹在全库视频中比对
+     *
+     * GET /api/rest/v1/file/similar-by-vhash/{id}?threshold=10&limit=20
+     *  - 指纹来源:thumbnail 缩略图,回退 {absolutePath}.jpg;未回填时现场计算(不落库)
+     *  - 抗转码/分辨率变化;首帧带水印时精度有限(后续可升级多帧指纹方案 B)
+     */
+    @GetMapping(value = "/similar-by-vhash/{id}")
+    @ResponseBody
+    public Mono<Response> similarByVhash(@PathVariable Long id,
+                                         @RequestParam(defaultValue = "10") int threshold,
+                                         @RequestParam(defaultValue = "20") int limit) {
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .flatMap(entity -> {
+                    String stored = entity.getVphash();
+                    Mono<String> targetMono = StringUtils.isNotBlank(stored)
+                            ? Mono.just(stored)
+                            : Mono.fromCallable(() -> {
+                                String thumb = ImageHashService.thumbnailPath(entity.getThumbnail(), entity.getAbsolutePath());
+                                return thumb == null ? null : ImageHashService.pHash(thumb);
+                            }).subscribeOn(Schedulers.boundedElastic());
+                    return targetMono.flatMap(target -> {
+                        if (StringUtils.isBlank(target)) {
+                            Response resp = Response.success(new ArrayList<>());
+                            resp.put("msg", "目标视频无可用封面指纹");
+                            return Mono.just(resp);
+                        }
+                        return ImageSimilarityService.getBean().searchByVphash(id, target, threshold, limit)
+                                .map(list -> {
+                                    Response resp = Response.success(list);
+                                    resp.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                                    resp.put("threshold", threshold);
+                                    return resp;
+                                });
+                    });
+                });
+    }
+
+    /**
+     * 相似视频搜索(方案 B:多帧指纹,抗水印/转码)
+     *
+     * GET /api/rest/v1/file/similar-by-vhash-frames/{id}?frameThreshold=8&minHits=8&limit=20
+     *  - 目标视频有 vhash 直接比对;没有则现场抽 12 帧计算(较慢,几秒)
+     *  - 抽帧不可用(非视频/时长读不出)时回退封面指纹方案,响应 mode=vphash
+     *  - 命中判据:对应帧汉明距离 ≤ frameThreshold 的帧数 ≥ minHits
+     */
+    @GetMapping(value = "/similar-by-vhash-frames/{id}")
+    @ResponseBody
+    public Mono<Response> similarByVhashFrames(@PathVariable Long id,
+                                               @RequestParam(defaultValue = "8") int frameThreshold,
+                                               @RequestParam(defaultValue = "8") int minHits,
+                                               @RequestParam(defaultValue = "20") int limit) {
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .flatMap(entity -> {
+                    String stored = entity.getVhash();
+                    Mono<String> targetMono = StringUtils.isNotBlank(stored)
+                            ? Mono.just(stored)
+                            : Mono.fromCallable(() -> VideoFrameHashService.join(
+                                    VideoFrameHashService.frameHashes(
+                                            entity.getAbsolutePath(), VideoFrameHashService.DEFAULT_FRAMES)))
+                                    .subscribeOn(Schedulers.boundedElastic());
+                    return targetMono.flatMap(target -> {
+                        if (StringUtils.isBlank(target)) {
+                            // 抽帧不可用 → 回退封面指纹方案
+                            return fallbackVphashSearch(entity, id, limit);
+                        }
+                        return ImageSimilarityService.getBean()
+                                .searchByVhashFrames(id, target, frameThreshold, minHits, limit)
+                                .map(list -> {
+                                    Response resp = Response.success(list);
+                                    resp.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                                    resp.put("mode", "frames");
+                                    resp.put("frameThreshold", frameThreshold);
+                                    resp.put("minHits", minHits);
+                                    return resp;
+                                });
+                    });
+                });
+    }
+
+    /** 回退检索:封面指纹(vphash),响应标记 mode=vphash */
+    private Mono<Response> fallbackVphashSearch(BaseFile entity, Long id, int limit) {
+        String stored = entity.getVphash();
+        Mono<String> targetMono = StringUtils.isNotBlank(stored)
+                ? Mono.just(stored)
+                : Mono.fromCallable(() -> {
+                    String thumb = ImageHashService.thumbnailPath(entity.getThumbnail(), entity.getAbsolutePath());
+                    return thumb == null ? null : ImageHashService.pHash(thumb);
+                }).subscribeOn(Schedulers.boundedElastic());
+        return targetMono.flatMap(t -> {
+            if (StringUtils.isBlank(t)) {
+                Response resp = Response.success(new ArrayList<>());
+                resp.put("msg", "目标视频无可用指纹(抽帧与封面均失败)");
+                resp.put("mode", "none");
+                return Mono.just(resp);
+            }
+            return ImageSimilarityService.getBean().searchByVphash(id, t, 10, limit)
+                    .map(list -> {
+                        Response resp = Response.success(list);
+                        resp.put("prevUrl", r.staticFileBasePath.replace("**", ""));
+                        resp.put("mode", "vphash");
+                        return resp;
+                    });
+        });
+    }
+
 
     /**
      * 获取所有不重复的code值（来源标识）
@@ -790,6 +903,45 @@ public class FileController {
                 .map(e -> e.get("type"))
                 .collectList()
                 .map(list -> Response.success(list));
+    }
+
+    /**
+     * 文件下载:流式返回原文件,并把文件名设为文件属性的真实文件名
+     *
+     * 前端用法:location.href = apiUrl + '/api/rest/v1/file/download/' + id
+     *  - 文件名优先 realName(原始文件名),回退 fileName / 磁盘文件名
+     *  - 中文名按 RFC 5987(filename*=UTF-8'')编码,浏览器另存后即为真实文件名
+     *  - 返回 application/octet-stream + attachment,浏览器直接下载而不是预览
+     */
+    @GetMapping(value = "/download/{id}")
+    @ResponseBody
+    public Mono<ResponseEntity<Resource>> download(@PathVariable Long id) {
+        return PostgresqlService.getBean().template()
+                .selectOne(Query.query(Criteria.where("id").is(id)), BaseFile.class)
+                .map(this::toDownloadResponse)
+                .switchIfEmpty(Mono.defer(() -> Mono.just(downloadNotFound())));
+    }
+
+    private ResponseEntity<Resource> toDownloadResponse(BaseFile entity) {
+        File file = new File(entity.getAbsolutePath());
+        if (!file.exists() || !file.isFile()) {
+            log.warn("[file/download] 源文件不存在: {}", entity.getAbsolutePath());
+            return downloadNotFound();
+        }
+        String fileName = StringUtils.isNotBlank(entity.getRealName()) ? entity.getRealName()
+                : (StringUtils.isNotBlank(entity.getFileName()) ? entity.getFileName() : file.getName());
+        ContentDisposition disposition = ContentDisposition.attachment()
+                .filename(fileName, StandardCharsets.UTF_8)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                .contentLength(file.length())
+                .body(new FileSystemResource(file));
+    }
+
+    private ResponseEntity<Resource> downloadNotFound() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PostMapping(value = "/video/copy")
